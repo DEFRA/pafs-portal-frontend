@@ -6,7 +6,7 @@ export function buildNavigation(request) {
       current: request?.path === '/'
     },
     {
-      text: 'About',
+      text: 'About me',
       href: '/about',
       current: request?.path === '/about'
     }
