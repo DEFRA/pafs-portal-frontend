@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import nunjucks from 'nunjucks'
 import hapiVision from '@hapi/vision'
 import { fileURLToPath } from 'node:url'
@@ -46,10 +46,10 @@ export const nunjucksConfig = {
   }
 }
 
-Object.entries(globals).forEach(([name, global]) => {
+for (const [name, global] of Object.entries(globals)) {
   nunjucksEnvironment.addGlobal(name, global)
-})
+}
 
-Object.entries(filters).forEach(([name, filter]) => {
+for (const [name, filter] of Object.entries(filters)) {
   nunjucksEnvironment.addFilter(name, filter)
-})
+}
