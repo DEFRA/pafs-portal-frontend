@@ -219,6 +219,38 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  backendApi: {
+    url: {
+      doc: 'Backend API base URL',
+      format: 'url',
+      default: 'http://localhost:3001',
+      env: 'BACKEND_API_URL'
+    },
+    timeout: {
+      doc: 'Backend API request timeout in milliseconds',
+      format: Number,
+      default: 10000,
+      env: 'BACKEND_API_TIMEOUT'
+    },
+    healthCheckEnabled: {
+      doc: 'Enable backend API health check on startup',
+      format: Boolean,
+      default: true,
+      env: 'BACKEND_API_HEALTH_CHECK_ENABLED'
+    },
+    healthCheckRetries: {
+      doc: 'Number of retries for backend health check',
+      format: Number,
+      default: 3,
+      env: 'BACKEND_API_HEALTH_CHECK_RETRIES'
+    },
+    healthCheckInterval: {
+      doc: 'Interval between health check retries in milliseconds',
+      format: Number,
+      default: 2000,
+      env: 'BACKEND_API_HEALTH_CHECK_INTERVAL'
+    }
   }
 })
 
