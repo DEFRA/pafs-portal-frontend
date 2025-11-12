@@ -1,7 +1,5 @@
-// TODO move this out of src
-
 import { fileURLToPath } from 'node:url'
-import path from 'path'
+import path from 'node:path'
 import nunjucks from 'nunjucks'
 import { load } from 'cheerio'
 import { camelCase } from 'lodash'
@@ -22,13 +20,13 @@ const nunjucksTestEnv = nunjucks.configure(
   }
 )
 
-Object.entries(globals).forEach(([name, global]) => {
+for (const [name, global] of Object.entries(globals)) {
   nunjucksTestEnv.addGlobal(name, global)
-})
+}
 
-Object.entries(filters).forEach(([name, filter]) => {
+for (const [name, filter] of Object.entries(filters)) {
   nunjucksTestEnv.addFilter(name, filter)
-})
+}
 
 export function renderComponent(componentName, params, callBlock) {
   const macroPath = `${componentName}/macro.njk`
