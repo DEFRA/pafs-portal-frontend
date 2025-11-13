@@ -19,12 +19,26 @@
     homepageUrl: "https://www.gov.uk/",
     classes: "app-header",
     containerClasses: "govuk-width-container",
-    serviceName: serviceName,
     serviceUrl: serviceUrl,
-    useTudorCrown: true
+    useTudorCrown: true,
+    navigation: [
+      {
+        text: "Signed in as: " + (data.userName or "Admin User")
+      },
+      {
+        href: "/switch-to-user-journey",
+        text: "Switch to User journey"
+      },
+      {
+        href: "/signout",
+        text: "Sign out"
+      }
+    ]
   }) }}
 
   {{ govukServiceNavigation({
+    serviceName: serviceName,
+    serviceUrl: serviceUrl,
     navigation: navigation
   }) }}
 {% endblock %}
@@ -46,6 +60,7 @@
 {% block footer %}
   {{ govukFooter({
     meta: {
+      html: '<p class="govuk-body">Contact the Defra IT Service Desk on  <a href="tel:0800 8766458" class="govuk-footer__link">0800 8766458</a> or email <a href="email:pafs-support@environment-agency.gov.uk" class="govuk-footer__link">pafs-support@environment-agency.gov.uk</a></p>',
       items: [
         {
           href: "https://www.gov.uk/help/privacy-notice",
@@ -57,7 +72,7 @@
         },
         {
           href: "https://www.gov.uk/help/accessibility-statement",
-          text: "Accessibility statement"
+          text: "Accessibility"
         }
       ]
     }

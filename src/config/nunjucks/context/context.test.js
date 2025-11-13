@@ -51,16 +51,21 @@ describe('context and cache', () => {
           navigation: [
             {
               current: true,
-              text: 'Home',
+              text: 'Your proposals',
               href: '/'
             },
             {
               current: false,
-              text: 'About',
-              href: '/about'
+              text: 'Download All',
+              href: '/download'
+            },
+            {
+              current: false,
+              text: 'Archive',
+              href: '/archive'
             }
           ],
-          serviceName: 'pafs-portal-frontend',
+          serviceName: 'Submit a flood risk management proposal',
           serviceUrl: '/'
         })
       })
@@ -92,6 +97,7 @@ describe('context and cache', () => {
       beforeEach(() => {
         mockReadFileSync.mockReturnValue(new Error('File not found'))
 
+        // Call context to trigger the error logging
         contextImport.context(mockRequest)
       })
 
@@ -141,16 +147,21 @@ describe('context and cache', () => {
           navigation: [
             {
               current: true,
-              text: 'Home',
+              text: 'Your proposals',
               href: '/'
             },
             {
               current: false,
-              text: 'About',
-              href: '/about'
+              text: 'Download All',
+              href: '/download'
+            },
+            {
+              current: false,
+              text: 'Archive',
+              href: '/archive'
             }
           ],
-          serviceName: 'pafs-portal-frontend',
+          serviceName: 'Submit a flood risk management proposal',
           serviceUrl: '/'
         })
       })
