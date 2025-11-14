@@ -1,5 +1,5 @@
 export const archiveController = {
-  handler(request, h) {
+  handler(_request, h) {
     return h.view('archive/index.njk', { title: 'Archive', heading: 'Archive' })
   }
 }
