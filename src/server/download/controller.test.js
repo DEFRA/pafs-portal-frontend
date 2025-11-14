@@ -16,7 +16,7 @@ describe('#downloadController', () => {
   test('Should provide expected response', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/'
+      url: '/download'
     })
 
     expect(result).toEqual(expect.stringContaining('Download'))

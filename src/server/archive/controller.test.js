@@ -16,7 +16,7 @@ describe('#archiveController', () => {
   test('Should provide expected response', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/'
+      url: '/archive'
     })
 
     expect(result).toEqual(expect.stringContaining('Archive'))
