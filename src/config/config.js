@@ -44,7 +44,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: 'pafs-portal-frontend'
+    default: 'Submit a flood risk management proposal'
   },
   root: {
     doc: 'Project root',

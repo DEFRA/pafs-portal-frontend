@@ -1,7 +1,7 @@
 import { createServer } from '../server.js'
 import { statusCodes } from '../common/constants/status-codes.js'
 
-describe('#homeController', () => {
+describe('#archiveController', () => {
   let server
 
   beforeAll(async () => {
@@ -16,10 +16,10 @@ describe('#homeController', () => {
   test('Should provide expected response', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/'
+      url: '/archive'
     })
 
-    expect(result).toEqual(expect.stringContaining('Project Proposals |'))
+    expect(result).toEqual(expect.stringContaining('Archive'))
     expect(statusCode).toBe(statusCodes.ok)
   })
 })

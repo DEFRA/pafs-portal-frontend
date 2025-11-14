@@ -23,7 +23,9 @@ describe('#errors', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('Page not found | pafs-portal-frontend')
+      expect.stringContaining(
+        'Page not found | Submit a flood risk management proposal'
+      )
     )
     expect(statusCode).toBe(statusCodes.notFound)
   })

@@ -6,7 +6,7 @@ import { homeController } from './controller.js'
  */
 export const home = {
   plugin: {
-    name: 'home',
+    name: 'Project Proposals',
     register(server) {
       server.route([
         {

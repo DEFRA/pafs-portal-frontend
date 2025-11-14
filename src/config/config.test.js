@@ -78,7 +78,9 @@ describe('Configuration', () => {
 
   describe('Application metadata', () => {
     test('Should have service name', () => {
-      expect(config.get('serviceName')).toBe('pafs-portal-frontend')
+      expect(config.get('serviceName')).toBe(
+        'Submit a flood risk management proposal'
+      )
     })
 
     test('Should have asset path', () => {
