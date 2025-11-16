@@ -11,13 +11,58 @@ describe('#buildNavigation', () => {
     ).toEqual([
       {
         current: false,
-        text: 'Home',
+        text: 'Your proposals',
         href: '/'
       },
       {
         current: false,
-        text: 'About',
-        href: '/about'
+        text: 'Download All',
+        href: '/download'
+      },
+      {
+        current: false,
+        text: 'Archive',
+        href: '/archive'
+      }
+    ])
+  })
+
+  test('Should provide expected highlighted navigation details for Download', () => {
+    expect(buildNavigation(mockRequest({ path: '/download' }))).toEqual([
+      {
+        current: false,
+        text: 'Your proposals',
+        href: '/'
+      },
+      {
+        current: true,
+        text: 'Download All',
+        href: '/download'
+      },
+      {
+        current: false,
+        text: 'Archive',
+        href: '/archive'
+      }
+    ])
+  })
+
+  test('Should provide expected highlighted navigation details for Archive', () => {
+    expect(buildNavigation(mockRequest({ path: '/archive' }))).toEqual([
+      {
+        current: false,
+        text: 'Your proposals',
+        href: '/'
+      },
+      {
+        current: false,
+        text: 'Download All',
+        href: '/download'
+      },
+      {
+        current: true,
+        text: 'Archive',
+        href: '/archive'
       }
     ])
   })
@@ -26,13 +71,18 @@ describe('#buildNavigation', () => {
     expect(buildNavigation(mockRequest({ path: '/' }))).toEqual([
       {
         current: true,
-        text: 'Home',
+        text: 'Your proposals',
         href: '/'
       },
       {
         current: false,
-        text: 'About',
-        href: '/about'
+        text: 'Download All',
+        href: '/download'
+      },
+      {
+        current: false,
+        text: 'Archive',
+        href: '/archive'
       }
     ])
   })
