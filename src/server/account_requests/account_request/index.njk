@@ -1,31 +1,29 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ title }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ __('accountRequest.index.heading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
-  <h1 class="govuk-heading-xl">{{ title }}</h1>
+  <h1 class="govuk-heading-xl">{{ __('accountRequest.index.heading') }}</h1>
 
   <p class="govuk-body">
-    You can request an account if you work for a risk management authority or an
-    Environment Agency team.
+    {{ __('accountRequest.index.introParagraph') }}
   </p>
 
-  <h2 class="govuk-heading-m">Before you start</h2>
+  <h2 class="govuk-heading-m">{{ __('accountRequest.index.beforeYouStartHeading') }}</h2>
 
-  <p class="govuk-body">You will need to provide:</p>
+  <p class="govuk-body">{{ __('accountRequest.index.beforeYouStartIntro') }}</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>your name and contact details</li>
-    <li>your organisation and job title</li>
-    <li>your area of responsibility</li>
+    <li>{{ __('accountRequest.index.bullet1') }}</li>
+    <li>{{ __('accountRequest.index.bullet2') }}</li>
+    <li>{{ __('accountRequest.index.bullet3') }}</li>
   </ul>
 
   <p class="govuk-body">
-    Your account request will be reviewed and you will be notified by email once it
-    has been approved.
+    {{ __('accountRequest.index.reviewStatement') }}
   </p>
 
   <a href="#" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
-    Start now
+    {{ __('accountRequest.index.startButton') }}
     <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
       <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"/>
     </svg>

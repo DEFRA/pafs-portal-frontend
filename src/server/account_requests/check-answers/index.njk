@@ -1,19 +1,19 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ title }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ __('accountRequest.checkAnswers.personalDetailsHeading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-    <a href="#" class="govuk-back-link">Back</a>
+    <a href="#" class="govuk-back-link">{{ __('accountRequest.back') }}</a>
 
-    <h1 class="govuk-heading-xl">{{ title }}</h1>
+    <h1 class="govuk-heading-xl">{{ __('accountRequest.checkAnswers.heading') }}</h1>
 
     <div class="govuk-summary-list__row">
-      <h2 class="govuk-heading-m govuk-summary-list__key">Personal details</h2>
+      <h2 class="govuk-heading-m govuk-summary-list__key">{{ __('accountRequest.checkAnswers.personalDetailsHeading') }}</h2>
       <dd class="govuk-summary-list__actions">
         <a class="govuk-link" href="#">
-          Change<span class="govuk-visually-hidden"> personal details</span>
+          {{ __('accountRequest.checkAnswers.changePersonalDetailsLink') }}<span class="govuk-visually-hidden"> {{ __('accountRequest.checkAnswers.personalDetailsHeading') }}</span>
         </a>
       </dd>
     </div>
@@ -21,7 +21,7 @@
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          First name
+          {{ __('accountRequest.details.firstNameLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           jonh doe
@@ -30,7 +30,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          Last name
+          {{ __('accountRequest.details.lastNameLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           doe
@@ -39,7 +39,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          Email address
+          {{ __('accountRequest.details.emailAddressLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           modfdf@abcmd.com
@@ -48,7 +48,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          Telephone number
+          {{ __('accountRequest.details.telephoneNumberLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           +443322332233
@@ -57,7 +57,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          Organisation
+          {{ __('accountRequest.details.organisationLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           Cdddddd
@@ -66,7 +66,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          Job title
+          {{ __('accountRequest.details.jobTitleLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           2344
@@ -75,49 +75,49 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          Responsibility
+          {{ __('accountRequest.checkAnswers.responsibilityLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          Environment Agency Area
+          {{ __('accountRequest.checkAnswers.responsibilityValue') }}
         </dd>
       </div>
     </dl>
 
-    <h2 class="govuk-heading-m">Area selection</h2>
+    <h2 class="govuk-heading-m">{{ __('accountRequest.checkAnswers.areaSelectionHeading') }}</h2>
 
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          Main EA area
+          {{ __('accountRequest.eaMainArea.mainEaAreaLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          Environment Agency – Area Programme Team
+          {{ __('accountRequest.checkAnswers.mainEaAreaValue') }}
         </dd>
         <dd class="govuk-summary-list__actions">
           <a class="govuk-link" href="#">
-            Change<span class="govuk-visually-hidden"> main EA area</span>
+            {{ __('accountRequest.checkAnswers.changeMainEaAreaLink') }}<span class="govuk-visually-hidden"> {{ __('accountRequest.eaMainArea.mainEaAreaLabel') }}</span>
           </a>
         </dd>
       </div>
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          Additional EA areas
+          {{ __('accountRequest.eaAdditionalAreas.introText') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          Anglian<br>North West
+          {{ __('accountRequest.eaAdditionalAreas.anglianOption') }}<br>{{ __('accountRequest.eaAdditionalAreas.northWestOption') }}
         </dd>
         <dd class="govuk-summary-list__actions">
           <a class="govuk-link" href="#">
-            Change<span class="govuk-visually-hidden"> additional EA areas</span>
+            {{ __('accountRequest.checkAnswers.changeAdditionalEaAreasLink') }}<span class="govuk-visually-hidden"> {{ __('accountRequest.eaAdditionalAreas.introText') }}</span>
           </a>
         </dd>
       </div>
     </dl>
 
-    <p class="govuk-body">By submitting this request you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
+    <p class="govuk-body">{{ __('accountRequest.checkAnswers.confirmationText') }}</p>
 
-    <button class="govuk-button" data-module="govuk-button">Confirm and send</button>
+    <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.checkAnswers.confirmAndSendButton') }}</button>
     </div>
   </div>
 {% endblock %}

@@ -1,21 +1,21 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ title }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ __('accountRequest.eaMainArea.heading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
-  <a href="#" class="govuk-back-link">Back</a>
+  <a href="#" class="govuk-back-link">{{ __('accountRequest.back') }}</a>
 
-  <h1 class="govuk-heading-l">{{ title }}</h1>
+  <h1 class="govuk-heading-l">{{ __('accountRequest.eaMainArea.heading') }}</h1>
 
   <div class="govuk-form-group">
     <label class="govuk-label govuk-label--m" for="main-ea-area">
-      Main EA area
+      {{ __('accountRequest.eaMainArea.mainEaAreaLabel') }}
     </label>
     <div id="main-ea-area-hint" class="govuk-hint">
-      This will be your primary area
+      {{ __('accountRequest.eaMainArea.mainEaAreaHint') }}
     </div>
     <select class="govuk-select" id="main-ea-area" name="mainEaArea">
-      <option value="">Select an area</option>
+      <option value="">{{ __('accountRequest.eaMainArea.selectAnAreaOption') }}</option>
       <option value="wessex">Wessex</option>
       <option value="thames">Thames</option>
       <option value="anglian">Anglian</option>
@@ -26,5 +26,5 @@
     </select>
   </div>
 
-  <button class="govuk-button" data-module="govuk-button">Continue</button>
+  <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.eaMainArea.continueButton') }}</button>
 {% endblock %}

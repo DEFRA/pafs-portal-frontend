@@ -1,17 +1,17 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ title }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ __('accountRequest.eaAdditionalAreas.heading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
-  <a href="#" class="govuk-back-link">Back</a>
+  <a href="#" class="govuk-back-link">{{ __('accountRequest.back') }}</a>
 
-  <h1 class="govuk-heading-l">{{ title }}</h1>
+  <h1 class="govuk-heading-l">{{ __('accountRequest.eaAdditionalAreas.heading') }}</h1>
 
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
         <h1 class="govuk-body">
-          Select any additional EA areas you should have access to (optional).
+          {{ __('accountRequest.eaAdditionalAreas.introText') }}
         </h1>
       </legend>
       <div class="govuk-checkboxes" data-module="govuk-checkboxes">
@@ -61,5 +61,5 @@
     </fieldset>
   </div>
 
-  <button class="govuk-button" data-module="govuk-button">Continue</button>
+  <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.eaAdditionalAreas.continueButton') }}</button>
 {% endblock %}

@@ -3,110 +3,106 @@
 {% block pageTitle %}{{ title }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
-  <a href="#" class="govuk-back-link">Back</a>
+  <a href="#" class="govuk-back-link">{{ __('accountRequest.back') }}</a>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       
 
 
-  <h1 class="govuk-heading-xl">{{ title }}</h1>
+  <h1 class="govuk-heading-xl">{{ __('accountRequest.details.heading') }}</h1>
 
   <p class="govuk-body">
-    You can request an account if you work for a risk management authority or an
-    Environment Agency team. We will use the information you provide to verify your
-    request for an account.
+    {{ __('accountRequest.details.introParagraph') }}
   </p>
 
   <div class="govuk-form-group">
-    <label class="govuk-label" for="first-name">First name</label>
+    <label class="govuk-label" for="first-name">{{ __('accountRequest.details.firstNameLabel') }}</label>
     <input class="govuk-input govuk-!-width-two-thirds" id="first-name" name="firstName" type="text" spellcheck="false" autocomplete="given-name">
   </div>
 
   <div class="govuk-form-group">
-    <label class="govuk-label" for="last-name">Last name</label>
+    <label class="govuk-label" for="last-name">{{ __('accountRequest.details.lastNameLabel') }}</label>
     <input class="govuk-input govuk-!-width-two-thirds" id="last-name" name="lastName" type="text" spellcheck="false" autocomplete="family-name">
   </div>
 
   <div class="govuk-form-group">
-    <label class="govuk-label" for="email-address">Email address</label>
+    <label class="govuk-label" for="email-address">{{ __('accountRequest.details.emailAddressLabel') }}</label>
     <input class="govuk-input govuk-!-width-two-thirds" id="email-address" name="emailAddress" type="email" spellcheck="false" autocomplete="email">
   </div>
 
   <div class="govuk-form-group">
-    <label class="govuk-label" for="telephone-number">Telephone number</label>
+    <label class="govuk-label" for="telephone-number">{{ __('accountRequest.details.telephoneNumberLabel') }}</label>
     <input class="govuk-input govuk-!-width-two-thirds" id="telephone-number" name="telephoneNumber" type="tel" autocomplete="tel">
   </div>
 
   <div class="govuk-form-group">
-    <label class="govuk-label" for="organisation">Organisation</label>
+    <label class="govuk-label" for="organisation">{{ __('accountRequest.details.organisationLabel') }}</label>
     <input class="govuk-input govuk-!-width-two-thirds" id="organisation" name="organisation" type="text">
   </div>
 
   <div class="govuk-form-group">
-    <label class="govuk-label" for="job-title">Job title</label>
+    <label class="govuk-label" for="job-title">{{ __('accountRequest.details.jobTitleLabel') }}</label>
     <input class="govuk-input govuk-!-width-two-thirds" id="job-title" name="jobTitle" type="text">
   </div>
 
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        <h1 class="govuk-fieldset__heading">What is your responsibility?</h1>
+        <h1 class="govuk-fieldset__heading">{{ __('accountRequest.details.responsibilityQuestion') }}</h1>
       </legend>
       <div class="govuk-radios" data-module="govuk-radios">
         <div class="govuk-radios__item">
           <input class="govuk-radios__input" id="responsibility-1" name="responsibility" type="radio" value="environment-agency-area-programme-team" checked>
           <label class="govuk-label govuk-radios__label" for="responsibility-1">
-            Environment Agency – Area Programme Team
+            {{ __('accountRequest.details.eaAreaProgrammeTeam') }}
           </label>
           <div id="responsibility-1-item-hint" class="govuk-hint govuk-radios__hint">
-            Allows you to view all records created within the boundary of your Area.
+            {{ __('accountRequest.details.eaAreaProgrammeTeamHint') }}
           </div>
         </div>
         <div class="govuk-radios__item">
           <input class="govuk-radios__input" id="responsibility-2" name="responsibility" type="radio" value="environment-agency-partnership-strategic-overview-team">
           <label class="govuk-label govuk-radios__label" for="responsibility-2">
-            Environment Agency – Partnership & Strategic Overview Team
+            {{ __('accountRequest.details.eaPartnershipStrategicOverviewTeam') }}
           </label>
           <div id="responsibility-2-item-hint" class="govuk-hint govuk-radios__hint">
-            Allows you to view and edit all records created within the boundary
-            of your team
+            {{ __('accountRequest.details.eaPartnershipStrategicOverviewTeamHint') }}
           </div>
         </div>
         <div class="govuk-radios__item">
           <input class="govuk-radios__input" id="responsibility-3" name="responsibility" type="radio" value="risk-management-authority">
           <label class="govuk-label govuk-radios__label" for="responsibility-3">
-            Risk Management Authority (RMA)
+            {{ __('accountRequest.details.riskManagementAuthority') }}
           </label>
           <div id="responsibility-3-item-hint" class="govuk-hint govuk-radios__hint">
-            Allows you to create, edit, and view all records created within the
-            boundary of your RMA.
+            {{ __('accountRequest.details.riskManagementAuthorityHint') }}
           </div>
         </div>
       </div>
     </fieldset>
   </div>
 
-  <h2 class="govuk-heading-m">Privacy Policy</h2>
-  <p class="govuk-body">Details of our Personal Information Charter can be found at <a href="https://www.gov.uk/government/organisations/environment-agency/about/personal-information-charter" class="govuk-link">https://www.gov.uk/government/organisations/environment-agency/about/personal-information-charter</a></p>
+  <h2 class="govuk-heading-m">{{ __('accountRequest.details.privacyPolicyHeading') }}</h2>
+  <p class="govuk-body">{{ __('accountRequest.details.privacyPolicyIntro') }}<a href="{{ __('accountRequest.details.privacyPolicyLink') }}" class="govuk-link">{{ __('accountRequest.details.privacyPolicyLink') }}</a></p>
 
   <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
-        What of my data is being collected and how is it used? What is the legal basis for the processing?
+        {{ __('accountRequest.details.dataCollectedQuestion') }}
       </span>
     </summary>
     <div class="govuk-details__text">
-      <p class="govuk-body govuk-!-font-weight-bold">Personal data is collected to:</p>
+      <p class="govuk-body govuk-!-font-weight-bold">{{ __('accountRequest.details.dataCollectedHeading') }}</p>
 
           <ul class="govuk-list govuk-list--bullet">
-            <li>Verify that you are eligible for an account</li>
-            <li>Ensure your account is set up with the correct access permissions</li>
-            <li>Allow us to contact you if your request is unclear</li>
-            <li>Your contact details will be used to manage your proposal, including contacting you with queries and updates</li>
+            <li>{{ __('accountRequest.details.dataCollectedBullet1') }}</li>
+            <li>{{ __('accountRequest.details.dataCollectedBullet2') }}</li>
+            <li>{{ __('accountRequest.details.dataCollectedBullet3') }}</li>
+            <li>{{ __('accountRequest.details.dataCollectedBullet4') }}</li>
           </ul>
 
           <p class="govuk-body">
-            Processing is necessary for the performance of a task carried out in the public interest or in the exercise of official authority vested in the data controller to enable Risk Management Authorities to bid for central government Grant in Aid funding.
+            {{ __('accountRequest.details.dataCollectedStatement') }}
           </p>
     </div>
   </details>
@@ -114,48 +110,48 @@
   <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
-        Who will my data be shared with?
+        {{ __('accountRequest.details.dataSharedQuestion') }}
       </span>
     </summary>
     <div class="govuk-details__text">
-          <p class="govuk-body">Your personal data will not be shared or disclosed to any other party outside the Environment Agency without your explicit consent.</p>
+          <p class="govuk-body">{{ __('accountRequest.details.dataSharedAnswer') }}</p>
         </div>
   </details>
 
   <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
-        Will my data be transferred outside of the EEA? If it will, how will it be protected?
+        {{ __('accountRequest.details.dataTransferredQuestion') }}
       </span>
     </summary>
     <div class="govuk-details__text">
-          <p class="govuk-body">The data you provide will not be transferred outside the European Economic Area.</p>
+          <p class="govuk-body">{{ __('accountRequest.details.dataTransferredAnswer') }}</p>
         </div>
   </details>
 
   <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
-        How long will my data be held for?
+        {{ __('accountRequest.details.dataHeldQuestion') }}
       </span>
     </summary>
      <div class="govuk-details__text">
-          <p class="govuk-body">Your personal data will be kept by us for as long as you require access to the service</p>
+          <p class="govuk-body">{{ __('accountRequest.details.dataHeldAnswer') }}</p>
         </div>
   </details>
 
   <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
-        Will my data be used for automated decision-making or profiling?
+        {{ __('accountRequest.details.automatedDecisionMakingQuestion') }}
       </span>
     </summary>
      <div class="govuk-details__text">
-          <p class="govuk-body">The information you provide is not connected with individual decision making (making a decision solely by automated means without any human involvement) or profiling (automated processing of personal data to evaluate certain things about an individual).</p>
+          <p class="govuk-body">{{ __('accountRequest.details.automatedDecisionMakingAnswer') }}</p>
         </div>
   </details>
 
-  <button class="govuk-button" data-module="govuk-button">Continue</button>
+  <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.details.continueButton') }}</button>
       </div>
   </div>
 {% endblock %}

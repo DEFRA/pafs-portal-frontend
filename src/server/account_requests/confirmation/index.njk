@@ -1,45 +1,43 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ title }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ __('accountRequest.confirmation.panelTitle') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
     <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
   <div class="govuk-panel govuk-panel--confirmation">
     <h1 class="govuk-panel__title">
-      Request submitted
+      {{ __('accountRequest.confirmation.panelTitle') }}
     </h1>
     <div class="govuk-panel__body">
-      Your account request is being reviewed
+      {{ __('accountRequest.confirmation.panelBody') }}
     </div>
   </div>
 
-  <h2 class="govuk-heading-m">What happens next</h2>
+  <h2 class="govuk-heading-m">{{ __('accountRequest.confirmation.whatHappensNextHeading') }}</h2>
 
   <p class="govuk-body">
-    Your account request has been submitted for review by an administrator.
+    {{ __('accountRequest.confirmation.whatHappensNextPara1') }}
   </p>
   <p class="govuk-body">
-    Once your account has been approved, you will receive an email with a link to
-    set your account password and start using the service.
+    {{ __('accountRequest.confirmation.whatHappensNextPara2') }}
   </p>
 
   <div class="govuk-inset-text">
-    Account approval usually takes 1-2 working days. You will be notified by
-    email once your account has been reviewed.
+    {{ __('accountRequest.confirmation.insetBoxText') }}
   </div>
 
-  <h2 class="govuk-heading-m">What you need to do</h2>
+  <h2 class="govuk-heading-m">{{ __('accountRequest.confirmation.whatYouNeedToDoHeading') }}</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>Wait for the approval email from the administrator</li>
-    <li>Check your spam folder if you do not receive an email within 2 working days</li>
-    <li>Once approved, use the link in the email to set your password</li>
-    <li>Sign in to the service</li>
+    <li>{{ __('accountRequest.confirmation.bullet1') }}</li>
+    <li>{{ __('accountRequest.confirmation.bullet2') }}</li>
+    <li>{{ __('accountRequest.confirmation.bullet3') }}</li>
+    <li>{{ __('accountRequest.confirmation.bullet4') }}</li>
   </ul>
 
   <p class="govuk-body">
-    <a href="#" class="govuk-link">Return to sign in</a>
+    <a href="#" class="govuk-link">{{ __('accountRequest.confirmation.returnToSignInLink') }}</a>
   </p>
   </div>
   </div>
