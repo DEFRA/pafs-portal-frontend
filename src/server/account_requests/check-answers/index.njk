@@ -1,0 +1,123 @@
+{% extends 'layouts/page.njk' %}
+
+{% block pageTitle %}{{ title }} | {{ serviceName }}{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+    <a href="#" class="govuk-back-link">Back</a>
+
+    <h1 class="govuk-heading-xl">{{ title }}</h1>
+
+    <div class="govuk-summary-list__row">
+      <h2 class="govuk-heading-m govuk-summary-list__key">Personal details</h2>
+      <dd class="govuk-summary-list__actions">
+        <a class="govuk-link" href="#">
+          Change<span class="govuk-visually-hidden"> personal details</span>
+        </a>
+      </dd>
+    </div>
+
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          First name
+        </dt>
+        <dd class="govuk-summary-list__value">
+          jonh doe
+        </dd>
+      </div>
+
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Last name
+        </dt>
+        <dd class="govuk-summary-list__value">
+          doe
+        </dd>
+      </div>
+
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Email address
+        </dt>
+        <dd class="govuk-summary-list__value">
+          modfdf@abcmd.com
+        </dd>
+      </div>
+
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Telephone number
+        </dt>
+        <dd class="govuk-summary-list__value">
+          +443322332233
+        </dd>
+      </div>
+
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Organisation
+        </dt>
+        <dd class="govuk-summary-list__value">
+          Cdddddd
+        </dd>
+      </div>
+
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Job title
+        </dt>
+        <dd class="govuk-summary-list__value">
+          2344
+        </dd>
+      </div>
+
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Responsibility
+        </dt>
+        <dd class="govuk-summary-list__value">
+          Environment Agency Area
+        </dd>
+      </div>
+    </dl>
+
+    <h2 class="govuk-heading-m">Area selection</h2>
+
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Main EA area
+        </dt>
+        <dd class="govuk-summary-list__value">
+          Environment Agency – Area Programme Team
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <a class="govuk-link" href="#">
+            Change<span class="govuk-visually-hidden"> main EA area</span>
+          </a>
+        </dd>
+      </div>
+
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Additional EA areas
+        </dt>
+        <dd class="govuk-summary-list__value">
+          Anglian<br>North West
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <a class="govuk-link" href="#">
+            Change<span class="govuk-visually-hidden"> additional EA areas</span>
+          </a>
+        </dd>
+      </div>
+    </dl>
+
+    <p class="govuk-body">By submitting this request you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
+
+    <button class="govuk-button" data-module="govuk-button">Confirm and send</button>
+    </div>
+  </div>
+{% endblock %}

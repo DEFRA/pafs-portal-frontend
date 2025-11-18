@@ -1,0 +1,30 @@
+{% extends 'layouts/page.njk' %}
+
+{% block pageTitle %}{{ title }} | {{ serviceName }}{% endblock %}
+
+{% block content %}
+  <a href="#" class="govuk-back-link">Back</a>
+
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+
+  <div class="govuk-form-group">
+    <label class="govuk-label govuk-label--m" for="main-ea-area">
+      Main EA area
+    </label>
+    <div id="main-ea-area-hint" class="govuk-hint">
+      This will be your primary area
+    </div>
+    <select class="govuk-select" id="main-ea-area" name="mainEaArea">
+      <option value="">Select an area</option>
+      <option value="wessex">Wessex</option>
+      <option value="thames">Thames</option>
+      <option value="anglian">Anglian</option>
+      <option value="midlands">Midlands</option>
+      <option value="north-west">North West</option>
+      <option value="yorkshire">Yorkshire</option>
+      <option value="north-east">North East</option>
+    </select>
+  </div>
+
+  <button class="govuk-button" data-module="govuk-button">Continue</button>
+{% endblock %}
