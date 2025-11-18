@@ -9,6 +9,11 @@ export const accountRequestEaMainArea = {
           method: 'GET',
           path: '/account_request/ea-main-area',
           ...accountRequestEaMainAreaController
+        },
+        {
+          method: 'POST',
+          path: '/account_request/ea-main-area',
+          ...accountRequestEaMainAreaController
         }
       ])
     }

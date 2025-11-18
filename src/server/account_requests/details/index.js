@@ -9,6 +9,11 @@ export const accountRequestDetails = {
           method: 'GET',
           path: '/account_request/details',
           ...accountRequestDetailsController
+        },
+        {
+          method: 'POST',
+          path: '/account_request/details',
+          ...accountRequestDetailsController
         }
       ])
     }

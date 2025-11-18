@@ -9,6 +9,11 @@ export const accountRequestCheckAnswers = {
           method: 'GET',
           path: '/account_request/check-answers',
           ...accountRequestCheckAnswersController
+        },
+        {
+          method: 'POST',
+          path: '/account_request/check-answers',
+          ...accountRequestCheckAnswersController
         }
       ])
     }

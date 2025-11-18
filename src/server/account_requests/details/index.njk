@@ -1,91 +1,206 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ title }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ __('accountRequest.details.heading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
   <a href="#" class="govuk-back-link">{{ __('accountRequest.back') }}</a>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      
-
-
-  <h1 class="govuk-heading-xl">{{ __('accountRequest.details.heading') }}</h1>
-
-  <p class="govuk-body">
-    {{ __('accountRequest.details.introParagraph') }}
-  </p>
-
-  <div class="govuk-form-group">
-    <label class="govuk-label" for="first-name">{{ __('accountRequest.details.firstNameLabel') }}</label>
-    <input class="govuk-input govuk-!-width-two-thirds" id="first-name" name="firstName" type="text" spellcheck="false" autocomplete="given-name">
-  </div>
-
-  <div class="govuk-form-group">
-    <label class="govuk-label" for="last-name">{{ __('accountRequest.details.lastNameLabel') }}</label>
-    <input class="govuk-input govuk-!-width-two-thirds" id="last-name" name="lastName" type="text" spellcheck="false" autocomplete="family-name">
-  </div>
-
-  <div class="govuk-form-group">
-    <label class="govuk-label" for="email-address">{{ __('accountRequest.details.emailAddressLabel') }}</label>
-    <input class="govuk-input govuk-!-width-two-thirds" id="email-address" name="emailAddress" type="email" spellcheck="false" autocomplete="email">
-  </div>
-
-  <div class="govuk-form-group">
-    <label class="govuk-label" for="telephone-number">{{ __('accountRequest.details.telephoneNumberLabel') }}</label>
-    <input class="govuk-input govuk-!-width-two-thirds" id="telephone-number" name="telephoneNumber" type="tel" autocomplete="tel">
-  </div>
-
-  <div class="govuk-form-group">
-    <label class="govuk-label" for="organisation">{{ __('accountRequest.details.organisationLabel') }}</label>
-    <input class="govuk-input govuk-!-width-two-thirds" id="organisation" name="organisation" type="text">
-  </div>
-
-  <div class="govuk-form-group">
-    <label class="govuk-label" for="job-title">{{ __('accountRequest.details.jobTitleLabel') }}</label>
-    <input class="govuk-input govuk-!-width-two-thirds" id="job-title" name="jobTitle" type="text">
-  </div>
-
-  <div class="govuk-form-group">
-    <fieldset class="govuk-fieldset">
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-        <h1 class="govuk-fieldset__heading">{{ __('accountRequest.details.responsibilityQuestion') }}</h1>
-      </legend>
-      <div class="govuk-radios" data-module="govuk-radios">
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="responsibility-1" name="responsibility" type="radio" value="environment-agency-area-programme-team" checked>
-          <label class="govuk-label govuk-radios__label" for="responsibility-1">
-            {{ __('accountRequest.details.eaAreaProgrammeTeam') }}
-          </label>
-          <div id="responsibility-1-item-hint" class="govuk-hint govuk-radios__hint">
-            {{ __('accountRequest.details.eaAreaProgrammeTeamHint') }}
-          </div>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="responsibility-2" name="responsibility" type="radio" value="environment-agency-partnership-strategic-overview-team">
-          <label class="govuk-label govuk-radios__label" for="responsibility-2">
-            {{ __('accountRequest.details.eaPartnershipStrategicOverviewTeam') }}
-          </label>
-          <div id="responsibility-2-item-hint" class="govuk-hint govuk-radios__hint">
-            {{ __('accountRequest.details.eaPartnershipStrategicOverviewTeamHint') }}
-          </div>
-        </div>
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="responsibility-3" name="responsibility" type="radio" value="risk-management-authority">
-          <label class="govuk-label govuk-radios__label" for="responsibility-3">
-            {{ __('accountRequest.details.riskManagementAuthority') }}
-          </label>
-          <div id="responsibility-3-item-hint" class="govuk-hint govuk-radios__hint">
-            {{ __('accountRequest.details.riskManagementAuthorityHint') }}
-          </div>
+      {% if errorSummary and (errorSummary | length) %}
+      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
+        <h2 class="govuk-error-summary__title" id="error-summary-title">
+          {{ __('accountRequest.details.errorSummaryTitle') }}
+        </h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            {% for item in errorSummary %}
+              <li><a href="{{ item.href }}">{{ item.text }}</a></li>
+            {% endfor %}
+          </ul>
         </div>
       </div>
-    </fieldset>
-  </div>
+      {% endif %}
 
-  <h2 class="govuk-heading-m">{{ __('accountRequest.details.privacyPolicyHeading') }}</h2>
-  <p class="govuk-body">{{ __('accountRequest.details.privacyPolicyIntro') }}<a href="{{ __('accountRequest.details.privacyPolicyLink') }}" class="govuk-link">{{ __('accountRequest.details.privacyPolicyLink') }}</a></p>
+      <form method="post" novalidate>
+        {% if returnTo %}
+        <input type="hidden" name="returnTo" value="{{ returnTo }}">
+        {% endif %}
+        <h1 class="govuk-heading-xl">{{ __('accountRequest.details.heading') }}</h1>
 
-  <details class="govuk-details" data-module="govuk-details">
+        <p class="govuk-body">
+          {{ __('accountRequest.details.introParagraph') }}
+        </p>
+
+        <div class="govuk-form-group {% if errors.firstName %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label" for="first-name">{{ __('accountRequest.details.firstNameLabel') }}</label>
+          {% if errors.firstName %}
+          <p id="first-name-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ errors.firstName }}
+          </p>
+          {% endif %}
+          <input
+            class="govuk-input govuk-!-width-two-thirds {% if errors.firstName %}govuk-input--error{% endif %}"
+            id="first-name"
+            name="firstName"
+            type="text"
+            spellcheck="false"
+            autocomplete="given-name"
+            value="{{ values.firstName | default('') }}"
+          >
+        </div>
+
+        <div class="govuk-form-group {% if errors.lastName %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label" for="last-name">{{ __('accountRequest.details.lastNameLabel') }}</label>
+          {% if errors.lastName %}
+          <p id="last-name-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ errors.lastName }}
+          </p>
+          {% endif %}
+          <input
+            class="govuk-input govuk-!-width-two-thirds {% if errors.lastName %}govuk-input--error{% endif %}"
+            id="last-name"
+            name="lastName"
+            type="text"
+            spellcheck="false"
+            autocomplete="family-name"
+            value="{{ values.lastName | default('') }}"
+          >
+        </div>
+
+        <div class="govuk-form-group {% if errors.emailAddress %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label" for="email-address">{{ __('accountRequest.details.emailAddressLabel') }}</label>
+          {% if errors.emailAddress %}
+          <p id="email-address-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ errors.emailAddress }}
+          </p>
+          {% endif %}
+          <input
+            class="govuk-input govuk-!-width-two-thirds {% if errors.emailAddress %}govuk-input--error{% endif %}"
+            id="email-address"
+            name="emailAddress"
+            type="email"
+            spellcheck="false"
+            autocomplete="email"
+            value="{{ values.emailAddress | default('') }}"
+          >
+        </div>
+
+        <div class="govuk-form-group {% if errors.telephoneNumber %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label" for="telephone-number">{{ __('accountRequest.details.telephoneNumberLabel') }}</label>
+          {% if errors.telephoneNumber %}
+          <p id="telephone-number-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ errors.telephoneNumber }}
+          </p>
+          {% endif %}
+          <input
+            class="govuk-input govuk-!-width-two-thirds {% if errors.telephoneNumber %}govuk-input--error{% endif %}"
+            id="telephone-number"
+            name="telephoneNumber"
+            type="tel"
+            autocomplete="tel"
+            value="{{ values.telephoneNumber | default('') }}"
+          >
+        </div>
+
+        <div class="govuk-form-group {% if errors.organisation %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label" for="organisation">{{ __('accountRequest.details.organisationLabel') }}</label>
+          {% if errors.organisation %}
+          <p id="organisation-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ errors.organisation }}
+          </p>
+          {% endif %}
+          <input
+            class="govuk-input govuk-!-width-two-thirds {% if errors.organisation %}govuk-input--error{% endif %}"
+            id="organisation"
+            name="organisation"
+            type="text"
+            value="{{ values.organisation | default('') }}"
+          >
+        </div>
+
+        <div class="govuk-form-group {% if errors.jobTitle %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label" for="job-title">{{ __('accountRequest.details.jobTitleLabel') }}</label>
+          {% if errors.jobTitle %}
+          <p id="job-title-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ errors.jobTitle }}
+          </p>
+          {% endif %}
+          <input
+            class="govuk-input govuk-!-width-two-thirds {% if errors.jobTitle %}govuk-input--error{% endif %}"
+            id="job-title"
+            name="jobTitle"
+            type="text"
+            value="{{ values.jobTitle | default('') }}"
+          >
+        </div>
+
+        <div class="govuk-form-group {% if errors.responsibility %}govuk-form-group--error{% endif %}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+              <h1 class="govuk-fieldset__heading">{{ __('accountRequest.details.responsibilityQuestion') }}</h1>
+            </legend>
+            {% if errors.responsibility %}
+            <p id="responsibility-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ errors.responsibility }}
+            </p>
+            {% endif %}
+            <div class="govuk-radios" data-module="govuk-radios">
+              <div class="govuk-radios__item">
+                <input
+                  class="govuk-radios__input"
+                  id="responsibility-1"
+                  name="responsibility"
+                  type="radio"
+                  value="environment-agency-area-programme-team"
+                  {% if values.responsibility == 'environment-agency-area-programme-team' %}checked{% endif %}
+                >
+                <label class="govuk-label govuk-radios__label" for="responsibility-1">
+                  {{ __('accountRequest.details.eaAreaProgrammeTeam') }}
+                </label>
+                <div id="responsibility-1-item-hint" class="govuk-hint govuk-radios__hint">
+                  {{ __('accountRequest.details.eaAreaProgrammeTeamHint') }}
+                </div>
+              </div>
+              <div class="govuk-radios__item">
+                <input
+                  class="govuk-radios__input"
+                  id="responsibility-2"
+                  name="responsibility"
+                  type="radio"
+                  value="environment-agency-partnership-strategic-overview-team"
+                  {% if values.responsibility == 'environment-agency-partnership-strategic-overview-team' %}checked{% endif %}
+                >
+                <label class="govuk-label govuk-radios__label" for="responsibility-2">
+                  {{ __('accountRequest.details.eaPartnershipStrategicOverviewTeam') }}
+                </label>
+                <div id="responsibility-2-item-hint" class="govuk-hint govuk-radios__hint">
+                  {{ __('accountRequest.details.eaPartnershipStrategicOverviewTeamHint') }}
+                </div>
+              </div>
+              <div class="govuk-radios__item">
+                <input
+                  class="govuk-radios__input"
+                  id="responsibility-3"
+                  name="responsibility"
+                  type="radio"
+                  value="risk-management-authority"
+                  {% if values.responsibility == 'risk-management-authority' %}checked{% endif %}
+                >
+                <label class="govuk-label govuk-radios__label" for="responsibility-3">
+                  {{ __('accountRequest.details.riskManagementAuthority') }}
+                </label>
+                <div id="responsibility-3-item-hint" class="govuk-hint govuk-radios__hint">
+                  {{ __('accountRequest.details.riskManagementAuthorityHint') }}
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <h2 class="govuk-heading-m">{{ __('accountRequest.details.privacyPolicyHeading') }}</h2>
+        <p class="govuk-body">{{ __('accountRequest.details.privacyPolicyIntro') }}<a href="{{ __('accountRequest.details.privacyPolicyLink') }}" class="govuk-link">{{ __('accountRequest.details.privacyPolicyLink') }}</a></p>
+
+        <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
         {{ __('accountRequest.details.dataCollectedQuestion') }}
@@ -105,9 +220,9 @@
             {{ __('accountRequest.details.dataCollectedStatement') }}
           </p>
     </div>
-  </details>
+        </details>
 
-  <details class="govuk-details" data-module="govuk-details">
+        <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
         {{ __('accountRequest.details.dataSharedQuestion') }}
@@ -116,9 +231,9 @@
     <div class="govuk-details__text">
           <p class="govuk-body">{{ __('accountRequest.details.dataSharedAnswer') }}</p>
         </div>
-  </details>
+        </details>
 
-  <details class="govuk-details" data-module="govuk-details">
+        <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
         {{ __('accountRequest.details.dataTransferredQuestion') }}
@@ -127,9 +242,9 @@
     <div class="govuk-details__text">
           <p class="govuk-body">{{ __('accountRequest.details.dataTransferredAnswer') }}</p>
         </div>
-  </details>
+        </details>
 
-  <details class="govuk-details" data-module="govuk-details">
+        <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
         {{ __('accountRequest.details.dataHeldQuestion') }}
@@ -149,9 +264,10 @@
      <div class="govuk-details__text">
           <p class="govuk-body">{{ __('accountRequest.details.automatedDecisionMakingAnswer') }}</p>
         </div>
-  </details>
+        </details>
 
-  <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.details.continueButton') }}</button>
+        <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.details.continueButton') }}</button>
+      </form>
       </div>
   </div>
 {% endblock %}

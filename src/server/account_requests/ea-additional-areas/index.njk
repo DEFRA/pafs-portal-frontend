@@ -14,52 +14,109 @@
           {{ __('accountRequest.eaAdditionalAreas.introText') }}
         </h1>
       </legend>
-      <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="additional-ea-areas-1" name="additionalEaAreas" type="checkbox" value="wessex">
-          <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-1">
-            Wessex
-          </label>
+      <form method="post" novalidate>
+        {% if returnTo %}
+        <input type="hidden" name="returnTo" value="{{ returnTo }}">
+        {% endif %}
+
+        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+          <div class="govuk-checkboxes__item">
+            <input
+              class="govuk-checkboxes__input"
+              id="additional-ea-areas-1"
+              name="additionalEaAreas"
+              type="checkbox"
+              value="wessex"
+              {% if 'wessex' in (values.additionalEaAreas or []) %}checked{% endif %}
+            >
+            <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-1">
+              Wessex
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input
+              class="govuk-checkboxes__input"
+              id="additional-ea-areas-2"
+              name="additionalEaAreas"
+              type="checkbox"
+              value="thames"
+              {% if 'thames' in (values.additionalEaAreas or []) %}checked{% endif %}
+            >
+            <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-2">
+              Thames
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input
+              class="govuk-checkboxes__input"
+              id="additional-ea-areas-3"
+              name="additionalEaAreas"
+              type="checkbox"
+              value="anglian"
+              {% if 'anglian' in (values.additionalEaAreas or []) %}checked{% endif %}
+            >
+            <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-3">
+              Anglian
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input
+              class="govuk-checkboxes__input"
+              id="additional-ea-areas-4"
+              name="additionalEaAreas"
+              type="checkbox"
+              value="midlands"
+              {% if 'midlands' in (values.additionalEaAreas or []) %}checked{% endif %}
+            >
+            <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-4">
+              Midlands
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input
+              class="govuk-checkboxes__input"
+              id="additional-ea-areas-5"
+              name="additionalEaAreas"
+              type="checkbox"
+              value="north-west"
+              {% if 'north-west' in (values.additionalEaAreas or []) %}checked{% endif %}
+            >
+            <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-5">
+              North West
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input
+              class="govuk-checkboxes__input"
+              id="additional-ea-areas-6"
+              name="additionalEaAreas"
+              type="checkbox"
+              value="yorkshire"
+              {% if 'yorkshire' in (values.additionalEaAreas or []) %}checked{% endif %}
+            >
+            <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-6">
+              Yorkshire
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input
+              class="govuk-checkboxes__input"
+              id="additional-ea-areas-7"
+              name="additionalEaAreas"
+              type="checkbox"
+              value="north-east"
+              {% if 'north-east' in (values.additionalEaAreas or []) %}checked{% endif %}
+            >
+            <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-7">
+              North East
+            </label>
+          </div>
         </div>
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="additional-ea-areas-2" name="additionalEaAreas" type="checkbox" value="thames">
-          <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-2">
-            Thames
-          </label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="additional-ea-areas-3" name="additionalEaAreas" type="checkbox" value="anglian" checked>
-          <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-3">
-            Anglian
-          </label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="additional-ea-areas-4" name="additionalEaAreas" type="checkbox" value="midlands">
-          <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-4">
-            Midlands
-          </label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="additional-ea-areas-5" name="additionalEaAreas" type="checkbox" value="north-west" checked>
-          <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-5">
-            North West
-          </label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="additional-ea-areas-6" name="additionalEaAreas" type="checkbox" value="yorkshire">
-          <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-6">
-            Yorkshire
-          </label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="additional-ea-areas-7" name="additionalEaAreas" type="checkbox" value="north-east">
-          <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-7">
-            North East
-          </label>
-        </div>
-      </div>
+
+        <button class="govuk-button" data-module="govuk-button">
+          {{ __('accountRequest.eaAdditionalAreas.continueButton') }}
+        </button>
+      </form>
     </fieldset>
   </div>
-
-  <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.eaAdditionalAreas.continueButton') }}</button>
 {% endblock %}

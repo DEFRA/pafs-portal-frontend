@@ -46,14 +46,28 @@
       "automatedDecisionMakingQuestion": "Will my data be used for automated decision-making or profiling?",
       "automatedDecisionMakingAnswer": "The information you provide is not connected with individual decision making (making a decision solely by automated means without any human involvement) or profiling (automated processing of personal data to evaluate certain things about an individual).",
       "continueButton": "Continue",
-      "dataCollectedHeading": "Personal data is collected to:"
+      "dataCollectedHeading": "Personal data is collected to:",
+      "errorSummaryTitle": "There is a problem",
+      "errors": {
+        "firstNameRequired": "Tell us your first name",
+        "lastNameRequired": "Tell us your last name",
+        "emailAddressRequired": "Enter your email address",
+        "emailAddressInvalid": "Enter an email address in the correct format, like name@example.com",
+        "telephoneNumberRequired": "Enter your telephone number",
+        "organisationRequired": "Enter your organisation",
+        "jobTitleRequired": "Enter your job title",
+        "responsibilityRequired": "Select your responsibility area"
+      }
     },
     "eaMainArea": {
       "heading": "Select main EA area",
       "mainEaAreaLabel": "Main EA area",
       "mainEaAreaHint": "This will be your primary area",
       "selectAnAreaOption": "Select an area",
-      "continueButton": "Continue"
+      "continueButton": "Continue",
+      "errors": {
+        "mainEaAreaRequired": "Select a main EA area"
+      }
     },
     "eaAdditionalAreas": {
       "heading": "Select additional EA areas",

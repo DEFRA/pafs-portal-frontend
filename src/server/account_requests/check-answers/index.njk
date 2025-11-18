@@ -1,6 +1,6 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ __('accountRequest.checkAnswers.personalDetailsHeading') }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ __('accountRequest.checkAnswers.heading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -12,7 +12,7 @@
     <div class="govuk-summary-list__row">
       <h2 class="govuk-heading-m govuk-summary-list__key">{{ __('accountRequest.checkAnswers.personalDetailsHeading') }}</h2>
       <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="#">
+        <a class="govuk-link" href="/account_request/details?from=check-answers">
           {{ __('accountRequest.checkAnswers.changePersonalDetailsLink') }}<span class="govuk-visually-hidden"> {{ __('accountRequest.checkAnswers.personalDetailsHeading') }}</span>
         </a>
       </dd>
@@ -24,7 +24,7 @@
           {{ __('accountRequest.details.firstNameLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          jonh doe
+          {{ details.firstName }}
         </dd>
       </div>
 
@@ -33,7 +33,7 @@
           {{ __('accountRequest.details.lastNameLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          doe
+          {{ details.lastName }}
         </dd>
       </div>
 
@@ -42,7 +42,7 @@
           {{ __('accountRequest.details.emailAddressLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          modfdf@abcmd.com
+          {{ details.emailAddress }}
         </dd>
       </div>
 
@@ -51,7 +51,7 @@
           {{ __('accountRequest.details.telephoneNumberLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          +443322332233
+          {{ details.telephoneNumber }}
         </dd>
       </div>
 
@@ -60,7 +60,7 @@
           {{ __('accountRequest.details.organisationLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          Cdddddd
+          {{ details.organisation }}
         </dd>
       </div>
 
@@ -69,7 +69,7 @@
           {{ __('accountRequest.details.jobTitleLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          2344
+          {{ details.jobTitle }}
         </dd>
       </div>
 
@@ -78,7 +78,7 @@
           {{ __('accountRequest.checkAnswers.responsibilityLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          {{ __('accountRequest.checkAnswers.responsibilityValue') }}
+          {{ responsibilityValue }}
         </dd>
       </div>
     </dl>
@@ -91,10 +91,10 @@
           {{ __('accountRequest.eaMainArea.mainEaAreaLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          {{ __('accountRequest.checkAnswers.mainEaAreaValue') }}
+          {{ mainEaAreaValue }}
         </dd>
         <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="#">
+          <a class="govuk-link" href="/account_request/ea-main-area?from=check-answers">
             {{ __('accountRequest.checkAnswers.changeMainEaAreaLink') }}<span class="govuk-visually-hidden"> {{ __('accountRequest.eaMainArea.mainEaAreaLabel') }}</span>
           </a>
         </dd>
@@ -105,10 +105,12 @@
           {{ __('accountRequest.eaAdditionalAreas.introText') }}
         </dt>
         <dd class="govuk-summary-list__value">
-          {{ __('accountRequest.eaAdditionalAreas.anglianOption') }}<br>{{ __('accountRequest.eaAdditionalAreas.northWestOption') }}
+          {% for area in additionalAreasLabels %}
+            {{ area }}{% if not loop.last %}<br>{% endif %}
+          {% endfor %}
         </dd>
         <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="#">
+          <a class="govuk-link" href="/account_request/ea-additional-areas?from=check-answers">
             {{ __('accountRequest.checkAnswers.changeAdditionalEaAreasLink') }}<span class="govuk-visually-hidden"> {{ __('accountRequest.eaAdditionalAreas.introText') }}</span>
           </a>
         </dd>
@@ -117,7 +119,9 @@
 
     <p class="govuk-body">{{ __('accountRequest.checkAnswers.confirmationText') }}</p>
 
-    <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.checkAnswers.confirmAndSendButton') }}</button>
+    <form method="post" novalidate>
+      <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.checkAnswers.confirmAndSendButton') }}</button>
+    </form>
     </div>
   </div>
 {% endblock %}
