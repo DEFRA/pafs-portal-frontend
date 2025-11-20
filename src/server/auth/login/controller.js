@@ -58,19 +58,20 @@ class LoginController {
           'string.email': 'email-invalid',
           'any.required': 'email-required'
         }),
-      password: Joi.string()
-        .required()
-        .messages({
-          'string.empty': 'password-required',
-          'any.required': 'password-required'
-        })
+      password: Joi.string().required().messages({
+        'string.empty': 'password-required',
+        'any.required': 'password-required'
+      })
     })
 
-    const { error } = schema.validate({ email, password }, { abortEarly: false })
+    const { error } = schema.validate(
+      { email, password },
+      { abortEarly: false }
+    )
 
     if (error) {
       // Return all validation errors as an array
-      return { errors: error.details.map(detail => detail.message) }
+      return { errors: error.details.map((detail) => detail.message) }
     }
 
     return { errors: null }
