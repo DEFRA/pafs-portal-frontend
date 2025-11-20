@@ -1,11 +1,12 @@
 import { getAuthSession } from '../../common/helpers/auth/session-manager.js'
 import { ROUTES } from '../../common/constants/routes.js'
+import { ADMIN_VIEWS } from '../../common/constants/common.js'
 
 class JourneySelectionController {
   get(request, h) {
     const session = getAuthSession(request)
 
-    return h.view('admin/journey-selection/index', {
+    return h.view(ADMIN_VIEWS.JOURNEY_SELECTION, {
       pageTitle: request.t('common.journey_selection'),
       user: session?.user
     })

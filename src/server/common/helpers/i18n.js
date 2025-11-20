@@ -4,8 +4,8 @@ import { dirname, join } from 'node:path'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { createLogger } from './logging/logger.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const fileName = fileURLToPath(import.meta.url)
+const dirName = dirname(fileName)
 const logger = createLogger()
 
 /**
@@ -13,13 +13,11 @@ const logger = createLogger()
  * Provides internationalization support for the application
  */
 class I18nService {
-  constructor() {
-    this.i18n = null
-    this.defaultLocale = 'en'
-    this.supportedLocales = ['en']
-    this.fallbackLocale = 'en'
-    this.initialized = false
-  }
+  i18n = null
+  defaultLocale = 'en'
+  supportedLocales = ['en']
+  fallbackLocale = 'en'
+  initialized = false
 
   /**
    * Initialize the i18n service
@@ -39,7 +37,7 @@ class I18nService {
     this.supportedLocales = options.supportedLocales || ['en']
     this.fallbackLocale = options.fallbackLocale || 'en'
 
-    const localesPath = options.localesPath || join(__dirname, '../locales')
+    const localesPath = options.localesPath || join(dirName, '../locales')
 
     try {
       // Load all translation resources

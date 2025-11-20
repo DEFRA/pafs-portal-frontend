@@ -2,13 +2,15 @@ import Joi from 'joi'
 import { login } from '../../common/services/auth/auth-service.js'
 import { setAuthSession } from '../../common/helpers/auth/session-manager.js'
 import { ROUTES } from '../../common/constants/routes.js'
+import { AUTH_VIEWS, LOCAL_KEYS } from '../../common/constants/common.js'
+import { EMAIL } from '../../common/constants/validation.js'
 
 class LoginController {
   get(request, h) {
     const { error } = request.query
 
-    return h.view('auth/login/index', {
-      pageTitle: request.t('common.sign_in'),
+    return h.view(AUTH_VIEWS.LOGIN, {
+      pageTitle: request.t(LOCAL_KEYS.SIGN_IN),
       errorCode: error // Error code from backend or middleware
     })
   }
@@ -18,8 +20,8 @@ class LoginController {
 
     const validation = this.validateInput(email, password, request)
     if (validation.errors) {
-      return h.view('auth/login/index', {
-        pageTitle: request.t('common.sign_in'),
+      return h.view(AUTH_VIEWS.LOGIN, {
+        pageTitle: request.t(LOCAL_KEYS.SIGN_IN),
         validationErrors: validation.errors,
         email: email || ''
       })
@@ -37,19 +39,19 @@ class LoginController {
     } catch (error) {
       request.server.logger.error({ err: error }, 'Login error')
 
-      return h.view('auth/login/index', {
-        pageTitle: request.t('common.sign_in'),
+      return h.view(AUTH_VIEWS.LOGIN, {
+        pageTitle: request.t(LOCAL_KEYS.SIGN_IN),
         errorMessage: request.t('auth.service_error'),
         email: email || ''
       })
     }
   }
 
-  validateInput(email, password, request) {
+  validateInput(email, password, _request) {
     const schema = Joi.object({
       email: Joi.string()
         .email({ tlds: { allow: false } })
-        .max(254)
+        .max(EMAIL.MAX_LENGTH)
         .trim()
         .lowercase()
         .required()
@@ -81,8 +83,8 @@ class LoginController {
     // result.error contains the API response body: { errorCode, warningCode, supportCode }
     const errorData = result.error
 
-    return h.view('auth/login/index', {
-      pageTitle: request.t('common.sign_in'),
+    return h.view(AUTH_VIEWS.LOGIN, {
+      pageTitle: request.t(LOCAL_KEYS.SIGN_IN),
       errorCode: errorData?.errorCode,
       warningCode: errorData?.warningCode,
       supportCode: errorData?.supportCode,

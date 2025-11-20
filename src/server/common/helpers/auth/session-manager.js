@@ -21,7 +21,9 @@ export function clearAuthSession(request) {
 }
 
 export function isSessionExpired(session) {
-  if (!session) return true
+  if (!session) {
+    return true
+  }
 
   const now = Date.now()
   const inactiveTime = now - session.lastActivity
@@ -30,7 +32,9 @@ export function isSessionExpired(session) {
 }
 
 export function shouldRefreshToken(session) {
-  if (!session) return false
+  if (!session) {
+    return false
+  }
 
   const now = Date.now()
   const timeUntilExpiry = session.expiresAt - now
@@ -101,9 +105,11 @@ function parseExpiry(expiresIn) {
   }
 
   const match = expiresIn.match(/^(\d+)([smhd])$/)
-  if (!match) return 15 * 60 * 1000 // Default 15 minutes
+  if (!match) {
+    return SESSION.TOKEN_REFRESH_MS
+  }
 
-  const value = parseInt(match[1])
+  const value = Number.parseInt(match[1])
   const unit = match[2]
 
   const multipliers = {
