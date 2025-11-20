@@ -14,37 +14,70 @@
 {% endblock %}
 
 {% block header %}
-  {# serviceName being used in govukHeader will be @deprecated in v6. It has moved to govukServiceNavigation - https://github.com/alphagov/govuk-frontend/blob/main/CHANGELOG.md#move-service-name-and-navigation-links-from-the-govuk-header-to-service-navigation-component #}
+  {% set headerNav = [] %}
+  {% set isAdminPath = request
+    .path
+    .startsWith('/admin') %}
+  {% set currentServiceName = t('common.service_name_admin')if isAdminPath else 
+    t('common.service_name') %}
+
+  {% if user %}
+    {% set switchLink = '/admin/users' if not isAdminPath else 
+      '/' %}
+    {% set switchText = t('common.switch_to_admin')if not isAdminPath else 
+      t('common.switch_to_user') %}
+
+    {% set headerNav = [
+      {
+        text: t('common.signed_in_as') + " " + (
+        user.firstName + " " + user.lastName if user.firstName else 
+          user.email
+        )
+      }
+    ] %}
+
+    {% if user.admin %}
+      {% set headerNav = headerNav.concat([
+        {
+          href: switchLink,
+          text: switchText
+        }
+      ]) %}
+    {% endif %}
+
+    {% set headerNav = headerNav.concat([
+      {
+        href: "/logout",
+        text: t('common.sign_out')
+      }
+    ]) %}
+  {% endif %}
+
   {{ govukHeader({
     homepageUrl: "https://www.gov.uk/",
     classes: "app-header",
     containerClasses: "govuk-width-container",
-    serviceUrl: serviceUrl,
     useTudorCrown: true,
-    navigation: [
-      {
-        text: "Signed in as: " + (data.userName or "Admin User")
-      },
-      {
-        href: "/switch-to-user-journey",
-        text: "Switch to User journey"
-      },
-      {
-        href: "/signout",
-        text: "Sign out"
-      }
-    ]
+    navigation: headerNav,
+    navigationClasses: "govuk-header__navigation--end",
+    navigationLabel: t('common.header_navigation_label'),
+    navigationId: "profile-nav",
+    menuButtonText: t('common.header_navigation_label'),
+    menuButtonLabel: "Show or hide Profile menu"
   }) }}
 
   {{ govukServiceNavigation({
-    serviceName: serviceName,
+    serviceName: currentServiceName,
     serviceUrl: serviceUrl,
-    navigation: navigation
+    navigation: navigation,
+    menuButtonText: t('common.service_navigation_menu_button_text'),
+    menuButtonLabel: "Show or hide service navigation menu",
+    navigationId: "service-nav"
   }) }}
 {% endblock %}
 
 {% block pageTitle %}
-  {{ pageTitle }} | {{ serviceName }}
+  {{ pageTitle }} | {{ currentServiceName }}
 {% endblock %}
 
 {% block beforeContent %}
@@ -60,19 +93,19 @@
 {% block footer %}
   {{ govukFooter({
     meta: {
-      html: '<p class="govuk-body">Contact the Defra IT Service Desk on  <a href="tel:0800 8766458" class="govuk-footer__link">0800 8766458</a> or email <a href="email:pafs-support@environment-agency.gov.uk" class="govuk-footer__link">pafs-support@environment-agency.gov.uk</a></p>',
+      html: '<p class="govuk-body-s">' + t('common.footer.contact_html') + '</p>',
       items: [
         {
-          href: "https://www.gov.uk/help/privacy-notice",
-          text: "Privacy"
+          href: t('common.footer.links.privacy.url'),
+          text: t('common.footer.links.privacy.text')
         },
         {
-          href: "https://www.gov.uk/help/cookies",
-          text: "Cookies"
+          href: t('common.footer.links.cookies.url'),
+          text: t('common.footer.links.cookies.text')
         },
         {
-          href: "https://www.gov.uk/help/accessibility-statement",
-          text: "Accessibility"
+          href: t('common.footer.links.accessibility.url'),
+          text: t('common.footer.links.accessibility.text')
         }
       ]
     }

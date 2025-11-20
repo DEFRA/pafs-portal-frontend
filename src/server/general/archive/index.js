@@ -1,4 +1,6 @@
 import { archiveController } from './controller.js'
+import { requireAuth } from '../../common/helpers/auth/auth-middleware.js'
+import { ROUTES } from '../../common/constants/routes.js'
 
 export const archive = {
   plugin: {
@@ -7,7 +9,10 @@ export const archive = {
       server.route([
         {
           method: 'GET',
-          path: '/archive',
+          path: ROUTES.GENERAL.ARCHIVE,
+          options: {
+            pre: [{ method: requireAuth }]
+          },
           ...archiveController
         }
       ])

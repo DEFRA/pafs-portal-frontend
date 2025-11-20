@@ -1,4 +1,6 @@
 import { homeController } from './controller.js'
+import { requireAuth } from '../../common/helpers/auth/auth-middleware.js'
+import { ROUTES } from '../../common/constants/routes.js'
 
 /**
  * Sets up the routes used in the home page.
@@ -11,7 +13,10 @@ export const home = {
       server.route([
         {
           method: 'GET',
-          path: '/',
+          path: ROUTES.GENERAL.HOME,
+          options: {
+            pre: [{ method: requireAuth }]
+          },
           ...homeController
         }
       ])

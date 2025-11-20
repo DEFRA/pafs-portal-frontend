@@ -1,9 +1,13 @@
 import inert from '@hapi/inert'
 
-import { home } from './home/index.js'
+import { home } from './general/home/index.js'
 import { health } from './health/index.js'
-import { download } from './download/index.js'
-import { archive } from './archive/index.js'
+import { download } from './general/download/index.js'
+import { archive } from './general/archive/index.js'
+import { login } from './auth/login/index.js'
+import { logout } from './auth/logout/index.js'
+import { users } from './admin/users/index.js'
+import { journeySelection } from './admin/journey-selection/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 
 export const router = {
@@ -15,7 +19,13 @@ export const router = {
       // Health-check route. Used by platform to check if service is running, do not remove!
       await server.register([health])
 
-      // Application specific routes, add your own routes here
+      // Authentication routes
+      await server.register([login, logout])
+
+      // Admin routes
+      await server.register([users, journeySelection])
+
+      // General user routes
       await server.register([home, archive, download])
 
       // Static assets
