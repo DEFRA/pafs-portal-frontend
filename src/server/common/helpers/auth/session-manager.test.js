@@ -277,6 +277,98 @@ describe('Session Manager', () => {
       )
     })
 
+    test('setAuthSession handles string expiresIn formats', () => {
+      const testCases = [
+        { input: '15m', expected: 15 * 60 * 1000 },
+        { input: '1h', expected: 60 * 60 * 1000 },
+        { input: '30s', expected: 30 * 1000 },
+        { input: '1d', expected: 24 * 60 * 60 * 1000 }
+      ]
+
+      testCases.forEach(({ input, expected }) => {
+        const authData = {
+          user: { id: 1 },
+          accessToken: 'token',
+          refreshToken: 'refresh',
+          expiresIn: input
+        }
+
+        setAuthSession(mockRequest, authData)
+
+        const call =
+          mockRequest.yar.set.mock.calls[
+            mockRequest.yar.set.mock.calls.length - 1
+          ]
+        const sessionData = call[1]
+        const expiresAt = sessionData.expiresAt
+        const now = Date.now()
+
+        // Allow 100ms tolerance for test execution time
+        expect(expiresAt).toBeGreaterThanOrEqual(now + expected - 100)
+        expect(expiresAt).toBeLessThanOrEqual(now + expected + 100)
+      })
+    })
+
+    test('setAuthSession handles invalid expiresIn format', () => {
+      const authData = {
+        user: { id: 1 },
+        accessToken: 'token',
+        refreshToken: 'refresh',
+        expiresIn: 'invalid'
+      }
+
+      setAuthSession(mockRequest, authData)
+
+      const call =
+        mockRequest.yar.set.mock.calls[
+          mockRequest.yar.set.mock.calls.length - 1
+        ]
+      const sessionData = call[1]
+      const expiresAt = sessionData.expiresAt
+      const now = Date.now()
+      const defaultExpiry = 15 * 60 * 1000 // Default 15 minutes
+
+      // Should use default expiry
+      expect(expiresAt).toBeGreaterThanOrEqual(now + defaultExpiry - 100)
+      expect(expiresAt).toBeLessThanOrEqual(now + defaultExpiry + 100)
+    })
+
+    test('refreshAuthSession handles missing logger gracefully', async () => {
+      mockRequest.server = undefined
+      mockRequest.yar.get.mockReturnValue({
+        user: { id: 1 },
+        refreshToken: 'refresh123',
+        lastActivity: Date.now()
+      })
+
+      refreshToken.mockResolvedValue({
+        success: true,
+        data: {
+          accessToken: 'newAccess',
+          refreshToken: 'newRefresh',
+          expiresIn: '15m'
+        }
+      })
+
+      const result = await refreshAuthSession(mockRequest)
+
+      expect(result.success).toBe(true)
+    })
+
+    test('updateActivity does nothing if no session exists', () => {
+      mockRequest.yar.get.mockReturnValue(null)
+
+      updateActivity(mockRequest)
+
+      expect(mockRequest.yar.set).not.toHaveBeenCalled()
+    })
+
+    test('clearAuthSession calls yar.reset', () => {
+      clearAuthSession(mockRequest)
+
+      expect(mockRequest.yar.reset).toHaveBeenCalled()
+    })
+
     test('setAuthSession handles string expiresIn', () => {
       const authData = {
         user: { id: 1 },

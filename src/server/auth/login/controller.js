@@ -92,7 +92,7 @@ class LoginController {
 
   redirectAfterLogin(user, h) {
     if (user.admin) {
-      return h.redirect(ROUTES.ADMIN.USERS)
+      return h.redirect(ROUTES.ADMIN.JOURNEY_SELECTION)
     }
     return h.redirect(ROUTES.GENERAL.HOME)
   }

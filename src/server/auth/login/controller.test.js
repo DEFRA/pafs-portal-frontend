@@ -124,7 +124,7 @@ describe('Login Controller', () => {
       expect(mockH.redirect).toHaveBeenCalledWith('/')
     })
 
-    test('redirects admin user to admin page', async () => {
+    test('redirects admin user to journey selection page', async () => {
       mockRequest.payload = { email: 'admin@example.com', password: 'password' }
 
       login.mockResolvedValue({
@@ -138,7 +138,8 @@ describe('Login Controller', () => {
 
       await loginPostController.handler(mockRequest, mockH)
 
-      expect(mockH.redirect).toHaveBeenCalledWith('/admin/users')
+      expect(setAuthSession).toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith('/admin/journey-selection')
     })
   })
 

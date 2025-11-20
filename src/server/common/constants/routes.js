@@ -13,6 +13,7 @@ export const ROUTES = {
 
   // Admin routes
   ADMIN: {
+    JOURNEY_SELECTION: '/admin/journey-selection',
     USERS: '/admin/users',
     PROJECTS: '/admin/projects',
     SUBMISSIONS: '/admin/submissions',

@@ -227,4 +227,167 @@ describe('API Client', () => {
       error: { error: 'Internal server error' }
     })
   })
+
+  test('handles network errors', async () => {
+    global.fetch.mockRejectedValue(new Error('Network failure'))
+
+    await expect(apiRequest('/test')).rejects.toThrow('Network failure')
+  })
+
+  test('handles empty response body', async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      status: 204,
+      json: async () => null
+    })
+
+    const result = await apiRequest('/delete', { method: 'DELETE' })
+
+    expect(result).toEqual({
+      success: true,
+      status: 204,
+      data: null
+    })
+  })
+
+  test('handles malformed JSON response', async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => {
+        throw new SyntaxError('Unexpected token')
+      }
+    })
+
+    await expect(apiRequest('/test')).rejects.toThrow('Unexpected token')
+  })
+
+  test('passes custom headers', async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ success: true })
+    })
+
+    await apiRequest('/test', {
+      headers: {
+        Authorization: 'Bearer token123',
+        'X-Custom-Header': 'value'
+      }
+    })
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer token123',
+          'X-Custom-Header': 'value'
+        })
+      })
+    )
+  })
+
+  test('handles PUT requests', async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ updated: true })
+    })
+
+    await apiRequest('/update', {
+      method: 'PUT',
+      body: JSON.stringify({ name: 'updated' })
+    })
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        method: 'PUT'
+      })
+    )
+  })
+
+  test('handles PATCH requests', async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ patched: true })
+    })
+
+    await apiRequest('/patch', {
+      method: 'PATCH',
+      body: JSON.stringify({ field: 'value' })
+    })
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        method: 'PATCH'
+      })
+    )
+  })
+
+  test('handles 401 unauthorized', async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 401,
+      json: async () => ({ errorCode: 'AUTH_INVALID_CREDENTIALS' })
+    })
+
+    const result = await apiRequest('/secure')
+
+    expect(result).toEqual({
+      success: false,
+      status: 401,
+      error: { errorCode: 'AUTH_INVALID_CREDENTIALS' }
+    })
+  })
+
+  test('handles 403 forbidden', async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 403,
+      json: async () => ({ error: 'Forbidden' })
+    })
+
+    const result = await apiRequest('/admin')
+
+    expect(result).toEqual({
+      success: false,
+      status: 403,
+      error: { error: 'Forbidden' }
+    })
+  })
+
+  test('handles 404 not found', async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 404,
+      json: async () => ({ error: 'Not found' })
+    })
+
+    const result = await apiRequest('/missing')
+
+    expect(result).toEqual({
+      success: false,
+      status: 404,
+      error: { error: 'Not found' }
+    })
+  })
+
+  test('handles 503 service unavailable', async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 503,
+      json: async () => ({ error: 'Service unavailable' })
+    })
+
+    const result = await apiRequest('/test')
+
+    expect(result).toEqual({
+      success: false,
+      status: 503,
+      error: { error: 'Service unavailable' }
+    })
+  })
 })
