@@ -1,0 +1,19 @@
+{% extends "layouts/page.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {{ govukPanel({
+        titleText: t('password-reset.reset_password_success.panel_title'),
+        html: t('password-reset.reset_password_success.panel_text')
+      }) }}
+
+      <p class="govuk-body govuk-!-margin-top-6">
+        <a href="/login" class="govuk-link govuk-!-font-size-19">{{ t('password-reset.reset_password_success.sign_in_link') }}</a>
+      </p>
+
+    </div>
+  </div>
+{% endblock %}

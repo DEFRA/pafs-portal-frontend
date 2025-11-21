@@ -6,6 +6,8 @@ import { download } from './general/download/index.js'
 import { archive } from './general/archive/index.js'
 import { login } from './auth/login/index.js'
 import { logout } from './auth/logout/index.js'
+import { forgotPassword } from './auth/forgot-password/index.js'
+import { resetPassword } from './auth/reset-password/index.js'
 import { users } from './admin/users/index.js'
 import { journeySelection } from './admin/journey-selection/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
@@ -20,7 +22,7 @@ export const router = {
       await server.register([health])
 
       // Authentication routes
-      await server.register([login, logout])
+      await server.register([login, logout, forgotPassword, resetPassword])
 
       // Admin routes
       await server.register([users, journeySelection])

@@ -22,3 +22,24 @@ export async function logout(accessToken) {
     }
   })
 }
+
+export async function forgotPassword(email) {
+  return apiRequest('/api/v1/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email })
+  })
+}
+
+export async function validateResetToken(token) {
+  return apiRequest('/api/v1/auth/validate-reset-token', {
+    method: 'POST',
+    body: JSON.stringify({ token })
+  })
+}
+
+export async function resetPassword(token, newPassword, confirmPassword) {
+  return apiRequest('/api/v1/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ token, password: newPassword, confirmPassword })
+  })
+}
