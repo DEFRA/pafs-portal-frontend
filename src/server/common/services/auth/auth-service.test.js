@@ -1,14 +1,22 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
-import { login, refreshToken, logout } from './auth-service.js'
+import {
+  login,
+  refreshToken,
+  logout,
+  forgotPassword,
+  resetPassword
+} from './auth-service.js'
 
 vi.mock('../../helpers/api-client.js', () => ({
   apiRequest: vi.fn()
 }))
 
-const { apiRequest } = await import('../../helpers/api-client.js')
-
 describe('Auth Service', () => {
-  beforeEach(() => {
+  let apiRequest
+
+  beforeEach(async () => {
+    const apiClient = await import('../../helpers/api-client.js')
+    apiRequest = apiClient.apiRequest
     vi.clearAllMocks()
   })
 
@@ -111,6 +119,154 @@ describe('Auth Service', () => {
       const result = await logout('invalid-token')
 
       expect(result.success).toBe(false)
+    })
+  })
+
+  describe('validateResetToken', () => {
+    it('calls API with token', async () => {
+      const { validateResetToken } = await import('./auth-service.js')
+      const { apiRequest } = await import('../../helpers/api-client.js')
+
+      apiRequest.mockResolvedValue({ success: true })
+
+      const result = await validateResetToken('valid-token-123')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/auth/validate-reset-token',
+        {
+          method: 'POST',
+          body: JSON.stringify({ token: 'valid-token-123' })
+        }
+      )
+      expect(result).toEqual({ success: true })
+    })
+
+    it('handles invalid token', async () => {
+      const { validateResetToken } = await import('./auth-service.js')
+      const { apiRequest } = await import('../../helpers/api-client.js')
+
+      apiRequest.mockResolvedValue({
+        success: false,
+        error: {
+          errorCode: 'AUTH_PASSWORD_RESET_INVALID_TOKEN',
+          message: 'Invalid token'
+        }
+      })
+
+      const result = await validateResetToken('invalid-token')
+
+      expect(result.success).toBe(false)
+      expect(result.error.errorCode).toBe('AUTH_PASSWORD_RESET_INVALID_TOKEN')
+    })
+
+    it('handles expired token', async () => {
+      const { validateResetToken } = await import('./auth-service.js')
+      const { apiRequest } = await import('../../helpers/api-client.js')
+
+      apiRequest.mockResolvedValue({
+        success: false,
+        error: {
+          errorCode: 'AUTH_PASSWORD_RESET_EXPIRED_TOKEN',
+          message: 'Token expired'
+        }
+      })
+
+      const result = await validateResetToken('expired-token')
+
+      expect(result.success).toBe(false)
+      expect(result.error.errorCode).toBe('AUTH_PASSWORD_RESET_EXPIRED_TOKEN')
+    })
+  })
+
+  describe('forgotPassword', () => {
+    test('calls API with email', async () => {
+      const mockResponse = {
+        success: true,
+        data: { message: 'Reset email sent' }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await forgotPassword('test@example.com')
+
+      expect(apiRequest).toHaveBeenCalledWith('/api/v1/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'test@example.com' })
+      })
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('handles API error', async () => {
+      const mockError = {
+        success: false,
+        error: { error: 'Service unavailable' }
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await forgotPassword('test@example.com')
+
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('resetPassword', () => {
+    test('calls API with token and passwords', async () => {
+      const mockResponse = {
+        success: true,
+        data: { message: 'Password reset successful' }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await resetPassword(
+        'token123',
+        'NewPass123!',
+        'NewPass123!'
+      )
+
+      expect(apiRequest).toHaveBeenCalledWith('/api/v1/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({
+          token: 'token123',
+          newPassword: 'NewPass123!',
+          confirmPassword: 'NewPass123!'
+        })
+      })
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('handles invalid token error', async () => {
+      const mockError = {
+        success: false,
+        error: { errorCode: 'AUTH_PASSWORD_RESET_INVALID_TOKEN' }
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await resetPassword(
+        'invalid-token',
+        'NewPass123!',
+        'NewPass123!'
+      )
+
+      expect(result.success).toBe(false)
+      expect(result.error.errorCode).toBe('AUTH_PASSWORD_RESET_INVALID_TOKEN')
+    })
+
+    test('handles password used previously error', async () => {
+      const mockError = {
+        success: false,
+        error: { errorCode: 'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY' }
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await resetPassword(
+        'token123',
+        'OldPass123!',
+        'OldPass123!'
+      )
+
+      expect(result.success).toBe(false)
+      expect(result.error.errorCode).toBe(
+        'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY'
+      )
     })
   })
 })

@@ -1,5 +1,10 @@
 export const AUTH_VIEWS = {
-  LOGIN: 'auth/login/index'
+  LOGIN: 'auth/login/index',
+  FORGOT_PASSWORD: 'auth/forgot-password/index',
+  FORGOT_PASSWORD_REQUEST_CONFIRMATION: 'auth/forgot-password/confirmation',
+  RESET_PASSWORD: 'auth/reset-password/index',
+  RESET_PASSWORD_SUCCESS: 'auth/reset-password/success',
+  RESET_PASSWORD_TOKEN_EXPIRED: 'auth/reset-password/token-expired'
 }
 
 export const ADMIN_VIEWS = {

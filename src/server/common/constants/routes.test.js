@@ -10,6 +10,30 @@ describe('Routes Constants', () => {
     test('LOGOUT route is defined', () => {
       expect(ROUTES.LOGOUT).toBe('/logout')
     })
+
+    test('FORGOT_PASSWORD route is defined', () => {
+      expect(ROUTES.FORGOT_PASSWORD).toBe('/forgot-password')
+    })
+
+    test('FORGOT_PASSWORD_CONFIRMATION route is defined', () => {
+      expect(ROUTES.FORGOT_PASSWORD_CONFIRMATION).toBe(
+        '/forgot-password/confirmation'
+      )
+    })
+
+    test('RESET_PASSWORD route is defined', () => {
+      expect(ROUTES.RESET_PASSWORD).toBe('/reset-password')
+    })
+
+    test('RESET_PASSWORD_SUCCESS route is defined', () => {
+      expect(ROUTES.RESET_PASSWORD_SUCCESS).toBe('/reset-password/success')
+    })
+
+    test('RESET_PASSWORD_TOKEN_EXPIRED route is defined', () => {
+      expect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED).toBe(
+        '/reset-password/token-expired'
+      )
+    })
   })
 
   describe('General user routes', () => {
@@ -64,6 +88,11 @@ describe('Routes Constants', () => {
     test('all auth routes are defined', () => {
       expect(ROUTES).toHaveProperty('LOGIN')
       expect(ROUTES).toHaveProperty('LOGOUT')
+      expect(ROUTES).toHaveProperty('FORGOT_PASSWORD')
+      expect(ROUTES).toHaveProperty('FORGOT_PASSWORD_CONFIRMATION')
+      expect(ROUTES).toHaveProperty('RESET_PASSWORD')
+      expect(ROUTES).toHaveProperty('RESET_PASSWORD_SUCCESS')
+      expect(ROUTES).toHaveProperty('RESET_PASSWORD_TOKEN_EXPIRED')
     })
 
     test('all general routes are defined', () => {

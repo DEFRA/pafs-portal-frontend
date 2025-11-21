@@ -2,6 +2,11 @@ export const ROUTES = {
   // Auth routes
   LOGIN: '/login',
   LOGOUT: '/logout',
+  FORGOT_PASSWORD: '/forgot-password',
+  FORGOT_PASSWORD_CONFIRMATION: '/forgot-password/confirmation',
+  RESET_PASSWORD: '/reset-password',
+  RESET_PASSWORD_SUCCESS: '/reset-password/success',
+  RESET_PASSWORD_TOKEN_EXPIRED: '/reset-password/token-expired',
 
   // General user routes
   GENERAL: {

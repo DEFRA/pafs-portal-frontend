@@ -1,0 +1,39 @@
+{% extends "layouts/page.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-xl">
+        {{ t('password-reset.reset_password_token_expired.heading') }}
+      </h1>
+
+      <p class="govuk-body">
+        {{ t('password-reset.reset_password_token_expired.link_expired') }}
+      </p>
+
+      <p class="govuk-body">
+        {{ t('password-reset.reset_password_token_expired.expiry_reason') }}
+      </p>
+
+      <h2 class="govuk-heading-m">
+        {{ t('password-reset.reset_password_token_expired.what_you_can_do') }}
+      </h2>
+
+      <p class="govuk-body">
+        {{ t('password-reset.reset_password_token_expired.request_new_link') }}
+      </p>
+
+      {{ govukButton({
+        text: t('password-reset.reset_password_token_expired.request_button'),
+        href: "/forgot-password"
+      }) }}
+
+      <p class="govuk-body govuk-!-margin-top-6">
+        <a href="/login" class="govuk-link">{{ t('password-reset.reset_password_token_expired.return_to_sign_in') }}</a>
+      </p>
+
+    </div>
+  </div>
+{% endblock %}
