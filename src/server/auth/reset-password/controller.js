@@ -5,7 +5,7 @@ import {
 } from '../../common/services/auth/auth-service.js'
 import { ROUTES } from '../../common/constants/routes.js'
 import { PASSWORD } from '../../common/constants/validation.js'
-import { AUTH_VIEWS } from '../../common/constants/common.js'
+import { AUTH_VIEWS, PAGE_TITLE } from '../../common/constants/common.js'
 
 class ResetPasswordController {
   async get(request, h) {
@@ -25,7 +25,7 @@ class ResetPasswordController {
       }
 
       return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-        pageTitle: request.t('password-reset.reset_password.title'),
+        pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
         token
       })
     } catch (error) {
@@ -52,7 +52,7 @@ class ResetPasswordController {
     const validation = this.validateInput(newPassword, confirmPassword, request)
     if (validation.errors) {
       return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-        pageTitle: request.t('password-reset.reset_password.title'),
+        pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
         validationErrors: validation.errors,
         token
       })
@@ -72,14 +72,14 @@ class ResetPasswordController {
       request.server.logger.error({ err: error }, 'Reset password error')
 
       return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-        pageTitle: request.t('password-reset.reset_password.title'),
+        pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
         errorMessage: request.t('auth.service_error'),
         token
       })
     }
   }
 
-  validateInput(newPassword, confirmPassword, request) {
+  validateInput(newPassword, confirmPassword, _request) {
     const schema = Joi.object({
       newPassword: Joi.string()
         .min(PASSWORD.MIN_LENGTH)
@@ -137,7 +137,7 @@ class ResetPasswordController {
     // Handle same as current password error
     if (errorData?.errorCode === 'AUTH_PASSWORD_RESET_SAME_AS_CURRENT') {
       return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-        pageTitle: request.t('password-reset.reset_password.title'),
+        pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
         validationErrors: ['password-same-as-current'],
         token
       })
@@ -149,7 +149,7 @@ class ResetPasswordController {
       'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY'
     ) {
       return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-        pageTitle: request.t('password-reset.reset_password.title'),
+        pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
         validationErrors: ['password-used-previously'],
         token
       })
@@ -157,7 +157,7 @@ class ResetPasswordController {
 
     // Generic error
     return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-      pageTitle: request.t('password-reset.reset_password.title'),
+      pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
       errorCode: errorData?.errorCode,
       token
     })
