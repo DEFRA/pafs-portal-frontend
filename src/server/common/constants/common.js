@@ -7,6 +7,6 @@ export const ADMIN_VIEWS = {
   USERS: 'admin/users/index'
 }
 
-export const LOCAL_KEYS = {
+export const LOCALE_KEYS = {
   SIGN_IN: 'common.sign_in'
 }

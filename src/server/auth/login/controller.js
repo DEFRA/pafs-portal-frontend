@@ -2,7 +2,7 @@ import Joi from 'joi'
 import { login } from '../../common/services/auth/auth-service.js'
 import { setAuthSession } from '../../common/helpers/auth/session-manager.js'
 import { ROUTES } from '../../common/constants/routes.js'
-import { AUTH_VIEWS, LOCAL_KEYS } from '../../common/constants/common.js'
+import { AUTH_VIEWS, LOCALE_KEYS } from '../../common/constants/common.js'
 import { EMAIL } from '../../common/constants/validation.js'
 
 class LoginController {
@@ -10,7 +10,7 @@ class LoginController {
     const { error } = request.query
 
     return h.view(AUTH_VIEWS.LOGIN, {
-      pageTitle: request.t(LOCAL_KEYS.SIGN_IN),
+      pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
       errorCode: error // Error code from backend or middleware
     })
   }
@@ -21,7 +21,7 @@ class LoginController {
     const validation = this.validateInput(email, password, request)
     if (validation.errors) {
       return h.view(AUTH_VIEWS.LOGIN, {
-        pageTitle: request.t(LOCAL_KEYS.SIGN_IN),
+        pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
         validationErrors: validation.errors,
         email: email || ''
       })
@@ -40,7 +40,7 @@ class LoginController {
       request.server.logger.error({ err: error }, 'Login error')
 
       return h.view(AUTH_VIEWS.LOGIN, {
-        pageTitle: request.t(LOCAL_KEYS.SIGN_IN),
+        pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
         errorMessage: request.t('auth.service_error'),
         email: email || ''
       })
@@ -84,7 +84,7 @@ class LoginController {
     const errorData = result.error
 
     return h.view(AUTH_VIEWS.LOGIN, {
-      pageTitle: request.t(LOCAL_KEYS.SIGN_IN),
+      pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
       errorCode: errorData?.errorCode,
       warningCode: errorData?.warningCode,
       supportCode: errorData?.supportCode,

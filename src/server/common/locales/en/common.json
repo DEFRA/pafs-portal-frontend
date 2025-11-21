@@ -6,7 +6,6 @@
   "signed_in_as": "Signed in as:",
   "switch_to_admin": "Switch to Admin journey",
   "switch_to_user": "Switch to User journey",
-  "journey_selection": "Select a journey",
   "error_summary_title": "There is a problem",
   "header_navigation_label": "Profile",
   "service_navigation_menu_button_text": "Menu",
@@ -24,6 +23,21 @@
       "heading": "Download"
     },
     "admin": {
+      "journey_selection": {
+        "title": "Which journey would you like to access?",
+        "heading": "Which journey would you like to access?",
+        "context": "As an administrator, you can explore both the general user journey and the admin journey.",
+        "options": {
+          "general_user": {
+            "text": "General user journey",
+            "hint": "Explore the user portal as an RMA, PSO, or EA user"
+          },
+          "admin_user": {
+            "text": "Admin journey",
+            "hint": "Explore the admin portal for managing users, proposals, and organisations"
+          }
+        }
+      },
       "users": {
         "title": "Users",
         "heading": "Users"

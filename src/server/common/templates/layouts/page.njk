@@ -8,6 +8,11 @@
 {% from "heading/macro.njk" import appHeading %}
 
 {% set mainClasses = "app-main-wrapper" %}
+{% set isAdminPath = request
+  .path
+  .startsWith('/admin') %}
+{% set currentServiceName = t('common.service_name_admin')if isAdminPath else 
+  t('common.service_name') %}
 
 {% block head %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
@@ -15,11 +20,6 @@
 
 {% block header %}
   {% set headerNav = [] %}
-  {% set isAdminPath = request
-    .path
-    .startsWith('/admin') %}
-  {% set currentServiceName = t('common.service_name_admin')if isAdminPath else 
-    t('common.service_name') %}
 
   {% if user %}
     {% set switchLink = '/admin/users' if not isAdminPath else 

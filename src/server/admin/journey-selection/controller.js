@@ -7,7 +7,7 @@ class JourneySelectionController {
     const session = getAuthSession(request)
 
     return h.view(ADMIN_VIEWS.JOURNEY_SELECTION, {
-      pageTitle: request.t('common.journey_selection'),
+      pageTitle: request.t('common.pages.admin.journey_selection.title'),
       user: session?.user
     })
   }

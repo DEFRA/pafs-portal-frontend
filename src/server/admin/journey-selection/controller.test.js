@@ -37,7 +37,7 @@ describe('Journey Selection Controller', () => {
       await journeySelectionController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith('admin/journey-selection/index', {
-        pageTitle: 'common.journey_selection',
+        pageTitle: 'common.pages.admin.journey_selection.title',
         user: { id: 1, admin: true }
       })
     })

@@ -5,8 +5,6 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      
-      <h1 class="govuk-heading-xl">Select a journey</h1>
 
       <form action="/admin/journey-selection" method="post">
 
@@ -14,19 +12,29 @@
           name: "journey",
           fieldset: {
             legend: {
-              text: "What would you like to do?",
-              classes: "govuk-fieldset__legend--m"
+              text: t('common.pages.admin.journey_selection.title'),
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--l"
             }
+          },
+          hint: {
+            text: t('common.pages.admin.journey_selection.context')
           },
           items: [
             {
               value: "admin",
-              text: "Admin tasks",
+              text: t('common.pages.admin.journey_selection.options.admin_user.text'),
+              hint: {
+                text: t('common.pages.admin.journey_selection.options.admin_user.hint')
+              },
               checked: true
             },
             {
               value: "general",
-              text: "General user tasks"
+              text: t('common.pages.admin.journey_selection.options.general_user.text'),
+              hint: {
+                text: t('common.pages.admin.journey_selection.options.general_user.hint')
+              }
             }
           ]
         }) }}

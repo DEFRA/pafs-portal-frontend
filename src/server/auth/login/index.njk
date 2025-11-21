@@ -86,7 +86,7 @@
         {% endif %}
       {% endif %}
 
-      <h1 class="govuk-heading-xl">{{ t('common.sign_in') }}</h1>
+      <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
 
       {% if warningCode == "AUTH_LAST_ATTEMPT_WARNING" %}
         {{ govukWarningText({
