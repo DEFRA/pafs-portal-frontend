@@ -226,7 +226,7 @@ describe('Auth Service', () => {
         method: 'POST',
         body: JSON.stringify({
           token: 'token123',
-          newPassword: 'NewPass123!',
+          password: 'NewPass123!',
           confirmPassword: 'NewPass123!'
         })
       })

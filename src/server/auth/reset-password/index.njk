@@ -67,6 +67,13 @@
                 href: "#new-password"
               }
             ]) %}
+          {% elif error == "password-same-as-current" %}
+            {% set errorList = errorList.concat([
+              {
+                text: t('password-reset.reset_password.errors.password_same_as_current'),
+                href: "#new-password"
+              }
+            ]) %}
           {% elif error == "password-mismatch" %}
             {% set errorList = errorList.concat([
               {
@@ -146,6 +153,10 @@
             {% elif error == "password-used-previously" %}
               {% set newPasswordErrorMessage = {
                 text: t('password-reset.reset_password.errors.password_used_previously')
+              } %}
+            {% elif error == "password-same-as-current" %}
+              {% set newPasswordErrorMessage = {
+                text: t('password-reset.reset_password.errors.password_same_as_current')
               } %}
             {% endif %}
           {% endfor %}

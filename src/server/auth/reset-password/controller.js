@@ -122,30 +122,31 @@ class ResetPasswordController {
     const errorData = result.error
 
     // Check for specific error codes
-    if (
-      errorData?.errorCode === 'auth.password_reset.expired_token' ||
-      errorData?.errorCode === 'AUTH_PASSWORD_RESET_EXPIRED_TOKEN'
-    ) {
+    if (errorData?.errorCode === 'AUTH_PASSWORD_RESET_EXPIRED_TOKEN') {
       return h
         .redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
         .state('canViewTokenExpired', '1')
     }
 
-    if (
-      errorData?.errorCode === 'auth.password_reset.invalid_token' ||
-      errorData?.errorCode === 'AUTH_PASSWORD_RESET_INVALID_TOKEN'
-    ) {
+    if (errorData?.errorCode === 'AUTH_PASSWORD_RESET_INVALID_TOKEN') {
       return h
         .redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
         .state('canViewTokenExpired', '1')
+    }
+
+    // Handle same as current password error
+    if (errorData?.errorCode === 'AUTH_PASSWORD_RESET_SAME_AS_CURRENT') {
+      return h.view(AUTH_VIEWS.RESET_PASSWORD, {
+        pageTitle: request.t('password-reset.reset_password.title'),
+        validationErrors: ['password-same-as-current'],
+        token
+      })
     }
 
     // Handle password was used previously error
     if (
       errorData?.errorCode ===
-        'auth.password_reset.password_was_used_previously' ||
-      errorData?.errorCode ===
-        'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY'
+      'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY'
     ) {
       return h.view(AUTH_VIEWS.RESET_PASSWORD, {
         pageTitle: request.t('password-reset.reset_password.title'),
@@ -180,11 +181,13 @@ class ResetPasswordSuccessController {
       return h.redirect(ROUTES.LOGIN)
     }
 
-    return h
-      .view(AUTH_VIEWS.RESET_PASSWORD_SUCCESS, {
-        pageTitle: request.t('password-reset.reset_password_success.title')
-      })
-      .unstate('canViewSuccess')
+    const response = h.view(AUTH_VIEWS.RESET_PASSWORD_SUCCESS, {
+      pageTitle: request.t('password-reset.reset_password_success.title')
+    })
+
+    response.unstate('canViewSuccess')
+
+    return response
   }
 }
 
@@ -201,13 +204,13 @@ class ResetPasswordTokenExpiredController {
       return h.redirect(ROUTES.FORGOT_PASSWORD)
     }
 
-    return h
-      .view(AUTH_VIEWS.RESET_PASSWORD_TOKEN_EXPIRED, {
-        pageTitle: request.t(
-          'password-reset.reset_password_token_expired.title'
-        )
-      })
-      .unstate('canViewTokenExpired')
+    const response = h.view(AUTH_VIEWS.RESET_PASSWORD_TOKEN_EXPIRED, {
+      pageTitle: request.t('password-reset.reset_password_token_expired.title')
+    })
+
+    response.unstate('canViewTokenExpired')
+
+    return response
   }
 }
 

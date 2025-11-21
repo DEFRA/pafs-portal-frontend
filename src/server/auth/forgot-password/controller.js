@@ -87,15 +87,15 @@ class ForgotPasswordConfirmationController {
 
     const email = request.state.resetEmail || ''
 
-    return h
-      .view(AUTH_VIEWS.FORGOT_PASSWORD_REQUEST_CONFIRMATION, {
-        pageTitle: request.t(
-          'password-reset.forgot_password_confirmation.title'
-        ),
-        email
-      })
-      .unstate('resetEmail')
-      .unstate('canViewConfirmation')
+    const response = h.view(AUTH_VIEWS.FORGOT_PASSWORD_REQUEST_CONFIRMATION, {
+      pageTitle: request.t('password-reset.forgot_password_confirmation.title'),
+      email
+    })
+
+    response.unstate('resetEmail')
+    response.unstate('canViewConfirmation')
+
+    return response
   }
 }
 

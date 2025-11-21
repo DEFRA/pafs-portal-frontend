@@ -237,6 +237,52 @@ describe('ResetPasswordController', () => {
         })
       )
     })
+
+    it('handles same as current password error', async () => {
+      const { resetPassword } = await import(
+        '../../common/services/auth/auth-service.js'
+      )
+      resetPassword.mockResolvedValue({
+        success: false,
+        error: {
+          errorCode: 'AUTH_PASSWORD_RESET_SAME_AS_CURRENT',
+          message: 'New password cannot be the same as your current password'
+        }
+      })
+
+      await resetPasswordPostController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'auth/reset-password/index',
+        expect.objectContaining({
+          validationErrors: ['password-same-as-current'],
+          token: 'valid-token-123'
+        })
+      )
+    })
+
+    it('handles generic error from backend', async () => {
+      const { resetPassword } = await import(
+        '../../common/services/auth/auth-service.js'
+      )
+      resetPassword.mockResolvedValue({
+        success: false,
+        error: {
+          errorCode: 'SOME_UNKNOWN_ERROR',
+          message: 'An unexpected error occurred'
+        }
+      })
+
+      await resetPasswordPostController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'auth/reset-password/index',
+        expect.objectContaining({
+          errorCode: 'SOME_UNKNOWN_ERROR',
+          token: 'valid-token-123'
+        })
+      )
+    })
   })
 
   describe('GET /reset-password/success', () => {
