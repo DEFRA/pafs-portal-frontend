@@ -1,3 +1,5 @@
+import { statusCodes } from '../../common/constants/status-codes.js'
+
 function buildViewModel(
   request,
   values = {},
@@ -53,6 +55,8 @@ function validateEmailField(emailAddress, addError) {
       'account-request.details.errors.emailAddressInvalid',
       '#email-address'
     )
+  } else {
+    // Email is valid - no error to add
   }
 }
 
@@ -135,7 +139,7 @@ function handlePostRequest(request, h) {
         'account_requests/details/index.njk',
         buildViewModel(request, values, errors, errorSummary, returnTo)
       )
-      .code(400)
+      .code(statusCodes.badRequest)
   }
 
   // Merge into accountRequest session object
