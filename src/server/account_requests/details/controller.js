@@ -119,26 +119,20 @@ export const accountRequestDetailsController = {
       sessionData.details = values
       request.yar.set('accountRequest', sessionData)
 
-      // All values valid – log them for now and redirect to the next step
+      // All values valid – log them for now
       console.log('Account request details submitted:', values)
 
-      const nextUrl =
-        returnTo === 'check-answers'
-          ? '/account_request/check-answers'
-          : '/account_request/ea-main-area'
-
-      return h.redirect(nextUrl)
+      // For now, redirect back to account_request page
+      return h.redirect('/account_request')
     }
 
     // GET – pre-populate from session if available
     const sessionData = request.yar.get('accountRequest') ?? {}
     const values = sessionData.details ?? {}
-    const returnTo =
-      request.query.from === 'check-answers' ? 'check-answers' : undefined
 
     return h.view(
       'account_requests/details/index.njk',
-      buildViewModel(request, values, undefined, undefined, returnTo)
+      buildViewModel(request, values, undefined, undefined, undefined)
     )
   }
 }

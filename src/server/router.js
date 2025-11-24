@@ -12,10 +12,6 @@ import { users } from './admin/users/index.js'
 import { journeySelection } from './admin/journey-selection/index.js'
 import { accountRequest } from './account_requests/account_request/index.js'
 import { accountRequestDetails } from './account_requests/details/index.js'
-import { accountRequestEaMainArea } from './account_requests/ea-main-area/index.js'
-import { accountRequestEaAdditionalAreas } from './account_requests/ea-additional-areas/index.js'
-import { accountRequestCheckAnswers } from './account_requests/check-answers/index.js'
-import { accountRequestConfirmation } from './account_requests/confirmation/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 
 export const router = {
@@ -37,14 +33,7 @@ export const router = {
       await server.register([home, archive, download])
 
       // Account request routes
-      await server.register([
-        accountRequest,
-        accountRequestDetails,
-        accountRequestEaMainArea,
-        accountRequestEaAdditionalAreas,
-        accountRequestCheckAnswers,
-        accountRequestConfirmation
-      ])
+      await server.register([accountRequest, accountRequestDetails])
 
       // Static assets
       await server.register([serveStaticFiles])

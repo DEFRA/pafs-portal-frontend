@@ -110,45 +110,6 @@ describe('#accountRequestDetailsController', () => {
       )
     })
 
-    test('Should redirect to ea-main-area on successful validation', async () => {
-      const { statusCode, headers } = await server.inject({
-        method: 'POST',
-        url: '/account_request/details',
-        payload: {
-          firstName: 'John',
-          lastName: 'Doe',
-          emailAddress: 'john@example.com',
-          telephoneNumber: '1234567890',
-          organisation: 'Test Org',
-          jobTitle: 'Developer',
-          responsibility: 'environment-agency-area-programme-team'
-        }
-      })
-
-      expect(statusCode).toBe(302)
-      expect(headers.location).toBe('/account_request/ea-main-area')
-    })
-
-    test('Should redirect to check-answers when returnTo is set', async () => {
-      const { statusCode, headers } = await server.inject({
-        method: 'POST',
-        url: '/account_request/details',
-        payload: {
-          firstName: 'John',
-          lastName: 'Doe',
-          emailAddress: 'john@example.com',
-          telephoneNumber: '1234567890',
-          organisation: 'Test Org',
-          jobTitle: 'Developer',
-          responsibility: 'environment-agency-area-programme-team',
-          returnTo: 'check-answers'
-        }
-      })
-
-      expect(statusCode).toBe(302)
-      expect(headers.location).toBe('/account_request/check-answers')
-    })
-
     test('Should store data in session on successful validation', async () => {
       const payload = {
         firstName: 'John',
