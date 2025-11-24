@@ -1,0 +1,9 @@
+{
+  "email": {
+    "required": "Enter your email address",
+    "invalid_format": "Enter an email address in the correct format, like name@example.com"
+  },
+  "password": {
+    "required": "Enter your password"
+  }
+}

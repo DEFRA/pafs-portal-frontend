@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { config } from '../../config.js'
 import { buildNavigation } from './build-navigation.js'
 import { createLogger } from '../../../server/common/helpers/logging/logger.js'
+import { translate } from '../../../server/common/helpers/i18n.js'
 
 const logger = createLogger()
 const assetPath = config.get('assetPath')
@@ -23,12 +24,17 @@ export function context(request) {
     }
   }
 
+  const session = request?.yar?.get('auth') || null
+
   return {
     assetPath: `${assetPath}/assets`,
     serviceName: config.get('serviceName'),
     serviceUrl: '/',
     breadcrumbs: [],
     navigation: buildNavigation(request),
+    user: session?.user,
+    request,
+    t: (key, params) => translate(key, 'en', params),
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
       return `${assetPath}/${webpackAssetPath ?? asset}`

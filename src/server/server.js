@@ -14,6 +14,7 @@ import { sessionCache } from './common/helpers/session-cache/session-cache.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
 import { contentSecurityPolicy } from './common/helpers/content-security-policy.js'
+import { i18nPlugin } from './common/helpers/i18n.js'
 
 export async function createServer() {
   setupProxy()
@@ -59,6 +60,7 @@ export async function createServer() {
     secureContext,
     pulse,
     sessionCache,
+    i18nPlugin,
     nunjucksConfig,
     Scooter,
     contentSecurityPolicy,
