@@ -1,15 +1,15 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ __('accountRequest.details.heading') }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ t('account-request.details.heading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
-  <a href="#" class="govuk-back-link">{{ __('accountRequest.back') }}</a>
+  <a href="#" class="govuk-back-link">{{ t('account-request.back') }}</a>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% if errorSummary and (errorSummary | length) %}
       <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
         <h2 class="govuk-error-summary__title" id="error-summary-title">
-          {{ __('accountRequest.details.errorSummaryTitle') }}
+          {{ t('account-request.details.errorSummaryTitle') }}
         </h2>
         <div class="govuk-error-summary__body">
           <ul class="govuk-list govuk-error-summary__list">
@@ -25,14 +25,14 @@
         {% if returnTo %}
         <input type="hidden" name="returnTo" value="{{ returnTo }}">
         {% endif %}
-        <h1 class="govuk-heading-xl">{{ __('accountRequest.details.heading') }}</h1>
+        <h1 class="govuk-heading-xl">{{ t('account-request.details.heading') }}</h1>
 
         <p class="govuk-body">
-          {{ __('accountRequest.details.introParagraph') }}
+          {{ t('account-request.details.introParagraph') }}
         </p>
 
         <div class="govuk-form-group {% if errors.firstName %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="first-name">{{ __('accountRequest.details.firstNameLabel') }}</label>
+          <label class="govuk-label" for="first-name">{{ t('account-request.details.firstNameLabel') }}</label>
           {% if errors.firstName %}
           <p id="first-name-error" class="govuk-error-message">
             <span class="govuk-visually-hidden">Error:</span> {{ errors.firstName }}
@@ -50,7 +50,7 @@
         </div>
 
         <div class="govuk-form-group {% if errors.lastName %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="last-name">{{ __('accountRequest.details.lastNameLabel') }}</label>
+          <label class="govuk-label" for="last-name">{{ t('account-request.details.lastNameLabel') }}</label>
           {% if errors.lastName %}
           <p id="last-name-error" class="govuk-error-message">
             <span class="govuk-visually-hidden">Error:</span> {{ errors.lastName }}
@@ -68,7 +68,7 @@
         </div>
 
         <div class="govuk-form-group {% if errors.emailAddress %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="email-address">{{ __('accountRequest.details.emailAddressLabel') }}</label>
+          <label class="govuk-label" for="email-address">{{ t('account-request.details.emailAddressLabel') }}</label>
           {% if errors.emailAddress %}
           <p id="email-address-error" class="govuk-error-message">
             <span class="govuk-visually-hidden">Error:</span> {{ errors.emailAddress }}
@@ -86,7 +86,7 @@
         </div>
 
         <div class="govuk-form-group {% if errors.telephoneNumber %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="telephone-number">{{ __('accountRequest.details.telephoneNumberLabel') }}</label>
+          <label class="govuk-label" for="telephone-number">{{ t('account-request.details.telephoneNumberLabel') }}</label>
           {% if errors.telephoneNumber %}
           <p id="telephone-number-error" class="govuk-error-message">
             <span class="govuk-visually-hidden">Error:</span> {{ errors.telephoneNumber }}
@@ -103,7 +103,7 @@
         </div>
 
         <div class="govuk-form-group {% if errors.organisation %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="organisation">{{ __('accountRequest.details.organisationLabel') }}</label>
+          <label class="govuk-label" for="organisation">{{ t('account-request.details.organisationLabel') }}</label>
           {% if errors.organisation %}
           <p id="organisation-error" class="govuk-error-message">
             <span class="govuk-visually-hidden">Error:</span> {{ errors.organisation }}
@@ -119,7 +119,7 @@
         </div>
 
         <div class="govuk-form-group {% if errors.jobTitle %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="job-title">{{ __('accountRequest.details.jobTitleLabel') }}</label>
+          <label class="govuk-label" for="job-title">{{ t('account-request.details.jobTitleLabel') }}</label>
           {% if errors.jobTitle %}
           <p id="job-title-error" class="govuk-error-message">
             <span class="govuk-visually-hidden">Error:</span> {{ errors.jobTitle }}
@@ -137,7 +137,7 @@
         <div class="govuk-form-group {% if errors.responsibility %}govuk-form-group--error{% endif %}">
           <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-              <h1 class="govuk-fieldset__heading">{{ __('accountRequest.details.responsibilityQuestion') }}</h1>
+              <h1 class="govuk-fieldset__heading">{{ t('account-request.details.responsibilityQuestion') }}</h1>
             </legend>
             {% if errors.responsibility %}
             <p id="responsibility-error" class="govuk-error-message">
@@ -155,10 +155,10 @@
                   {% if values.responsibility == 'environment-agency-area-programme-team' %}checked{% endif %}
                 >
                 <label class="govuk-label govuk-radios__label" for="responsibility-1">
-                  {{ __('accountRequest.details.eaAreaProgrammeTeam') }}
+                  {{ t('account-request.details.eaAreaProgrammeTeam') }}
                 </label>
                 <div id="responsibility-1-item-hint" class="govuk-hint govuk-radios__hint">
-                  {{ __('accountRequest.details.eaAreaProgrammeTeamHint') }}
+                  {{ t('account-request.details.eaAreaProgrammeTeamHint') }}
                 </div>
               </div>
               <div class="govuk-radios__item">
@@ -171,10 +171,10 @@
                   {% if values.responsibility == 'environment-agency-partnership-strategic-overview-team' %}checked{% endif %}
                 >
                 <label class="govuk-label govuk-radios__label" for="responsibility-2">
-                  {{ __('accountRequest.details.eaPartnershipStrategicOverviewTeam') }}
+                  {{ t('account-request.details.eaPartnershipStrategicOverviewTeam') }}
                 </label>
                 <div id="responsibility-2-item-hint" class="govuk-hint govuk-radios__hint">
-                  {{ __('accountRequest.details.eaPartnershipStrategicOverviewTeamHint') }}
+                  {{ t('account-request.details.eaPartnershipStrategicOverviewTeamHint') }}
                 </div>
               </div>
               <div class="govuk-radios__item">
@@ -187,37 +187,37 @@
                   {% if values.responsibility == 'risk-management-authority' %}checked{% endif %}
                 >
                 <label class="govuk-label govuk-radios__label" for="responsibility-3">
-                  {{ __('accountRequest.details.riskManagementAuthority') }}
+                  {{ t('account-request.details.riskManagementAuthority') }}
                 </label>
                 <div id="responsibility-3-item-hint" class="govuk-hint govuk-radios__hint">
-                  {{ __('accountRequest.details.riskManagementAuthorityHint') }}
+                  {{ t('account-request.details.riskManagementAuthorityHint') }}
                 </div>
               </div>
             </div>
           </fieldset>
         </div>
 
-        <h2 class="govuk-heading-m">{{ __('accountRequest.details.privacyPolicyHeading') }}</h2>
-        <p class="govuk-body">{{ __('accountRequest.details.privacyPolicyIntro') }}<a href="{{ __('accountRequest.details.privacyPolicyLink') }}" class="govuk-link">{{ __('accountRequest.details.privacyPolicyLink') }}</a></p>
+        <h2 class="govuk-heading-m">{{ t('account-request.details.privacyPolicyHeading') }}</h2>
+        <p class="govuk-body">{{ t('account-request.details.privacyPolicyIntro') }}<a href="{{ t('account-request.details.privacyPolicyLink') }}" class="govuk-link">{{ t('account-request.details.privacyPolicyLink') }}</a></p>
 
         <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
-        {{ __('accountRequest.details.dataCollectedQuestion') }}
+        {{ t('account-request.details.dataCollectedQuestion') }}
       </span>
     </summary>
     <div class="govuk-details__text">
-      <p class="govuk-body govuk-!-font-weight-bold">{{ __('accountRequest.details.dataCollectedHeading') }}</p>
+      <p class="govuk-body govuk-!-font-weight-bold">{{ t('account-request.details.dataCollectedHeading') }}</p>
 
           <ul class="govuk-list govuk-list--bullet">
-            <li>{{ __('accountRequest.details.dataCollectedBullet1') }}</li>
-            <li>{{ __('accountRequest.details.dataCollectedBullet2') }}</li>
-            <li>{{ __('accountRequest.details.dataCollectedBullet3') }}</li>
-            <li>{{ __('accountRequest.details.dataCollectedBullet4') }}</li>
+            <li>{{ t('account-request.details.dataCollectedBullet1') }}</li>
+            <li>{{ t('account-request.details.dataCollectedBullet2') }}</li>
+            <li>{{ t('account-request.details.dataCollectedBullet3') }}</li>
+            <li>{{ t('account-request.details.dataCollectedBullet4') }}</li>
           </ul>
 
           <p class="govuk-body">
-            {{ __('accountRequest.details.dataCollectedStatement') }}
+            {{ t('account-request.details.dataCollectedStatement') }}
           </p>
     </div>
         </details>
@@ -225,48 +225,48 @@
         <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
-        {{ __('accountRequest.details.dataSharedQuestion') }}
+        {{ t('account-request.details.dataSharedQuestion') }}
       </span>
     </summary>
     <div class="govuk-details__text">
-          <p class="govuk-body">{{ __('accountRequest.details.dataSharedAnswer') }}</p>
+          <p class="govuk-body">{{ t('account-request.details.dataSharedAnswer') }}</p>
         </div>
         </details>
 
         <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
-        {{ __('accountRequest.details.dataTransferredQuestion') }}
+        {{ t('account-request.details.dataTransferredQuestion') }}
       </span>
     </summary>
     <div class="govuk-details__text">
-          <p class="govuk-body">{{ __('accountRequest.details.dataTransferredAnswer') }}</p>
+          <p class="govuk-body">{{ t('account-request.details.dataTransferredAnswer') }}</p>
         </div>
         </details>
 
         <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
-        {{ __('accountRequest.details.dataHeldQuestion') }}
+        {{ t('account-request.details.dataHeldQuestion') }}
       </span>
     </summary>
      <div class="govuk-details__text">
-          <p class="govuk-body">{{ __('accountRequest.details.dataHeldAnswer') }}</p>
+          <p class="govuk-body">{{ t('account-request.details.dataHeldAnswer') }}</p>
         </div>
   </details>
 
   <details class="govuk-details" data-module="govuk-details">
     <summary class="govuk-details__summary">
       <span class="govuk-details__summary-text">
-        {{ __('accountRequest.details.automatedDecisionMakingQuestion') }}
+        {{ t('account-request.details.automatedDecisionMakingQuestion') }}
       </span>
     </summary>
      <div class="govuk-details__text">
-          <p class="govuk-body">{{ __('accountRequest.details.automatedDecisionMakingAnswer') }}</p>
+          <p class="govuk-body">{{ t('account-request.details.automatedDecisionMakingAnswer') }}</p>
         </div>
         </details>
 
-        <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.details.continueButton') }}</button>
+        <button class="govuk-button" data-module="govuk-button">{{ t('account-request.details.continueButton') }}</button>
       </form>
       </div>
   </div>

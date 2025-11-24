@@ -1,43 +1,43 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ __('accountRequest.confirmation.panelTitle') }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ t('account-request.confirmation.panelTitle') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
     <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
   <div class="govuk-panel govuk-panel--confirmation">
     <h1 class="govuk-panel__title">
-      {{ __('accountRequest.confirmation.panelTitle') }}
+      {{ t('account-request.confirmation.panelTitle') }}
     </h1>
     <div class="govuk-panel__body">
-      {{ __('accountRequest.confirmation.panelBody') }}
+      {{ t('account-request.confirmation.panelBody') }}
     </div>
   </div>
 
-  <h2 class="govuk-heading-m">{{ __('accountRequest.confirmation.whatHappensNextHeading') }}</h2>
+  <h2 class="govuk-heading-m">{{ t('account-request.confirmation.whatHappensNextHeading') }}</h2>
 
   <p class="govuk-body">
-    {{ __('accountRequest.confirmation.whatHappensNextPara1') }}
+    {{ t('account-request.confirmation.whatHappensNextPara1') }}
   </p>
   <p class="govuk-body">
-    {{ __('accountRequest.confirmation.whatHappensNextPara2') }}
+    {{ t('account-request.confirmation.whatHappensNextPara2') }}
   </p>
 
   <div class="govuk-inset-text">
-    {{ __('accountRequest.confirmation.insetBoxText') }}
+    {{ t('account-request.confirmation.insetBoxText') }}
   </div>
 
-  <h2 class="govuk-heading-m">{{ __('accountRequest.confirmation.whatYouNeedToDoHeading') }}</h2>
+  <h2 class="govuk-heading-m">{{ t('account-request.confirmation.whatYouNeedToDoHeading') }}</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>{{ __('accountRequest.confirmation.bullet1') }}</li>
-    <li>{{ __('accountRequest.confirmation.bullet2') }}</li>
-    <li>{{ __('accountRequest.confirmation.bullet3') }}</li>
-    <li>{{ __('accountRequest.confirmation.bullet4') }}</li>
+    <li>{{ t('account-request.confirmation.bullet1') }}</li>
+    <li>{{ t('account-request.confirmation.bullet2') }}</li>
+    <li>{{ t('account-request.confirmation.bullet3') }}</li>
+    <li>{{ t('account-request.confirmation.bullet4') }}</li>
   </ul>
 
   <p class="govuk-body">
-    <a href="#" class="govuk-link">{{ __('accountRequest.confirmation.returnToSignInLink') }}</a>
+    <a href="/login" class="govuk-link">{{ t('account-request.confirmation.returnToSignInLink') }}</a>
   </p>
   </div>
   </div>

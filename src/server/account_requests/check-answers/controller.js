@@ -6,19 +6,19 @@ function buildViewModel(request, sessionData = {}) {
   }
 
   // Map responsibility code to label using i18n
-  const t = request.i18n.__.bind(request.i18n)
+  const t = request.t.bind(request)
   let responsibilityValue = ''
   switch (details.responsibility) {
     case 'environment-agency-area-programme-team':
-      responsibilityValue = t('accountRequest.details.eaAreaProgrammeTeam')
+      responsibilityValue = t('account-request.details.eaAreaProgrammeTeam')
       break
     case 'environment-agency-partnership-strategic-overview-team':
       responsibilityValue = t(
-        'accountRequest.details.eaPartnershipStrategicOverviewTeam'
+        'account-request.details.eaPartnershipStrategicOverviewTeam'
       )
       break
     case 'risk-management-authority':
-      responsibilityValue = t('accountRequest.details.riskManagementAuthority')
+      responsibilityValue = t('account-request.details.riskManagementAuthority')
       break
     default:
       responsibilityValue = ''
@@ -43,7 +43,7 @@ function buildViewModel(request, sessionData = {}) {
     .filter(Boolean)
 
   return {
-    title: t('accountRequest.checkAnswers.heading'),
+    title: t('account-request.checkAnswers.heading'),
     details,
     responsibilityValue,
     mainEaAreaValue,

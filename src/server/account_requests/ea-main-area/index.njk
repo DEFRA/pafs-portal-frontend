@@ -1,16 +1,16 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ __('accountRequest.eaMainArea.heading') }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ t('account-request.eaMainArea.heading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
-  <a href="#" class="govuk-back-link">{{ __('accountRequest.back') }}</a>
+  <a href="#" class="govuk-back-link">{{ t('account-request.back') }}</a>
 
-  <h1 class="govuk-heading-l">{{ __('accountRequest.eaMainArea.heading') }}</h1>
+  <h1 class="govuk-heading-l">{{ t('account-request.eaMainArea.heading') }}</h1>
 
   {% if errorSummary and (errorSummary | length) %}
   <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
     <h2 class="govuk-error-summary__title" id="error-summary-title">
-      {{ __('accountRequest.details.errorSummaryTitle') }}
+      {{ t('account-request.details.errorSummaryTitle') }}
     </h2>
     <div class="govuk-error-summary__body">
       <ul class="govuk-list govuk-error-summary__list">
@@ -29,10 +29,10 @@
 
     <div class="govuk-form-group {% if errors.mainEaArea %}govuk-form-group--error{% endif %}">
       <label class="govuk-label govuk-label--m" for="main-ea-area">
-        {{ __('accountRequest.eaMainArea.mainEaAreaLabel') }}
+        {{ t('account-request.eaMainArea.mainEaAreaLabel') }}
       </label>
       <div id="main-ea-area-hint" class="govuk-hint">
-        {{ __('accountRequest.eaMainArea.mainEaAreaHint') }}
+        {{ t('account-request.eaMainArea.mainEaAreaHint') }}
       </div>
       {% if errors.mainEaArea %}
       <p id="main-ea-area-error" class="govuk-error-message">
@@ -40,7 +40,7 @@
       </p>
       {% endif %}
       <select class="govuk-select {% if errors.mainEaArea %}govuk-select--error{% endif %}" id="main-ea-area" name="mainEaArea">
-        <option value="">{{ __('accountRequest.eaMainArea.selectAnAreaOption') }}</option>
+        <option value="">{{ t('account-request.eaMainArea.selectAnAreaOption') }}</option>
         <option value="wessex" {% if values.mainEaArea == 'wessex' %}selected{% endif %}>Wessex</option>
         <option value="thames" {% if values.mainEaArea == 'thames' %}selected{% endif %}>Thames</option>
         <option value="anglian" {% if values.mainEaArea == 'anglian' %}selected{% endif %}>Anglian</option>
@@ -51,6 +51,6 @@
       </select>
     </div>
 
-    <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.eaMainArea.continueButton') }}</button>
+    <button class="govuk-button" data-module="govuk-button">{{ t('account-request.eaMainArea.continueButton') }}</button>
   </form>
 {% endblock %}

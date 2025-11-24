@@ -6,7 +6,7 @@ function buildViewModel(
   returnTo
 ) {
   return {
-    title: request.i18n.__('accountRequest.eaMainArea.heading'),
+    title: request.t('account-request.eaMainArea.heading'),
     values,
     errors,
     errorSummary,
@@ -15,7 +15,7 @@ function buildViewModel(
 }
 
 function validateEaMainArea(request) {
-  const t = request.i18n.__.bind(request.i18n)
+  const t = request.t.bind(request)
   const payload = request.payload ?? {}
   const values = {
     mainEaArea: payload.mainEaArea ?? ''
@@ -33,7 +33,7 @@ function validateEaMainArea(request) {
   if (!values.mainEaArea) {
     addError(
       'mainEaArea',
-      'accountRequest.eaMainArea.errors.mainEaAreaRequired',
+      'account-request.eaMainArea.errors.mainEaAreaRequired',
       '#main-ea-area'
     )
   }

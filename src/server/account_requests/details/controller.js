@@ -6,7 +6,7 @@ function buildViewModel(
   returnTo
 ) {
   return {
-    title: request.i18n.__('accountRequest.details.heading'),
+    title: request.t('account-request.details.heading'),
     values,
     errors,
     errorSummary,
@@ -15,7 +15,7 @@ function buildViewModel(
 }
 
 function validateDetails(request) {
-  const t = request.i18n.__.bind(request.i18n)
+  const t = request.t.bind(request)
   const payload = request.payload ?? {}
   const values = {
     firstName: payload.firstName ?? '',
@@ -39,21 +39,21 @@ function validateDetails(request) {
   if (!values.firstName.trim()) {
     addError(
       'firstName',
-      'accountRequest.details.errors.firstNameRequired',
+      'account-request.details.errors.firstNameRequired',
       '#first-name'
     )
   }
   if (!values.lastName.trim()) {
     addError(
       'lastName',
-      'accountRequest.details.errors.lastNameRequired',
+      'account-request.details.errors.lastNameRequired',
       '#last-name'
     )
   }
   if (!values.emailAddress.trim()) {
     addError(
       'emailAddress',
-      'accountRequest.details.errors.emailAddressRequired',
+      'account-request.details.errors.emailAddressRequired',
       '#email-address'
     )
   } else {
@@ -62,7 +62,7 @@ function validateDetails(request) {
     if (!emailPattern.test(values.emailAddress)) {
       addError(
         'emailAddress',
-        'accountRequest.details.errors.emailAddressInvalid',
+        'account-request.details.errors.emailAddressInvalid',
         '#email-address'
       )
     }
@@ -70,28 +70,28 @@ function validateDetails(request) {
   if (!values.telephoneNumber.trim()) {
     addError(
       'telephoneNumber',
-      'accountRequest.details.errors.telephoneNumberRequired',
+      'account-request.details.errors.telephoneNumberRequired',
       '#telephone-number'
     )
   }
   if (!values.organisation.trim()) {
     addError(
       'organisation',
-      'accountRequest.details.errors.organisationRequired',
+      'account-request.details.errors.organisationRequired',
       '#organisation'
     )
   }
   if (!values.jobTitle.trim()) {
     addError(
       'jobTitle',
-      'accountRequest.details.errors.jobTitleRequired',
+      'account-request.details.errors.jobTitleRequired',
       '#job-title'
     )
   }
   if (!values.responsibility) {
     addError(
       'responsibility',
-      'accountRequest.details.errors.responsibilityRequired',
+      'account-request.details.errors.responsibilityRequired',
       '#responsibility-1'
     )
   }

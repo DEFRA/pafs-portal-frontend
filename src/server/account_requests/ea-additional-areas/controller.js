@@ -1,6 +1,6 @@
 function buildViewModel(request, values = {}, returnTo) {
   return {
-    title: request.i18n.__('accountRequest.eaAdditionalAreas.heading'),
+    title: request.t('account-request.eaAdditionalAreas.heading'),
     values,
     returnTo
   }

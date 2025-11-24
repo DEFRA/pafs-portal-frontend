@@ -1,19 +1,19 @@
 {% extends 'layouts/page.njk' %}
 
-{% block pageTitle %}{{ __('accountRequest.checkAnswers.heading') }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ t('account-request.checkAnswers.heading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-    <a href="#" class="govuk-back-link">{{ __('accountRequest.back') }}</a>
+    <a href="#" class="govuk-back-link">{{ t('account-request.back') }}</a>
 
-    <h1 class="govuk-heading-xl">{{ __('accountRequest.checkAnswers.heading') }}</h1>
+    <h1 class="govuk-heading-xl">{{ t('account-request.checkAnswers.heading') }}</h1>
 
     <div class="govuk-summary-list__row">
-      <h2 class="govuk-heading-m govuk-summary-list__key">{{ __('accountRequest.checkAnswers.personalDetailsHeading') }}</h2>
+      <h2 class="govuk-heading-m govuk-summary-list__key">{{ t('account-request.checkAnswers.personalDetailsHeading') }}</h2>
       <dd class="govuk-summary-list__actions">
         <a class="govuk-link" href="/account_request/details?from=check-answers">
-          {{ __('accountRequest.checkAnswers.changePersonalDetailsLink') }}<span class="govuk-visually-hidden"> {{ __('accountRequest.checkAnswers.personalDetailsHeading') }}</span>
+          {{ t('account-request.checkAnswers.changePersonalDetailsLink') }}<span class="govuk-visually-hidden"> {{ t('account-request.checkAnswers.personalDetailsHeading') }}</span>
         </a>
       </dd>
     </div>
@@ -21,7 +21,7 @@
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          {{ __('accountRequest.details.firstNameLabel') }}
+          {{ t('account-request.details.firstNameLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           {{ details.firstName }}
@@ -30,7 +30,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          {{ __('accountRequest.details.lastNameLabel') }}
+          {{ t('account-request.details.lastNameLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           {{ details.lastName }}
@@ -39,7 +39,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          {{ __('accountRequest.details.emailAddressLabel') }}
+          {{ t('account-request.details.emailAddressLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           {{ details.emailAddress }}
@@ -48,7 +48,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          {{ __('accountRequest.details.telephoneNumberLabel') }}
+          {{ t('account-request.details.telephoneNumberLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           {{ details.telephoneNumber }}
@@ -57,7 +57,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          {{ __('accountRequest.details.organisationLabel') }}
+          {{ t('account-request.details.organisationLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           {{ details.organisation }}
@@ -66,7 +66,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          {{ __('accountRequest.details.jobTitleLabel') }}
+          {{ t('account-request.details.jobTitleLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           {{ details.jobTitle }}
@@ -75,7 +75,7 @@
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          {{ __('accountRequest.checkAnswers.responsibilityLabel') }}
+          {{ t('account-request.checkAnswers.responsibilityLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           {{ responsibilityValue }}
@@ -83,26 +83,26 @@
       </div>
     </dl>
 
-    <h2 class="govuk-heading-m">{{ __('accountRequest.checkAnswers.areaSelectionHeading') }}</h2>
+    <h2 class="govuk-heading-m">{{ t('account-request.checkAnswers.areaSelectionHeading') }}</h2>
 
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          {{ __('accountRequest.eaMainArea.mainEaAreaLabel') }}
+          {{ t('account-request.eaMainArea.mainEaAreaLabel') }}
         </dt>
         <dd class="govuk-summary-list__value">
           {{ mainEaAreaValue }}
         </dd>
         <dd class="govuk-summary-list__actions">
           <a class="govuk-link" href="/account_request/ea-main-area?from=check-answers">
-            {{ __('accountRequest.checkAnswers.changeMainEaAreaLink') }}<span class="govuk-visually-hidden"> {{ __('accountRequest.eaMainArea.mainEaAreaLabel') }}</span>
+            {{ t('account-request.checkAnswers.changeMainEaAreaLink') }}<span class="govuk-visually-hidden"> {{ t('account-request.eaMainArea.mainEaAreaLabel') }}</span>
           </a>
         </dd>
       </div>
 
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">
-          {{ __('accountRequest.eaAdditionalAreas.introText') }}
+          {{ t('account-request.eaAdditionalAreas.introText') }}
         </dt>
         <dd class="govuk-summary-list__value">
           {% for area in additionalAreasLabels %}
@@ -111,16 +111,16 @@
         </dd>
         <dd class="govuk-summary-list__actions">
           <a class="govuk-link" href="/account_request/ea-additional-areas?from=check-answers">
-            {{ __('accountRequest.checkAnswers.changeAdditionalEaAreasLink') }}<span class="govuk-visually-hidden"> {{ __('accountRequest.eaAdditionalAreas.introText') }}</span>
+            {{ t('account-request.checkAnswers.changeAdditionalEaAreasLink') }}<span class="govuk-visually-hidden"> {{ t('account-request.eaAdditionalAreas.introText') }}</span>
           </a>
         </dd>
       </div>
     </dl>
 
-    <p class="govuk-body">{{ __('accountRequest.checkAnswers.confirmationText') }}</p>
+    <p class="govuk-body">{{ t('account-request.checkAnswers.confirmationText') }}</p>
 
     <form method="post" novalidate>
-      <button class="govuk-button" data-module="govuk-button">{{ __('accountRequest.checkAnswers.confirmAndSendButton') }}</button>
+      <button class="govuk-button" data-module="govuk-button">{{ t('account-request.checkAnswers.confirmAndSendButton') }}</button>
     </form>
     </div>
   </div>
