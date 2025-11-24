@@ -3,7 +3,7 @@ function buildViewModel(
   values = {},
   errors = {},
   errorSummary = [],
-  returnTo
+  returnTo = undefined
 ) {
   return {
     title: request.t('account-request.details.heading'),
@@ -14,10 +14,8 @@ function buildViewModel(
   }
 }
 
-function validateDetails(request) {
-  const t = request.t.bind(request)
-  const payload = request.payload ?? {}
-  const values = {
+function extractFormValues(payload) {
+  return {
     firstName: payload.firstName ?? '',
     lastName: payload.lastName ?? '',
     emailAddress: payload.emailAddress ?? '',
@@ -26,6 +24,88 @@ function validateDetails(request) {
     jobTitle: payload.jobTitle ?? '',
     responsibility: payload.responsibility ?? ''
   }
+}
+
+function validateEmailFormat(emailAddress) {
+  // Basic email format validation: something@something.domain
+  // Using a safer regex pattern to prevent ReDoS (Regular Expression Denial of Service)
+  // This pattern avoids catastrophic backtracking by using more restrictive character classes
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  return emailPattern.test(emailAddress)
+}
+
+function validateRequiredField(value, fieldName, messageKey, href, addError) {
+  if (!value.trim()) {
+    addError(fieldName, messageKey, href)
+  }
+}
+
+function validateEmailField(emailAddress, addError) {
+  if (!emailAddress.trim()) {
+    addError(
+      'emailAddress',
+      'account-request.details.errors.emailAddressRequired',
+      '#email-address'
+    )
+  } else if (!validateEmailFormat(emailAddress)) {
+    addError(
+      'emailAddress',
+      'account-request.details.errors.emailAddressInvalid',
+      '#email-address'
+    )
+  }
+}
+
+function validateAllFields(values, addError) {
+  validateRequiredField(
+    values.firstName,
+    'firstName',
+    'account-request.details.errors.firstNameRequired',
+    '#first-name',
+    addError
+  )
+  validateRequiredField(
+    values.lastName,
+    'lastName',
+    'account-request.details.errors.lastNameRequired',
+    '#last-name',
+    addError
+  )
+  validateEmailField(values.emailAddress, addError)
+  validateRequiredField(
+    values.telephoneNumber,
+    'telephoneNumber',
+    'account-request.details.errors.telephoneNumberRequired',
+    '#telephone-number',
+    addError
+  )
+  validateRequiredField(
+    values.organisation,
+    'organisation',
+    'account-request.details.errors.organisationRequired',
+    '#organisation',
+    addError
+  )
+  validateRequiredField(
+    values.jobTitle,
+    'jobTitle',
+    'account-request.details.errors.jobTitleRequired',
+    '#job-title',
+    addError
+  )
+  if (!values.responsibility) {
+    addError(
+      'responsibility',
+      'account-request.details.errors.responsibilityRequired',
+      '#responsibility-1'
+    )
+  }
+}
+
+function validateDetails(request) {
+  const t = request.t.bind(request)
+  const payload = request.payload ?? {}
+  const values = extractFormValues(payload)
 
   const errors = {}
   const errorSummary = []
@@ -36,103 +116,59 @@ function validateDetails(request) {
     errorSummary.push({ href, text })
   }
 
-  if (!values.firstName.trim()) {
-    addError(
-      'firstName',
-      'account-request.details.errors.firstNameRequired',
-      '#first-name'
-    )
-  }
-  if (!values.lastName.trim()) {
-    addError(
-      'lastName',
-      'account-request.details.errors.lastNameRequired',
-      '#last-name'
-    )
-  }
-  if (!values.emailAddress.trim()) {
-    addError(
-      'emailAddress',
-      'account-request.details.errors.emailAddressRequired',
-      '#email-address'
-    )
-  } else {
-    // Basic email format validation: something@something.domain
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailPattern.test(values.emailAddress)) {
-      addError(
-        'emailAddress',
-        'account-request.details.errors.emailAddressInvalid',
-        '#email-address'
-      )
-    }
-  }
-  if (!values.telephoneNumber.trim()) {
-    addError(
-      'telephoneNumber',
-      'account-request.details.errors.telephoneNumberRequired',
-      '#telephone-number'
-    )
-  }
-  if (!values.organisation.trim()) {
-    addError(
-      'organisation',
-      'account-request.details.errors.organisationRequired',
-      '#organisation'
-    )
-  }
-  if (!values.jobTitle.trim()) {
-    addError(
-      'jobTitle',
-      'account-request.details.errors.jobTitleRequired',
-      '#job-title'
-    )
-  }
-  if (!values.responsibility) {
-    addError(
-      'responsibility',
-      'account-request.details.errors.responsibilityRequired',
-      '#responsibility-1'
-    )
-  }
+  validateAllFields(values, addError)
 
   return { values, errors, errorSummary }
+}
+
+function getSessionData(request) {
+  return request.yar.get('accountRequest') ?? {}
+}
+
+function handlePostRequest(request, h) {
+  const { values, errors, errorSummary } = validateDetails(request)
+  const returnTo = request.payload?.returnTo
+
+  if (errorSummary.length) {
+    return h
+      .view(
+        'account_requests/details/index.njk',
+        buildViewModel(request, values, errors, errorSummary, returnTo)
+      )
+      .code(400)
+  }
+
+  // Merge into accountRequest session object
+  const sessionData = getSessionData(request)
+  sessionData.details = values
+  request.yar.set('accountRequest', sessionData)
+
+  // All values valid – log them
+  request.server.logger.info(
+    { accountRequestDetails: values },
+    'Account request details submitted'
+  )
+
+  // For now, redirect back to account_request page
+  return h.redirect('/account_request')
+}
+
+function handleGetRequest(request, h) {
+  const sessionData = getSessionData(request)
+  const values = sessionData.details ?? {}
+
+  return h.view(
+    'account_requests/details/index.njk',
+    buildViewModel(request, values)
+  )
 }
 
 export const accountRequestDetailsController = {
   handler(request, h) {
     if (request.method === 'post') {
-      const { values, errors, errorSummary } = validateDetails(request)
-      const returnTo = request.payload?.returnTo
-
-      if (errorSummary.length) {
-        return h
-          .view(
-            'account_requests/details/index.njk',
-            buildViewModel(request, values, errors, errorSummary, returnTo)
-          )
-          .code(400)
-      }
-
-      // Merge into accountRequest session object
-      const sessionData = request.yar.get('accountRequest') ?? {}
-      sessionData.details = values
-      request.yar.set('accountRequest', sessionData)
-
-      // All values valid – log them for now
-      console.log('Account request details submitted:', values)
-
-      // For now, redirect back to account_request page
-      return h.redirect('/account_request')
+      return handlePostRequest(request, h)
     }
 
-    // GET – pre-populate from session if available
-    const sessionData = request.yar.get('accountRequest') ?? {}
-    const values = sessionData.details ?? {}
-
-    return h.view(
-      'account_requests/details/index.njk',
-      buildViewModel(request, values, undefined, undefined, undefined)
-    )
+    return handleGetRequest(request, h)
   }
 }
