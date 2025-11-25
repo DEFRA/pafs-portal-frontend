@@ -1,24 +1,28 @@
 {% extends 'layouts/page.njk' %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% block pageTitle %}{{ t('account-request.details.heading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
-  <a href="#" class="govuk-back-link">{{ t('account-request.back') }}</a>
+  <a href="#" class="govuk-back-link">{{ t('common.back_link') }}</a>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% if errorSummary and (errorSummary | length) %}
-      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
-        <h2 class="govuk-error-summary__title" id="error-summary-title">
-          {{ t('account-request.details.errorSummaryTitle') }}
-        </h2>
-        <div class="govuk-error-summary__body">
-          <ul class="govuk-list govuk-error-summary__list">
+        {% set errorList = [] %}
             {% for item in errorSummary %}
-              <li><a href="{{ item.href }}">{{ item.text }}</a></li>
+          {% set errorList = errorList.concat([{
+            text: item.text,
+            href: item.href
+          }]) %}
             {% endfor %}
-          </ul>
-        </div>
-      </div>
+        {{ govukErrorSummary({
+          titleText: t('account-request.details.errorSummaryTitle'),
+          errorList: errorList
+        }) }}
       {% endif %}
 
       <form method="post" novalidate>
@@ -31,242 +35,210 @@
           {{ t('account-request.details.introParagraph') }}
         </p>
 
-        <div class="govuk-form-group {% if errors.firstName %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="first-name">{{ t('account-request.details.firstNameLabel') }}</label>
-          {% if errors.firstName %}
-          <p id="first-name-error" class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> {{ errors.firstName }}
-          </p>
-          {% endif %}
-          <input
-            class="govuk-input govuk-!-width-two-thirds {% if errors.firstName %}govuk-input--error{% endif %}"
-            id="first-name"
-            name="firstName"
-            type="text"
-            spellcheck="false"
-            autocomplete="given-name"
-            value="{{ values.firstName | default('') }}"
-          >
-        </div>
+        {% set firstNameErrorMessage = false %}
+        {% if errors.firstName %}
+          {% set firstNameErrorMessage = {
+            text: errors.firstName
+          } %}
+        {% endif %}
 
-        <div class="govuk-form-group {% if errors.lastName %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="last-name">{{ t('account-request.details.lastNameLabel') }}</label>
-          {% if errors.lastName %}
-          <p id="last-name-error" class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> {{ errors.lastName }}
-          </p>
-          {% endif %}
-          <input
-            class="govuk-input govuk-!-width-two-thirds {% if errors.lastName %}govuk-input--error{% endif %}"
-            id="last-name"
-            name="lastName"
-            type="text"
-            spellcheck="false"
-            autocomplete="family-name"
-            value="{{ values.lastName | default('') }}"
-          >
-        </div>
+        {{ govukInput({
+          label: {
+            text: t('account-request.details.firstNameLabel')
+          },
+          id: "first-name",
+          name: "firstName",
+          type: "text",
+          spellcheck: false,
+          autocomplete: "given-name",
+          value: values.firstName | default(''),
+          classes: "govuk-!-width-two-thirds",
+          errorMessage: firstNameErrorMessage
+        }) }}
 
-        <div class="govuk-form-group {% if errors.emailAddress %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="email-address">{{ t('account-request.details.emailAddressLabel') }}</label>
-          {% if errors.emailAddress %}
-          <p id="email-address-error" class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> {{ errors.emailAddress }}
-          </p>
-          {% endif %}
-          <input
-            class="govuk-input govuk-!-width-two-thirds {% if errors.emailAddress %}govuk-input--error{% endif %}"
-            id="email-address"
-            name="emailAddress"
-            type="email"
-            spellcheck="false"
-            autocomplete="email"
-            value="{{ values.emailAddress | default('') }}"
-          >
-        </div>
+        {% set lastNameErrorMessage = false %}
+        {% if errors.lastName %}
+          {% set lastNameErrorMessage = {
+            text: errors.lastName
+          } %}
+        {% endif %}
 
-        <div class="govuk-form-group {% if errors.telephoneNumber %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="telephone-number">{{ t('account-request.details.telephoneNumberLabel') }}</label>
-          {% if errors.telephoneNumber %}
-          <p id="telephone-number-error" class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> {{ errors.telephoneNumber }}
-          </p>
-          {% endif %}
-          <input
-            class="govuk-input govuk-!-width-two-thirds {% if errors.telephoneNumber %}govuk-input--error{% endif %}"
-            id="telephone-number"
-            name="telephoneNumber"
-            type="tel"
-            autocomplete="tel"
-            value="{{ values.telephoneNumber | default('') }}"
-          >
-        </div>
+        {{ govukInput({
+          label: {
+            text: t('account-request.details.lastNameLabel')
+          },
+          id: "last-name",
+          name: "lastName",
+          type: "text",
+          spellcheck: false,
+          autocomplete: "family-name",
+          value: values.lastName | default(''),
+          classes: "govuk-!-width-two-thirds",
+          errorMessage: lastNameErrorMessage
+        }) }}
 
-        <div class="govuk-form-group {% if errors.organisation %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="organisation">{{ t('account-request.details.organisationLabel') }}</label>
-          {% if errors.organisation %}
-          <p id="organisation-error" class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> {{ errors.organisation }}
-          </p>
-          {% endif %}
-          <input
-            class="govuk-input govuk-!-width-two-thirds {% if errors.organisation %}govuk-input--error{% endif %}"
-            id="organisation"
-            name="organisation"
-            type="text"
-            value="{{ values.organisation | default('') }}"
-          >
-        </div>
+        {% set emailAddressErrorMessage = false %}
+        {% if errors.emailAddress %}
+          {% set emailAddressErrorMessage = {
+            text: errors.emailAddress
+          } %}
+        {% endif %}
 
-        <div class="govuk-form-group {% if errors.jobTitle %}govuk-form-group--error{% endif %}">
-          <label class="govuk-label" for="job-title">{{ t('account-request.details.jobTitleLabel') }}</label>
-          {% if errors.jobTitle %}
-          <p id="job-title-error" class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> {{ errors.jobTitle }}
-          </p>
-          {% endif %}
-          <input
-            class="govuk-input govuk-!-width-two-thirds {% if errors.jobTitle %}govuk-input--error{% endif %}"
-            id="job-title"
-            name="jobTitle"
-            type="text"
-            value="{{ values.jobTitle | default('') }}"
-          >
-        </div>
+        {{ govukInput({
+          label: {
+            text: t('account-request.details.emailAddressLabel')
+          },
+          id: "email-address",
+          name: "emailAddress",
+          type: "email",
+          spellcheck: false,
+          autocomplete: "email",
+          value: values.emailAddress | default(''),
+          classes: "govuk-!-width-two-thirds",
+          errorMessage: emailAddressErrorMessage
+        }) }}
 
-        <div class="govuk-form-group {% if errors.responsibility %}govuk-form-group--error{% endif %}">
-          <fieldset class="govuk-fieldset">
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-              <h1 class="govuk-fieldset__heading">{{ t('account-request.details.responsibilityQuestion') }}</h1>
-            </legend>
-            {% if errors.responsibility %}
-            <p id="responsibility-error" class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ errors.responsibility }}
-            </p>
-            {% endif %}
-            <div class="govuk-radios" data-module="govuk-radios">
-              <div class="govuk-radios__item">
-                <input
-                  class="govuk-radios__input"
-                  id="responsibility-1"
-                  name="responsibility"
-                  type="radio"
-                  value="environment-agency-area-programme-team"
-                  {% if values.responsibility == 'environment-agency-area-programme-team' %}checked{% endif %}
-                >
-                <label class="govuk-label govuk-radios__label" for="responsibility-1">
-                  {{ t('account-request.details.eaAreaProgrammeTeam') }}
-                </label>
-                <div id="responsibility-1-item-hint" class="govuk-hint govuk-radios__hint">
-                  {{ t('account-request.details.eaAreaProgrammeTeamHint') }}
-                </div>
-              </div>
-              <div class="govuk-radios__item">
-                <input
-                  class="govuk-radios__input"
-                  id="responsibility-2"
-                  name="responsibility"
-                  type="radio"
-                  value="environment-agency-partnership-strategic-overview-team"
-                  {% if values.responsibility == 'environment-agency-partnership-strategic-overview-team' %}checked{% endif %}
-                >
-                <label class="govuk-label govuk-radios__label" for="responsibility-2">
-                  {{ t('account-request.details.eaPartnershipStrategicOverviewTeam') }}
-                </label>
-                <div id="responsibility-2-item-hint" class="govuk-hint govuk-radios__hint">
-                  {{ t('account-request.details.eaPartnershipStrategicOverviewTeamHint') }}
-                </div>
-              </div>
-              <div class="govuk-radios__item">
-                <input
-                  class="govuk-radios__input"
-                  id="responsibility-3"
-                  name="responsibility"
-                  type="radio"
-                  value="risk-management-authority"
-                  {% if values.responsibility == 'risk-management-authority' %}checked{% endif %}
-                >
-                <label class="govuk-label govuk-radios__label" for="responsibility-3">
-                  {{ t('account-request.details.riskManagementAuthority') }}
-                </label>
-                <div id="responsibility-3-item-hint" class="govuk-hint govuk-radios__hint">
-                  {{ t('account-request.details.riskManagementAuthorityHint') }}
-                </div>
-              </div>
-            </div>
-          </fieldset>
-        </div>
+        {% set telephoneNumberErrorMessage = false %}
+        {% if errors.telephoneNumber %}
+          {% set telephoneNumberErrorMessage = {
+            text: errors.telephoneNumber
+          } %}
+        {% endif %}
+
+        {{ govukInput({
+          label: {
+            text: t('account-request.details.telephoneNumberLabel')
+          },
+          id: "telephone-number",
+          name: "telephoneNumber",
+          type: "tel",
+          autocomplete: "tel",
+          value: values.telephoneNumber | default(''),
+          classes: "govuk-!-width-two-thirds",
+          errorMessage: telephoneNumberErrorMessage
+        }) }}
+
+        {% set organisationErrorMessage = false %}
+        {% if errors.organisation %}
+          {% set organisationErrorMessage = {
+            text: errors.organisation
+          } %}
+        {% endif %}
+
+        {{ govukInput({
+          label: {
+            text: t('account-request.details.organisationLabel')
+          },
+          id: "organisation",
+          name: "organisation",
+          type: "text",
+          value: values.organisation | default(''),
+          classes: "govuk-!-width-two-thirds",
+          errorMessage: organisationErrorMessage
+        }) }}
+
+        {% set jobTitleErrorMessage = false %}
+        {% if errors.jobTitle %}
+          {% set jobTitleErrorMessage = {
+            text: errors.jobTitle
+          } %}
+        {% endif %}
+
+        {{ govukInput({
+          label: {
+            text: t('account-request.details.jobTitleLabel')
+          },
+          id: "job-title",
+          name: "jobTitle",
+          type: "text",
+          value: values.jobTitle | default(''),
+          classes: "govuk-!-width-two-thirds",
+          errorMessage: jobTitleErrorMessage
+        }) }}
+
+        {% set responsibilityErrorMessage = false %}
+        {% if errors.responsibility %}
+          {% set responsibilityErrorMessage = {
+            text: errors.responsibility
+          } %}
+        {% endif %}
+
+        {{ govukRadios({
+          name: "responsibility",
+          fieldset: {
+            legend: {
+              text: t('account-request.details.responsibilityQuestion'),
+              isPageHeading: false,
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          errorMessage: responsibilityErrorMessage,
+          items: [
+            {
+              value: "environment-agency-area-programme-team",
+              text: t('account-request.details.eaAreaProgrammeTeam'),
+              hint: {
+                text: t('account-request.details.eaAreaProgrammeTeamHint')
+              },
+              checked: values.responsibility == 'environment-agency-area-programme-team'
+            },
+            {
+              value: "environment-agency-partnership-strategic-overview-team",
+              text: t('account-request.details.eaPartnershipStrategicOverviewTeam'),
+              hint: {
+                text: t('account-request.details.eaPartnershipStrategicOverviewTeamHint')
+              },
+              checked: values.responsibility == 'environment-agency-partnership-strategic-overview-team'
+            },
+            {
+              value: "risk-management-authority",
+              text: t('account-request.details.riskManagementAuthority'),
+              hint: {
+                text: t('account-request.details.riskManagementAuthorityHint')
+              },
+              checked: values.responsibility == 'risk-management-authority'
+            }
+          ]
+        }) }}
 
         <h2 class="govuk-heading-m">{{ t('account-request.details.privacyPolicyHeading') }}</h2>
         <p class="govuk-body">{{ t('account-request.details.privacyPolicyIntro') }}<a href="{{ t('account-request.details.privacyPolicyLink') }}" class="govuk-link">{{ t('account-request.details.privacyPolicyLink') }}</a></p>
 
-        <details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary">
-      <span class="govuk-details__summary-text">
-        {{ t('account-request.details.dataCollectedQuestion') }}
-      </span>
-    </summary>
-    <div class="govuk-details__text">
-      <p class="govuk-body govuk-!-font-weight-bold">{{ t('account-request.details.dataCollectedHeading') }}</p>
-
+        {{ govukDetails({
+          summaryText: t('account-request.details.dataCollectedQuestion'),
+          html: '<p class="govuk-body govuk-!-font-weight-bold">' + t('account-request.details.dataCollectedHeading') + '</p>
           <ul class="govuk-list govuk-list--bullet">
-            <li>{{ t('account-request.details.dataCollectedBullet1') }}</li>
-            <li>{{ t('account-request.details.dataCollectedBullet2') }}</li>
-            <li>{{ t('account-request.details.dataCollectedBullet3') }}</li>
-            <li>{{ t('account-request.details.dataCollectedBullet4') }}</li>
+            <li>' + t('account-request.details.dataCollectedBullet1') + '</li>
+            <li>' + t('account-request.details.dataCollectedBullet2') + '</li>
+            <li>' + t('account-request.details.dataCollectedBullet3') + '</li>
+            <li>' + t('account-request.details.dataCollectedBullet4') + '</li>
           </ul>
+          <p class="govuk-body">' + t('account-request.details.dataCollectedStatement') + '</p>'
+        }) }}
 
-          <p class="govuk-body">
-            {{ t('account-request.details.dataCollectedStatement') }}
-          </p>
-    </div>
-        </details>
+        {{ govukDetails({
+          summaryText: t('account-request.details.dataSharedQuestion'),
+          text: t('account-request.details.dataSharedAnswer')
+        }) }}
 
-        <details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary">
-      <span class="govuk-details__summary-text">
-        {{ t('account-request.details.dataSharedQuestion') }}
-      </span>
-    </summary>
-    <div class="govuk-details__text">
-          <p class="govuk-body">{{ t('account-request.details.dataSharedAnswer') }}</p>
-        </div>
-        </details>
+        {{ govukDetails({
+          summaryText: t('account-request.details.dataTransferredQuestion'),
+          text: t('account-request.details.dataTransferredAnswer')
+        }) }}
 
-        <details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary">
-      <span class="govuk-details__summary-text">
-        {{ t('account-request.details.dataTransferredQuestion') }}
-      </span>
-    </summary>
-    <div class="govuk-details__text">
-          <p class="govuk-body">{{ t('account-request.details.dataTransferredAnswer') }}</p>
-        </div>
-        </details>
+        {{ govukDetails({
+          summaryText: t('account-request.details.dataHeldQuestion'),
+          text: t('account-request.details.dataHeldAnswer')
+        }) }}
 
-        <details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary">
-      <span class="govuk-details__summary-text">
-        {{ t('account-request.details.dataHeldQuestion') }}
-      </span>
-    </summary>
-     <div class="govuk-details__text">
-          <p class="govuk-body">{{ t('account-request.details.dataHeldAnswer') }}</p>
-        </div>
-  </details>
+        {{ govukDetails({
+          summaryText: t('account-request.details.automatedDecisionMakingQuestion'),
+          text: t('account-request.details.automatedDecisionMakingAnswer')
+        }) }}
 
-  <details class="govuk-details" data-module="govuk-details">
-    <summary class="govuk-details__summary">
-      <span class="govuk-details__summary-text">
-        {{ t('account-request.details.automatedDecisionMakingQuestion') }}
-      </span>
-    </summary>
-     <div class="govuk-details__text">
-          <p class="govuk-body">{{ t('account-request.details.automatedDecisionMakingAnswer') }}</p>
-        </div>
-        </details>
-
-        <button class="govuk-button" data-module="govuk-button">{{ t('account-request.details.continueButton') }}</button>
+        {{ govukButton({
+          text: t('account-request.details.continueButton')
+        }) }}
       </form>
       </div>
   </div>
