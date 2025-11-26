@@ -10,6 +10,8 @@ import { forgotPassword } from './auth/forgot-password/index.js'
 import { resetPassword } from './auth/reset-password/index.js'
 import { users } from './admin/users/index.js'
 import { journeySelection } from './admin/journey-selection/index.js'
+import { accountRequest } from './account_requests/account_request/index.js'
+import { accountRequestDetails } from './account_requests/details/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 
 export const router = {
@@ -29,6 +31,9 @@ export const router = {
 
       // General user routes
       await server.register([home, archive, download])
+
+      // Account request routes
+      await server.register([accountRequest, accountRequestDetails])
 
       // Static assets
       await server.register([serveStaticFiles])
