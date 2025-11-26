@@ -49,14 +49,16 @@ function validateEmailField(emailAddress, addError) {
       'account-request.details.errors.emailAddressRequired',
       '#email-address'
     )
-  } else if (!validateEmailFormat(emailAddress)) {
+    return
+  }
+
+  const isValidEmail = validateEmailFormat(emailAddress)
+  if (!isValidEmail) {
     addError(
       'emailAddress',
       'account-request.details.errors.emailAddressInvalid',
       '#email-address'
     )
-  } else {
-    // Email is valid - no error to add
   }
 }
 
