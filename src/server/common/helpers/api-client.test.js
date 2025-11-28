@@ -173,12 +173,29 @@ describe('apiRequest', () => {
     expect(global.fetch).toHaveBeenCalledTimes(3)
   })
 
-  test('network error returns NETWORK_ERROR', async () => {
-    global.fetch.mockRejectedValue(new Error('fetch failed'))
+  test('handles non-JSON response content type', async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => 'text/html' },
+      json: vi.fn()
+    })
 
     const result = await apiRequest('/test', { retries: 0 })
 
+    expect(result.success).toBe(true)
+    expect(result.data).toBeNull()
+  })
+
+  test('exhausts retries on network error and returns network error response', async () => {
+    const networkError = new TypeError('Failed to fetch')
+    global.fetch.mockRejectedValue(networkError)
+
+    const result = await apiRequest('/test', { retries: 2 })
+
     expect(result.success).toBe(false)
+    expect(result.status).toBe(0)
     expect(result.errors[0].errorCode).toBe('NETWORK_ERROR')
+    expect(global.fetch).toHaveBeenCalledTimes(3)
   })
 })

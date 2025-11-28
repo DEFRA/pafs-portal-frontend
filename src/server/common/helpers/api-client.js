@@ -83,6 +83,20 @@ async function executeRequest(url, options, controller) {
   return buildErrorResponse(response.status, data)
 }
 
+async function attemptRequest(url, options) {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT)
+
+  try {
+    const result = await executeRequest(url, options, controller)
+    clearTimeout(timeoutId)
+    return { result, error: null }
+  } catch (error) {
+    clearTimeout(timeoutId)
+    return { result: null, error }
+  }
+}
+
 export async function apiRequest(path, options = {}) {
   const url = `${BASE_URL}${path}`
   const retries = options.retries ?? MAX_RETRIES
@@ -90,36 +104,23 @@ export async function apiRequest(path, options = {}) {
   let lastResponse = null
 
   for (let attempt = 0; attempt <= retries; attempt++) {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT)
+    const { result, error } = await attemptRequest(url, options)
 
-    try {
-      const result = await executeRequest(url, options, controller)
-      clearTimeout(timeoutId)
-
-      if (result.success) {
-        return result
-      }
-
-      lastResponse = result
-
-      if (shouldRetry(result.status, attempt, retries)) {
-        await sleep(RETRY_DELAY * (attempt + 1))
-        continue
-      }
-
-      return lastResponse
-    } catch (error) {
-      clearTimeout(timeoutId)
+    if (error) {
       lastError = error
-
-      if (shouldRetry(error, attempt, retries)) {
-        await sleep(RETRY_DELAY * (attempt + 1))
-        continue
+      if (!shouldRetry(error, attempt, retries)) {
+        return buildNetworkErrorResponse(error)
       }
-
-      return buildNetworkErrorResponse(error)
+    } else if (result.success) {
+      return result
+    } else {
+      lastResponse = result
+      if (!shouldRetry(result.status, attempt, retries)) {
+        return lastResponse
+      }
     }
+
+    await sleep(RETRY_DELAY * (attempt + 1))
   }
 
   return lastResponse || buildNetworkErrorResponse(lastError)
