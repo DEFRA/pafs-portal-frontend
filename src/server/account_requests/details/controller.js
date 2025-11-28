@@ -1,4 +1,6 @@
 import { statusCodes } from '../../common/constants/status-codes.js'
+import { getAreas } from '../../common/services/areas/area-service.js'
+import { getCachedAreas } from '../../common/services/areas/areas-cache.js'
 
 function buildViewModel(
   request,
@@ -159,9 +161,24 @@ function handlePostRequest(request, h) {
   return h.redirect('/account_request')
 }
 
-function handleGetRequest(request, h) {
+async function handleGetRequest(request, h) {
   const sessionData = getSessionData(request)
   const values = sessionData.details ?? {}
+
+  try {
+    // Get areas from cache or fetch from API
+    const areas = await getCachedAreas(request.server, getAreas)
+    if (areas) {
+      request.server.logger.info({ areas: areas }, 'Areas fetched successfully')
+    } else {
+      request.server.logger.warn('Failed to fetch areas')
+    }
+  } catch (error) {
+    request.server.logger.error(
+      { error: error.message },
+      'Error fetching areas'
+    )
+  }
 
   return h.view(
     'account_requests/details/index.njk',
@@ -170,7 +187,7 @@ function handleGetRequest(request, h) {
 }
 
 export const accountRequestDetailsController = {
-  handler(request, h) {
+  async handler(request, h) {
     if (request.method === 'post') {
       return handlePostRequest(request, h)
     }
