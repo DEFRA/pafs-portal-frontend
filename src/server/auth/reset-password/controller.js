@@ -105,31 +105,18 @@ function handleResetError(result, token, request, h) {
 
   // Token expired or invalid - redirect to token expired page
   if (
-    errorData?.errorCode === 'AUTH_PASSWORD_RESET_EXPIRED_TOKEN' ||
-    errorData?.errorCode === 'AUTH_PASSWORD_RESET_INVALID_TOKEN'
+    errorData?.errorCode === VIEW_ERROR_CODES.RESET_TOKEN_EXPIRED_OR_INVALID
   ) {
     request.yar.flash('tokenExpired', true)
     return h.redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
   }
 
-  // Password same as current
-  if (errorData?.errorCode === 'AUTH_PASSWORD_RESET_SAME_AS_CURRENT') {
+  if (errorData?.errorCode === VIEW_ERROR_CODES.PASSWORD_WAS_USED_PREVIOUSLY) {
     return h.view(AUTH_VIEWS.RESET_PASSWORD, {
       pageTitle: request.t(LOCALE_KEYS.PASSWORD_RESET),
-      fieldErrors: { newPassword: 'PASSWORD_SAME_AS_CURRENT' },
-      token,
-      errorCode: '',
-      ERROR_CODES: VIEW_ERROR_CODES
-    })
-  }
-
-  // Password was used previously
-  if (
-    errorData?.errorCode === 'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY'
-  ) {
-    return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-      pageTitle: request.t(LOCALE_KEYS.PASSWORD_RESET),
-      fieldErrors: { newPassword: 'PASSWORD_USED_PREVIOUSLY' },
+      fieldErrors: {
+        newPassword: VIEW_ERROR_CODES.PASSWORD_WAS_USED_PREVIOUSLY
+      },
       token,
       errorCode: '',
       ERROR_CODES: VIEW_ERROR_CODES

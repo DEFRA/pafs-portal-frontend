@@ -6,14 +6,14 @@ const TIMEOUT = config.get('backendApi.timeout')
 const MAX_RETRIES = config.get('backendApi.retries')
 const RETRY_DELAY = config.get('backendApi.retryDelay')
 
-const RETRYABLE_STATUS_CODES = [
+const RETRYABLE_STATUS_CODES = new Set([
   statusCodes.networkError,
   statusCodes.tooManyRequests,
   statusCodes.internalServerError,
   statusCodes.badGateway,
   statusCodes.serviceUnavailable,
   statusCodes.gatewayTimeout
-]
+])
 
 function isRetryable(error) {
   return error.name === 'AbortError' || error.name === 'TypeError'
@@ -21,6 +21,66 @@ function isRetryable(error) {
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function shouldRetry(statusOrError, attempt, retries) {
+  if (attempt >= retries) {
+    return false
+  }
+  if (typeof statusOrError === 'number') {
+    return RETRYABLE_STATUS_CODES.has(statusOrError)
+  }
+  return isRetryable(statusOrError)
+}
+
+async function parseResponseData(response) {
+  const contentType = response.headers.get('content-type')
+  if (contentType?.includes('application/json')) {
+    return response.json()
+  }
+  return null
+}
+
+function buildErrorResponse(status, data) {
+  const response = {
+    success: false,
+    status,
+    validationErrors: data?.validationErrors || null,
+    errors: data?.errors || null
+  }
+
+  if (!response.validationErrors && !response.errors) {
+    response.errors = [{ errorCode: 'UNKNOWN_ERROR' }]
+  }
+
+  return response
+}
+
+function buildNetworkErrorResponse(error) {
+  return {
+    success: false,
+    status: 0,
+    errors: [{ errorCode: 'NETWORK_ERROR', message: error?.message }]
+  }
+}
+
+async function executeRequest(url, options, controller) {
+  const response = await fetch(url, {
+    ...options,
+    signal: controller.signal,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers
+    }
+  })
+
+  const data = await parseResponseData(response)
+
+  if (response.ok) {
+    return { success: true, status: response.status, data }
+  }
+
+  return buildErrorResponse(response.status, data)
 }
 
 export async function apiRequest(path, options = {}) {
@@ -34,43 +94,16 @@ export async function apiRequest(path, options = {}) {
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT)
 
     try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers
-        }
-      })
+      const result = await executeRequest(url, options, controller)
       clearTimeout(timeoutId)
 
-      const contentType = response.headers.get('content-type')
-      let data = null
-      if (contentType?.includes('application/json')) {
-        data = await response.json()
+      if (result.success) {
+        return result
       }
 
-      if (response.ok) {
-        return { success: true, status: response.status, data }
-      }
+      lastResponse = result
 
-      // Return both validation errors and general errors from backend
-      lastResponse = {
-        success: false,
-        status: response.status,
-        validationErrors: data?.validationErrors || null,
-        errors: data?.errors || null
-      }
-
-      // If neither present, add unknown error
-      if (!lastResponse.validationErrors && !lastResponse.errors) {
-        lastResponse.errors = [{ errorCode: 'UNKNOWN_ERROR' }]
-      }
-
-      if (
-        RETRYABLE_STATUS_CODES.includes(response.status) &&
-        attempt < retries
-      ) {
+      if (shouldRetry(result.status, attempt, retries)) {
         await sleep(RETRY_DELAY * (attempt + 1))
         continue
       }
@@ -80,24 +113,14 @@ export async function apiRequest(path, options = {}) {
       clearTimeout(timeoutId)
       lastError = error
 
-      if (isRetryable(error) && attempt < retries) {
+      if (shouldRetry(error, attempt, retries)) {
         await sleep(RETRY_DELAY * (attempt + 1))
         continue
       }
 
-      return {
-        success: false,
-        status: 0,
-        errors: [{ errorCode: 'NETWORK_ERROR', message: error.message }]
-      }
+      return buildNetworkErrorResponse(error)
     }
   }
 
-  return (
-    lastResponse || {
-      success: false,
-      status: 0,
-      errors: [{ errorCode: 'NETWORK_ERROR', message: lastError?.message }]
-    }
-  )
+  return lastResponse || buildNetworkErrorResponse(lastError)
 }

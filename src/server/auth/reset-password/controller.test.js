@@ -5,7 +5,10 @@ import {
   resetPasswordSuccessController,
   resetPasswordTokenExpiredController
 } from './controller.js'
-import { VALIDATION_CODES } from '../../common/constants/validation.js'
+import {
+  VALIDATION_CODES,
+  VIEW_ERROR_CODES
+} from '../../common/constants/validation.js'
 
 vi.mock('../../common/services/auth/auth-service.js')
 
@@ -156,7 +159,7 @@ describe('Reset Password Controller', () => {
     })
   })
 
-  describe('POST /reset-password - success', () => {
+  describe('POST /reset-password - API responses', () => {
     beforeEach(() => {
       mockRequest.payload = {
         token: 'valid-token-123',
@@ -182,11 +185,12 @@ describe('Reset Password Controller', () => {
     test('handles expired token error from backend', async () => {
       resetPassword.mockResolvedValue({
         success: false,
-        errors: [{ errorCode: 'AUTH_PASSWORD_RESET_EXPIRED_TOKEN' }]
+        errors: [{ errorCode: VIEW_ERROR_CODES.RESET_TOKEN_EXPIRED_OR_INVALID }]
       })
 
       await resetPasswordPostController.handler(mockRequest, mockH)
 
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith('tokenExpired', true)
       expect(mockH.redirect).toHaveBeenCalledWith(
         '/reset-password/token-expired'
       )
@@ -195,9 +199,7 @@ describe('Reset Password Controller', () => {
     test('handles password used previously error', async () => {
       resetPassword.mockResolvedValue({
         success: false,
-        errors: [
-          { errorCode: 'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY' }
-        ]
+        errors: [{ errorCode: VIEW_ERROR_CODES.PASSWORD_WAS_USED_PREVIOUSLY }]
       })
 
       await resetPasswordPostController.handler(mockRequest, mockH)
@@ -205,16 +207,18 @@ describe('Reset Password Controller', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'auth/reset-password/index',
         expect.objectContaining({
-          fieldErrors: { newPassword: 'PASSWORD_USED_PREVIOUSLY' },
+          fieldErrors: {
+            newPassword: VIEW_ERROR_CODES.PASSWORD_WAS_USED_PREVIOUSLY
+          },
           token: 'valid-token-123'
         })
       )
     })
 
-    test('handles same as current password error', async () => {
+    test('handles generic error from backend', async () => {
       resetPassword.mockResolvedValue({
         success: false,
-        errors: [{ errorCode: 'AUTH_PASSWORD_RESET_SAME_AS_CURRENT' }]
+        errors: [{ errorCode: 'SOME_OTHER_ERROR' }]
       })
 
       await resetPasswordPostController.handler(mockRequest, mockH)
@@ -222,7 +226,24 @@ describe('Reset Password Controller', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'auth/reset-password/index',
         expect.objectContaining({
-          fieldErrors: { newPassword: 'PASSWORD_SAME_AS_CURRENT' },
+          fieldErrors: {},
+          errorCode: 'SOME_OTHER_ERROR',
+          token: 'valid-token-123'
+        })
+      )
+    })
+
+    test('handles network error during reset', async () => {
+      resetPassword.mockRejectedValue(new Error('Network error'))
+
+      await resetPasswordPostController.handler(mockRequest, mockH)
+
+      expect(mockRequest.server.logger.error).toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalledWith(
+        'auth/reset-password/index',
+        expect.objectContaining({
+          fieldErrors: {},
+          errorCode: VIEW_ERROR_CODES.NETWORK_ERROR,
           token: 'valid-token-123'
         })
       )
