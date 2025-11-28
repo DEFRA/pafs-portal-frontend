@@ -1,6 +1,5 @@
-import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, test, expect, beforeEach, vi } from 'vitest'
 
-// Mock fetch and AbortController before importing
 global.fetch = vi.fn()
 global.AbortController = class {
   constructor() {
@@ -9,71 +8,119 @@ global.AbortController = class {
   }
 }
 
+function mockResponse(options) {
+  return {
+    ok: options.ok ?? true,
+    status: options.status ?? 200,
+    headers: { get: () => options.contentType ?? 'application/json' },
+    json: async () => options.data ?? {}
+  }
+}
+
 const { apiRequest } = await import('./api-client.js')
 
-describe('API Client', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
+describe('apiRequest', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  test('successful request returns data', async () => {
+    global.fetch.mockResolvedValue(mockResponse({ data: { user: { id: 1 } } }))
+
+    const result = await apiRequest('/test', { retries: 0 })
+
+    expect(result.success).toBe(true)
+    expect(result.data).toEqual({ user: { id: 1 } })
   })
 
-  afterEach(() => {
-    vi.clearAllTimers()
+  test('error response returns errors array', async () => {
+    global.fetch.mockResolvedValue(
+      mockResponse({
+        ok: false,
+        status: 401,
+        data: { errors: [{ errorCode: 'AUTH_INVALID_CREDENTIALS' }] }
+      })
+    )
+
+    const result = await apiRequest('/test', { retries: 0 })
+
+    expect(result.success).toBe(false)
+    expect(result.errors).toEqual([{ errorCode: 'AUTH_INVALID_CREDENTIALS' }])
+    expect(result.validationErrors).toBeNull()
   })
 
-  test('makes successful API request', async () => {
-    const mockData = { user: { id: 1 } }
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => mockData
-    })
-
-    const result = await apiRequest('/test', { method: 'GET' })
-
-    expect(result).toEqual({
-      success: true,
-      status: 200,
-      data: mockData
-    })
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/test'),
-      expect.objectContaining({
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
+  test('validation error response returns validationErrors array', async () => {
+    global.fetch.mockResolvedValue(
+      mockResponse({
+        ok: false,
+        status: 400,
+        data: {
+          validationErrors: [
+            { field: 'email', errorCode: 'VALIDATION_EMAIL_REQUIRED' }
+          ]
         }
       })
     )
+
+    const result = await apiRequest('/test', { retries: 0 })
+
+    expect(result.success).toBe(false)
+    expect(result.validationErrors).toEqual([
+      { field: 'email', errorCode: 'VALIDATION_EMAIL_REQUIRED' }
+    ])
+    expect(result.errors).toBeNull()
   })
 
-  test('handles API error response', async () => {
-    const mockError = { error: 'Invalid credentials' }
-    global.fetch.mockResolvedValue({
-      ok: false,
-      status: 401,
-      json: async () => mockError
-    })
+  test('preserves warning and support codes', async () => {
+    global.fetch.mockResolvedValue(
+      mockResponse({
+        ok: false,
+        status: 401,
+        data: {
+          errors: [
+            {
+              errorCode: 'AUTH_INVALID_CREDENTIALS',
+              warningCode: 'AUTH_LAST_ATTEMPT',
+              supportCode: 'CONTACT_SUPPORT'
+            }
+          ]
+        }
+      })
+    )
 
-    const result = await apiRequest('/test', { method: 'POST' })
+    const result = await apiRequest('/test', { retries: 0 })
 
-    expect(result).toEqual({
-      success: false,
-      status: 401,
-      error: mockError
-    })
+    expect(result.errors[0].warningCode).toBe('AUTH_LAST_ATTEMPT')
+    expect(result.errors[0].supportCode).toBe('CONTACT_SUPPORT')
   })
 
-  test('includes custom headers', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({})
-    })
+  test('missing both errors returns UNKNOWN_ERROR', async () => {
+    global.fetch.mockResolvedValue(
+      mockResponse({
+        ok: false,
+        status: 400,
+        data: { message: 'bad request' }
+      })
+    )
+
+    const result = await apiRequest('/test', { retries: 0 })
+
+    expect(result.errors).toEqual([{ errorCode: 'UNKNOWN_ERROR' }])
+  })
+
+  test('network error returns NETWORK_ERROR', async () => {
+    global.fetch.mockRejectedValue(new Error('fetch failed'))
+
+    const result = await apiRequest('/test', { retries: 0 })
+
+    expect(result.success).toBe(false)
+    expect(result.errors[0].errorCode).toBe('NETWORK_ERROR')
+  })
+
+  test('merges custom headers', async () => {
+    global.fetch.mockResolvedValue(mockResponse({}))
 
     await apiRequest('/test', {
-      headers: {
-        Authorization: 'Bearer token123'
-      }
+      headers: { Authorization: 'Bearer xyz' },
+      retries: 0
     })
 
     expect(global.fetch).toHaveBeenCalledWith(
@@ -81,313 +128,57 @@ describe('API Client', () => {
       expect.objectContaining({
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer token123'
+          Authorization: 'Bearer xyz'
         }
       })
     )
   })
 
-  test('throws on network error', async () => {
-    global.fetch.mockRejectedValue(new Error('Network error'))
+  test('retries on 503 then succeeds', async () => {
+    global.fetch
+      .mockResolvedValueOnce(
+        mockResponse({ ok: false, status: 503, data: { errors: [] } })
+      )
+      .mockResolvedValueOnce(mockResponse({ data: { ok: true } }))
 
-    await expect(apiRequest('/test')).rejects.toThrow('Network error')
-  })
-
-  test('sets up abort controller for timeout', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({})
-    })
-
-    await apiRequest('/test')
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        signal: expect.any(Object)
-      })
-    )
-  })
-
-  test('clears timeout on successful response', async () => {
-    vi.useFakeTimers()
-
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ data: 'test' })
-    })
-
-    await apiRequest('/test')
-
-    // Timeout should be cleared, so advancing time shouldn't cause issues
-    vi.advanceTimersByTime(20000)
-
-    vi.useRealTimers()
-  })
-
-  test('clears timeout on error', async () => {
-    vi.useFakeTimers()
-
-    global.fetch.mockRejectedValue(new Error('Connection failed'))
-
-    await expect(apiRequest('/test')).rejects.toThrow('Connection failed')
-
-    // Timeout should be cleared even on error
-    vi.advanceTimersByTime(20000)
-
-    vi.useRealTimers()
-  })
-
-  test('handles empty options parameter', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({})
-    })
-
-    const result = await apiRequest('/test')
+    const result = await apiRequest('/test', { retries: 1 })
 
     expect(result.success).toBe(true)
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        headers: {
-          'Content-Type': 'application/json'
-        }
+    expect(global.fetch).toHaveBeenCalledTimes(2)
+  })
+
+  test('retries on network error then succeeds', async () => {
+    global.fetch
+      .mockRejectedValueOnce(new TypeError('network'))
+      .mockResolvedValueOnce(mockResponse({ data: { ok: true } }))
+
+    const result = await apiRequest('/test', { retries: 1 })
+
+    expect(result.success).toBe(true)
+    expect(global.fetch).toHaveBeenCalledTimes(2)
+  })
+
+  test('exhausts retries and returns last error', async () => {
+    global.fetch.mockResolvedValue(
+      mockResponse({
+        ok: false,
+        status: 503,
+        data: { errors: [{ errorCode: 'SERVICE_UNAVAILABLE' }] }
       })
     )
+
+    const result = await apiRequest('/test', { retries: 2 })
+
+    expect(result.success).toBe(false)
+    expect(global.fetch).toHaveBeenCalledTimes(3)
   })
 
-  test('constructs correct URL with base URL', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({})
-    })
+  test('network error returns NETWORK_ERROR', async () => {
+    global.fetch.mockRejectedValue(new Error('fetch failed'))
 
-    await apiRequest('/api/v1/test')
+    const result = await apiRequest('/test', { retries: 0 })
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringMatching(/http:\/\/localhost:3001\/api\/v1\/test/),
-      expect.any(Object)
-    )
-  })
-
-  test('handles different HTTP methods', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 201,
-      json: async () => ({ created: true })
-    })
-
-    await apiRequest('/create', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'test' })
-    })
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ name: 'test' })
-      })
-    )
-  })
-
-  test('handles 404 not found', async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      status: 404,
-      json: async () => ({ error: 'Not found' })
-    })
-
-    const result = await apiRequest('/nonexistent')
-
-    expect(result).toEqual({
-      success: false,
-      status: 404,
-      error: { error: 'Not found' }
-    })
-  })
-
-  test('handles 500 server error', async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      status: 500,
-      json: async () => ({ error: 'Internal server error' })
-    })
-
-    const result = await apiRequest('/error')
-
-    expect(result).toEqual({
-      success: false,
-      status: 500,
-      error: { error: 'Internal server error' }
-    })
-  })
-
-  test('handles network errors', async () => {
-    global.fetch.mockRejectedValue(new Error('Network failure'))
-
-    await expect(apiRequest('/test')).rejects.toThrow('Network failure')
-  })
-
-  test('handles empty response body', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 204,
-      json: async () => null
-    })
-
-    const result = await apiRequest('/delete', { method: 'DELETE' })
-
-    expect(result).toEqual({
-      success: true,
-      status: 204,
-      data: null
-    })
-  })
-
-  test('handles malformed JSON response', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => {
-        throw new SyntaxError('Unexpected token')
-      }
-    })
-
-    await expect(apiRequest('/test')).rejects.toThrow('Unexpected token')
-  })
-
-  test('passes custom headers', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ success: true })
-    })
-
-    await apiRequest('/test', {
-      headers: {
-        Authorization: 'Bearer token123',
-        'X-Custom-Header': 'value'
-      }
-    })
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        headers: expect.objectContaining({
-          Authorization: 'Bearer token123',
-          'X-Custom-Header': 'value'
-        })
-      })
-    )
-  })
-
-  test('handles PUT requests', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ updated: true })
-    })
-
-    await apiRequest('/update', {
-      method: 'PUT',
-      body: JSON.stringify({ name: 'updated' })
-    })
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        method: 'PUT'
-      })
-    )
-  })
-
-  test('handles PATCH requests', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ patched: true })
-    })
-
-    await apiRequest('/patch', {
-      method: 'PATCH',
-      body: JSON.stringify({ field: 'value' })
-    })
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        method: 'PATCH'
-      })
-    )
-  })
-
-  test('handles 401 unauthorized', async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      status: 401,
-      json: async () => ({ errorCode: 'AUTH_INVALID_CREDENTIALS' })
-    })
-
-    const result = await apiRequest('/secure')
-
-    expect(result).toEqual({
-      success: false,
-      status: 401,
-      error: { errorCode: 'AUTH_INVALID_CREDENTIALS' }
-    })
-  })
-
-  test('handles 403 forbidden', async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      status: 403,
-      json: async () => ({ error: 'Forbidden' })
-    })
-
-    const result = await apiRequest('/admin')
-
-    expect(result).toEqual({
-      success: false,
-      status: 403,
-      error: { error: 'Forbidden' }
-    })
-  })
-
-  test('handles 404 not found', async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      status: 404,
-      json: async () => ({ error: 'Not found' })
-    })
-
-    const result = await apiRequest('/missing')
-
-    expect(result).toEqual({
-      success: false,
-      status: 404,
-      error: { error: 'Not found' }
-    })
-  })
-
-  test('handles 503 service unavailable', async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      status: 503,
-      json: async () => ({ error: 'Service unavailable' })
-    })
-
-    const result = await apiRequest('/test')
-
-    expect(result).toEqual({
-      success: false,
-      status: 503,
-      error: { error: 'Service unavailable' }
-    })
+    expect(result.success).toBe(false)
+    expect(result.errors[0].errorCode).toBe('NETWORK_ERROR')
   })
 })

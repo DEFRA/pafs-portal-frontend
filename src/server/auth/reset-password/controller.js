@@ -1,14 +1,18 @@
-import Joi from 'joi'
 import {
   resetPassword,
   validateResetToken
 } from '../../common/services/auth/auth-service.js'
 import { ROUTES } from '../../common/constants/routes.js'
-import { PASSWORD } from '../../common/constants/validation.js'
-import { AUTH_VIEWS, PAGE_TITLE } from '../../common/constants/common.js'
+import { VIEW_ERROR_CODES } from '../../common/constants/validation.js'
+import { AUTH_VIEWS, LOCALE_KEYS } from '../../common/constants/common.js'
+import { extractJoiErrors } from '../../common/helpers/error-renderer.js'
+import { resetPasswordSchema } from '../schema.js'
 
-class ResetPasswordController {
-  async get(request, h) {
+/**
+ * GET /reset-password - Show reset password form
+ */
+export const resetPasswordController = {
+  async handler(request, h) {
     const { token } = request.query
 
     if (!token) {
@@ -19,203 +23,161 @@ class ResetPasswordController {
       const result = await validateResetToken(token)
 
       if (!result.success) {
-        return h
-          .redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
-          .state('canViewTokenExpired', '1')
+        request.yar.flash('tokenExpired', true)
+        return h.redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
       }
 
       return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-        pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
-        token
+        pageTitle: request.t(LOCALE_KEYS.PASSWORD_RESET),
+        token,
+        fieldErrors: {},
+        errorCode: '',
+        ERROR_CODES: VIEW_ERROR_CODES
       })
-    } catch (error) {
-      request.server.logger.error(
-        { err: error },
-        'Error validating reset token'
-      )
-
-      return h
-        .redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
-        .state('canViewTokenExpired', '1')
+    } catch (err) {
+      request.server.logger.error({ err }, 'Error validating reset token')
+      request.yar.flash('tokenExpired', true)
+      return h.redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
     }
   }
+}
 
-  async post(request, h) {
+/**
+ * POST /reset-password - Process password reset
+ */
+export const resetPasswordPostController = {
+  async handler(request, h) {
     const { token, newPassword, confirmPassword } = request.payload || {}
 
     if (!token) {
-      return h
-        .redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
-        .state('canViewTokenExpired', '1')
+      request.yar.flash('tokenExpired', true)
+      return h.redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
     }
 
-    const validation = this.validateInput(newPassword, confirmPassword, request)
-    if (validation.errors) {
-      return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-        pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
-        validationErrors: validation.errors,
-        token
-      })
-    }
-
-    try {
-      const result = await resetPassword(token, newPassword, confirmPassword)
-
-      if (!result.success) {
-        return this.handleResetError(result, token, request, h)
-      }
-
-      return h
-        .redirect(ROUTES.RESET_PASSWORD_SUCCESS)
-        .state('canViewSuccess', '1')
-    } catch (error) {
-      request.server.logger.error({ err: error }, 'Reset password error')
-
-      return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-        pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
-        errorMessage: request.t('auth.service_error'),
-        token
-      })
-    }
-  }
-
-  validateInput(newPassword, confirmPassword, _request) {
-    const schema = Joi.object({
-      newPassword: Joi.string()
-        .min(PASSWORD.MIN_LENGTH)
-        .max(PASSWORD.MAX_LENGTH)
-        .pattern(/[A-Z]/, 'uppercase')
-        .pattern(/[a-z]/, 'lowercase')
-        .pattern(/\d/, 'number')
-        .pattern(/[!@#$%^&*()_.+\-=[\]]/, 'special')
-        .required()
-        .messages({
-          'string.empty': 'password-required',
-          'string.min': 'password-min-length',
-          'string.max': 'password-max-length',
-          'string.pattern.name': 'password-{#name}',
-          'any.required': 'password-required'
-        }),
-      confirmPassword: Joi.string()
-        .valid(Joi.ref('newPassword'))
-        .required()
-        .messages({
-          'string.empty': 'confirm-password-required',
-          'any.only': 'password-mismatch',
-          'any.required': 'confirm-password-required'
-        })
-    })
-
-    const { error } = schema.validate(
-      { newPassword, confirmPassword },
+    // Validate input using schema
+    const { error, value } = resetPasswordSchema.validate(
+      { token, newPassword, confirmPassword },
       { abortEarly: false }
     )
 
     if (error) {
-      return { errors: error.details.map((detail) => detail.message) }
+      return h.view(AUTH_VIEWS.RESET_PASSWORD, {
+        pageTitle: request.t(LOCALE_KEYS.PASSWORD_RESET),
+        fieldErrors: extractJoiErrors(error),
+        token,
+        errorCode: '',
+        ERROR_CODES: VIEW_ERROR_CODES
+      })
     }
 
-    return { errors: null }
+    try {
+      const result = await resetPassword(
+        value.token,
+        value.newPassword,
+        value.confirmPassword
+      )
+
+      if (!result.success) {
+        return handleResetError(result, token, request, h)
+      }
+
+      // Success - redirect to success page
+      request.yar.flash('resetSuccess', true)
+      return h.redirect(ROUTES.RESET_PASSWORD_SUCCESS)
+    } catch (err) {
+      request.server.logger.error({ err }, 'Reset password error')
+      return h.view(AUTH_VIEWS.RESET_PASSWORD, {
+        pageTitle: request.t(LOCALE_KEYS.PASSWORD_RESET),
+        fieldErrors: {},
+        errorCode: VIEW_ERROR_CODES.NETWORK_ERROR,
+        token,
+        ERROR_CODES: VIEW_ERROR_CODES
+      })
+    }
+  }
+}
+
+/**
+ * Handle API errors from reset password
+ */
+function handleResetError(result, token, request, h) {
+  const errorData = result.errors?.[0]
+
+  // Token expired or invalid - redirect to token expired page
+  if (
+    errorData?.errorCode === 'AUTH_PASSWORD_RESET_EXPIRED_TOKEN' ||
+    errorData?.errorCode === 'AUTH_PASSWORD_RESET_INVALID_TOKEN'
+  ) {
+    request.yar.flash('tokenExpired', true)
+    return h.redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
   }
 
-  handleResetError(result, token, request, h) {
-    const errorData = result.error
-
-    // Check for specific error codes
-    if (errorData?.errorCode === 'AUTH_PASSWORD_RESET_EXPIRED_TOKEN') {
-      return h
-        .redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
-        .state('canViewTokenExpired', '1')
-    }
-
-    if (errorData?.errorCode === 'AUTH_PASSWORD_RESET_INVALID_TOKEN') {
-      return h
-        .redirect(ROUTES.RESET_PASSWORD_TOKEN_EXPIRED)
-        .state('canViewTokenExpired', '1')
-    }
-
-    // Handle same as current password error
-    if (errorData?.errorCode === 'AUTH_PASSWORD_RESET_SAME_AS_CURRENT') {
-      return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-        pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
-        validationErrors: ['password-same-as-current'],
-        token
-      })
-    }
-
-    // Handle password was used previously error
-    if (
-      errorData?.errorCode ===
-      'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY'
-    ) {
-      return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-        pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
-        validationErrors: ['password-used-previously'],
-        token
-      })
-    }
-
-    // Generic error
+  // Password same as current
+  if (errorData?.errorCode === 'AUTH_PASSWORD_RESET_SAME_AS_CURRENT') {
     return h.view(AUTH_VIEWS.RESET_PASSWORD, {
-      pageTitle: request.t(PAGE_TITLE.PASSWORD_RESET),
-      errorCode: errorData?.errorCode,
-      token
+      pageTitle: request.t(LOCALE_KEYS.PASSWORD_RESET),
+      fieldErrors: { newPassword: 'PASSWORD_SAME_AS_CURRENT' },
+      token,
+      errorCode: '',
+      ERROR_CODES: VIEW_ERROR_CODES
     })
   }
+
+  // Password was used previously
+  if (
+    errorData?.errorCode === 'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY'
+  ) {
+    return h.view(AUTH_VIEWS.RESET_PASSWORD, {
+      pageTitle: request.t(LOCALE_KEYS.PASSWORD_RESET),
+      fieldErrors: { newPassword: 'PASSWORD_USED_PREVIOUSLY' },
+      token,
+      errorCode: '',
+      ERROR_CODES: VIEW_ERROR_CODES
+    })
+  }
+
+  // Generic error
+  return h.view(AUTH_VIEWS.RESET_PASSWORD, {
+    pageTitle: request.t(LOCALE_KEYS.PASSWORD_RESET),
+    fieldErrors: {},
+    errorCode: errorData?.errorCode || VIEW_ERROR_CODES.UNKNOWN_ERROR,
+    token,
+    ERROR_CODES: VIEW_ERROR_CODES
+  })
 }
 
-const controller = new ResetPasswordController()
+/**
+ * GET /reset-password/success - Show success page
+ */
+export const resetPasswordSuccessController = {
+  handler(request, h) {
+    // Check flash session for access control
+    const flashSuccess = request.yar.flash('resetSuccess')
 
-export const resetPasswordController = {
-  handler: (request, h) => controller.get(request, h)
-}
-
-export const resetPasswordPostController = {
-  handler: (request, h) => controller.post(request, h)
-}
-
-class ResetPasswordSuccessController {
-  get(request, h) {
-    // Prevent direct access - must come from successful password reset
-    if (!request.state.canViewSuccess) {
+    if (!flashSuccess?.[0]) {
       return h.redirect(ROUTES.LOGIN)
     }
 
-    const response = h.view(AUTH_VIEWS.RESET_PASSWORD_SUCCESS, {
-      pageTitle: request.t('password-reset.reset_password_success.title')
+    return h.view(AUTH_VIEWS.RESET_PASSWORD_SUCCESS, {
+      pageTitle: request.t('auth.reset_password_success.title')
     })
-
-    response.unstate('canViewSuccess')
-
-    return response
   }
 }
 
-const successController = new ResetPasswordSuccessController()
+/**
+ * GET /reset-password/token-expired - Show token expired page
+ */
+export const resetPasswordTokenExpiredController = {
+  handler(request, h) {
+    // Check flash session for access control
+    const flashExpired = request.yar.flash('tokenExpired')
 
-export const resetPasswordSuccessController = {
-  handler: (request, h) => successController.get(request, h)
-}
-
-class ResetPasswordTokenExpiredController {
-  get(request, h) {
-    // Prevent direct access - must come from invalid/expired token
-    if (!request.state.canViewTokenExpired) {
+    if (!flashExpired?.[0]) {
       return h.redirect(ROUTES.FORGOT_PASSWORD)
     }
 
-    const response = h.view(AUTH_VIEWS.RESET_PASSWORD_TOKEN_EXPIRED, {
-      pageTitle: request.t('password-reset.reset_password_token_expired.title')
+    return h.view(AUTH_VIEWS.RESET_PASSWORD_TOKEN_EXPIRED, {
+      pageTitle: request.t('auth.reset_password_token_expired.title')
     })
-
-    response.unstate('canViewTokenExpired')
-
-    return response
   }
-}
-
-const tokenExpiredController = new ResetPasswordTokenExpiredController()
-
-export const resetPasswordTokenExpiredController = {
-  handler: (request, h) => tokenExpiredController.get(request, h)
 }

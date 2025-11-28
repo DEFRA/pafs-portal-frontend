@@ -1,111 +1,95 @@
-import Joi from 'joi'
 import { login } from '../../common/services/auth/auth-service.js'
 import { setAuthSession } from '../../common/helpers/auth/session-manager.js'
 import { ROUTES } from '../../common/constants/routes.js'
 import { AUTH_VIEWS, LOCALE_KEYS } from '../../common/constants/common.js'
-import { EMAIL } from '../../common/constants/validation.js'
+import { VIEW_ERROR_CODES } from '../../common/constants/validation.js'
+import { loginSchema } from '../schema.js'
+import {
+  extractJoiErrors,
+  extractApiValidationErrors,
+  extractApiError
+} from '../../common/helpers/error-renderer.js'
 
-class LoginController {
-  get(request, h) {
-    const { error } = request.query
-
+export const loginController = {
+  handler(request, h) {
     return h.view(AUTH_VIEWS.LOGIN, {
       pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
-      errorCode: error // Error code from backend or middleware
+      errorCode: request.query.error || '',
+      warningCode: '',
+      supportCode: '',
+      fieldErrors: {},
+      ERROR_CODES: VIEW_ERROR_CODES
     })
   }
+}
 
-  async post(request, h) {
-    const { email, password } = request.payload || {}
+export const loginPostController = {
+  async handler(request, h) {
+    const { email = '', password } = request.payload || {}
 
-    const validation = this.validateInput(email, password, request)
-    if (validation.errors) {
+    const { error, value } = loginSchema.validate(
+      { email, password },
+      { abortEarly: false }
+    )
+    if (error) {
       return h.view(AUTH_VIEWS.LOGIN, {
         pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
-        validationErrors: validation.errors,
-        email: email || ''
+        fieldErrors: extractJoiErrors(error),
+        errorCode: '',
+        warningCode: '',
+        supportCode: '',
+        email,
+        ERROR_CODES: VIEW_ERROR_CODES
       })
     }
 
     try {
-      const result = await login(email, password)
+      const result = await login(value.email, value.password)
 
       if (!result.success) {
-        return this.handleLoginError(result, email, request, h)
+        // Check for backend validation errors first
+        if (result.validationErrors) {
+          return h.view(AUTH_VIEWS.LOGIN, {
+            pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
+            errorCode: '',
+            fieldErrors: extractApiValidationErrors(result),
+            warningCode: '',
+            supportCode: '',
+            email,
+            ERROR_CODES: VIEW_ERROR_CODES
+          })
+        }
+
+        // Handle auth/general errors
+        const apiError = extractApiError(result)
+        return h.view(AUTH_VIEWS.LOGIN, {
+          pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
+          fieldErrors: {},
+          errorCode: apiError?.errorCode,
+          warningCode: apiError?.warningCode || '',
+          supportCode: apiError?.supportCode || '',
+          email,
+          ERROR_CODES: VIEW_ERROR_CODES
+        })
       }
 
       setAuthSession(request, result.data)
-      return this.redirectAfterLogin(result.data.user, h)
-    } catch (error) {
-      request.server.logger.error({ err: error }, 'Login error')
 
+      if (result.data.user.admin) {
+        return h.redirect(ROUTES.ADMIN.JOURNEY_SELECTION)
+      }
+      return h.redirect(ROUTES.GENERAL.HOME)
+    } catch (err) {
+      request.server.logger.error({ err }, 'Login error')
       return h.view(AUTH_VIEWS.LOGIN, {
         pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
-        errorMessage: request.t('auth.service_error'),
-        email: email || ''
+        errorCode: VIEW_ERROR_CODES.NETWORK_ERROR,
+        warningCode: '',
+        supportCode: '',
+        fieldErrors: {},
+        email,
+        ERROR_CODES: VIEW_ERROR_CODES
       })
     }
   }
-
-  validateInput(email, password, _request) {
-    const schema = Joi.object({
-      email: Joi.string()
-        .email({ tlds: { allow: false } })
-        .max(EMAIL.MAX_LENGTH)
-        .trim()
-        .lowercase()
-        .required()
-        .messages({
-          'string.empty': 'email-required',
-          'string.email': 'email-invalid',
-          'any.required': 'email-required'
-        }),
-      password: Joi.string().required().messages({
-        'string.empty': 'password-required',
-        'any.required': 'password-required'
-      })
-    })
-
-    const { error } = schema.validate(
-      { email, password },
-      { abortEarly: false }
-    )
-
-    if (error) {
-      // Return all validation errors as an array
-      return { errors: error.details.map((detail) => detail.message) }
-    }
-
-    return { errors: null }
-  }
-
-  handleLoginError(result, email, request, h) {
-    // result.error contains the API response body: { errorCode, warningCode, supportCode }
-    const errorData = result.error
-
-    return h.view(AUTH_VIEWS.LOGIN, {
-      pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
-      errorCode: errorData?.errorCode,
-      warningCode: errorData?.warningCode,
-      supportCode: errorData?.supportCode,
-      email: email || ''
-    })
-  }
-
-  redirectAfterLogin(user, h) {
-    if (user.admin) {
-      return h.redirect(ROUTES.ADMIN.JOURNEY_SELECTION)
-    }
-    return h.redirect(ROUTES.GENERAL.HOME)
-  }
-}
-
-const controller = new LoginController()
-
-export const loginController = {
-  handler: (request, h) => controller.get(request, h)
-}
-
-export const loginPostController = {
-  handler: (request, h) => controller.post(request, h)
 }

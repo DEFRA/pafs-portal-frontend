@@ -7,63 +7,42 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-      {# Validation errors #}
-      {% if validationErrors %}
-        {% set errorList = [] %}
-        {% for error in validationErrors %}
-          {% if error == "email-required" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.forgot_password.errors.email_required'),
-                href: "#email"
-              }
-            ]) %}
-          {% elif error == "email-invalid" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.forgot_password.errors.email_invalid'),
-                href: "#email"
-              }
-            ]) %}
-          {% endif %}
-        {% endfor %}
+      {# Build error summary list #}
+      {% set errorList = [] %}
+      {% if fieldErrors.email == ERROR_CODES.EMAIL_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.email.required'), href: "#email" }]) %}
+      {% elif fieldErrors.email == ERROR_CODES.EMAIL_INVALID_FORMAT or fieldErrors.email == ERROR_CODES.EMAIL_TOO_LONG %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.email.invalid_format'), href: "#email" }]) %}
+      {% endif %}
 
-        {% if errorList.length > 0 %}
-          {{ govukErrorSummary({
-            titleText: t('common.error_summary_title'),
-            errorList: errorList
-          }) }}
-        {% endif %}
+      {% if errorList.length > 0 %}
+        {{ govukErrorSummary({
+          titleText: t('common.error_summary_title'),
+          errorList: errorList
+        }) }}
       {% endif %}
 
       <h1 class="govuk-heading-xl">
-        {{ t('password-reset.forgot_password.heading') }}
+        {{ t('auth.forgot_password.heading') }}
       </h1>
 
       <p class="govuk-body">
-        {{ t('password-reset.forgot_password.description') }}
+        {{ t('auth.forgot_password.description') }}
       </p>
 
       <form action="/forgot-password" method="post" novalidate>
 
-        {% set emailErrorMessage = false %}
-        {% if validationErrors %}
-          {% for error in validationErrors %}
-            {% if error == "email-required" %}
-              {% set emailErrorMessage = {
-                text: t('password-reset.forgot_password.errors.email_required')
-              } %}
-            {% elif error == "email-invalid" %}
-              {% set emailErrorMessage = {
-                text: t('password-reset.forgot_password.errors.email_invalid')
-              } %}
-            {% endif %}
-          {% endfor %}
+        {# Email field error #}
+        {% set emailError = false %}
+        {% if fieldErrors.email == ERROR_CODES.EMAIL_REQUIRED %}
+          {% set emailError = { text: t('auth.validation.email.required') } %}
+        {% elif fieldErrors.email == ERROR_CODES.EMAIL_INVALID_FORMAT or fieldErrors.email == ERROR_CODES.EMAIL_TOO_LONG %}
+          {% set emailError = { text: t('auth.validation.email.invalid_format') } %}
         {% endif %}
 
         {{ govukInput({
           label: {
-            text: t('password-reset.forgot_password.email_label')
+            text: t('auth.labels.email')
           },
           classes: "govuk-!-width-two-thirds",
           id: "email",
@@ -72,17 +51,17 @@
           autocomplete: "email",
           value: email,
           spellcheck: false,
-          errorMessage: emailErrorMessage
+          errorMessage: emailError
         }) }}
 
         {{ govukButton({
-          text: t('password-reset.forgot_password.submit_button')
+          text: t('auth.forgot_password.submit_button')
         }) }}
 
       </form>
 
       <p class="govuk-body govuk-!-margin-top-6">
-        <a href="/login" class="govuk-link">{{ t('password-reset.forgot_password.back_to_sign_in') }}</a>
+        <a href="/login" class="govuk-link">{{ t('common.back_to_sign_in') }}</a>
       </p>
 
     </div>

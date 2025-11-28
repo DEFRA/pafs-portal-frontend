@@ -1,4 +1,5 @@
 import { SESSION } from '../../constants/session.js'
+import { AUTH_ERROR_CODES } from '../../constants/validation.js'
 import { refreshToken } from '../../services/auth/auth-service.js'
 
 export function setAuthSession(request, authData) {
@@ -47,14 +48,14 @@ export async function refreshAuthSession(request) {
   const logger = request.server?.logger
 
   if (!session) {
-    return { success: false, reason: SESSION.SESSION_TIMEOUT }
+    return { success: false, reason: AUTH_ERROR_CODES.SESSION_TIMEOUT }
   }
 
   if (isSessionExpired(session)) {
     const userId = session.user?.id
     logger?.info({ userId }, 'Session expired due to inactivity')
     clearAuthSession(request)
-    return { success: false, reason: SESSION.SESSION_TIMEOUT }
+    return { success: false, reason: AUTH_ERROR_CODES.SESSION_TIMEOUT }
   }
 
   try {
@@ -68,7 +69,7 @@ export async function refreshAuthSession(request) {
       clearAuthSession(request)
 
       // Always return session timeout for user-friendly message
-      return { success: false, reason: SESSION.SESSION_TIMEOUT }
+      return { success: false, reason: AUTH_ERROR_CODES.SESSION_TIMEOUT }
     }
 
     const now = Date.now()
@@ -87,7 +88,7 @@ export async function refreshAuthSession(request) {
     clearAuthSession(request)
 
     // Always return session timeout for user-friendly message
-    return { success: false, reason: SESSION.SESSION_TIMEOUT }
+    return { success: false, reason: AUTH_ERROR_CODES.SESSION_TIMEOUT }
   }
 }
 
