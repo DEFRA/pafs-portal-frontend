@@ -26,8 +26,8 @@ describe('i18n translation service', () => {
       )
     })
 
-    test('gets translation from validation namespace', () => {
-      expect(translate('validation.email.required')).toBe(
+    test('gets translation from auth validation namespace', () => {
+      expect(translate('auth.validation.email.required')).toBe(
         'Enter your email address'
       )
     })
@@ -133,8 +133,8 @@ describe('i18n translation service', () => {
   describe('real-world usage scenarios', () => {
     test('translates login page strings', () => {
       expect(translate('common.sign_in')).toBe('Sign in')
-      expect(translate('common.login.email_label')).toBe('Email address')
-      expect(translate('common.login.password_label')).toBe('Password')
+      expect(translate('auth.labels.email')).toBe('Email address')
+      expect(translate('auth.labels.password')).toBe('Password')
     })
 
     test('translates error messages', () => {
@@ -155,10 +155,10 @@ describe('i18n translation service', () => {
     })
 
     test('translates validation messages', () => {
-      expect(translate('validation.email.invalid_format')).toBe(
+      expect(translate('auth.validation.email.invalid_format')).toBe(
         'Enter an email address in the correct format, like name@example.com'
       )
-      expect(translate('validation.password.required')).toBe(
+      expect(translate('auth.validation.password.required')).toBe(
         'Enter your password'
       )
     })

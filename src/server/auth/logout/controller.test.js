@@ -5,9 +5,8 @@ vi.mock('../../common/services/auth/auth-service.js')
 vi.mock('../../common/helpers/auth/session-manager.js')
 
 const { logout } = await import('../../common/services/auth/auth-service.js')
-const { getAuthSession, clearAuthSession } = await import(
-  '../../common/helpers/auth/session-manager.js'
-)
+const { getAuthSession, clearAuthSession } =
+  await import('../../common/helpers/auth/session-manager.js')
 
 describe('Logout Controller', () => {
   let mockRequest
