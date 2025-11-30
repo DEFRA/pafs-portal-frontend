@@ -33,7 +33,7 @@
         "options": {
           "general_user": {
             "text": "General user journey",
-            "hint": "Explore the user portal as an RMA, PSO, or EA user"
+            "hint": "Explore the user portal as an RMA, PSO or Area user"
           },
           "admin_user": {
             "text": "Admin journey",

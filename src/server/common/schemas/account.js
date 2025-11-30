@@ -47,7 +47,7 @@ export const passwordStrengthSchema = Joi.string()
     'string.min': VALIDATION_CODES.PASSWORD_MIN_LENGTH,
     'string.max': VALIDATION_CODES.PASSWORD_MAX_LENGTH,
     'string.pattern.name': 'PASSWORD_STRENGTH_{#name}'
-  })
+  }).options({ abortEarly: true })
 
 /**
  * Confirm password schema - must match password field
@@ -66,12 +66,10 @@ export const confirmPasswordSchema = Joi.string()
  * Token schema - validates token format
  */
 export const tokenSchema = Joi.string()
-  .max(SIZE.LENGTH_32)
   .trim()
   .label('token')
   .required()
   .messages({
     'string.empty': VALIDATION_CODES.TOKEN_REQUIRED,
-    'any.required': VALIDATION_CODES.TOKEN_REQUIRED,
-    'string.max': VALIDATION_CODES.TOKEN_INVALID
+    'any.required': VALIDATION_CODES.TOKEN_REQUIRED
   })
