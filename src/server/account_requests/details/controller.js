@@ -133,11 +133,21 @@ function getSessionData(request) {
   return request.yar.get('accountRequest') ?? {}
 }
 
-function handlePostRequest(request, h) {
+async function handlePostRequest(request, h) {
   const { values, errors, errorSummary } = validateDetails(request)
   const returnTo = request.payload?.returnTo
 
   if (errorSummary.length) {
+    // Pre-fetch areas to warm up cache for next page
+    try {
+      await getCachedAreas(request.server, getAreas)
+    } catch (error) {
+      request.server.logger.error(
+        { error: error.message },
+        'Error pre-fetching areas for cache'
+      )
+    }
+
     return h
       .view(
         'account_requests/details/index.njk',
@@ -157,32 +167,56 @@ function handlePostRequest(request, h) {
     'Account request details submitted'
   )
 
-  // For now, redirect back to account_request page
-  return h.redirect('/account_request')
+  // Redirect based on responsibility selection
+  let nextUrl = '/account_request'
+  switch (values.responsibility) {
+    case 'EA':
+      nextUrl = '/account_request/ea-main-area'
+      break
+    case 'PSO':
+      nextUrl = '/account_request/ea-area'
+      break
+    case 'RMA':
+      nextUrl = '/account_request/ea-area'
+      break
+    default:
+      request.server.logger.warn(
+        { responsibility: values.responsibility },
+        'Unknown responsibility value, redirecting to default'
+      )
+      nextUrl = '/account_request'
+  }
+
+  return h.redirect(nextUrl)
 }
 
 async function handleGetRequest(request, h) {
   const sessionData = getSessionData(request)
   const values = sessionData.details ?? {}
+  const returnTo =
+    request.query.from === 'check-answers' ? 'check-answers' : undefined
 
+  // Pre-fetch areas to warm up cache for next page (not used on this page)
   try {
-    // Get areas from cache or fetch from API
     const areas = await getCachedAreas(request.server, getAreas)
     if (areas) {
-      request.server.logger.info({ areas: areas }, 'Areas fetched successfully')
+      request.server.logger.info(
+        { areasCount: Array.isArray(areas) ? areas.length : 'unknown' },
+        'Areas pre-fetched and cached for next page'
+      )
     } else {
-      request.server.logger.warn('Failed to fetch areas')
+      request.server.logger.warn('Failed to pre-fetch areas')
     }
   } catch (error) {
     request.server.logger.error(
       { error: error.message },
-      'Error fetching areas'
+      'Error pre-fetching areas for cache'
     )
   }
 
   return h.view(
     'account_requests/details/index.njk',
-    buildViewModel(request, values)
+    buildViewModel(request, values, undefined, undefined, returnTo)
   )
 }
 

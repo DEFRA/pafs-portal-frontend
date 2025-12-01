@@ -1,0 +1,68 @@
+{% extends 'layouts/page.njk' %}
+
+{% block pageTitle %}{{ t('account-request.eaArea.heading') }} | {{ serviceName }}{% endblock %}
+
+{% block content %}
+  <a href="#" class="govuk-back-link">{{ t('account-request.back') }}</a>
+
+  {% if errorSummary and (errorSummary | length) %}
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
+    <h2 class="govuk-error-summary__title" id="error-summary-title">
+      {{ t('account-request.details.errorSummaryTitle') }}
+    </h2>
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+        {% for item in errorSummary %}
+          <li><a href="{{ item.href }}">{{ item.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="govuk-form-group {% if errors.eaAreas %}govuk-form-group--error{% endif %}">
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 class="govuk-heading-l">{{ t('account-request.eaArea.heading') }}</h1>
+      </legend>
+      <div id="ea-area-hint" class="govuk-hint">
+        {{ t('account-request.eaArea.eaAreaHint') }}
+      </div>
+      {% if errors.eaAreas %}
+      <p id="ea-areas-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors.eaAreas }}
+      </p>
+      {% endif %}
+      <form method="post" novalidate>
+        {% if returnTo %}
+        <input type="hidden" name="returnTo" value="{{ returnTo }}">
+        {% endif %}
+
+        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+          {% if eaAreas and eaAreas.length > 0 %}
+            {% for area in eaAreas %}
+              <div class="govuk-checkboxes__item">
+                <input
+                  class="govuk-checkboxes__input"
+                  id="ea-areas-{{ area.id }}"
+                  name="eaAreas"
+                  type="checkbox"
+                  value="{{ area.id }}"
+                  {% if area.id|string in (values.eaAreas or []) %}checked{% endif %}
+                >
+                <label class="govuk-label govuk-checkboxes__label" for="ea-areas-{{ area.id }}">
+                  {{ area.name }}
+                </label>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="govuk-body">{{ t('account-request.eaArea.noAreasAvailable') }}</p>
+          {% endif %}
+        </div>
+
+        <button class="govuk-button" data-module="govuk-button">{{ t('account-request.eaArea.continueButton') }}</button>
+      </form>
+    </fieldset>
+  </div>
+{% endblock %}
+

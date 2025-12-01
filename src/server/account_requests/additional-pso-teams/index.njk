@@ -1,0 +1,58 @@
+{% extends 'layouts/page.njk' %}
+
+{% block pageTitle %}{{ t('account-request.additionalPsoTeams.heading') }} | {{ serviceName }}{% endblock %}
+
+{% block content %}
+  <a href="#" class="govuk-back-link">{{ t('account-request.back') }}</a>
+
+  <h1 class="govuk-heading-l">{{ t('account-request.additionalPsoTeams.heading') }}</h1>
+
+  <form method="post" novalidate>
+    {% if returnTo %}
+    <input type="hidden" name="returnTo" value="{{ returnTo }}">
+    {% endif %}
+
+    <div class="govuk-form-group">
+      <label class="govuk-label govuk-label--m">
+        {{ t('account-request.additionalPsoTeams.additionalPsoTeamsLabel') }}
+      </label>
+      <div id="additional-pso-teams-hint" class="govuk-hint">
+        {{ t('account-request.additionalPsoTeams.additionalPsoTeamsHint') }}
+      </div>
+    </div>
+
+    {% if additionalPsoTeamsByEaArea and additionalPsoTeamsByEaArea.length > 0 %}
+      {% for group in additionalPsoTeamsByEaArea %}
+        <div class="govuk-form-group govuk-!-margin-bottom-8">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend">{{ group.eaArea.name }}</legend>
+            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+              {% for team in group.teams %}
+                <div class="govuk-checkboxes__item">
+                  <input
+                    class="govuk-checkboxes__input"
+                    id="additional-pso-teams-{{ team.id }}"
+                    name="additionalPsoTeams"
+                    type="checkbox"
+                    value="{{ team.id }}"
+                    {% if team.id|string in (values.additionalPsoTeams or []) %}checked{% endif %}
+                  >
+                  <label class="govuk-label govuk-checkboxes__label" for="additional-pso-teams-{{ team.id }}">
+                    {{ team.name }}
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          </fieldset>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="govuk-body">{{ t('account-request.additionalPsoTeams.noAdditionalTeams') }}</p>
+    {% endif %}
+
+    <button class="govuk-button" data-module="govuk-button">
+      {{ t('account-request.additionalPsoTeams.continueButton') }}
+    </button>
+  </form>
+{% endblock %}
+

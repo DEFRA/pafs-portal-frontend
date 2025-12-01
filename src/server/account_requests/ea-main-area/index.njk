@@ -1,0 +1,54 @@
+{% extends 'layouts/page.njk' %}
+
+{% block pageTitle %}{{ t('account-request.eaMainArea.heading') }} | {{ serviceName }}{% endblock %}
+
+{% block content %}
+  <a href="#" class="govuk-back-link">{{ t('account-request.back') }}</a>
+
+  <h1 class="govuk-heading-l">{{ t('account-request.eaMainArea.heading') }}</h1>
+
+  {% if errorSummary and (errorSummary | length) %}
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
+    <h2 class="govuk-error-summary__title" id="error-summary-title">
+      {{ t('account-request.details.errorSummaryTitle') }}
+    </h2>
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+        {% for item in errorSummary %}
+          <li><a href="{{ item.href }}">{{ item.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% if returnTo %}
+    <input type="hidden" name="returnTo" value="{{ returnTo }}">
+    {% endif %}
+
+    <div class="govuk-form-group {% if errors.mainEaArea %}govuk-form-group--error{% endif %}">
+      <label class="govuk-label govuk-label--m" for="main-ea-area">
+        {{ t('account-request.eaMainArea.mainEaAreaLabel') }}
+      </label>
+      <div id="main-ea-area-hint" class="govuk-hint">
+        {{ t('account-request.eaMainArea.mainEaAreaHint') }}
+      </div>
+      {% if errors.mainEaArea %}
+      <p id="main-ea-area-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors.mainEaArea }}
+      </p>
+      {% endif %}
+      <select class="govuk-select {% if errors.mainEaArea %}govuk-select--error{% endif %}" id="main-ea-area" name="mainEaArea">
+        <option value="">{{ t('account-request.eaMainArea.selectAnAreaOption') }}</option>
+        {% if eaAreas %}
+          {% for area in eaAreas %}
+            <option value="{{ area.id }}" {% if values.mainEaArea == area.id|string %}selected{% endif %}>{{ area.name }}</option>
+          {% endfor %}
+        {% endif %}
+      </select>
+    </div>
+
+    <button class="govuk-button" data-module="govuk-button">{{ t('account-request.eaMainArea.continueButton') }}</button>
+  </form>
+{% endblock %}
