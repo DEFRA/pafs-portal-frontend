@@ -13,9 +13,6 @@ export const ADMIN_VIEWS = {
 }
 
 export const LOCALE_KEYS = {
-  SIGN_IN: 'common.sign_in'
-}
-
-export const PAGE_TITLE = {
-  PASSWORD_RESET: 'password-reset.reset_password.title'
+  SIGN_IN: 'auth.login.title',
+  PASSWORD_RESET: 'auth.reset_password.title'
 }

@@ -131,13 +131,10 @@ describe('Auth Service', () => {
 
       const result = await validateResetToken('valid-token-123')
 
-      expect(apiRequest).toHaveBeenCalledWith(
-        '/api/v1/auth/validate-reset-token',
-        {
-          method: 'POST',
-          body: JSON.stringify({ token: 'valid-token-123' })
-        }
-      )
+      expect(apiRequest).toHaveBeenCalledWith('/api/v1/auth/validate-token', {
+        method: 'POST',
+        body: JSON.stringify({ token: 'valid-token-123', type: 'RESET' })
+      })
       expect(result).toEqual({ success: true })
     })
 

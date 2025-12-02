@@ -5,6 +5,11 @@ export const statusCodes = {
   unauthorized: 401,
   forbidden: 403,
   notFound: 404,
+  networkError: 408,
   imATeapot: 418,
-  internalServerError: 500
+  tooManyRequests: 429,
+  internalServerError: 500,
+  badGateway: 502,
+  serviceUnavailable: 503,
+  gatewayTimeout: 504
 }

@@ -1,88 +1,74 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, test, expect, beforeEach, vi } from 'vitest'
 import {
   resetPasswordController,
   resetPasswordPostController,
   resetPasswordSuccessController,
   resetPasswordTokenExpiredController
 } from './controller.js'
+import {
+  VALIDATION_CODES,
+  VIEW_ERROR_CODES
+} from '../../common/constants/validation.js'
 
-vi.mock('../../common/services/auth/auth-service.js', () => ({
-  validateResetToken: vi.fn(),
-  resetPassword: vi.fn()
-}))
+vi.mock('../../common/services/auth/auth-service.js')
 
-describe('ResetPasswordController', () => {
+const { validateResetToken, resetPassword } =
+  await import('../../common/services/auth/auth-service.js')
+
+describe('Reset Password Controller', () => {
   let mockRequest
   let mockH
-  let mockLogger
 
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockLogger = {
-      error: vi.fn()
-    }
-
     mockRequest = {
       payload: {},
       query: {},
-      server: {
-        logger: mockLogger
-      },
-      t: vi.fn((key) => key)
+      server: { logger: { error: vi.fn() } },
+      t: vi.fn((key) => key),
+      yar: {
+        flash: vi.fn()
+      }
     }
 
     mockH = {
-      view: vi.fn((template, context) => ({
-        template,
-        context,
-        unstate: vi.fn(function () {
-          return this
-        })
-      })),
-      redirect: vi.fn((path) => ({
-        path,
-        state: vi.fn(function () {
-          return this
-        })
-      }))
+      view: vi.fn((template, context) => ({ template, context })),
+      redirect: vi.fn((url) => ({ redirect: url }))
     }
   })
 
   describe('GET /reset-password', () => {
-    it('renders reset password page with valid token', async () => {
-      const { validateResetToken } = await import(
-        '../../common/services/auth/auth-service.js'
-      )
+    test('renders reset password page with valid token', async () => {
       validateResetToken.mockResolvedValue({ success: true })
-
       mockRequest.query = { token: 'valid-token-123' }
 
       await resetPasswordController.handler(mockRequest, mockH)
 
       expect(validateResetToken).toHaveBeenCalledWith('valid-token-123')
-      expect(mockH.view).toHaveBeenCalledWith('auth/reset-password/index', {
-        pageTitle: 'password-reset.reset_password.title',
-        token: 'valid-token-123'
-      })
+      expect(mockH.view).toHaveBeenCalledWith(
+        'auth/reset-password/index',
+        expect.objectContaining({
+          pageTitle: 'auth.reset_password.title',
+          token: 'valid-token-123',
+          fieldErrors: {}
+        })
+      )
     })
 
-    it('redirects to token expired page if token is invalid', async () => {
-      const { validateResetToken } = await import(
-        '../../common/services/auth/auth-service.js'
-      )
+    test('redirects to token expired page if token is invalid', async () => {
       validateResetToken.mockResolvedValue({ success: false })
-
       mockRequest.query = { token: 'invalid-token' }
 
       await resetPasswordController.handler(mockRequest, mockH)
 
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith('tokenExpired', true)
       expect(mockH.redirect).toHaveBeenCalledWith(
         '/reset-password/token-expired'
       )
     })
 
-    it('redirects to login if no token provided', async () => {
+    test('redirects to login if no token provided', async () => {
       mockRequest.query = {}
 
       await resetPasswordController.handler(mockRequest, mockH)
@@ -90,24 +76,20 @@ describe('ResetPasswordController', () => {
       expect(mockH.redirect).toHaveBeenCalledWith('/login')
     })
 
-    it('redirects to token expired on validation error', async () => {
-      const { validateResetToken } = await import(
-        '../../common/services/auth/auth-service.js'
-      )
+    test('redirects to token expired on validation error', async () => {
       validateResetToken.mockRejectedValue(new Error('Network error'))
-
       mockRequest.query = { token: 'valid-token-123' }
 
       await resetPasswordController.handler(mockRequest, mockH)
 
-      expect(mockLogger.error).toHaveBeenCalled()
+      expect(mockRequest.server.logger.error).toHaveBeenCalled()
       expect(mockH.redirect).toHaveBeenCalledWith(
         '/reset-password/token-expired'
       )
     })
   })
 
-  describe('POST /reset-password', () => {
+  describe('POST /reset-password - validation', () => {
     beforeEach(() => {
       mockRequest.payload = {
         token: 'valid-token-123',
@@ -116,7 +98,7 @@ describe('ResetPasswordController', () => {
       }
     })
 
-    it('redirects to token expired if no token in payload', async () => {
+    test('redirects to token expired if no token in payload', async () => {
       mockRequest.payload = {
         newPassword: 'ValidPass123!',
         confirmPassword: 'ValidPass123!'
@@ -129,7 +111,7 @@ describe('ResetPasswordController', () => {
       )
     })
 
-    it('validates password is required', async () => {
+    test('validates password is required', async () => {
       mockRequest.payload.newPassword = ''
 
       await resetPasswordPostController.handler(mockRequest, mockH)
@@ -137,12 +119,14 @@ describe('ResetPasswordController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'auth/reset-password/index',
         expect.objectContaining({
-          validationErrors: expect.arrayContaining(['password-required'])
+          fieldErrors: expect.objectContaining({
+            newPassword: VALIDATION_CODES.PASSWORD_REQUIRED
+          })
         })
       )
     })
 
-    it('validates password minimum length', async () => {
+    test('validates password minimum length', async () => {
       mockRequest.payload.newPassword = 'Short1!'
       mockRequest.payload.confirmPassword = 'Short1!'
 
@@ -151,26 +135,14 @@ describe('ResetPasswordController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'auth/reset-password/index',
         expect.objectContaining({
-          validationErrors: expect.arrayContaining(['password-min-length'])
+          fieldErrors: expect.objectContaining({
+            newPassword: VALIDATION_CODES.PASSWORD_MIN_LENGTH
+          })
         })
       )
     })
 
-    it('validates password requires uppercase letter', async () => {
-      mockRequest.payload.newPassword = 'validpass123!'
-      mockRequest.payload.confirmPassword = 'validpass123!'
-
-      await resetPasswordPostController.handler(mockRequest, mockH)
-
-      expect(mockH.view).toHaveBeenCalledWith(
-        'auth/reset-password/index',
-        expect.objectContaining({
-          validationErrors: expect.arrayContaining(['password-uppercase'])
-        })
-      )
-    })
-
-    it('validates passwords match', async () => {
+    test('validates passwords match', async () => {
       mockRequest.payload.newPassword = 'ValidPass123!'
       mockRequest.payload.confirmPassword = 'DifferentPass123!'
 
@@ -179,15 +151,24 @@ describe('ResetPasswordController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'auth/reset-password/index',
         expect.objectContaining({
-          validationErrors: expect.arrayContaining(['password-mismatch'])
+          fieldErrors: expect.objectContaining({
+            confirmPassword: VALIDATION_CODES.PASSWORD_MISMATCH
+          })
         })
       )
     })
+  })
 
-    it('successfully resets password and redirects to success', async () => {
-      const { resetPassword } = await import(
-        '../../common/services/auth/auth-service.js'
-      )
+  describe('POST /reset-password - API responses', () => {
+    beforeEach(() => {
+      mockRequest.payload = {
+        token: 'valid-token-123',
+        newPassword: 'ValidPass123!',
+        confirmPassword: 'ValidPass123!'
+      }
+    })
+
+    test('successfully resets password and redirects to success', async () => {
       resetPassword.mockResolvedValue({ success: true })
 
       await resetPasswordPostController.handler(mockRequest, mockH)
@@ -197,34 +178,28 @@ describe('ResetPasswordController', () => {
         'ValidPass123!',
         'ValidPass123!'
       )
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith('resetSuccess', true)
       expect(mockH.redirect).toHaveBeenCalledWith('/reset-password/success')
     })
 
-    it('handles expired token error from backend', async () => {
-      const { resetPassword } = await import(
-        '../../common/services/auth/auth-service.js'
-      )
+    test('handles expired token error from backend', async () => {
       resetPassword.mockResolvedValue({
         success: false,
-        error: { errorCode: 'AUTH_PASSWORD_RESET_EXPIRED_TOKEN' }
+        errors: [{ errorCode: VIEW_ERROR_CODES.RESET_TOKEN_EXPIRED_OR_INVALID }]
       })
 
       await resetPasswordPostController.handler(mockRequest, mockH)
 
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith('tokenExpired', true)
       expect(mockH.redirect).toHaveBeenCalledWith(
         '/reset-password/token-expired'
       )
     })
 
-    it('handles password used previously error', async () => {
-      const { resetPassword } = await import(
-        '../../common/services/auth/auth-service.js'
-      )
+    test('handles password used previously error', async () => {
       resetPassword.mockResolvedValue({
         success: false,
-        error: {
-          errorCode: 'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY'
-        }
+        errors: [{ errorCode: VIEW_ERROR_CODES.PASSWORD_WAS_USED_PREVIOUSLY }]
       })
 
       await resetPasswordPostController.handler(mockRequest, mockH)
@@ -232,22 +207,18 @@ describe('ResetPasswordController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'auth/reset-password/index',
         expect.objectContaining({
-          validationErrors: ['password-used-previously'],
+          fieldErrors: {
+            newPassword: VIEW_ERROR_CODES.PASSWORD_WAS_USED_PREVIOUSLY
+          },
           token: 'valid-token-123'
         })
       )
     })
 
-    it('handles same as current password error', async () => {
-      const { resetPassword } = await import(
-        '../../common/services/auth/auth-service.js'
-      )
+    test('handles generic error from backend', async () => {
       resetPassword.mockResolvedValue({
         success: false,
-        error: {
-          errorCode: 'AUTH_PASSWORD_RESET_SAME_AS_CURRENT',
-          message: 'New password cannot be the same as your current password'
-        }
+        errors: [{ errorCode: 'SOME_OTHER_ERROR' }]
       })
 
       await resetPasswordPostController.handler(mockRequest, mockH)
@@ -255,30 +226,24 @@ describe('ResetPasswordController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'auth/reset-password/index',
         expect.objectContaining({
-          validationErrors: ['password-same-as-current'],
+          fieldErrors: {},
+          errorCode: 'SOME_OTHER_ERROR',
           token: 'valid-token-123'
         })
       )
     })
 
-    it('handles generic error from backend', async () => {
-      const { resetPassword } = await import(
-        '../../common/services/auth/auth-service.js'
-      )
-      resetPassword.mockResolvedValue({
-        success: false,
-        error: {
-          errorCode: 'SOME_UNKNOWN_ERROR',
-          message: 'An unexpected error occurred'
-        }
-      })
+    test('handles network error during reset', async () => {
+      resetPassword.mockRejectedValue(new Error('Network error'))
 
       await resetPasswordPostController.handler(mockRequest, mockH)
 
+      expect(mockRequest.server.logger.error).toHaveBeenCalled()
       expect(mockH.view).toHaveBeenCalledWith(
         'auth/reset-password/index',
         expect.objectContaining({
-          errorCode: 'SOME_UNKNOWN_ERROR',
+          fieldErrors: {},
+          errorCode: VIEW_ERROR_CODES.NETWORK_ERROR,
           token: 'valid-token-123'
         })
       )
@@ -286,57 +251,45 @@ describe('ResetPasswordController', () => {
   })
 
   describe('GET /reset-password/success', () => {
-    it('redirects to login if accessed directly', () => {
-      mockRequest.state = {}
+    test('redirects to login if accessed directly', () => {
+      mockRequest.yar.flash.mockReturnValue([])
 
       resetPasswordSuccessController.handler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith('/login')
     })
 
-    it('renders success page when canViewSuccess is true', () => {
-      mockRequest.state = { canViewSuccess: true }
-
-      const mockUnstate = vi.fn()
-      mockH.view = vi.fn(() => ({
-        unstate: mockUnstate
-      }))
+    test('renders success page when flash is set', () => {
+      mockRequest.yar.flash.mockReturnValue([true])
 
       resetPasswordSuccessController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith('auth/reset-password/success', {
-        pageTitle: 'password-reset.reset_password_success.title'
+        pageTitle: 'auth.reset_password_success.title'
       })
-      expect(mockUnstate).toHaveBeenCalledWith('canViewSuccess')
     })
   })
 
   describe('GET /reset-password/token-expired', () => {
-    it('redirects to forgot-password if accessed directly', () => {
-      mockRequest.state = {}
+    test('redirects to forgot-password if accessed directly', () => {
+      mockRequest.yar.flash.mockReturnValue([])
 
       resetPasswordTokenExpiredController.handler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith('/forgot-password')
     })
 
-    it('renders token expired page when canViewTokenExpired is true', () => {
-      mockRequest.state = { canViewTokenExpired: true }
-
-      const mockUnstate = vi.fn()
-      mockH.view = vi.fn(() => ({
-        unstate: mockUnstate
-      }))
+    test('renders token expired page when flash is set', () => {
+      mockRequest.yar.flash.mockReturnValue([true])
 
       resetPasswordTokenExpiredController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
         'auth/reset-password/token-expired',
         {
-          pageTitle: 'password-reset.reset_password_token_expired.title'
+          pageTitle: 'auth.reset_password_token_expired.title'
         }
       )
-      expect(mockUnstate).toHaveBeenCalledWith('canViewTokenExpired')
     })
   })
 })

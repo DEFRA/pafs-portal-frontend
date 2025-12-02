@@ -7,198 +7,112 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-      {# Validation errors #}
-      {% if validationErrors %}
-        {% set errorList = [] %}
-        {% for error in validationErrors %}
-          {% if error == "password-required" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.password_required'),
-                href: "#new-password"
-              }
-            ]) %}
-          {% elif error == "password-min-length" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.password_min_length'),
-                href: "#new-password"
-              }
-            ]) %}
-          {% elif error == "password-max-length" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.password_max_length'),
-                href: "#new-password"
-              }
-            ]) %}
-          {% elif error == "password-uppercase" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.password_uppercase'),
-                href: "#new-password"
-              }
-            ]) %}
-          {% elif error == "password-lowercase" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.password_lowercase'),
-                href: "#new-password"
-              }
-            ]) %}
-          {% elif error == "password-number" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.password_number'),
-                href: "#new-password"
-              }
-            ]) %}
-          {% elif error == "password-special" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.password_special'),
-                href: "#new-password"
-              }
-            ]) %}
-          {% elif error == "password-used-previously" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.password_used_previously'),
-                href: "#new-password"
-              }
-            ]) %}
-          {% elif error == "password-same-as-current" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.password_same_as_current'),
-                href: "#new-password"
-              }
-            ]) %}
-          {% elif error == "password-mismatch" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.password_mismatch'),
-                href: "#confirm-password"
-              }
-            ]) %}
-          {% elif error == "confirm-password-required" %}
-            {% set errorList = errorList.concat([
-              {
-                text: t('password-reset.reset_password.errors.confirm_password_required'),
-                href: "#confirm-password"
-              }
-            ]) %}
-          {% endif %}
-        {% endfor %}
+      {# Build error summary list #}
+      {% set errorList = [] %}
 
-        {% if errorList.length > 0 %}
-          {{ govukErrorSummary({
-            titleText: t('common.error_summary_title'),
-            errorList: errorList
-          }) }}
-        {% endif %}
+      {# New password field errors #}
+      {% if fieldErrors.newPassword == ERROR_CODES.PASSWORD_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.password.required'), href: "#new-password" }]) %}
+      {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_MIN_LENGTH %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.password.min_length'), href: "#new-password" }]) %}
+      {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_MAX_LENGTH %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.password.max_length'), href: "#new-password" }]) %}
+      {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_STRENGTH_UPPERCASE %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.password.uppercase'), href: "#new-password" }]) %}
+      {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_STRENGTH_LOWERCASE %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.password.lowercase'), href: "#new-password" }]) %}
+      {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_STRENGTH_NUMBER %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.password.number'), href: "#new-password" }]) %}
+      {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_STRENGTH_SPECIAL %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.password.special'), href: "#new-password" }]) %}
+      {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_WAS_USED_PREVIOUSLY %}
+        {% set errorList = errorList.concat([{ text: t('auth.errors.password_used_previously'), href: "#new-password" }]) %}
+      {% endif %}
+
+      {# Confirm password field errors #}
+      {% if fieldErrors.confirmPassword == ERROR_CODES.PASSWORD_MISMATCH %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.confirm_password.mismatch'), href: "#confirm-password" }]) %}
+      {% elif fieldErrors.confirmPassword == ERROR_CODES.PASSWORD_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('auth.validation.confirm_password.required'), href: "#confirm-password" }]) %}
+      {% endif %}
+
+      {% if errorList.length > 0 %}
+        {{ govukErrorSummary({
+          titleText: t('common.error_summary_title'),
+          errorList: errorList
+        }) }}
       {% endif %}
 
       <h1 class="govuk-heading-xl">
-        {{ t('password-reset.reset_password.heading') }}
+        {{ t('auth.reset_password.heading') }}
       </h1>
 
-      <p class="govuk-body">{{ t('password-reset.reset_password.requirements_intro') }}</p>
+      <p class="govuk-body">{{ t('auth.reset_password.requirements_intro') }}</p>
 
       <ul class="govuk-list govuk-list--bullet">
-        <li>{{ t('password-reset.reset_password.requirements.min_length') }}</li>
-        <li>{{ t('password-reset.reset_password.requirements.uppercase') }}</li>
-        <li>{{ t('password-reset.reset_password.requirements.lowercase') }}</li>
-        <li>{{ t('password-reset.reset_password.requirements.number') }}</li>
-        <li>{{ t('password-reset.reset_password.requirements.special') }}</li>
+        <li>{{ t('auth.reset_password.requirements.min_length') }}</li>
+        <li>{{ t('auth.reset_password.requirements.uppercase') }}</li>
+        <li>{{ t('auth.reset_password.requirements.lowercase') }}</li>
+        <li>{{ t('auth.reset_password.requirements.number') }}</li>
+        <li>{{ t('auth.reset_password.requirements.special') }}</li>
       </ul>
 
-      <p class="govuk-body">{{ t('password-reset.reset_password.no_reuse') }}</p>
+      <p class="govuk-body">{{ t('auth.reset_password.no_reuse') }}</p>
 
       <form action="/reset-password" method="post" novalidate>
 
         <input type="hidden" name="token" value="{{ token }}">
 
-        {% set newPasswordErrorMessage = false %}
-        {% if validationErrors %}
-          {% for error in validationErrors %}
-            {% if error == "password-required" %}
-              {% set newPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.password_required')
-              } %}
-            {% elif error == "password-min-length" %}
-              {% set newPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.password_min_length')
-              } %}
-            {% elif error == "password-max-length" %}
-              {% set newPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.password_max_length')
-              } %}
-            {% elif error == "password-uppercase" %}
-              {% set newPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.password_uppercase')
-              } %}
-            {% elif error == "password-lowercase" %}
-              {% set newPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.password_lowercase')
-              } %}
-            {% elif error == "password-number" %}
-              {% set newPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.password_number')
-              } %}
-            {% elif error == "password-special" %}
-              {% set newPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.password_special')
-              } %}
-            {% elif error == "password-used-previously" %}
-              {% set newPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.password_used_previously')
-              } %}
-            {% elif error == "password-same-as-current" %}
-              {% set newPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.password_same_as_current')
-              } %}
-            {% endif %}
-          {% endfor %}
+        {# New password field error #}
+        {% set newPasswordError = false %}
+        {% if fieldErrors.newPassword == ERROR_CODES.PASSWORD_REQUIRED %}
+          {% set newPasswordError = { text: t('auth.validation.password.required') } %}
+        {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_MIN_LENGTH %}
+          {% set newPasswordError = { text: t('auth.validation.password.min_length') } %}
+        {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_MAX_LENGTH %}
+          {% set newPasswordError = { text: t('auth.validation.password.max_length') } %}
+        {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_STRENGTH_UPPERCASE %}
+          {% set newPasswordError = { text: t('auth.validation.password.uppercase') } %}
+        {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_STRENGTH_LOWERCASE %}
+          {% set newPasswordError = { text: t('auth.validation.password.lowercase') } %}
+        {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_STRENGTH_NUMBER %}
+          {% set newPasswordError = { text: t('auth.validation.password.number') } %}
+        {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_STRENGTH_SPECIAL %}
+          {% set newPasswordError = { text: t('auth.validation.password.special') } %}
+        {% elif fieldErrors.newPassword == ERROR_CODES.PASSWORD_WAS_USED_PREVIOUSLY %}
+          {% set newPasswordError = { text: t('auth.errors.password_used_previously') } %}
         {% endif %}
 
         {{ govukPasswordInput({
           label: {
-            text: t('password-reset.reset_password.new_password_label')
+            text: t('auth.labels.password')
           },
           id: "new-password",
           name: "newPassword",
           autocomplete: "new-password",
-          errorMessage: newPasswordErrorMessage
+          errorMessage: newPasswordError
         }) }}
 
-        {% set confirmPasswordErrorMessage = false %}
-        {% if validationErrors %}
-          {% for error in validationErrors %}
-            {% if error == "password-mismatch" %}
-              {% set confirmPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.password_mismatch')
-              } %}
-            {% elif error == "confirm-password-required" %}
-              {% set confirmPasswordErrorMessage = {
-                text: t('password-reset.reset_password.errors.confirm_password_required')
-              } %}
-            {% endif %}
-          {% endfor %}
+        {# Confirm password field error #}
+        {% set confirmPasswordError = false %}
+        {% if fieldErrors.confirmPassword == ERROR_CODES.PASSWORD_MISMATCH %}
+          {% set confirmPasswordError = { text: t('auth.validation.confirm_password.mismatch') } %}
+        {% elif fieldErrors.confirmPassword == ERROR_CODES.PASSWORD_REQUIRED %}
+          {% set confirmPasswordError = { text: t('auth.validation.confirm_password.required') } %}
         {% endif %}
 
         {{ govukPasswordInput({
           label: {
-            text: t('password-reset.reset_password.confirm_password_label')
+            text: t('auth.labels.confirm_password')
           },
           id: "confirm-password",
           name: "confirmPassword",
           autocomplete: "new-password",
-          errorMessage: confirmPasswordErrorMessage
+          errorMessage: confirmPasswordError
         }) }}
 
         {{ govukButton({
-          text: t('password-reset.reset_password.submit_button')
+          text: t('auth.reset_password.submit_button')
         }) }}
 
       </form>
