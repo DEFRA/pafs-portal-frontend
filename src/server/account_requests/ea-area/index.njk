@@ -6,7 +6,7 @@
 {% block pageTitle %}{{ t('account-request.eaArea.heading') }} | {{ serviceName }}{% endblock %}
 
 {% block content %}
-  <a href="#" class="govuk-back-link">{{ t('account-request.back') }}</a>
+  <a href="/account_request/details" class="govuk-back-link">{{ t('account-request.back') }}</a>
 
   {% if errorSummary and (errorSummary | length) %}
     {% set errorList = [] %}
