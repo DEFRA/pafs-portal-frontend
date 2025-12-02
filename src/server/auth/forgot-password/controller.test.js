@@ -8,8 +8,9 @@ import { VALIDATION_CODES } from '../../common/constants/validation.js'
 
 vi.mock('../../common/services/auth/auth-service.js')
 
-const { forgotPassword } =
-  await import('../../common/services/auth/auth-service.js')
+const { forgotPassword } = await import(
+  '../../common/services/auth/auth-service.js'
+)
 
 describe('Forgot Password Controller', () => {
   let mockRequest

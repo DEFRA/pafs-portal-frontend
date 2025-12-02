@@ -3,8 +3,9 @@ import { downloadController } from './controller.js'
 
 vi.mock('../../common/helpers/auth/session-manager.js')
 
-const { getAuthSession } =
-  await import('../../common/helpers/auth/session-manager.js')
+const { getAuthSession } = await import(
+  '../../common/helpers/auth/session-manager.js'
+)
 
 describe('#downloadController', () => {
   let mockRequest

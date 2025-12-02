@@ -1,5 +1,19 @@
 import { createServer } from '../../server.js'
 import { statusCodes } from '../../common/constants/status-codes.js'
+import { vi } from 'vitest'
+
+// Mock area service to prevent real API calls
+vi.mock('../../common/services/areas/area-service.js', () => ({
+  getAreas: vi.fn().mockResolvedValue({
+    success: true,
+    data: [
+      { id: 1, name: 'Thames', area_type: 'EA Area' },
+      { id: 2, name: 'Anglian', area_type: 'EA Area' },
+      { id: 10, name: 'PSO Team 1', area_type: 'PSO Area', parent_id: 1 },
+      { id: 11, name: 'PSO Team 2', area_type: 'PSO Area', parent_id: 1 }
+    ]
+  })
+}))
 
 describe('#accountRequestMainPsoTeamController', () => {
   let server

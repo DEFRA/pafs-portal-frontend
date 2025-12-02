@@ -6,8 +6,9 @@ import {
 
 vi.mock('../../common/helpers/auth/session-manager.js')
 
-const { getAuthSession } =
-  await import('../../common/helpers/auth/session-manager.js')
+const { getAuthSession } = await import(
+  '../../common/helpers/auth/session-manager.js'
+)
 
 describe('Journey Selection Controller', () => {
   let mockRequest

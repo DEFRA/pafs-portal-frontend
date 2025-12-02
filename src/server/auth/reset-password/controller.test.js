@@ -12,8 +12,9 @@ import {
 
 vi.mock('../../common/services/auth/auth-service.js')
 
-const { validateResetToken, resetPassword } =
-  await import('../../common/services/auth/auth-service.js')
+const { validateResetToken, resetPassword } = await import(
+  '../../common/services/auth/auth-service.js'
+)
 
 describe('Reset Password Controller', () => {
   let mockRequest
