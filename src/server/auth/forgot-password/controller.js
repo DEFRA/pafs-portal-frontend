@@ -1,106 +1,74 @@
-import Joi from 'joi'
 import { forgotPassword } from '../../common/services/auth/auth-service.js'
 import { ROUTES } from '../../common/constants/routes.js'
-import { EMAIL } from '../../common/constants/validation.js'
+import { VIEW_ERROR_CODES } from '../../common/constants/validation.js'
 import { AUTH_VIEWS } from '../../common/constants/common.js'
+import { extractJoiErrors } from '../../common/helpers/error-renderer.js'
+import { forgotPasswordSchema } from '../schema.js'
 
-class ForgotPasswordController {
-  get(request, h) {
+/**
+ * GET /forgot-password - Show forgot password form
+ */
+export const forgotPasswordController = {
+  handler(request, h) {
     return h.view(AUTH_VIEWS.FORGOT_PASSWORD, {
-      pageTitle: request.t('password-reset.forgot_password.title')
+      pageTitle: request.t('auth.forgot_password.title'),
+      fieldErrors: {},
+      email: '',
+      ERROR_CODES: VIEW_ERROR_CODES
     })
   }
+}
 
-  async post(request, h) {
-    const { email } = request.payload || {}
+/**
+ * POST /forgot-password - Process forgot password request
+ */
+export const forgotPasswordPostController = {
+  async handler(request, h) {
+    const { email = '' } = request.payload || {}
 
-    const validation = this.validateInput(email, request)
-    if (validation.errors) {
+    // Validate input
+    const { error, value } = forgotPasswordSchema.validate(
+      { email },
+      { abortEarly: false }
+    )
+    if (error) {
       return h.view(AUTH_VIEWS.FORGOT_PASSWORD, {
-        pageTitle: request.t('password-reset.forgot_password.title'),
-        validationErrors: validation.errors,
-        email: email || ''
+        pageTitle: request.t('auth.forgot_password.title'),
+        fieldErrors: extractJoiErrors(error),
+        email,
+        ERROR_CODES: VIEW_ERROR_CODES
       })
     }
 
     try {
-      // Always call the API regardless of whether email exists (prevent enumeration)
-      await forgotPassword(email)
-
-      // Always redirect to confirmation page with session flags
-      return h
-        .redirect(ROUTES.FORGOT_PASSWORD_CONFIRMATION)
-        .state('resetEmail', email)
-        .state('canViewConfirmation', '1')
-    } catch (error) {
-      request.server.logger.error({ err: error }, 'Forgot password error')
-
-      // Even on error, redirect to confirmation (prevent enumeration)
-      return h
-        .redirect(ROUTES.FORGOT_PASSWORD_CONFIRMATION)
-        .state('resetEmail', email)
-        .state('canViewConfirmation', '1')
-    }
-  }
-
-  validateInput(email, _request) {
-    const schema = Joi.object({
-      email: Joi.string()
-        .email({ tlds: { allow: false } })
-        .max(EMAIL.MAX_LENGTH)
-        .trim()
-        .lowercase()
-        .required()
-        .messages({
-          'string.empty': 'email-required',
-          'string.email': 'email-invalid',
-          'any.required': 'email-required'
-        })
-    })
-
-    const { error } = schema.validate({ email }, { abortEarly: false })
-
-    if (error) {
-      return { errors: error.details.map((detail) => detail.message) }
+      await forgotPassword(value.email)
+    } catch (err) {
+      request.server.logger.error({ err }, 'Forgot password error')
     }
 
-    return { errors: null }
+    // Store email in session for confirmation page
+    request.yar.flash('resetEmail', value.email)
+    return h.redirect(ROUTES.FORGOT_PASSWORD_CONFIRMATION)
   }
 }
 
-const controller = new ForgotPasswordController()
+/**
+ * GET /forgot-password/confirmation - Show confirmation page
+ */
+export const forgotPasswordConfirmationController = {
+  handler(request, h) {
+    // Get email from flash session (one-time read)
+    const flashEmail = request.yar.flash('resetEmail')
+    const email = flashEmail?.[0] || ''
 
-export const forgotPasswordController = {
-  handler: (request, h) => controller.get(request, h)
-}
-
-export const forgotPasswordPostController = {
-  handler: (request, h) => controller.post(request, h)
-}
-
-class ForgotPasswordConfirmationController {
-  get(request, h) {
     // Prevent direct access - must come from forgot password form
-    if (!request.state.canViewConfirmation) {
+    if (!email) {
       return h.redirect(ROUTES.FORGOT_PASSWORD)
     }
 
-    const email = request.state.resetEmail || ''
-
-    const response = h.view(AUTH_VIEWS.FORGOT_PASSWORD_REQUEST_CONFIRMATION, {
-      pageTitle: request.t('password-reset.forgot_password_confirmation.title'),
+    return h.view(AUTH_VIEWS.FORGOT_PASSWORD_REQUEST_CONFIRMATION, {
+      pageTitle: request.t('auth.forgot_password_confirmation.title'),
       email
     })
-
-    response.unstate('resetEmail')
-    response.unstate('canViewConfirmation')
-
-    return response
   }
-}
-
-const confirmationController = new ForgotPasswordConfirmationController()
-
-export const forgotPasswordConfirmationController = {
-  handler: (request, h) => confirmationController.get(request, h)
 }

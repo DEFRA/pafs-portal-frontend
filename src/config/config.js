@@ -233,6 +233,18 @@ export const config = convict({
       default: 10000,
       env: 'BACKEND_API_TIMEOUT'
     },
+    retries: {
+      doc: 'Number of retries for failed API requests',
+      format: Number,
+      default: 3,
+      env: 'BACKEND_API_RETRIES'
+    },
+    retryDelay: {
+      doc: 'Delay between retries in milliseconds',
+      format: Number,
+      default: 1000,
+      env: 'BACKEND_API_RETRY_DELAY'
+    },
     healthCheckEnabled: {
       doc: 'Enable backend API health check on startup',
       format: Boolean,

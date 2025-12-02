@@ -10,6 +10,8 @@
   "error_summary_title": "There is a problem",
   "header_navigation_label": "Profile",
   "service_navigation_menu_button_text": "Menu",
+  "back_to_sign_in": "Back to sign in",
+  "service_error": "There was a problem signing in. Please try again",
   "pages": {
     "home": {
       "title": "Project Proposals",
@@ -55,12 +57,6 @@
     "organisations": "Organisations",
     "download_projects": "Download Projects",
     "download_rma": "Download RMA"
-  },
-  "login": {
-    "email_label": "Email address",
-    "password_label": "Password",
-    "forgot_password": "I have forgotten my password",
-    "request_account": "Request an account"
   },
   "footer": {
     "contact_html": "Contact the Defra IT Service Desk on <a href=\"tel:08008766458\" class=\"govuk-footer__link\">0800 8766458</a> or email <a href=\"mailto:pafs-support@environment-agency.gov.uk\" class=\"govuk-footer__link\">pafs-support@environment-agency.gov.uk</a>",

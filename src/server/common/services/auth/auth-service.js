@@ -31,9 +31,9 @@ export async function forgotPassword(email) {
 }
 
 export async function validateResetToken(token) {
-  return apiRequest('/api/v1/auth/validate-reset-token', {
+  return apiRequest('/api/v1/auth/validate-token', {
     method: 'POST',
-    body: JSON.stringify({ token })
+    body: JSON.stringify({ token, type: 'RESET' })
   })
 }
 

@@ -8,40 +8,40 @@
     <div class="govuk-grid-column-two-thirds">
 
       {{ govukPanel({
-        titleText: t('password-reset.forgot_password_confirmation.panel_title'),
-        html: t('password-reset.forgot_password_confirmation.panel_text')
+        titleText: t('auth.forgot_password_confirmation.panel_title'),
+        html: t('auth.forgot_password_confirmation.panel_text')
       }) }}
 
       <h2 class="govuk-heading-m govuk-!-margin-top-7">
-        {{ t('password-reset.forgot_password_confirmation.what_happens_next') }}
+        {{ t('auth.forgot_password_confirmation.what_happens_next') }}
       </h2>
 
       {% if email %}
         <p class="govuk-body">
-          {{ t('password-reset.forgot_password_confirmation.email_sent_html', { email: email }) | safe }}
+          {{ t('auth.forgot_password_confirmation.email_sent_html', { email: email }) | safe }}
         </p>
       {% endif %}
 
       <p class="govuk-body">
-        {{ t('password-reset.forgot_password_confirmation.link_expiry_html') | safe }}
+        {{ t('auth.forgot_password_confirmation.link_expiry_html') | safe }}
       </p>
 
       {{ govukInsetText({
-        html: '<h3 class="govuk-heading-s">' + t('password-reset.forgot_password_confirmation.if_no_email.heading') + '</h3>
+        html: '<h3 class="govuk-heading-s">' + t('auth.forgot_password_confirmation.if_no_email.heading') + '</h3>
         <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
-          <li>' + t('password-reset.forgot_password_confirmation.if_no_email.check_spam') + '</li>
-          <li>' + t('password-reset.forgot_password_confirmation.if_no_email.check_email') + '</li>
-          <li>' + t('password-reset.forgot_password_confirmation.if_no_email.wait') + '</li>
+          <li>' + t('auth.forgot_password_confirmation.if_no_email.check_spam') + '</li>
+          <li>' + t('auth.forgot_password_confirmation.if_no_email.check_email') + '</li>
+          <li>' + t('auth.forgot_password_confirmation.if_no_email.wait') + '</li>
         </ul>'
       }) }}
 
       {{ govukDetails({
-        summaryText: t('password-reset.forgot_password_confirmation.need_help.summary'),
-        html: t('password-reset.forgot_password_confirmation.need_help.content_html')
+        summaryText: t('auth.forgot_password_confirmation.need_help.summary'),
+        html: t('auth.forgot_password_confirmation.need_help.content_html')
       }) }}
 
       <p class="govuk-body govuk-!-margin-top-8">
-        <a href="/login" class="govuk-link">{{ t('password-reset.forgot_password_confirmation.return_to_sign_in') }}</a>
+        <a href="/login" class="govuk-link">{{ t('common.back_to_sign_in') }}</a>
       </p>
 
     </div>
