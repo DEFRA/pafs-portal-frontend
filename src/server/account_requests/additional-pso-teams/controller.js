@@ -87,8 +87,12 @@ export const accountRequestAdditionalPsoTeamsController = {
 
     const sessionData = request.yar.get('accountRequest') ?? {}
     const values = sessionData.additionalPsoTeams ?? {}
+    // Check for returnTo in query string (from main-pso-team redirect) or from query param
     const returnTo =
-      request.query.from === 'check-answers' ? 'check-answers' : undefined
+      request.query.returnTo === 'check-answers' ||
+      request.query.from === 'check-answers'
+        ? 'check-answers'
+        : undefined
 
     // Get selected EA areas and main PSO team from session
     const selectedEaAreaIds = sessionData.eaArea?.eaAreas ?? []

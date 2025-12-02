@@ -1,4 +1,6 @@
 {% extends 'layouts/page.njk' %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block pageTitle %}{{ t('account-request.additionalPsoTeams.heading') }} | {{ serviceName }}{% endblock %}
 
@@ -12,47 +14,37 @@
     <input type="hidden" name="returnTo" value="{{ returnTo }}">
     {% endif %}
 
-    <div class="govuk-form-group">
-      <label class="govuk-label govuk-label--m">
-        {{ t('account-request.additionalPsoTeams.additionalPsoTeamsLabel') }}
-      </label>
-      <div id="additional-pso-teams-hint" class="govuk-hint">
-        {{ t('account-request.additionalPsoTeams.additionalPsoTeamsHint') }}
-      </div>
-    </div>
-
     {% if additionalPsoTeamsByEaArea and additionalPsoTeamsByEaArea.length > 0 %}
       {% for group in additionalPsoTeamsByEaArea %}
+        {% set checkboxItems = [] %}
+        {% for team in group.teams %}
+          {% set checkboxItems = checkboxItems.concat([{
+            value: team.id | string,
+            text: team.name,
+            checked: team.id | string in (values.additionalPsoTeams or [])
+          }]) %}
+        {% endfor %}
+
         <div class="govuk-form-group govuk-!-margin-bottom-8">
-          <fieldset class="govuk-fieldset">
-            <legend class="govuk-fieldset__legend">{{ group.eaArea.name }}</legend>
-            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-              {% for team in group.teams %}
-                <div class="govuk-checkboxes__item">
-                  <input
-                    class="govuk-checkboxes__input"
-                    id="additional-pso-teams-{{ team.id }}"
-                    name="additionalPsoTeams"
-                    type="checkbox"
-                    value="{{ team.id }}"
-                    {% if team.id|string in (values.additionalPsoTeams or []) %}checked{% endif %}
-                  >
-                  <label class="govuk-label govuk-checkboxes__label" for="additional-pso-teams-{{ team.id }}">
-                    {{ team.name }}
-                  </label>
-                </div>
-              {% endfor %}
-            </div>
-          </fieldset>
+          {{ govukCheckboxes({
+            name: "additionalPsoTeams",
+            fieldset: {
+              legend: {
+                text: group.eaArea.name,
+                classes: "govuk-fieldset__legend"
+              }
+            },
+            items: checkboxItems
+          }) }}
         </div>
       {% endfor %}
     {% else %}
       <p class="govuk-body">{{ t('account-request.additionalPsoTeams.noAdditionalTeams') }}</p>
     {% endif %}
 
-    <button class="govuk-button" data-module="govuk-button">
-      {{ t('account-request.additionalPsoTeams.continueButton') }}
-    </button>
+    {{ govukButton({
+      text: t('account-request.additionalPsoTeams.continueButton')
+    }) }}
   </form>
 {% endblock %}
 

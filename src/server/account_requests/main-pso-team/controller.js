@@ -142,9 +142,10 @@ export const accountRequestMainPsoTeamController = {
       sessionData.mainPsoTeam = values
       request.yar.set('accountRequest', sessionData)
 
+      // Always go to additional-pso-teams, but pass returnTo if coming from check-answers
       const nextUrl =
         returnTo === 'check-answers'
-          ? '/account_request/check-answers'
+          ? '/account_request/additional-pso-teams?returnTo=check-answers'
           : '/account_request/additional-pso-teams'
 
       return h.redirect(nextUrl)
@@ -152,8 +153,12 @@ export const accountRequestMainPsoTeamController = {
 
     const sessionData = request.yar.get('accountRequest') ?? {}
     const values = sessionData.mainPsoTeam ?? {}
+    // Check for returnTo in query string (from ea-area redirect) or from query param
     const returnTo =
-      request.query.from === 'check-answers' ? 'check-answers' : undefined
+      request.query.returnTo === 'check-answers' ||
+      request.query.from === 'check-answers'
+        ? 'check-answers'
+        : undefined
 
     // Get selected EA areas from session (array from checkbox selection)
     const selectedEaAreaIds = sessionData.eaArea?.eaAreas ?? []

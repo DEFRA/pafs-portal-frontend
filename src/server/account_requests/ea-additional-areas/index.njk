@@ -1,4 +1,6 @@
 {% extends 'layouts/page.njk' %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block pageTitle %}{{ t('account-request.eaAdditionalAreas.heading') }} | {{ serviceName }}{% endblock %}
 
@@ -7,44 +9,40 @@
 
   <h1 class="govuk-heading-l">{{ t('account-request.eaAdditionalAreas.heading') }}</h1>
 
-  <div class="govuk-form-group">
-    <fieldset class="govuk-fieldset">
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-        <h1 class="govuk-body">
-          {{ t('account-request.eaAdditionalAreas.introText') }}
-        </h1>
-      </legend>
-      <form method="post" novalidate>
-        {% if returnTo %}
-        <input type="hidden" name="returnTo" value="{{ returnTo }}">
-        {% endif %}
+  <form method="post" novalidate>
+    {% if returnTo %}
+    <input type="hidden" name="returnTo" value="{{ returnTo }}">
+    {% endif %}
 
-        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-          {% if additionalEaAreas and additionalEaAreas.length > 0 %}
-            {% for area in additionalEaAreas %}
-              <div class="govuk-checkboxes__item">
-                <input
-                  class="govuk-checkboxes__input"
-                  id="additional-ea-areas-{{ area.id }}"
-                  name="additionalEaAreas"
-                  type="checkbox"
-                  value="{{ area.id }}"
-                  {% if area.id|string in (values.additionalEaAreas or []) %}checked{% endif %}
-                >
-                <label class="govuk-label govuk-checkboxes__label" for="additional-ea-areas-{{ area.id }}">
-                  {{ area.name }}
-                </label>
-              </div>
-            {% endfor %}
-          {% else %}
-            <p class="govuk-body">{{ t('account-request.eaAdditionalAreas.noAdditionalAreas') }}</p>
-          {% endif %}
-        </div>
+    {% set checkboxItems = [] %}
+    {% if additionalEaAreas and additionalEaAreas.length > 0 %}
+      {% for area in additionalEaAreas %}
+        {% set checkboxItems = checkboxItems.concat([{
+          value: area.id | string,
+          text: area.name,
+          checked: area.id | string in (values.additionalEaAreas or [])
+        }]) %}
+      {% endfor %}
+    {% endif %}
 
-        <button class="govuk-button" data-module="govuk-button">
-          {{ t('account-request.eaAdditionalAreas.continueButton') }}
-        </button>
-      </form>
-    </fieldset>
-  </div>
+    {{ govukCheckboxes({
+      name: "additionalEaAreas",
+      fieldset: {
+        legend: {
+          text: t('account-request.eaAdditionalAreas.introText'),
+          classes: "govuk-fieldset__legend--l",
+          isPageHeading: false
+        }
+      },
+      items: checkboxItems
+    }) }}
+
+    {% if not additionalEaAreas or additionalEaAreas.length == 0 %}
+      <p class="govuk-body">{{ t('account-request.eaAdditionalAreas.noAdditionalAreas') }}</p>
+    {% endif %}
+
+    {{ govukButton({
+      text: t('account-request.eaAdditionalAreas.continueButton')
+    }) }}
+  </form>
 {% endblock %}

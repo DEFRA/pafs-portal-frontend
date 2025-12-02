@@ -1,4 +1,6 @@
 {% extends 'layouts/page.njk' %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block pageTitle %}{{ t('account-request.mainPsoTeam.heading') }} | {{ serviceName }}{% endblock %}
 
@@ -8,23 +10,29 @@
   <h1 class="govuk-heading-l">{{ t('account-request.mainPsoTeam.heading') }}</h1>
 
   {% if errorSummary and (errorSummary | length) %}
-  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
-    <h2 class="govuk-error-summary__title" id="error-summary-title">
-      {{ t('account-request.details.errorSummaryTitle') }}
-    </h2>
-    <div class="govuk-error-summary__body">
-      <ul class="govuk-list govuk-error-summary__list">
-        {% for item in errorSummary %}
-          <li><a href="{{ item.href }}">{{ item.text }}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
+    {% set errorList = [] %}
+    {% for item in errorSummary %}
+      {% set errorList = errorList.concat([{
+        text: item.text,
+        href: item.href
+      }]) %}
+    {% endfor %}
+    {{ govukErrorSummary({
+      titleText: t('account-request.details.errorSummaryTitle'),
+      errorList: errorList
+    }) }}
   {% endif %}
 
   <form method="post" novalidate>
     {% if returnTo %}
     <input type="hidden" name="returnTo" value="{{ returnTo }}">
+    {% endif %}
+
+    {% set mainPsoTeamErrorMessage = false %}
+    {% if errors.mainPsoTeam %}
+      {% set mainPsoTeamErrorMessage = {
+        text: errors.mainPsoTeam
+      } %}
     {% endif %}
 
     <div class="govuk-form-group {% if errors.mainPsoTeam %}govuk-form-group--error{% endif %}">
@@ -35,9 +43,9 @@
         {{ t('account-request.mainPsoTeam.mainPsoTeamHint') }}
       </div>
       {% if errors.mainPsoTeam %}
-      <p id="main-pso-team-error" class="govuk-error-message">
-        <span class="govuk-visually-hidden">Error:</span> {{ errors.mainPsoTeam }}
-      </p>
+        <p id="main-pso-team-error" class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span> {{ errors.mainPsoTeam }}
+        </p>
       {% endif %}
       <select class="govuk-select {% if errors.mainPsoTeam %}govuk-select--error{% endif %}" id="main-pso-team" name="mainPsoTeam">
         <option value="">{{ t('account-request.mainPsoTeam.selectATeamOption') }}</option>
@@ -53,7 +61,9 @@
       </select>
     </div>
 
-    <button class="govuk-button" data-module="govuk-button">{{ t('account-request.mainPsoTeam.continueButton') }}</button>
+    {{ govukButton({
+      text: t('account-request.mainPsoTeam.continueButton')
+    }) }}
   </form>
 {% endblock %}
 

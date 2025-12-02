@@ -55,22 +55,29 @@ function validateEaArea(request) {
   return { values, errors, errorSummary }
 }
 
-function getNextUrl(sessionData) {
-  const returnTo = sessionData.details?.returnTo
+function getNextUrl(sessionData, returnTo) {
   const responsibility = sessionData.details?.responsibility
 
-  if (returnTo === 'check-answers') {
-    return '/account_request/check-answers'
-  }
-
   // Determine next step based on responsibility
+  // When returnTo is 'check-answers', we still need to go through the full flow
+  // The returnTo will be passed along and handled at the final step
   switch (responsibility) {
     case 'PSO':
-      return '/account_request/main-pso-team'
+      // For PSO: EA areas → main-pso-team → additional-pso-teams → check-answers
+      return returnTo === 'check-answers'
+        ? '/account_request/main-pso-team?returnTo=check-answers'
+        : '/account_request/main-pso-team'
     case 'RMA':
-      return '/account_request/pso-team'
+      // For RMA: EA areas → pso-team → main-rma → additional-rmas → check-answers
+      return returnTo === 'check-answers'
+        ? '/account_request/pso-team?returnTo=check-answers'
+        : '/account_request/pso-team'
     default:
-      return '/account_request'
+      // For EA or unknown, if returnTo is check-answers, go there directly
+      // Otherwise continue flow
+      return returnTo === 'check-answers'
+        ? '/account_request/check-answers'
+        : '/account_request'
   }
 }
 
@@ -114,7 +121,25 @@ export const accountRequestEaAreaController = {
       sessionData.eaArea = values
       request.yar.set('accountRequest', sessionData)
 
-      const nextUrl = getNextUrl(sessionData)
+      request.server.logger.info(
+        {
+          responsibility: sessionData.details?.responsibility,
+          eaAreas: values.eaAreas,
+          eaAreasCount: Array.isArray(values.eaAreas)
+            ? values.eaAreas.length
+            : 0,
+          returnTo,
+          sessionKeys: Object.keys(sessionData)
+        },
+        'EA areas saved to session, redirecting to next page'
+      )
+
+      const nextUrl = getNextUrl(sessionData, returnTo)
+
+      request.server.logger.info(
+        { nextUrl, responsibility: sessionData.details?.responsibility },
+        'Redirecting to next page in RMA/PSO flow'
+      )
 
       return h.redirect(nextUrl)
     }
@@ -133,8 +158,12 @@ export const accountRequestEaAreaController = {
 
     const updatedSessionData = request.yar.get('accountRequest') ?? {}
     const values = updatedSessionData.eaArea ?? {}
+    // Check for returnTo in query string (from check-answers redirect) or from query param
     const returnTo =
-      request.query.from === 'check-answers' ? 'check-answers' : undefined
+      request.query.returnTo === 'check-answers' ||
+      request.query.from === 'check-answers'
+        ? 'check-answers'
+        : undefined
 
     // Load EA areas from cache
     let eaAreas = []

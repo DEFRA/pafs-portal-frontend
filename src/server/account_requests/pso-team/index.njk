@@ -1,4 +1,7 @@
 {% extends 'layouts/page.njk' %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block pageTitle %}{{ t('account-request.psoTeam.heading') }} | {{ serviceName }}{% endblock %}
 
@@ -8,18 +11,17 @@
   <h1 class="govuk-heading-l">{{ t('account-request.psoTeam.heading') }}</h1>
 
   {% if errorSummary and (errorSummary | length) %}
-  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
-    <h2 class="govuk-error-summary__title" id="error-summary-title">
-      {{ t('account-request.details.errorSummaryTitle') }}
-    </h2>
-    <div class="govuk-error-summary__body">
-      <ul class="govuk-list govuk-error-summary__list">
-        {% for item in errorSummary %}
-          <li><a href="{{ item.href }}">{{ item.text }}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
+    {% set errorList = [] %}
+    {% for item in errorSummary %}
+      {% set errorList = errorList.concat([{
+        text: item.text,
+        href: item.href
+      }]) %}
+    {% endfor %}
+    {{ govukErrorSummary({
+      titleText: t('account-request.details.errorSummaryTitle'),
+      errorList: errorList
+    }) }}
   {% endif %}
 
   <form method="post" novalidate>
@@ -27,50 +29,63 @@
     <input type="hidden" name="returnTo" value="{{ returnTo }}">
     {% endif %}
 
-    <div class="govuk-form-group {% if errors.psoTeams %}govuk-form-group--error{% endif %}">
-      <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-          {{ t('account-request.psoTeam.psoTeamLabel') }}
-        </legend>
-        <div id="pso-team-hint" class="govuk-hint">
-          {{ t('account-request.psoTeam.psoTeamHint') }}
-        </div>
-        {% if errors.psoTeams %}
-        <p id="pso-teams-error" class="govuk-error-message">
-          <span class="govuk-visually-hidden">Error:</span> {{ errors.psoTeams }}
-        </p>
-        {% endif %}
-        {% if psoTeamsByEaArea and psoTeamsByEaArea.length > 0 %}
-          {% for group in psoTeamsByEaArea %}
-            <div class="govuk-form-group govuk-!-margin-bottom-8">
-              <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend">{{ group.eaArea.name }} - PSO areas</legend>
-                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                  {% for team in group.teams %}
-                    <div class="govuk-checkboxes__item">
-                      <input
-                        class="govuk-checkboxes__input"
-                        id="pso-team-{{ team.id }}"
-                        name="psoTeams"
-                        type="checkbox"
-                        value="{{ team.id }}"
-                        {% if team.id|string in (values.psoTeams or []) %}checked{% endif %}
-                      >
-                      <label class="govuk-label govuk-checkboxes__label" for="pso-team-{{ team.id }}">
-                        {{ team.name }}
-                      </label>
-                    </div>
-                  {% endfor %}
-                </div>
-              </fieldset>
-            </div>
-          {% endfor %}
-        {% else %}
-          <p class="govuk-body">No PSO areas available</p>
-        {% endif %}
-      </fieldset>
-    </div>
+    {% set psoTeamsErrorMessage = false %}
+    {% if errors.psoTeams %}
+      {% set psoTeamsErrorMessage = {
+        text: errors.psoTeams
+      } %}
+    {% endif %}
 
-    <button class="govuk-button" data-module="govuk-button">{{ t('account-request.psoTeam.continueButton') }}</button>
+    {% if psoTeamsByEaArea and psoTeamsByEaArea.length > 0 %}
+      {% for group in psoTeamsByEaArea %}
+        {% if group and group.eaArea and group.teams %}
+          {% set checkboxItems = [] %}
+          {% for team in group.teams %}
+            {% if team and team.id and team.name %}
+              {% set checkboxItems = checkboxItems.concat([{
+                value: team.id | string,
+                text: team.name,
+                checked: team.id | string in (values.psoTeams or [])
+              }]) %}
+            {% endif %}
+          {% endfor %}
+
+          {% if checkboxItems.length > 0 %}
+            <div class="govuk-form-group govuk-!-margin-bottom-8">
+              {% if loop.first and psoTeamsErrorMessage %}
+                {{ govukCheckboxes({
+                  name: "psoTeams",
+                  fieldset: {
+                    legend: {
+                      text: (group.eaArea.name or "") + " - PSO areas",
+                      classes: "govuk-fieldset__legend"
+                    }
+                  },
+                  items: checkboxItems,
+                  errorMessage: psoTeamsErrorMessage
+                }) }}
+              {% else %}
+                {{ govukCheckboxes({
+                  name: "psoTeams",
+                  fieldset: {
+                    legend: {
+                      text: (group.eaArea.name or "") + " - PSO areas",
+                      classes: "govuk-fieldset__legend"
+                    }
+                  },
+                  items: checkboxItems
+                }) }}
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <p class="govuk-body">No PSO areas available</p>
+    {% endif %}
+
+    {{ govukButton({
+      text: t('account-request.psoTeam.continueButton')
+    }) }}
   </form>
 {% endblock %}
