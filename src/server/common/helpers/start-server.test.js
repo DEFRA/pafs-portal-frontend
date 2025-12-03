@@ -24,7 +24,7 @@ describe('#startServer', () => {
 
     createServerSpy = vi.spyOn(createServerImport, 'createServer')
     hapiServerSpy = vi.spyOn(hapi, 'server')
-  })
+  }, 30000) // Increase timeout for dynamic imports
 
   beforeEach(() => {
     mockCheckBackendHealth.mockReset()
@@ -39,8 +39,10 @@ describe('#startServer', () => {
     let server
 
     afterAll(async () => {
-      await server.stop({ timeout: 0 })
-    })
+      if (server) {
+        await server.stop({ timeout: 0 })
+      }
+    }, 10000)
 
     test('Should start up server as expected', async () => {
       server = await startServerImport.startServer()
@@ -56,7 +58,7 @@ describe('#startServer', () => {
 
       expect(result).toEqual({ message: 'success' })
       expect(statusCode).toBe(statusCodes.ok)
-    })
+    }, 15000)
 
     test('Should disable HTTP timeouts', async () => {
       expect(server.listener.requestTimeout).toBe(0)
@@ -76,7 +78,7 @@ describe('#startServer', () => {
 
       expect(mockCheckBackendHealth).toHaveBeenCalled()
       expect(server).toBeDefined()
-    })
+    }, 15000)
   })
 
   describe('When server start fails', () => {

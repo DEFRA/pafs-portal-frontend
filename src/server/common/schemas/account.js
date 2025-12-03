@@ -47,7 +47,8 @@ export const passwordStrengthSchema = Joi.string()
     'string.min': VALIDATION_CODES.PASSWORD_MIN_LENGTH,
     'string.max': VALIDATION_CODES.PASSWORD_MAX_LENGTH,
     'string.pattern.name': 'PASSWORD_STRENGTH_{#name}'
-  }).options({ abortEarly: true })
+  })
+  .options({ abortEarly: true })
 
 /**
  * Confirm password schema - must match password field

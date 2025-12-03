@@ -9,10 +9,22 @@ export const AUTH_VIEWS = {
 
 export const ADMIN_VIEWS = {
   JOURNEY_SELECTION: 'admin/journey-selection/index',
-  USERS: 'admin/users/index'
+  USERS: 'admin/users/index',
+  USERS_PENDING: 'admin/users/pending/index',
+  USERS_ACTIVE: 'admin/users/active/index'
 }
 
 export const LOCALE_KEYS = {
   SIGN_IN: 'auth.login.title',
   PASSWORD_RESET: 'auth.reset_password.title'
+}
+
+export const PAGINATION = {
+  DEFAULT_PAGE: 1
+}
+
+export const CACHE_SEGMENTS = {
+  ACCOUNTS: 'accounts',
+  AREAS: 'areas',
+  USERS: 'users'
 }

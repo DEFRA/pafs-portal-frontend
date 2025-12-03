@@ -1,15 +1,9 @@
-import { ADMIN_VIEWS } from '../../common/constants/common.js'
-import { getAuthSession } from '../../common/helpers/auth/session-manager.js'
+import { ROUTES } from '../../common/constants/routes.js'
 
 class UsersController {
-  get(request, h) {
-    const session = getAuthSession(request)
-
-    return h.view(ADMIN_VIEWS.USERS, {
-      pageTitle: request.t('common.pages.admin.users.title'),
-      heading: request.t('common.pages.admin.users.heading'),
-      user: session?.user
-    })
+  get(_request, h) {
+    // Redirect to pending users page by default
+    return h.redirect(ROUTES.ADMIN.USERS_ACTIVE)
   }
 }
 

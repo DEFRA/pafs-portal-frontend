@@ -220,6 +220,14 @@ export const config = convict({
       env: 'TRACING_HEADER'
     }
   },
+  pagination: {
+    defaultPageSize: {
+      doc: 'Default number of items per page for paginated lists',
+      format: Number,
+      default: 20,
+      env: 'PAGINATION_DEFAULT_PAGE_SIZE'
+    }
+  },
   backendApi: {
     url: {
       doc: 'Backend API base URL',

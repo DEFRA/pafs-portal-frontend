@@ -42,23 +42,29 @@ function buildAdminNavigation(path) {
   return [
     {
       text: translate('common.navigation.users'),
-      href: ROUTES.ADMIN.USERS,
-      current: path === ROUTES.ADMIN.USERS
+      href: ROUTES.ADMIN.USERS_ACTIVE,
+      current: path.startsWith(ROUTES.ADMIN.USERS)
     },
     {
       text: translate('common.navigation.projects'),
       href: ROUTES.ADMIN.PROJECTS,
-      current: path === ROUTES.ADMIN.PROJECTS
+      current:
+        path === ROUTES.ADMIN.PROJECTS ||
+        path.startsWith(ROUTES.ADMIN.PROJECTS + '/')
     },
     {
       text: translate('common.navigation.submissions'),
       href: ROUTES.ADMIN.SUBMISSIONS,
-      current: path === ROUTES.ADMIN.SUBMISSIONS
+      current:
+        path === ROUTES.ADMIN.SUBMISSIONS ||
+        path.startsWith(ROUTES.ADMIN.SUBMISSIONS + '/')
     },
     {
       text: translate('common.navigation.organisations'),
       href: ROUTES.ADMIN.ORGANISATIONS,
-      current: path === ROUTES.ADMIN.ORGANISATIONS
+      current:
+        path === ROUTES.ADMIN.ORGANISATIONS ||
+        path.startsWith(ROUTES.ADMIN.ORGANISATIONS + '/')
     },
     {
       text: translate('common.navigation.download_projects'),

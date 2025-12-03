@@ -20,6 +20,9 @@ export const ROUTES = {
   ADMIN: {
     JOURNEY_SELECTION: '/admin/journey-selection',
     USERS: '/admin/users',
+    USERS_PENDING: '/admin/users/pending',
+    USERS_ACTIVE: '/admin/users/active',
+    USER_VIEW: '/admin/users/{id}',
     PROJECTS: '/admin/projects',
     SUBMISSIONS: '/admin/submissions',
     ORGANISATIONS: '/admin/organisations',

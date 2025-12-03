@@ -1,0 +1,152 @@
+{#
+  Users Layout Template
+  
+  A common layout for pending and active users pages.
+  
+  Required blocks:
+    - usersTable: Content block for the users table
+  
+  Context variables:
+    - pageTitle: string - Page title
+    - user: object - Current user session
+    - pendingCount: number - Count of pending users
+    - activeCount: number - Count of active users  
+    - currentTab: string - 'pending' or 'active'
+    - filters: object - Current filter values
+      - search: string
+      - areaId: string
+    - areas: array - Area options for dropdown
+    - pagination: object - Pagination data for GOV.UK component
+      - items: array - Page number items
+      - previous: object - Previous link config
+      - next: object - Next link config
+      - summary: object - Summary text data
+    - baseUrl: string - Base URL for pagination and form
+    - tabUrls: object - URLs for tabs
+      - pending: string
+      - active: string
+#}
+
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-xl">{{ t('accounts.manage_users.heading') }}</h1>
+
+    {# Tab navigation styled as buttons #}
+    <nav class="app-users-tabs govuk-!-margin-bottom-6" aria-label="{{ t('accounts.manage_users.tabs.aria_label') }}">
+      <ul class="app-users-tabs__list" role="list">
+        <li class="app-users-tabs__item">
+          <a class="app-users-tabs__link{% if currentTab == 'pending' %} app-users-tabs__link--active{% endif %}"
+             href="{{ tabUrls.pending | default('/admin/users/pending') }}"
+             {% if currentTab == 'pending' %}aria-current="page"{% endif %}
+             data-testid="users-tab-pending">
+            <span class="govuk-visually-hidden">{{ t('accounts.manage_users.tabs.view') }} </span>{{ t('accounts.manage_users.tabs.pending') }} ({{ pendingCount | default(0) }})
+          </a>
+        </li>
+        <li class="app-users-tabs__item">
+          <a class="app-users-tabs__link{% if currentTab == 'active' %} app-users-tabs__link--active{% endif %}"
+             href="{{ tabUrls.active | default('/admin/users/active') }}"
+             {% if currentTab == 'active' %}aria-current="page"{% endif %}
+             data-testid="users-tab-active">
+            <span class="govuk-visually-hidden">{{ t('accounts.manage_users.tabs.view') }} </span>{{ t('accounts.manage_users.tabs.active') }} ({{ activeCount | default(0) }})
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    {# Filter form #}
+    <form action="{{ baseUrl }}" method="get" class="govuk-!-margin-bottom-6" role="search" aria-label="{{ t('accounts.manage_users.filters.aria_label') }}" data-testid="users-filter-form">
+      {{ govukInput({
+        label: {
+          text: t('accounts.manage_users.filters.search_label'),
+          classes: "govuk-label"
+        },
+        id: "search",
+        name: "search",
+        value: filters.search,
+        classes: "govuk-!-width-two-thirds",
+        attributes: {
+          "aria-describedby": "search-hint"
+        }
+      }) }}
+      <span id="search-hint" class="govuk-visually-hidden">{{ t('accounts.manage_users.filters.search_hint') }}</span>
+
+      {{ govukSelect({
+        id: "area-filter",
+        name: "areaId",
+        label: {
+          text: t('accounts.manage_users.filters.area_label'),
+          classes: "govuk-label"
+        },
+        classes: "govuk-!-width-two-thirds",
+        items: areas,
+        value: filters.areaId
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: t('accounts.manage_users.filters.filter_button'),
+          type: "submit"
+        }) }}
+        <a href="{{ baseUrl }}" class="govuk-link" data-testid="clear-filters">
+          {{ t('accounts.manage_users.filters.clear_filters') }}
+        </a>
+      </div>
+    </form>
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true">
+
+    {# Users table - injected by child template #}
+    {% block usersTable %}{% endblock %}
+
+    {# Pagination row with summary and navigation #}
+    {% if pagination.summary or pagination.items or pagination.previous or pagination.next %}
+    <div class="app-pagination-row govuk-!-margin-top-6">
+      {# Pagination summary #}
+      {% if pagination.summary %}
+      <p class="govuk-body app-pagination-row__summary" data-testid="pagination-summary">
+        {{ t('accounts.manage_users.pagination.showing') }}
+        <strong>{{ pagination.summary.startItem }}</strong>
+        {{ t('accounts.manage_users.pagination.to') }}
+        <strong>{{ pagination.summary.endItem }}</strong>
+        {{ t('accounts.manage_users.pagination.of') }}
+        <strong>{{ pagination.summary.totalItems }}</strong>
+        {{ t('accounts.manage_users.pagination.users') }}
+      </p>
+      {% endif %}
+
+      {# GOV.UK Pagination #}
+      {% if pagination.items or pagination.previous or pagination.next %}
+      <div class="app-pagination-row__nav">
+        {{ govukPagination({
+          items: pagination.items,
+          previous: pagination.previous,
+          next: pagination.next,
+          landmarkLabel: t('accounts.manage_users.pagination.aria_label')
+        }) }}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-6" aria-hidden="true">
+
+    {# Bottom action links #}
+    <div class="app-users-actions govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+      <a href="/admin/users/add" class="govuk-link" data-testid="add-new-user">
+        {{ t('accounts.manage_users.actions.add_new_user') }}
+      </a>
+      <a href="/admin/users/download" class="govuk-link" data-testid="download-all-users">
+        {{ t('accounts.manage_users.actions.download_all_users') }}
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
