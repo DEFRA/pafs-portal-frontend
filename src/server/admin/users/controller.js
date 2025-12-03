@@ -2,7 +2,7 @@ import { ROUTES } from '../../common/constants/routes.js'
 
 class UsersController {
   get(_request, h) {
-    return h.redirect(ROUTES.ADMIN.USERS_PENDING)
+    return h.redirect(ROUTES.ADMIN.USERS_ACTIVE)
   }
 }
 
