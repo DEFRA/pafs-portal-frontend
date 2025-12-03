@@ -24,6 +24,15 @@ vi.mock('../../common/helpers/account-request-helpers.js', () => ({
   }))
 }))
 
+// Mock account-request-service
+vi.mock('../../common/services/account-request-service.js', () => ({
+  submitAccountRequest: vi.fn().mockResolvedValue({
+    success: true,
+    status: 200,
+    data: { id: 123 }
+  })
+}))
+
 describe('#accountRequestCheckAnswersController', () => {
   let server
 

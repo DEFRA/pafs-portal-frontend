@@ -2,6 +2,8 @@ import { getAreas } from '../../common/services/areas/area-service.js'
 import { getCachedAreas } from '../../common/services/areas/areas-cache.js'
 import { getAreaById } from '../../common/helpers/area-filters.js'
 import { prepareAccountRequestPayload } from '../../common/helpers/account-request-helpers.js'
+import { submitAccountRequest } from '../../common/services/account-request-service.js'
+import { statusCodes } from '../../common/constants/status-codes.js'
 
 function buildViewModel(request, summaryData = {}) {
   return {
@@ -166,29 +168,114 @@ function getResponsibilityDisplayValue(responsibility) {
   return mapping[responsibility] || responsibility
 }
 
-export const accountRequestCheckAnswersController = {
-  async handler(request, h) {
-    // Handle POST - submit data and redirect to confirmation page
-    if (request.method === 'post') {
-      const sessionData = request.yar.get('accountRequest') ?? {}
+async function handlePost(request, h) {
+  const sessionData = request.yar.get('accountRequest') ?? {}
 
-      // Prepare JSON payload for backend API
-      const payload = prepareAccountRequestPayload(sessionData)
+  // Prepare JSON payload for backend API
+  const payload = prepareAccountRequestPayload(sessionData)
 
-      // Log the prepared payload for debugging
+  // Log the prepared payload for debugging
+  request.server.logger.info(
+    {
+      payload,
+      areasCount: payload.areas.length,
+      primaryArea: payload.areas.find((area) => area.primary === true)
+    },
+    'Account request payload prepared for backend API'
+  )
+
+  // Submit to backend API
+  try {
+    const response = await submitAccountRequest(payload)
+
+    if (response.success) {
       request.server.logger.info(
         {
-          payload,
-          areasCount: payload.areas.length,
-          primaryArea: payload.areas.find((area) => area.primary === true)
+          status: response.status,
+          areasCount: payload.areas.length
         },
-        'Account request payload prepared for backend API'
+        'Account request submitted successfully to backend API'
       )
 
       // Clear session data after successful submission
       request.yar.set('accountRequest', {})
 
       return h.redirect('/account_request/confirmation')
+    }
+
+    // API returned an error response
+    request.server.logger.error(
+      {
+        status: response.status,
+        errors: response.errors,
+        validationErrors: response.validationErrors
+      },
+      'Account request submission failed - API returned error'
+    )
+
+    // Load areas for error display
+    let areas = []
+    try {
+      areas = (await getCachedAreas(request.server, getAreas)) ?? []
+    } catch (error) {
+      request.server.logger.error(
+        { error: error.message },
+        'Error loading areas for error display'
+      )
+    }
+
+    const summaryData = buildSummaryData(sessionData, areas)
+
+    // Build error message for display
+    const errorMessage =
+      response.validationErrors || response.errors
+        ? 'There was a problem submitting your request. Please try again.'
+        : 'There was a problem submitting your request. Please try again later.'
+
+    return h
+      .view('account_requests/check-answers/index.njk', {
+        ...buildViewModel(request, summaryData),
+        error: errorMessage
+      })
+      .code(response.status || statusCodes.internalServerError)
+  } catch (error) {
+    // Network or other error
+    request.server.logger.error(
+      {
+        error: error.message,
+        stack: error.stack
+      },
+      'Error submitting account request to backend API'
+    )
+
+    // Load areas for error display
+    let areas = []
+    try {
+      areas = (await getCachedAreas(request.server, getAreas)) ?? []
+    } catch (loadError) {
+      request.server.logger.error(
+        { error: loadError.message },
+        'Error loading areas for error display'
+      )
+    }
+
+    const summaryData = buildSummaryData(sessionData, areas)
+
+    return h
+      .view('account_requests/check-answers/index.njk', {
+        ...buildViewModel(request, summaryData),
+        error:
+          'There was a problem submitting your request. Please try again later.'
+      })
+      .code(statusCodes.internalServerError)
+  }
+}
+
+export const accountRequestCheckAnswersController = {
+  async handler(request, h) {
+    // Handle POST - submit data and redirect to confirmation page
+    if (request.method === 'post') {
+      return handlePost(request, h)
     }
 
     // Handle GET - display check answers page
