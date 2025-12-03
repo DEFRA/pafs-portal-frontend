@@ -1,0 +1,56 @@
+{#
+  Active Users Page
+  Displays the list of active user accounts
+#}
+
+{% extends "layouts/users-layout.njk" %}
+
+{% block usersTable %}
+  {% if users | length > 0 %}
+  <table class="govuk-table app-users-table" data-testid="users-table">
+    <caption class="govuk-visually-hidden">{{ t('accounts.manage_users.table.active_caption') }}</caption>
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.name') }}</th>
+        <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.email') }}</th>
+        <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.area') }}</th>
+        <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.admin') }}</th>
+        <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.last_sign_in') }}</th>
+        <th scope="col" class="govuk-table__header">
+          <span class="govuk-visually-hidden">{{ t('accounts.manage_users.table.actions') }}</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      {% for user in users %}
+      <tr class="govuk-table__row" data-testid="users-table-row">
+        <td class="govuk-table__cell" data-testid="user-name">{{ user.firstName }} {{ user.lastName }}</td>
+        <td class="govuk-table__cell" data-testid="user-email">{{ user.email }}</td>
+        <td class="govuk-table__cell" data-testid="user-area">{{ user.primaryArea | default('-') }}</td>
+        <td class="govuk-table__cell" data-testid="user-admin">
+          {% if user.isAdmin %}
+            {{ t('accounts.manage_users.table.yes') }}
+          {% else %}
+            {{ t('accounts.manage_users.table.no') }}
+          {% endif %}
+        </td>
+        <td class="govuk-table__cell" data-testid="user-last-sign-in">
+          {% if user.lastSignIn %}
+            {{ user.lastSignIn | formatDate('d MMM yyyy') }}
+          {% else %}
+            {{ t('accounts.manage_users.table.never') }}
+          {% endif %}
+        </td>
+        <td class="govuk-table__cell">
+          <a href="/admin/users/{{ user.id }}" class="govuk-link" data-testid="user-view-link">
+            {{ t('accounts.manage_users.actions.view') }}<span class="govuk-visually-hidden"> {{ user.firstName }} {{ user.lastName }}</span>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="govuk-body" data-testid="users-empty">{{ t('accounts.manage_users.empty.active') }}</p>
+  {% endif %}
+{% endblock %}
