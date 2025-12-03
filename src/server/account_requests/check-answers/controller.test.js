@@ -330,11 +330,8 @@ describe('#accountRequestCheckAnswersController', () => {
   describe('Unit tests for direct coverage', () => {
     let mockRequest
     let mockH
-    let consoleLogSpy
 
     beforeEach(() => {
-      consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-
       mockRequest = {
         method: 'get',
         t: vi.fn((key) => key),
@@ -361,10 +358,6 @@ describe('#accountRequestCheckAnswersController', () => {
       }
     })
 
-    afterEach(() => {
-      consoleLogSpy.mockRestore()
-    })
-
     test('Should call handler for GET request', async () => {
       mockRequest.yar.get.mockReturnValue({
         details: { responsibility: 'EA' }
@@ -378,7 +371,7 @@ describe('#accountRequestCheckAnswersController', () => {
       await accountRequestCheckAnswersController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalled()
-      expect(consoleLogSpy).toHaveBeenCalled()
+      expect(mockRequest.server.logger.info).toHaveBeenCalled()
     })
 
     test('Should call handler for POST request', async () => {

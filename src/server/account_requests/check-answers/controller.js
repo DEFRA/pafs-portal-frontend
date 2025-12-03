@@ -5,6 +5,11 @@ import { prepareAccountRequestPayload } from '../../common/helpers/account-reque
 import { submitAccountRequest } from '../../common/services/account-request-service.js'
 import { statusCodes } from '../../common/constants/status-codes.js'
 
+const ERROR_MESSAGE_RETRY =
+  'There was a problem submitting your request. Please try again.'
+const ERROR_MESSAGE_LATER =
+  'There was a problem submitting your request. Please try again later.'
+
 function buildViewModel(request, summaryData = {}) {
   return {
     title: request.t('account-request.checkAnswers.heading'),
@@ -229,8 +234,8 @@ async function handlePost(request, h) {
     // Build error message for display
     const errorMessage =
       response.validationErrors || response.errors
-        ? 'There was a problem submitting your request. Please try again.'
-        : 'There was a problem submitting your request. Please try again later.'
+        ? ERROR_MESSAGE_RETRY
+        : ERROR_MESSAGE_LATER
 
     return h
       .view('account_requests/check-answers/index.njk', {
@@ -264,8 +269,7 @@ async function handlePost(request, h) {
     return h
       .view('account_requests/check-answers/index.njk', {
         ...buildViewModel(request, summaryData),
-        error:
-          'There was a problem submitting your request. Please try again later.'
+        error: ERROR_MESSAGE_LATER
       })
       .code(statusCodes.internalServerError)
   }
@@ -298,25 +302,15 @@ export const accountRequestCheckAnswersController = {
     // Prepare and log payload for backend API
     const payload = prepareAccountRequestPayload(sessionData)
 
-    console.log(
-      '\n*********************RAW SESSION DATA****************************'
-    )
-    console.log(JSON.stringify(sessionData, null, 2))
-    console.log(
-      '*********************RAW SESSION DATA*****************************\n'
-    )
-
-    console.log(
-      '*********************BACKEND API PAYLOAD****************************'
-    )
-    console.log(JSON.stringify(payload, null, 2))
-    console.log('Total areas:', payload.areas.length)
-    console.log(
-      'Primary area:',
-      payload.areas.find((area) => area.primary === true)
-    )
-    console.log(
-      '*********************BACKEND API PAYLOAD*****************************\n'
+    // Log session data and payload for debugging
+    request.server.logger.info(
+      {
+        sessionData,
+        payload,
+        areasCount: payload.areas.length,
+        primaryArea: payload.areas.find((area) => area.primary === true)
+      },
+      'Account request data prepared for check-answers page'
     )
 
     return h.view(
