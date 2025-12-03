@@ -2,8 +2,7 @@ import { ROUTES } from '../../common/constants/routes.js'
 
 class UsersController {
   get(_request, h) {
-    // Redirect to pending users page by default
-    return h.redirect(ROUTES.ADMIN.USERS_ACTIVE)
+    return h.redirect(ROUTES.ADMIN.USERS_PENDING)
   }
 }
 

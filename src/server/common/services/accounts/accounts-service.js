@@ -3,19 +3,37 @@ import { ACCOUNT_STATUS } from '../../constants/accounts.js'
 import { getDefaultPageSize } from '../../helpers/pagination/index.js'
 import { PAGINATION } from '../../constants/common.js'
 
-/**
- * Fetch accounts from the backend API
- *
- * @param {Object} params - Query parameters
- * @param {string} params.status - Account status ('pending' or 'active')
- * @param {string} [params.search] - Search query for name/email
- * @param {string} [params.areaId] - Filter by area ID
- * @param {number} [params.page] - Page number (default: 1)
- * @param {number} [params.pageSize] - Page size (default: 20)
- * @param {string} [params.accessToken] - Access token for authorization
- * @param {Object} [params.cacheService] - Optional cache service instance
- * @returns {Promise<Object>} API response with accounts data
- */
+function buildAccountsQueryParams({ status, search, areaId, page, pageSize }) {
+  const queryParams = new URLSearchParams()
+
+  queryParams.append('status', status)
+  queryParams.append('page', String(page))
+  queryParams.append('pageSize', String(pageSize))
+
+  if (search?.trim()) {
+    queryParams.append('search', search.trim())
+  }
+
+  if (areaId) {
+    queryParams.append('areaId', areaId)
+  }
+
+  return queryParams
+}
+
+async function getFromCache(cacheService, cacheParams) {
+  if (!cacheService) {
+    return null
+  }
+  return cacheService.get(cacheParams)
+}
+
+async function storeInCache(cacheService, cacheParams, result) {
+  if (cacheService && result.success) {
+    await cacheService.set(cacheParams, result)
+  }
+}
+
 export async function getAccounts({
   status,
   search,
@@ -34,26 +52,18 @@ export async function getAccounts({
   }
 
   // Try to get from cache first
-  if (cacheService) {
-    const cached = await cacheService.get(cacheParams)
-    if (cached) {
-      return cached
-    }
+  const cached = await getFromCache(cacheService, cacheParams)
+  if (cached) {
+    return cached
   }
 
-  const queryParams = new URLSearchParams()
-
-  queryParams.append('status', status)
-  queryParams.append('page', String(page))
-  queryParams.append('pageSize', String(effectivePageSize))
-
-  if (search && search.trim()) {
-    queryParams.append('search', search.trim())
-  }
-
-  if (areaId) {
-    queryParams.append('areaId', areaId)
-  }
+  const queryParams = buildAccountsQueryParams({
+    status,
+    search,
+    areaId,
+    page,
+    pageSize: effectivePageSize
+  })
 
   const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
 
@@ -66,21 +76,11 @@ export async function getAccounts({
   )
 
   // Cache successful responses
-  if (result.success && cacheService) {
-    await cacheService.set(cacheParams, result)
-  }
+  await storeInCache(cacheService, cacheParams, result)
 
   return result
 }
 
-/**
- * Get accounts count by status
- *
- * @param {string} status - Account status ('pending' or 'active')
- * @param {string} [accessToken] - Access token for authorization
- * @param {Object} [cacheService] - Optional cache service instance
- * @returns {Promise<number>} Count of accounts
- */
 export async function getAccountsCount(status, accessToken, cacheService) {
   const cacheKey = `count:${status}`
 
@@ -110,24 +110,10 @@ export async function getAccountsCount(status, accessToken, cacheService) {
   return count
 }
 
-/**
- * Get pending accounts count
- *
- * @param {string} [accessToken] - Access token for authorization
- * @param {Object} [cacheService] - Optional cache service instance
- * @returns {Promise<number>} Count of pending accounts
- */
 export function getPendingCount(accessToken, cacheService) {
   return getAccountsCount(ACCOUNT_STATUS.PENDING, accessToken, cacheService)
 }
 
-/**
- * Get active accounts count
- *
- * @param {string} [accessToken] - Access token for authorization
- * @param {Object} [cacheService] - Optional cache service instance
- * @returns {Promise<number>} Count of active accounts
- */
 export function getActiveCount(accessToken, cacheService) {
   return getAccountsCount(ACCOUNT_STATUS.ACTIVE, accessToken, cacheService)
 }
