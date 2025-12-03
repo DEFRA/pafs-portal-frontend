@@ -55,6 +55,82 @@ function getCacheInstance(server) {
   }
 }
 
+function extractCachedData(cached) {
+  // Catbox cache returns { item: value, stored: timestamp }
+  // But sometimes it might return the value directly
+  if (cached.item !== undefined) {
+    return cached.item
+  }
+
+  if (Array.isArray(cached)) {
+    // If cached is already an array, use it directly
+    return cached
+  }
+
+  if (typeof cached === 'object' && cached !== null) {
+    // Check if it's an array-like object (has numeric keys)
+    const keys = Object.keys(cached)
+    const hasNumericKeys =
+      keys.length > 0 && keys.every((key) => !isNaN(Number(key)))
+
+    if (hasNumericKeys) {
+      // Convert array-like object to array
+      // Use Object.values() which preserves order for sequential numeric keys
+      return Object.values(cached)
+    }
+
+    if (!cached.stored && !cached.item) {
+      // It's a plain object, use it directly
+      return cached
+    }
+  }
+
+  // Primitive value, use directly
+  return cached
+}
+
+async function getFromCache(cache, server) {
+  const cached = await cache.get(CACHE_KEY)
+
+  if (cached === null || cached === undefined) {
+    return null
+  }
+
+  const cachedData = extractCachedData(cached)
+
+  if (cachedData !== null && cachedData !== undefined) {
+    server.logger.info('Areas retrieved from cache')
+    return cachedData
+  }
+
+  return null
+}
+
+async function fetchAndCache(cache, fetchFunction, server) {
+  const areasResponse = await fetchFunction()
+
+  if (areasResponse.success) {
+    // Store in cache for future requests
+    await cache.set(CACHE_KEY, areasResponse.data)
+    return areasResponse.data
+  }
+
+  return null
+}
+
+async function fetchFromApiDirectly(fetchFunction, server) {
+  try {
+    const areasResponse = await fetchFunction()
+    return areasResponse && areasResponse.success ? areasResponse.data : null
+  } catch (fetchError) {
+    server.logger.error(
+      { error: fetchError.message },
+      'Error fetching areas from API'
+    )
+    return null
+  }
+}
+
 /**
  * Get areas from cache or fetch from API and cache it
  * @param {Object} server - Hapi server instance
@@ -72,54 +148,13 @@ export async function getCachedAreas(server, fetchFunction) {
 
   try {
     // Try to get from cache first
-    const cached = await cache.get(CACHE_KEY)
-
-    if (cached !== null && cached !== undefined) {
-      // Catbox cache returns { item: value, stored: timestamp }
-      // But sometimes it might return the value directly
-      let cachedData = null
-
-      // Check if it's the standard Catbox format
-      if (cached.item !== undefined) {
-        cachedData = cached.item
-      } else if (Array.isArray(cached)) {
-        // If cached is already an array, use it directly
-        cachedData = cached
-      } else if (typeof cached === 'object' && cached !== null) {
-        // Check if it's an array-like object (has numeric keys)
-        const keys = Object.keys(cached)
-        const hasNumericKeys =
-          keys.length > 0 && keys.every((key) => !isNaN(Number(key)))
-
-        if (hasNumericKeys) {
-          // Convert array-like object to array
-          // Use Object.values() which preserves order for sequential numeric keys
-          cachedData = Object.values(cached)
-        } else if (!cached.stored && !cached.item) {
-          // It's a plain object, use it directly
-          cachedData = cached
-        }
-      } else {
-        // Primitive value, use directly
-        cachedData = cached
-      }
-
-      if (cachedData !== null && cachedData !== undefined) {
-        server.logger.info('Areas retrieved from cache')
-        return cachedData
-      }
+    const cachedData = await getFromCache(cache, server)
+    if (cachedData !== null) {
+      return cachedData
     }
 
     // If not in cache, fetch from API
-    const areasResponse = await fetchFunction()
-
-    if (areasResponse.success) {
-      // Store in cache for future requests
-      await cache.set(CACHE_KEY, areasResponse.data)
-      return areasResponse.data
-    }
-
-    return null
+    return await fetchAndCache(cache, fetchFunction, server)
   } catch (error) {
     server.logger.error(
       {
@@ -130,15 +165,6 @@ export async function getCachedAreas(server, fetchFunction) {
       'Error accessing areas cache'
     )
     // If cache fails, try to fetch from API directly (but don't throw)
-    try {
-      const areasResponse = await fetchFunction()
-      return areasResponse && areasResponse.success ? areasResponse.data : null
-    } catch (fetchError) {
-      server.logger.error(
-        { error: fetchError.message },
-        'Error fetching areas from API'
-      )
-      return null
-    }
+    return fetchFromApiDirectly(fetchFunction, server)
   }
 }

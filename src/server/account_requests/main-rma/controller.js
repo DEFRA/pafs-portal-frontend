@@ -7,6 +7,10 @@ import {
   getAreaById
 } from '../../common/helpers/area-filters.js'
 
+const CHECK_ANSWERS_RETURN_TO = 'check-answers'
+const CHECK_ANSWERS_URL = '/account_request/check-answers'
+const ADDITIONAL_RMAS_URL = '/account_request/additional-rmas'
+
 function buildViewModel(
   request,
   values = {},
@@ -99,109 +103,154 @@ function validateMainRma(request) {
   return { values, errors, errorSummary }
 }
 
-export const accountRequestMainRmaController = {
-  async handler(request, h) {
-    if (request.method === 'post') {
-      const { values, errors, errorSummary } = validateMainRma(request)
-      const returnTo = request.payload?.returnTo
-
-      if (errorSummary.length) {
-        // Load RMAs for error display
-        let rmasByPsoTeam = []
-        try {
-          const sessionData = request.yar.get('accountRequest') ?? {}
-          const selectedPsoTeamIds = sessionData.psoTeam?.psoTeams ?? []
-          const areas = await getCachedAreas(request.server, getAreas)
-          if (areas && selectedPsoTeamIds.length > 0) {
-            const allRmaAreas = filterAreasByType(areas, 'RMA')
-            const rmas = filterAreasByParentIds(allRmaAreas, selectedPsoTeamIds)
-            rmasByPsoTeam = groupRmasByPsoTeam(rmas, areas, selectedPsoTeamIds)
-          }
-        } catch (error) {
-          request.server.logger.error(
-            { error: error.message },
-            'Error loading RMAs for error display'
-          )
-        }
-
-        return h
-          .view(
-            'account_requests/main-rma/index.njk',
-            buildViewModel(
-              request,
-              values,
-              errors,
-              errorSummary,
-              returnTo,
-              rmasByPsoTeam
-            )
-          )
-          .code(statusCodes.badRequest)
-      }
-
-      const sessionData = request.yar.get('accountRequest') ?? {}
-      sessionData.mainRma = values
-      request.yar.set('accountRequest', sessionData)
-
-      const nextUrl =
-        returnTo === 'check-answers'
-          ? '/account_request/check-answers'
-          : '/account_request/additional-rmas'
-
-      return h.redirect(nextUrl)
-    }
-
+async function loadRmasForErrorDisplay(request) {
+  try {
     const sessionData = request.yar.get('accountRequest') ?? {}
-    const values = sessionData.mainRma ?? {}
-    const returnTo =
-      request.query.from === 'check-answers' ? 'check-answers' : undefined
-
-    // Get selected PSO teams from session (array from checkbox selection)
     const selectedPsoTeamIds = sessionData.psoTeam?.psoTeams ?? []
-
-    // Load RMAs filtered by all selected PSO teams and group by PSO team
-    let rmasByPsoTeam = []
-    try {
-      const areas = await getCachedAreas(request.server, getAreas)
-      if (areas && selectedPsoTeamIds.length > 0) {
-        const allRmaAreas = filterAreasByType(areas, 'RMA')
-        const rmas = filterAreasByParentIds(allRmaAreas, selectedPsoTeamIds)
-        rmasByPsoTeam = groupRmasByPsoTeam(rmas, areas, selectedPsoTeamIds)
-        request.server.logger.info(
-          {
-            rmasCount: rmas.length,
-            groupedCount: rmasByPsoTeam.length,
-            selectedPsoTeamIds,
-            selectedPsoTeamCount: selectedPsoTeamIds.length
-          },
-          'RMAs loaded and grouped by PSO team for main RMA selection'
-        )
-      } else {
-        request.server.logger.warn(
-          {
-            selectedPsoTeamIds,
-            selectedPsoTeamCount: selectedPsoTeamIds.length
-          },
-          'Failed to load RMAs - missing PSO team selection'
-        )
-      }
-    } catch (error) {
-      request.server.logger.error(
-        { error: error.message, stack: error.stack },
-        'Error loading RMAs'
-      )
+    const areas = await getCachedAreas(request.server, getAreas)
+    if (areas && selectedPsoTeamIds.length > 0) {
+      const allRmaAreas = filterAreasByType(areas, 'RMA')
+      const rmas = filterAreasByParentIds(allRmaAreas, selectedPsoTeamIds)
+      return groupRmasByPsoTeam(rmas, areas, selectedPsoTeamIds)
     }
+  } catch (error) {
+    request.server.logger.error(
+      { error: error.message },
+      'Error loading RMAs for error display'
+    )
+  }
+  return []
+}
 
-    return h.view(
+async function handlePostWithErrors(
+  request,
+  h,
+  values,
+  errors,
+  errorSummary,
+  returnTo
+) {
+  const rmasByPsoTeam = await loadRmasForErrorDisplay(request)
+
+  return h
+    .view(
       'account_requests/main-rma/index.njk',
       buildViewModel(
         request,
         values,
-        undefined,
-        undefined,
+        errors,
+        errorSummary,
         returnTo,
         rmasByPsoTeam
       )
     )
+    .code(statusCodes.badRequest)
+}
+
+async function handlePostSuccess(request, h, values, returnTo) {
+  const sessionData = request.yar.get('accountRequest') ?? {}
+  sessionData.mainRma = values
+  request.yar.set('accountRequest', sessionData)
+
+  const nextUrl =
+    returnTo === CHECK_ANSWERS_RETURN_TO
+      ? CHECK_ANSWERS_URL
+      : ADDITIONAL_RMAS_URL
+
+  return h.redirect(nextUrl)
+}
+
+async function handlePost(request, h) {
+  const { values, errors, errorSummary } = validateMainRma(request)
+  const returnTo = request.payload?.returnTo
+
+  if (errorSummary.length) {
+    return handlePostWithErrors(
+      request,
+      h,
+      values,
+      errors,
+      errorSummary,
+      returnTo
+    )
+  }
+
+  return handlePostSuccess(request, h, values, returnTo)
+}
+
+function getReturnToFromQuery(request) {
+  return request.query.from === CHECK_ANSWERS_RETURN_TO
+    ? CHECK_ANSWERS_RETURN_TO
+    : undefined
+}
+
+async function loadRmasByPsoTeam(request, selectedPsoTeamIds) {
+  const areas = await getCachedAreas(request.server, getAreas)
+  if (!areas || selectedPsoTeamIds.length === 0) {
+    request.server.logger.warn(
+      {
+        selectedPsoTeamIds,
+        selectedPsoTeamCount: selectedPsoTeamIds.length
+      },
+      'Failed to load RMAs - missing PSO team selection'
+    )
+    return []
+  }
+
+  const allRmaAreas = filterAreasByType(areas, 'RMA')
+  const rmas = filterAreasByParentIds(allRmaAreas, selectedPsoTeamIds)
+  const rmasByPsoTeam = groupRmasByPsoTeam(rmas, areas, selectedPsoTeamIds)
+
+  request.server.logger.info(
+    {
+      rmasCount: rmas.length,
+      groupedCount: rmasByPsoTeam.length,
+      selectedPsoTeamIds,
+      selectedPsoTeamCount: selectedPsoTeamIds.length
+    },
+    'RMAs loaded and grouped by PSO team for main RMA selection'
+  )
+
+  return rmasByPsoTeam
+}
+
+async function handleGet(request, h) {
+  const sessionData = request.yar.get('accountRequest') ?? {}
+  const values = sessionData.mainRma ?? {}
+  const returnTo = getReturnToFromQuery(request)
+
+  // Get selected PSO teams from session (array from checkbox selection)
+  const selectedPsoTeamIds = sessionData.psoTeam?.psoTeams ?? []
+
+  // Load RMAs filtered by all selected PSO teams and group by PSO team
+  let rmasByPsoTeam = []
+  try {
+    rmasByPsoTeam = await loadRmasByPsoTeam(request, selectedPsoTeamIds)
+  } catch (error) {
+    request.server.logger.error(
+      { error: error.message, stack: error.stack },
+      'Error loading RMAs'
+    )
+  }
+
+  return h.view(
+    'account_requests/main-rma/index.njk',
+    buildViewModel(
+      request,
+      values,
+      undefined,
+      undefined,
+      returnTo,
+      rmasByPsoTeam
+    )
+  )
+}
+
+export const accountRequestMainRmaController = {
+  async handler(request, h) {
+    if (request.method === 'post') {
+      return handlePost(request, h)
+    }
+    return handleGet(request, h)
   }
 }

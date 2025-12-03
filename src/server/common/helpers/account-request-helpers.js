@@ -1,3 +1,56 @@
+function parseAreaId(areaId) {
+  return typeof areaId === 'string' ? parseInt(areaId, 10) : areaId
+}
+
+function addArea(areas, areaId, isPrimary) {
+  if (areaId) {
+    areas.push({
+      area_id: parseAreaId(areaId),
+      primary: isPrimary
+    })
+  }
+}
+
+function addAreas(areas, areaIds, isPrimary) {
+  if (Array.isArray(areaIds) && areaIds.length > 0) {
+    areaIds.forEach((areaId) => {
+      addArea(areas, areaId, isPrimary)
+    })
+  }
+}
+
+function prepareEaAreas(sessionData, areas) {
+  const mainEaAreaId = sessionData.eaMainArea?.mainEaArea
+  const additionalEaAreaIds =
+    sessionData.eaAdditionalAreas?.additionalEaAreas ?? []
+
+  addArea(areas, mainEaAreaId, true)
+  addAreas(areas, additionalEaAreaIds, false)
+}
+
+function preparePsoAreas(sessionData, areas) {
+  const eaAreaIds = sessionData.eaArea?.eaAreas ?? []
+  const mainPsoTeamId = sessionData.mainPsoTeam?.mainPsoTeam
+  const additionalPsoTeamIds =
+    sessionData.additionalPsoTeams?.additionalPsoTeams ?? []
+
+  addAreas(areas, eaAreaIds, false)
+  addArea(areas, mainPsoTeamId, true)
+  addAreas(areas, additionalPsoTeamIds, false)
+}
+
+function prepareRmaAreas(sessionData, areas) {
+  const rmaEaAreaIds = sessionData.eaArea?.eaAreas ?? []
+  const psoTeamIds = sessionData.psoTeam?.psoTeams ?? []
+  const mainRmaId = sessionData.mainRma?.mainRma
+  const additionalRmaIds = sessionData.additionalRmas?.additionalRmas ?? []
+
+  addAreas(areas, rmaEaAreaIds, false)
+  addAreas(areas, psoTeamIds, false)
+  addArea(areas, mainRmaId, true)
+  addAreas(areas, additionalRmaIds, false)
+}
+
 /**
  * Prepare complete JSON payload for backend API submission
  * @param {Object} sessionData - Session data containing all account request information
@@ -41,143 +94,21 @@ export function prepareAccountRequestPayload(sessionData) {
   const areas = []
 
   switch (responsibility) {
-    case 'EA': {
-      // EA: Main EA Area (primary) + Additional EA Areas
-      const mainEaAreaId = sessionData.eaMainArea?.mainEaArea
-      const additionalEaAreaIds =
-        sessionData.eaAdditionalAreas?.additionalEaAreas ?? []
-
-      // Add main EA area as primary
-      if (mainEaAreaId) {
-        const mainEaAreaIdNum =
-          typeof mainEaAreaId === 'string'
-            ? parseInt(mainEaAreaId, 10)
-            : mainEaAreaId
-        areas.push({
-          area_id: mainEaAreaIdNum,
-          primary: true
-        })
-      }
-
-      // Add additional EA areas as non-primary
-      if (
-        Array.isArray(additionalEaAreaIds) &&
-        additionalEaAreaIds.length > 0
-      ) {
-        additionalEaAreaIds.forEach((areaId) => {
-          const areaIdNum =
-            typeof areaId === 'string' ? parseInt(areaId, 10) : areaId
-          areas.push({
-            area_id: areaIdNum,
-            primary: false
-          })
-        })
-      }
+    case 'EA':
+      prepareEaAreas(sessionData, areas)
       break
-    }
 
-    case 'PSO': {
-      // PSO: EA Areas + Main PSO Team (primary) + Additional PSO Teams
-      const eaAreaIds = sessionData.eaArea?.eaAreas ?? []
-      const mainPsoTeamId = sessionData.mainPsoTeam?.mainPsoTeam
-      const additionalPsoTeamIds =
-        sessionData.additionalPsoTeams?.additionalPsoTeams ?? []
-
-      // Add EA areas as non-primary
-      if (Array.isArray(eaAreaIds) && eaAreaIds.length > 0) {
-        eaAreaIds.forEach((areaId) => {
-          const areaIdNum =
-            typeof areaId === 'string' ? parseInt(areaId, 10) : areaId
-          areas.push({
-            area_id: areaIdNum,
-            primary: false
-          })
-        })
-      }
-
-      // Add main PSO team as primary
-      if (mainPsoTeamId) {
-        const mainPsoTeamIdNum =
-          typeof mainPsoTeamId === 'string'
-            ? parseInt(mainPsoTeamId, 10)
-            : mainPsoTeamId
-        areas.push({
-          area_id: mainPsoTeamIdNum,
-          primary: true
-        })
-      }
-
-      // Add additional PSO teams as non-primary
-      if (
-        Array.isArray(additionalPsoTeamIds) &&
-        additionalPsoTeamIds.length > 0
-      ) {
-        additionalPsoTeamIds.forEach((areaId) => {
-          const areaIdNum =
-            typeof areaId === 'string' ? parseInt(areaId, 10) : areaId
-          areas.push({
-            area_id: areaIdNum,
-            primary: false
-          })
-        })
-      }
+    case 'PSO':
+      preparePsoAreas(sessionData, areas)
       break
-    }
 
-    case 'RMA': {
-      // RMA: EA Areas + PSO Teams + Main RMA (primary) + Additional RMAs
-      const rmaEaAreaIds = sessionData.eaArea?.eaAreas ?? []
-      const psoTeamIds = sessionData.psoTeam?.psoTeams ?? []
-      const mainRmaId = sessionData.mainRma?.mainRma
-      const additionalRmaIds = sessionData.additionalRmas?.additionalRmas ?? []
-
-      // Add EA areas as non-primary
-      if (Array.isArray(rmaEaAreaIds) && rmaEaAreaIds.length > 0) {
-        rmaEaAreaIds.forEach((areaId) => {
-          const areaIdNum =
-            typeof areaId === 'string' ? parseInt(areaId, 10) : areaId
-          areas.push({
-            area_id: areaIdNum,
-            primary: false
-          })
-        })
-      }
-
-      // Add PSO teams as non-primary
-      if (Array.isArray(psoTeamIds) && psoTeamIds.length > 0) {
-        psoTeamIds.forEach((areaId) => {
-          const areaIdNum =
-            typeof areaId === 'string' ? parseInt(areaId, 10) : areaId
-          areas.push({
-            area_id: areaIdNum,
-            primary: false
-          })
-        })
-      }
-
-      // Add main RMA as primary
-      if (mainRmaId) {
-        const mainRmaIdNum =
-          typeof mainRmaId === 'string' ? parseInt(mainRmaId, 10) : mainRmaId
-        areas.push({
-          area_id: mainRmaIdNum,
-          primary: true
-        })
-      }
-
-      // Add additional RMAs as non-primary
-      if (Array.isArray(additionalRmaIds) && additionalRmaIds.length > 0) {
-        additionalRmaIds.forEach((areaId) => {
-          const areaIdNum =
-            typeof areaId === 'string' ? parseInt(areaId, 10) : areaId
-          areas.push({
-            area_id: areaIdNum,
-            primary: false
-          })
-        })
-      }
+    case 'RMA':
+      prepareRmaAreas(sessionData, areas)
       break
-    }
+
+    default:
+      // Unknown responsibility - leave areas empty
+      break
   }
 
   return {

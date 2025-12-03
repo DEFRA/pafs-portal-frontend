@@ -7,6 +7,9 @@ import {
   getAreaById
 } from '../../common/helpers/area-filters.js'
 
+const CHECK_ANSWERS_URL = '/account_request/check-answers'
+const CHECK_ANSWERS_RETURN_TO = 'check-answers'
+
 function buildViewModel(
   request,
   values = {},
@@ -80,89 +83,106 @@ function groupRmasByPsoTeam(rmas, allAreas, selectedPsoTeamIds, mainRmaId) {
   return grouped
 }
 
+async function handlePost(request, h) {
+  const payload = request.payload ?? {}
+  let additionalRmas = payload.additionalRmas ?? []
+
+  if (!Array.isArray(additionalRmas)) {
+    additionalRmas = additionalRmas ? [additionalRmas] : []
+  }
+
+  const values = { additionalRmas }
+  const sessionData = request.yar.get('accountRequest') ?? {}
+  sessionData.additionalRmas = values
+  request.yar.set('accountRequest', sessionData)
+
+  return h.redirect(CHECK_ANSWERS_URL)
+}
+
+async function loadAdditionalRmasByPsoTeam(
+  request,
+  selectedPsoTeamIds,
+  mainRmaId
+) {
+  const areas = await getCachedAreas(request.server, getAreas)
+  if (!areas || selectedPsoTeamIds.length === 0) {
+    request.server.logger.warn(
+      {
+        selectedPsoTeamIds,
+        selectedPsoTeamCount: selectedPsoTeamIds.length
+      },
+      'Failed to load additional RMAs - missing PSO team selection'
+    )
+    return []
+  }
+
+  const allRmaAreas = filterAreasByType(areas, 'RMA')
+  const rmasByPsoTeams = filterAreasByParentIds(allRmaAreas, selectedPsoTeamIds)
+
+  // Exclude the main selected RMA and group by PSO team
+  const rmasExcludingMain = mainRmaId
+    ? filterAreasExcludingIds(rmasByPsoTeams, [mainRmaId])
+    : rmasByPsoTeams
+
+  const additionalRmasByPsoTeam = groupRmasByPsoTeam(
+    rmasExcludingMain,
+    areas,
+    selectedPsoTeamIds,
+    mainRmaId
+  )
+
+  request.server.logger.info(
+    {
+      additionalRmasCount: rmasExcludingMain.length,
+      groupedCount: additionalRmasByPsoTeam.length,
+      selectedPsoTeamIds,
+      selectedPsoTeamCount: selectedPsoTeamIds.length,
+      mainRmaId
+    },
+    'Additional RMAs loaded and grouped by PSO team'
+  )
+
+  return additionalRmasByPsoTeam
+}
+
+async function handleGet(request, h) {
+  const sessionData = request.yar.get('accountRequest') ?? {}
+  const values = sessionData.additionalRmas ?? {}
+  const returnTo =
+    request.query.from === CHECK_ANSWERS_RETURN_TO
+      ? CHECK_ANSWERS_RETURN_TO
+      : undefined
+
+  // Get selected PSO teams and main RMA from session
+  const selectedPsoTeamIds = sessionData.psoTeam?.psoTeams ?? []
+  const mainRmaId = sessionData.mainRma?.mainRma
+
+  // Load RMAs filtered by all selected PSO teams, grouped by PSO team, excluding main selected RMA
+  let additionalRmasByPsoTeam = []
+  try {
+    additionalRmasByPsoTeam = await loadAdditionalRmasByPsoTeam(
+      request,
+      selectedPsoTeamIds,
+      mainRmaId
+    )
+  } catch (error) {
+    request.server.logger.error(
+      { error: error.message, stack: error.stack },
+      'Error loading additional RMAs'
+    )
+  }
+
+  return h.view(
+    'account_requests/additional-rmas/index.njk',
+    buildViewModel(request, values, returnTo, additionalRmasByPsoTeam)
+  )
+}
+
 export const accountRequestAdditionalRmasController = {
   async handler(request, h) {
     if (request.method === 'post') {
-      const payload = request.payload ?? {}
-      let additionalRmas = payload.additionalRmas ?? []
-
-      if (!Array.isArray(additionalRmas)) {
-        additionalRmas = additionalRmas ? [additionalRmas] : []
-      }
-
-      const values = { additionalRmas }
-      const returnTo = payload.returnTo
-
-      const sessionData = request.yar.get('accountRequest') ?? {}
-      sessionData.additionalRmas = values
-      request.yar.set('accountRequest', sessionData)
-
-      const nextUrl =
-        returnTo === 'check-answers'
-          ? '/account_request/check-answers'
-          : '/account_request/check-answers'
-
-      return h.redirect(nextUrl)
+      return handlePost(request, h)
     }
-
-    const sessionData = request.yar.get('accountRequest') ?? {}
-    const values = sessionData.additionalRmas ?? {}
-    const returnTo =
-      request.query.from === 'check-answers' ? 'check-answers' : undefined
-
-    // Get selected PSO teams and main RMA from session
-    const selectedPsoTeamIds = sessionData.psoTeam?.psoTeams ?? []
-    const mainRmaId = sessionData.mainRma?.mainRma
-
-    // Load RMAs filtered by all selected PSO teams, grouped by PSO team, excluding main selected RMA
-    let additionalRmasByPsoTeam = []
-    try {
-      const areas = await getCachedAreas(request.server, getAreas)
-      if (areas && selectedPsoTeamIds.length > 0) {
-        const allRmaAreas = filterAreasByType(areas, 'RMA')
-        const rmasByPsoTeams = filterAreasByParentIds(
-          allRmaAreas,
-          selectedPsoTeamIds
-        )
-        // Exclude the main selected RMA and group by PSO team
-        const rmasExcludingMain = mainRmaId
-          ? filterAreasExcludingIds(rmasByPsoTeams, [mainRmaId])
-          : rmasByPsoTeams
-        additionalRmasByPsoTeam = groupRmasByPsoTeam(
-          rmasExcludingMain,
-          areas,
-          selectedPsoTeamIds,
-          mainRmaId
-        )
-        request.server.logger.info(
-          {
-            additionalRmasCount: rmasExcludingMain.length,
-            groupedCount: additionalRmasByPsoTeam.length,
-            selectedPsoTeamIds,
-            selectedPsoTeamCount: selectedPsoTeamIds.length,
-            mainRmaId
-          },
-          'Additional RMAs loaded and grouped by PSO team'
-        )
-      } else {
-        request.server.logger.warn(
-          {
-            selectedPsoTeamIds,
-            selectedPsoTeamCount: selectedPsoTeamIds.length
-          },
-          'Failed to load additional RMAs - missing PSO team selection'
-        )
-      }
-    } catch (error) {
-      request.server.logger.error(
-        { error: error.message, stack: error.stack },
-        'Error loading additional RMAs'
-      )
-    }
-
-    return h.view(
-      'account_requests/additional-rmas/index.njk',
-      buildViewModel(request, values, returnTo, additionalRmasByPsoTeam)
-    )
+    return handleGet(request, h)
   }
 }

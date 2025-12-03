@@ -17,7 +17,9 @@ function buildViewModel(request, summaryData = {}) {
  * @returns {string} Area name or 'Unknown' if not found
  */
 function getAreaName(areas, areaId) {
-  if (!areaId) return ''
+  if (!areaId) {
+    return ''
+  }
   const area = getAreaById(areas, areaId)
   return area ? area.name : 'Unknown'
 }
@@ -29,10 +31,77 @@ function getAreaName(areas, areaId) {
  * @returns {Array<string>} Array of area names
  */
 function getAreaNames(areas, areaIds) {
-  if (!Array.isArray(areaIds) || areaIds.length === 0) return []
+  if (!Array.isArray(areaIds) || areaIds.length === 0) {
+    return []
+  }
   return areaIds
     .map((id) => getAreaName(areas, id))
     .filter((name) => name !== '')
+}
+
+/**
+ * Build EA flow area summary
+ * @param {Object} sessionData - Session data
+ * @param {Array} areas - All areas from cache
+ * @returns {Object} Area summary for EA flow
+ */
+function buildEaAreaSummary(sessionData, areas) {
+  const mainEaAreaId = sessionData.eaMainArea?.mainEaArea
+  const additionalEaAreaIds =
+    sessionData.eaAdditionalAreas?.additionalEaAreas ?? []
+
+  return {
+    mainEaArea: {
+      id: mainEaAreaId,
+      name: getAreaName(areas, mainEaAreaId)
+    },
+    additionalEaAreas: getAreaNames(areas, additionalEaAreaIds)
+  }
+}
+
+/**
+ * Build PSO flow area summary
+ * @param {Object} sessionData - Session data
+ * @param {Array} areas - All areas from cache
+ * @returns {Object} Area summary for PSO flow
+ */
+function buildPsoAreaSummary(sessionData, areas) {
+  const eaAreaIds = sessionData.eaArea?.eaAreas ?? []
+  const mainPsoTeamId = sessionData.mainPsoTeam?.mainPsoTeam
+  const additionalPsoTeamIds =
+    sessionData.additionalPsoTeams?.additionalPsoTeams ?? []
+
+  return {
+    eaAreas: getAreaNames(areas, eaAreaIds),
+    mainPsoTeam: {
+      id: mainPsoTeamId,
+      name: getAreaName(areas, mainPsoTeamId)
+    },
+    additionalPsoTeams: getAreaNames(areas, additionalPsoTeamIds)
+  }
+}
+
+/**
+ * Build RMA flow area summary
+ * @param {Object} sessionData - Session data
+ * @param {Array} areas - All areas from cache
+ * @returns {Object} Area summary for RMA flow
+ */
+function buildRmaAreaSummary(sessionData, areas) {
+  const rmaEaAreaIds = sessionData.eaArea?.eaAreas ?? []
+  const psoTeamIds = sessionData.psoTeam?.psoTeams ?? []
+  const mainRmaId = sessionData.mainRma?.mainRma
+  const additionalRmaIds = sessionData.additionalRmas?.additionalRmas ?? []
+
+  return {
+    eaAreas: getAreaNames(areas, rmaEaAreaIds),
+    psoTeams: getAreaNames(areas, psoTeamIds),
+    mainRma: {
+      id: mainRmaId,
+      name: getAreaName(areas, mainRmaId)
+    },
+    additionalRmas: getAreaNames(areas, additionalRmaIds)
+  }
 }
 
 /**
@@ -63,55 +132,21 @@ function buildSummaryData(sessionData, areas) {
 
   // Determine which flow and build area summary
   switch (responsibility) {
-    case 'EA': {
-      // EA Area Programme Team flow: Main EA Area + Additional EA Areas
-      const mainEaAreaId = sessionData.eaMainArea?.mainEaArea
-      const additionalEaAreaIds =
-        sessionData.eaAdditionalAreas?.additionalEaAreas ?? []
-
-      summary.areas.mainEaArea = {
-        id: mainEaAreaId,
-        name: getAreaName(areas, mainEaAreaId)
-      }
-      summary.areas.additionalEaAreas = getAreaNames(areas, additionalEaAreaIds)
+    case 'EA':
+      summary.areas = buildEaAreaSummary(sessionData, areas)
       break
-    }
 
-    case 'PSO': {
-      // PSO Team flow: EA Areas + Main PSO Team + Additional PSO Teams
-      const eaAreaIds = sessionData.eaArea?.eaAreas ?? []
-      const mainPsoTeamId = sessionData.mainPsoTeam?.mainPsoTeam
-      const additionalPsoTeamIds =
-        sessionData.additionalPsoTeams?.additionalPsoTeams ?? []
-
-      summary.areas.eaAreas = getAreaNames(areas, eaAreaIds)
-      summary.areas.mainPsoTeam = {
-        id: mainPsoTeamId,
-        name: getAreaName(areas, mainPsoTeamId)
-      }
-      summary.areas.additionalPsoTeams = getAreaNames(
-        areas,
-        additionalPsoTeamIds
-      )
+    case 'PSO':
+      summary.areas = buildPsoAreaSummary(sessionData, areas)
       break
-    }
 
-    case 'RMA': {
-      // RMA flow: EA Areas + PSO Teams (array) + Main RMA + Additional RMAs
-      const rmaEaAreaIds = sessionData.eaArea?.eaAreas ?? []
-      const psoTeamIds = sessionData.psoTeam?.psoTeams ?? []
-      const mainRmaId = sessionData.mainRma?.mainRma
-      const additionalRmaIds = sessionData.additionalRmas?.additionalRmas ?? []
-
-      summary.areas.eaAreas = getAreaNames(areas, rmaEaAreaIds)
-      summary.areas.psoTeams = getAreaNames(areas, psoTeamIds)
-      summary.areas.mainRma = {
-        id: mainRmaId,
-        name: getAreaName(areas, mainRmaId)
-      }
-      summary.areas.additionalRmas = getAreaNames(areas, additionalRmaIds)
+    case 'RMA':
+      summary.areas = buildRmaAreaSummary(sessionData, areas)
       break
-    }
+
+    default:
+      // Unknown responsibility - leave areas empty
+      break
   }
 
   return summary

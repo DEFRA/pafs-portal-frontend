@@ -7,6 +7,9 @@ import {
   getAreaById
 } from '../../common/helpers/area-filters.js'
 
+const CHECK_ANSWERS_RETURN_TO = 'check-answers'
+const ADDITIONAL_PSO_TEAMS_URL = '/account_request/additional-pso-teams'
+
 function buildViewModel(
   request,
   values = {},
@@ -91,122 +94,157 @@ function validateMainPsoTeam(request) {
   return { values, errors, errorSummary }
 }
 
-export const accountRequestMainPsoTeamController = {
-  async handler(request, h) {
-    if (request.method === 'post') {
-      const { values, errors, errorSummary } = validateMainPsoTeam(request)
-      const returnTo = request.payload?.returnTo
-
-      if (errorSummary.length) {
-        // Load PSO teams for error display
-        let psoTeamsByEaArea = []
-        try {
-          const sessionData = request.yar.get('accountRequest') ?? {}
-          const selectedEaAreaIds = sessionData.eaArea?.eaAreas ?? []
-          const areas = await getCachedAreas(request.server, getAreas)
-          if (areas && selectedEaAreaIds.length > 0) {
-            const allPsoAreas = filterAreasByType(areas, 'PSO Area')
-            const psoTeams = filterAreasByParentIds(
-              allPsoAreas,
-              selectedEaAreaIds
-            )
-            psoTeamsByEaArea = groupPsoTeamsByEaArea(
-              psoTeams,
-              areas,
-              selectedEaAreaIds
-            )
-          }
-        } catch (error) {
-          request.server.logger.error(
-            { error: error.message },
-            'Error loading PSO teams for error display'
-          )
-        }
-
-        return h
-          .view(
-            'account_requests/main-pso-team/index.njk',
-            buildViewModel(
-              request,
-              values,
-              errors,
-              errorSummary,
-              returnTo,
-              psoTeamsByEaArea
-            )
-          )
-          .code(statusCodes.badRequest)
-      }
-
-      const sessionData = request.yar.get('accountRequest') ?? {}
-      sessionData.mainPsoTeam = values
-      request.yar.set('accountRequest', sessionData)
-
-      // Always go to additional-pso-teams, but pass returnTo if coming from check-answers
-      const nextUrl =
-        returnTo === 'check-answers'
-          ? '/account_request/additional-pso-teams?returnTo=check-answers'
-          : '/account_request/additional-pso-teams'
-
-      return h.redirect(nextUrl)
-    }
-
+async function loadPsoTeamsForErrorDisplay(request) {
+  try {
     const sessionData = request.yar.get('accountRequest') ?? {}
-    const values = sessionData.mainPsoTeam ?? {}
-    // Check for returnTo in query string (from ea-area redirect) or from query param
-    const returnTo =
-      request.query.returnTo === 'check-answers' ||
-      request.query.from === 'check-answers'
-        ? 'check-answers'
-        : undefined
-
-    // Get selected EA areas from session (array from checkbox selection)
     const selectedEaAreaIds = sessionData.eaArea?.eaAreas ?? []
-
-    // Load PSO teams filtered by all selected EA areas and group by EA area
-    let psoTeamsByEaArea = []
-    try {
-      const areas = await getCachedAreas(request.server, getAreas)
-      if (areas && selectedEaAreaIds.length > 0) {
-        const allPsoAreas = filterAreasByType(areas, 'PSO Area')
-        const psoTeams = filterAreasByParentIds(allPsoAreas, selectedEaAreaIds)
-        psoTeamsByEaArea = groupPsoTeamsByEaArea(
-          psoTeams,
-          areas,
-          selectedEaAreaIds
-        )
-        request.server.logger.info(
-          {
-            psoTeamsCount: psoTeams.length,
-            groupedCount: psoTeamsByEaArea.length,
-            selectedEaAreaIds,
-            selectedEaAreaCount: selectedEaAreaIds.length
-          },
-          'PSO teams loaded and grouped by EA area for main team selection'
-        )
-      } else {
-        request.server.logger.warn(
-          { selectedEaAreaIds, selectedEaAreaCount: selectedEaAreaIds.length },
-          'Failed to load PSO teams - missing EA area selection'
-        )
-      }
-    } catch (error) {
-      request.server.logger.error(
-        { error: error.message, stack: error.stack },
-        'Error loading PSO teams'
-      )
+    const areas = await getCachedAreas(request.server, getAreas)
+    if (areas && selectedEaAreaIds.length > 0) {
+      const allPsoAreas = filterAreasByType(areas, 'PSO Area')
+      const psoTeams = filterAreasByParentIds(allPsoAreas, selectedEaAreaIds)
+      return groupPsoTeamsByEaArea(psoTeams, areas, selectedEaAreaIds)
     }
+  } catch (error) {
+    request.server.logger.error(
+      { error: error.message },
+      'Error loading PSO teams for error display'
+    )
+  }
+  return []
+}
 
-    return h.view(
+async function handlePostWithErrors(
+  request,
+  h,
+  values,
+  errors,
+  errorSummary,
+  returnTo
+) {
+  const psoTeamsByEaArea = await loadPsoTeamsForErrorDisplay(request)
+
+  return h
+    .view(
       'account_requests/main-pso-team/index.njk',
       buildViewModel(
         request,
         values,
-        undefined,
-        undefined,
+        errors,
+        errorSummary,
         returnTo,
         psoTeamsByEaArea
       )
     )
+    .code(statusCodes.badRequest)
+}
+
+async function handlePostSuccess(request, h, values, returnTo) {
+  const sessionData = request.yar.get('accountRequest') ?? {}
+  sessionData.mainPsoTeam = values
+  request.yar.set('accountRequest', sessionData)
+
+  // Always go to additional-pso-teams, but pass returnTo if coming from check-answers
+  const nextUrl =
+    returnTo === CHECK_ANSWERS_RETURN_TO
+      ? `${ADDITIONAL_PSO_TEAMS_URL}?returnTo=${CHECK_ANSWERS_RETURN_TO}`
+      : ADDITIONAL_PSO_TEAMS_URL
+
+  return h.redirect(nextUrl)
+}
+
+async function handlePost(request, h) {
+  const { values, errors, errorSummary } = validateMainPsoTeam(request)
+  const returnTo = request.payload?.returnTo
+
+  if (errorSummary.length) {
+    return handlePostWithErrors(
+      request,
+      h,
+      values,
+      errors,
+      errorSummary,
+      returnTo
+    )
+  }
+
+  return handlePostSuccess(request, h, values, returnTo)
+}
+
+function getReturnToFromQuery(request) {
+  return request.query.returnTo === CHECK_ANSWERS_RETURN_TO ||
+    request.query.from === CHECK_ANSWERS_RETURN_TO
+    ? CHECK_ANSWERS_RETURN_TO
+    : undefined
+}
+
+async function loadPsoTeamsByEaArea(request, selectedEaAreaIds) {
+  const areas = await getCachedAreas(request.server, getAreas)
+  if (!areas || selectedEaAreaIds.length === 0) {
+    request.server.logger.warn(
+      { selectedEaAreaIds, selectedEaAreaCount: selectedEaAreaIds.length },
+      'Failed to load PSO teams - missing EA area selection'
+    )
+    return []
+  }
+
+  const allPsoAreas = filterAreasByType(areas, 'PSO Area')
+  const psoTeams = filterAreasByParentIds(allPsoAreas, selectedEaAreaIds)
+  const psoTeamsByEaArea = groupPsoTeamsByEaArea(
+    psoTeams,
+    areas,
+    selectedEaAreaIds
+  )
+
+  request.server.logger.info(
+    {
+      psoTeamsCount: psoTeams.length,
+      groupedCount: psoTeamsByEaArea.length,
+      selectedEaAreaIds,
+      selectedEaAreaCount: selectedEaAreaIds.length
+    },
+    'PSO teams loaded and grouped by EA area for main team selection'
+  )
+
+  return psoTeamsByEaArea
+}
+
+async function handleGet(request, h) {
+  const sessionData = request.yar.get('accountRequest') ?? {}
+  const values = sessionData.mainPsoTeam ?? {}
+  const returnTo = getReturnToFromQuery(request)
+
+  // Get selected EA areas from session (array from checkbox selection)
+  const selectedEaAreaIds = sessionData.eaArea?.eaAreas ?? []
+
+  // Load PSO teams filtered by all selected EA areas and group by EA area
+  let psoTeamsByEaArea = []
+  try {
+    psoTeamsByEaArea = await loadPsoTeamsByEaArea(request, selectedEaAreaIds)
+  } catch (error) {
+    request.server.logger.error(
+      { error: error.message, stack: error.stack },
+      'Error loading PSO teams'
+    )
+  }
+
+  return h.view(
+    'account_requests/main-pso-team/index.njk',
+    buildViewModel(
+      request,
+      values,
+      undefined,
+      undefined,
+      returnTo,
+      psoTeamsByEaArea
+    )
+  )
+}
+
+export const accountRequestMainPsoTeamController = {
+  async handler(request, h) {
+    if (request.method === 'post') {
+      return handlePost(request, h)
+    }
+    return handleGet(request, h)
   }
 }
