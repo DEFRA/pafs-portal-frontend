@@ -37,7 +37,8 @@ export function createUsersListController({ status, viewTemplate, baseUrl }) {
       // Create cache service instance for this request
       const cacheService = createAccountsCacheService(request.server)
 
-      const page = parseInt(request.query.page, 10) || PAGINATION.DEFAULT_PAGE
+      const page =
+        Number.parseInt(request.query.page, 10) || PAGINATION.DEFAULT_PAGE
       const search = request.query.search || ''
       const areaId = request.query.areaId || ''
       const filters = { search, areaId }

@@ -228,39 +228,6 @@ describe('Pagination Helper', () => {
       })
     })
 
-    describe('ellipsis handling', () => {
-      test('adds ellipsis before current range when page > 3', () => {
-        const result = buildGovukPagination({
-          ...baseParams,
-          currentPage: 5,
-          totalPages: 10
-        })
-
-        expect(result.items[1]).toEqual({ ellipsis: true })
-      })
-
-      test('adds ellipsis after current range when page < totalPages - 2', () => {
-        const result = buildGovukPagination({
-          ...baseParams,
-          currentPage: 3,
-          totalPages: 10
-        })
-
-        const ellipsisItems = result.items.filter((item) => item.ellipsis)
-        expect(ellipsisItems.length).toBeGreaterThan(0)
-      })
-
-      test('no ellipsis when pages fit in range', () => {
-        const result = buildGovukPagination({
-          ...baseParams,
-          totalPages: 3
-        })
-
-        const ellipsisItems = result.items.filter((item) => item.ellipsis)
-        expect(ellipsisItems).toHaveLength(0)
-      })
-    })
-
     describe('filter preservation in URLs', () => {
       test('preserves search filter in pagination URLs', () => {
         const result = buildGovukPagination({
@@ -323,20 +290,203 @@ describe('Pagination Helper', () => {
       })
     })
 
-    describe('many pages', () => {
-      test('handles many pages with correct ellipsis', () => {
+    describe('GOV.UK Design System pagination pattern', () => {
+      // Pattern reference:
+      // [1] 2 … 100      (page 1)
+      // 1 [2] 3 … 100    (page 2)
+      // 1 2 [3] 4 … 100  (page 3)
+      // 1 2 3 [4] 5 … 100 (page 4)
+      // 1 … 4 [5] 6 … 100 (page 5 onwards, middle)
+      // 1 … 97 [98] 99 100 (page 98)
+      // 1 … 98 [99] 100   (page 99)
+      // 1 … 99 [100]      (page 100)
+
+      const manyPagesParams = {
+        ...baseParams,
+        totalPages: 100,
+        totalItems: 2000
+      }
+
+      test('page 1: shows [1] 2 … 100', () => {
         const result = buildGovukPagination({
-          ...baseParams,
-          currentPage: 50,
-          totalPages: 100,
-          totalItems: 2000
+          ...manyPagesParams,
+          currentPage: 1
         })
 
-        // Should have: 1, ellipsis, 49, 50 (current), 51, ellipsis, 100
+        expect(result.items[0]).toMatchObject({ number: '1', current: true })
+        expect(result.items[1]).toMatchObject({ number: '2', current: false })
+        expect(result.items[2]).toEqual({ ellipsis: true })
+        expect(result.items[3]).toMatchObject({ number: '100', current: false })
+        expect(result.items).toHaveLength(4)
+      })
+
+      test('page 2: shows 1 [2] 3 … 100', () => {
+        const result = buildGovukPagination({
+          ...manyPagesParams,
+          currentPage: 2
+        })
+
+        expect(result.items[0]).toMatchObject({ number: '1', current: false })
+        expect(result.items[1]).toMatchObject({ number: '2', current: true })
+        expect(result.items[2]).toMatchObject({ number: '3', current: false })
+        expect(result.items[3]).toEqual({ ellipsis: true })
+        expect(result.items[4]).toMatchObject({ number: '100', current: false })
+        expect(result.items).toHaveLength(5)
+      })
+
+      test('page 3: shows 1 2 [3] 4 … 100', () => {
+        const result = buildGovukPagination({
+          ...manyPagesParams,
+          currentPage: 3
+        })
+
+        expect(result.items[0]).toMatchObject({ number: '1', current: false })
+        expect(result.items[1]).toMatchObject({ number: '2', current: false })
+        expect(result.items[2]).toMatchObject({ number: '3', current: true })
+        expect(result.items[3]).toMatchObject({ number: '4', current: false })
+        expect(result.items[4]).toEqual({ ellipsis: true })
+        expect(result.items[5]).toMatchObject({ number: '100', current: false })
+        expect(result.items).toHaveLength(6)
+      })
+
+      test('page 4: shows 1 2 3 [4] 5 … 100', () => {
+        const result = buildGovukPagination({
+          ...manyPagesParams,
+          currentPage: 4
+        })
+
+        expect(result.items[0]).toMatchObject({ number: '1', current: false })
+        expect(result.items[1]).toMatchObject({ number: '2', current: false })
+        expect(result.items[2]).toMatchObject({ number: '3', current: false })
+        expect(result.items[3]).toMatchObject({ number: '4', current: true })
+        expect(result.items[4]).toMatchObject({ number: '5', current: false })
+        expect(result.items[5]).toEqual({ ellipsis: true })
+        expect(result.items[6]).toMatchObject({ number: '100', current: false })
+        expect(result.items).toHaveLength(7)
+      })
+
+      test('page 5 (middle): shows 1 … 4 [5] 6 … 100', () => {
+        const result = buildGovukPagination({
+          ...manyPagesParams,
+          currentPage: 5
+        })
+
+        expect(result.items[0]).toMatchObject({ number: '1', current: false })
+        expect(result.items[1]).toEqual({ ellipsis: true })
+        expect(result.items[2]).toMatchObject({ number: '4', current: false })
+        expect(result.items[3]).toMatchObject({ number: '5', current: true })
+        expect(result.items[4]).toMatchObject({ number: '6', current: false })
+        expect(result.items[5]).toEqual({ ellipsis: true })
+        expect(result.items[6]).toMatchObject({ number: '100', current: false })
+        expect(result.items).toHaveLength(7)
+      })
+
+      test('page 50 (middle): shows 1 … 49 [50] 51 … 100', () => {
+        const result = buildGovukPagination({
+          ...manyPagesParams,
+          currentPage: 50
+        })
+
+        expect(result.items[0]).toMatchObject({ number: '1', current: false })
+        expect(result.items[1]).toEqual({ ellipsis: true })
+        expect(result.items[2]).toMatchObject({ number: '49', current: false })
+        expect(result.items[3]).toMatchObject({ number: '50', current: true })
+        expect(result.items[4]).toMatchObject({ number: '51', current: false })
+        expect(result.items[5]).toEqual({ ellipsis: true })
+        expect(result.items[6]).toMatchObject({ number: '100', current: false })
+        expect(result.items).toHaveLength(7)
+      })
+
+      test('page 97: shows 1 … 96 [97] 98 99 100', () => {
+        const result = buildGovukPagination({
+          ...manyPagesParams,
+          currentPage: 97
+        })
+
+        expect(result.items[0]).toMatchObject({ number: '1', current: false })
+        expect(result.items[1]).toEqual({ ellipsis: true })
+        expect(result.items[2]).toMatchObject({ number: '96', current: false })
+        expect(result.items[3]).toMatchObject({ number: '97', current: true })
+        expect(result.items[4]).toMatchObject({ number: '98', current: false })
+        expect(result.items[5]).toMatchObject({ number: '99', current: false })
+        expect(result.items[6]).toMatchObject({ number: '100', current: false })
+        expect(result.items).toHaveLength(7)
+      })
+
+      test('page 98: shows 1 … 97 [98] 99 100', () => {
+        const result = buildGovukPagination({
+          ...manyPagesParams,
+          currentPage: 98
+        })
+
+        expect(result.items[0]).toMatchObject({ number: '1', current: false })
+        expect(result.items[1]).toEqual({ ellipsis: true })
+        expect(result.items[2]).toMatchObject({ number: '97', current: false })
+        expect(result.items[3]).toMatchObject({ number: '98', current: true })
+        expect(result.items[4]).toMatchObject({ number: '99', current: false })
+        expect(result.items[5]).toMatchObject({ number: '100', current: false })
+        expect(result.items).toHaveLength(6)
+      })
+
+      test('page 99: shows 1 … 98 [99] 100', () => {
+        const result = buildGovukPagination({
+          ...manyPagesParams,
+          currentPage: 99
+        })
+
+        expect(result.items[0]).toMatchObject({ number: '1', current: false })
+        expect(result.items[1]).toEqual({ ellipsis: true })
+        expect(result.items[2]).toMatchObject({ number: '98', current: false })
+        expect(result.items[3]).toMatchObject({ number: '99', current: true })
+        expect(result.items[4]).toMatchObject({ number: '100', current: false })
+        expect(result.items).toHaveLength(5)
+      })
+
+      test('page 100: shows 1 … 99 [100]', () => {
+        const result = buildGovukPagination({
+          ...manyPagesParams,
+          currentPage: 100
+        })
+
+        expect(result.items[0]).toMatchObject({ number: '1', current: false })
+        expect(result.items[1]).toEqual({ ellipsis: true })
+        expect(result.items[2]).toMatchObject({ number: '99', current: false })
+        expect(result.items[3]).toMatchObject({ number: '100', current: true })
+        expect(result.items).toHaveLength(4)
+      })
+    })
+
+    describe('small page counts (5 or fewer)', () => {
+      test('shows all 3 pages without ellipsis', () => {
+        const result = buildGovukPagination({
+          ...baseParams,
+          totalPages: 3,
+          currentPage: 2
+        })
+
+        expect(result.items).toHaveLength(3)
         expect(result.items[0].number).toBe('1')
-        expect(result.items[1].ellipsis).toBe(true)
-        expect(result.items[result.items.length - 1].number).toBe('100')
-        expect(result.items[result.items.length - 2].ellipsis).toBe(true)
+        expect(result.items[1].number).toBe('2')
+        expect(result.items[2].number).toBe('3')
+        const ellipsisItems = result.items.filter((item) => item.ellipsis)
+        expect(ellipsisItems).toHaveLength(0)
+      })
+
+      test('shows all 5 pages without ellipsis', () => {
+        const result = buildGovukPagination({
+          ...baseParams,
+          totalPages: 5,
+          currentPage: 3
+        })
+
+        expect(result.items).toHaveLength(5)
+        expect(result.items[0].number).toBe('1')
+        expect(result.items[1].number).toBe('2')
+        expect(result.items[2].number).toBe('3')
+        expect(result.items[3].number).toBe('4')
+        expect(result.items[4].number).toBe('5')
+        const ellipsisItems = result.items.filter((item) => item.ellipsis)
+        expect(ellipsisItems).toHaveLength(0)
       })
     })
   })

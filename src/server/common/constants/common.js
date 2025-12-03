@@ -20,7 +20,10 @@ export const LOCALE_KEYS = {
 }
 
 export const PAGINATION = {
-  DEFAULT_PAGE: 1
+  DEFAULT_PAGE: 1,
+  MAX_VISIBLE_PAGES: 5,
+  START_THRESHOLD: 4,
+  END_OFFSET: 3
 }
 
 export const CACHE_SEGMENTS = {
