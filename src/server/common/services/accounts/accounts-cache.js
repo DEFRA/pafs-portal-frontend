@@ -91,7 +91,7 @@ export class AccountsCacheService extends BaseCacheService {
    * @param {Object} listParams - List query parameters
    * @returns {Promise<void>}
    */
-  async addToList(account, listParams) {
+  async addToList(account, _listParams) {
     // For list operations, it's safer to invalidate the cache
     // Adding to list would require complex pagination recalculation
     await this.invalidateByStatus(account.status)
