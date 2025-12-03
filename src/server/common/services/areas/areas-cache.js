@@ -106,7 +106,7 @@ async function getFromCache(cache, server) {
   return null
 }
 
-async function fetchAndCache(cache, fetchFunction, server) {
+async function fetchAndCache(cache, fetchFunction, _server) {
   const areasResponse = await fetchFunction()
 
   if (areasResponse.success) {

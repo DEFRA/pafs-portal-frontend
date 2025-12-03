@@ -1003,6 +1003,11 @@ describe('#accountRequestPsoTeamController', () => {
       }
     })
 
+    afterEach(() => {
+      // Don't clear all mocks as it clears the logger mocks
+      // Only clear specific mocks if needed
+    })
+
     test('Should call handler for GET request', async () => {
       mockRequest.yar.get.mockReturnValue({
         eaArea: { eaAreas: ['1'] },
@@ -1179,11 +1184,15 @@ describe('#accountRequestPsoTeamController', () => {
         psoTeam: {}
       })
 
+      // Reset logger mocks to ensure clean state
+      mockRequest.server.logger.info.mockClear()
+      mockRequest.server.logger.warn.mockClear()
+      mockRequest.server.logger.error.mockClear()
+      mockH.view.mockClear()
+
       // Mock getCachedAreas to return the data array directly (not wrapped in success/data)
-      vi.spyOn(
-        await import('../../common/services/areas/areas-cache.js'),
-        'getCachedAreas'
-      ).mockResolvedValue([
+      const areasCacheModule = await import('../../common/services/areas/areas-cache.js')
+      const getCachedAreasSpy = vi.spyOn(areasCacheModule, 'getCachedAreas').mockResolvedValue([
         { id: 1, name: 'Thames', area_type: 'EA Area' },
         { id: 2, name: 'Anglian', area_type: 'EA Area' },
         { id: 10, name: 'PSO Team 1', area_type: 'PSO Area', parent_id: 1 },
@@ -1194,11 +1203,15 @@ describe('#accountRequestPsoTeamController', () => {
       await accountRequestPsoTeamController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalled()
-      // logger.info is called when grouping succeeds
+      expect(getCachedAreasSpy).toHaveBeenCalled()
+      // logger.info is called when grouping succeeds in processPsoTeams
       expect(mockRequest.server.logger.info).toHaveBeenCalledWith(
         expect.objectContaining({
           psoTeamsCount: expect.any(Number),
-          groupedCount: expect.any(Number)
+          groupedCount: expect.any(Number),
+          selectedEaAreaIds: expect.any(Array),
+          selectedEaAreaCount: expect.any(Number),
+          allPsoAreasCount: expect.any(Number)
         }),
         'PSO teams loaded and grouped by EA area for team selection'
       )

@@ -51,8 +51,8 @@ const CHECK_ANSWERS_RETURN_TO = 'check-answers'
 
 function buildViewModel(
   request,
-  values = {},
   returnTo,
+  values = {},
   additionalPsoTeamsByEaArea = []
 ) {
   return {
@@ -157,7 +157,7 @@ async function handleGet(request, h) {
 
   return h.view(
     'account_requests/additional-pso-teams/index.njk',
-    buildViewModel(request, values, returnTo, additionalPsoTeamsByEaArea)
+    buildViewModel(request, returnTo, values, additionalPsoTeamsByEaArea)
   )
 }
 

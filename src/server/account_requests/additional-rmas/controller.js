@@ -12,8 +12,8 @@ const CHECK_ANSWERS_RETURN_TO = 'check-answers'
 
 function buildViewModel(
   request,
-  values = {},
   returnTo,
+  values = {},
   additionalRmasByPsoTeam = []
 ) {
   return {
@@ -54,11 +54,12 @@ function groupRmasByPsoTeam(rmas, allAreas, selectedPsoTeamIds, mainRmaId) {
         // Check if RMA belongs to this PSO team and is not the main RMA
         const belongsToTeam = rmaParentId === psoTeamIdNum
         const rmaId = typeof rma.id === 'string' ? parseInt(rma.id, 10) : rma.id
-        const mainRmaIdNum = mainRmaId
-          ? typeof mainRmaId === 'string'
-            ? parseInt(mainRmaId, 10)
-            : mainRmaId
-          : null
+
+        let mainRmaIdNum = null
+        if (mainRmaId) {
+          mainRmaIdNum =
+            typeof mainRmaId === 'string' ? parseInt(mainRmaId, 10) : mainRmaId
+        }
         const isNotMainRma = !mainRmaIdNum || rmaId !== mainRmaIdNum
 
         return belongsToTeam && isNotMainRma
@@ -174,7 +175,7 @@ async function handleGet(request, h) {
 
   return h.view(
     'account_requests/additional-rmas/index.njk',
-    buildViewModel(request, values, returnTo, additionalRmasByPsoTeam)
+    buildViewModel(request, returnTo, values, additionalRmasByPsoTeam)
   )
 }
 

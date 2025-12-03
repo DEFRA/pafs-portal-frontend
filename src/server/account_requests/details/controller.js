@@ -168,25 +168,24 @@ async function handlePostRequest(request, h) {
   )
 
   // Redirect based on responsibility selection
-  let nextUrl = '/account_request'
-  switch (values.responsibility) {
-    case 'EA':
-      nextUrl = '/account_request/ea-main-area'
-      break
-    case 'PSO':
-      nextUrl = '/account_request/ea-area'
-      break
-    case 'RMA':
-      nextUrl = '/account_request/ea-area'
-      break
-    default:
-      request.server.logger.warn(
-        { responsibility: values.responsibility },
-        'Unknown responsibility value, redirecting to default'
-      )
-      nextUrl = '/account_request'
+  function getNextUrl(responsibility) {
+    switch (responsibility) {
+      case 'EA':
+        return '/account_request/ea-main-area'
+      case 'PSO':
+        return '/account_request/ea-area'
+      case 'RMA':
+        return '/account_request/ea-area'
+      default:
+        request.server.logger.warn(
+          { responsibility },
+          'Unknown responsibility value, redirecting to default'
+        )
+        return '/account_request'
+    }
   }
 
+  const nextUrl = getNextUrl(values.responsibility)
   return h.redirect(nextUrl)
 }
 

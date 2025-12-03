@@ -9,6 +9,7 @@ const ERROR_MESSAGE_RETRY =
   'There was a problem submitting your request. Please try again.'
 const ERROR_MESSAGE_LATER =
   'There was a problem submitting your request. Please try again later.'
+const CHECK_ANSWERS_VIEW = 'account_requests/check-answers/index.njk'
 
 function buildViewModel(request, summaryData = {}) {
   return {
@@ -111,6 +112,37 @@ function buildRmaAreaSummary(sessionData, areas) {
   }
 }
 
+function buildPersonalDetails(details) {
+  return {
+    firstName: details.firstName ?? '',
+    lastName: details.lastName ?? '',
+    emailAddress: details.emailAddress ?? '',
+    telephoneNumber: details.telephoneNumber ?? '',
+    organisation: details.organisation ?? '',
+    jobTitle: details.jobTitle ?? ''
+  }
+}
+
+function buildResponsibilitySummary(responsibility) {
+  return {
+    value: responsibility,
+    displayValue: getResponsibilityDisplayValue(responsibility)
+  }
+}
+
+function buildAreaSummaryByResponsibility(responsibility, sessionData, areas) {
+  switch (responsibility) {
+    case 'EA':
+      return buildEaAreaSummary(sessionData, areas)
+    case 'PSO':
+      return buildPsoAreaSummary(sessionData, areas)
+    case 'RMA':
+      return buildRmaAreaSummary(sessionData, areas)
+    default:
+      return {}
+  }
+}
+
 /**
  * Build summary data from session
  * @param {Object} sessionData - Session data
@@ -121,42 +153,11 @@ function buildSummaryData(sessionData, areas) {
   const details = sessionData.details ?? {}
   const responsibility = details.responsibility
 
-  const summary = {
-    personalDetails: {
-      firstName: details.firstName ?? '',
-      lastName: details.lastName ?? '',
-      emailAddress: details.emailAddress ?? '',
-      telephoneNumber: details.telephoneNumber ?? '',
-      organisation: details.organisation ?? '',
-      jobTitle: details.jobTitle ?? ''
-    },
-    responsibility: {
-      value: responsibility,
-      displayValue: getResponsibilityDisplayValue(responsibility)
-    },
-    areas: {}
+  return {
+    personalDetails: buildPersonalDetails(details),
+    responsibility: buildResponsibilitySummary(responsibility),
+    areas: buildAreaSummaryByResponsibility(responsibility, sessionData, areas)
   }
-
-  // Determine which flow and build area summary
-  switch (responsibility) {
-    case 'EA':
-      summary.areas = buildEaAreaSummary(sessionData, areas)
-      break
-
-    case 'PSO':
-      summary.areas = buildPsoAreaSummary(sessionData, areas)
-      break
-
-    case 'RMA':
-      summary.areas = buildRmaAreaSummary(sessionData, areas)
-      break
-
-    default:
-      // Unknown responsibility - leave areas empty
-      break
-  }
-
-  return summary
 }
 
 /**
@@ -173,13 +174,8 @@ function getResponsibilityDisplayValue(responsibility) {
   return mapping[responsibility] || responsibility
 }
 
-async function handlePost(request, h) {
-  const sessionData = request.yar.get('accountRequest') ?? {}
-
-  // Prepare JSON payload for backend API
+function preparePayload(sessionData, request) {
   const payload = prepareAccountRequestPayload(sessionData)
-
-  // Log the prepared payload for debugging
   request.server.logger.info(
     {
       payload,
@@ -188,63 +184,74 @@ async function handlePost(request, h) {
     },
     'Account request payload prepared for backend API'
   )
+  return payload
+}
 
-  // Submit to backend API
+function handlePostSuccess(request, h, payload) {
+  request.server.logger.info(
+    {
+      status: 200,
+      areasCount: payload.areas.length
+    },
+    'Account request submitted successfully to backend API'
+  )
+  request.yar.set('accountRequest', {})
+  return h.redirect('/account_request/confirmation')
+}
+
+async function loadAreasForErrorDisplay(request) {
+  try {
+    return (await getCachedAreas(request.server, getAreas)) ?? []
+  } catch (error) {
+    request.server.logger.error(
+      { error: error.message },
+      'Error loading areas for error display'
+    )
+    return []
+  }
+}
+
+async function buildErrorView(request, h, sessionData, statusCode) {
+  const areas = await loadAreasForErrorDisplay(request)
+  const summaryData = buildSummaryData(sessionData, areas)
+  const errorMessage =
+    statusCode >= 400 && statusCode < 500
+      ? ERROR_MESSAGE_RETRY
+      : ERROR_MESSAGE_LATER
+
+  return h
+    .view(CHECK_ANSWERS_VIEW, {
+      ...buildViewModel(request, summaryData),
+      error: errorMessage
+    })
+    .code(statusCode || statusCodes.internalServerError)
+}
+
+async function handleApiError(request, h, sessionData, response) {
+  request.server.logger.error(
+    {
+      status: response.status,
+      errors: response.errors,
+      validationErrors: response.validationErrors
+    },
+    'Account request submission failed - API returned error'
+  )
+  return buildErrorView(request, h, sessionData, response.status)
+}
+
+async function handlePost(request, h) {
+  const sessionData = request.yar.get('accountRequest') ?? {}
+  const payload = preparePayload(sessionData, request)
+
   try {
     const response = await submitAccountRequest(payload)
 
     if (response.success) {
-      request.server.logger.info(
-        {
-          status: response.status,
-          areasCount: payload.areas.length
-        },
-        'Account request submitted successfully to backend API'
-      )
-
-      // Clear session data after successful submission
-      request.yar.set('accountRequest', {})
-
-      return h.redirect('/account_request/confirmation')
+      return handlePostSuccess(request, h, payload)
     }
 
-    // API returned an error response
-    request.server.logger.error(
-      {
-        status: response.status,
-        errors: response.errors,
-        validationErrors: response.validationErrors
-      },
-      'Account request submission failed - API returned error'
-    )
-
-    // Load areas for error display
-    let areas = []
-    try {
-      areas = (await getCachedAreas(request.server, getAreas)) ?? []
-    } catch (error) {
-      request.server.logger.error(
-        { error: error.message },
-        'Error loading areas for error display'
-      )
-    }
-
-    const summaryData = buildSummaryData(sessionData, areas)
-
-    // Build error message for display
-    const errorMessage =
-      response.validationErrors || response.errors
-        ? ERROR_MESSAGE_RETRY
-        : ERROR_MESSAGE_LATER
-
-    return h
-      .view('account_requests/check-answers/index.njk', {
-        ...buildViewModel(request, summaryData),
-        error: errorMessage
-      })
-      .code(response.status || statusCodes.internalServerError)
+    return await handleApiError(request, h, sessionData, response)
   } catch (error) {
-    // Network or other error
     request.server.logger.error(
       {
         error: error.message,
@@ -252,26 +259,12 @@ async function handlePost(request, h) {
       },
       'Error submitting account request to backend API'
     )
-
-    // Load areas for error display
-    let areas = []
-    try {
-      areas = (await getCachedAreas(request.server, getAreas)) ?? []
-    } catch (loadError) {
-      request.server.logger.error(
-        { error: loadError.message },
-        'Error loading areas for error display'
-      )
-    }
-
-    const summaryData = buildSummaryData(sessionData, areas)
-
-    return h
-      .view('account_requests/check-answers/index.njk', {
-        ...buildViewModel(request, summaryData),
-        error: ERROR_MESSAGE_LATER
-      })
-      .code(statusCodes.internalServerError)
+    return await buildErrorView(
+      request,
+      h,
+      sessionData,
+      statusCodes.internalServerError
+    )
   }
 }
 
@@ -313,9 +306,6 @@ export const accountRequestCheckAnswersController = {
       'Account request data prepared for check-answers page'
     )
 
-    return h.view(
-      'account_requests/check-answers/index.njk',
-      buildViewModel(request, summaryData)
-    )
+    return h.view(CHECK_ANSWERS_VIEW, buildViewModel(request, summaryData))
   }
 }

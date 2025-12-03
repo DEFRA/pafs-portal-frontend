@@ -9,10 +9,10 @@ import {
 
 function buildViewModel(
   request,
+  returnTo = undefined,
   values = {},
   errors = {},
   errorSummary = [],
-  returnTo,
   psoTeamsByEaArea = []
 ) {
   return {
@@ -51,9 +51,9 @@ function groupPsoTeamsByEaArea(psoTeams, allAreas, selectedEaAreaIds) {
     }
 
     const eaArea = getAreaById(allAreas, eaAreaId)
-    if (eaArea && eaArea.id !== undefined && eaArea.name !== undefined) {
+    if (eaArea?.id !== undefined && eaArea?.name !== undefined) {
       const teams = psoTeams.filter((team) => {
-        if (!team || team.parent_id === undefined || team.parent_id === null) {
+        if (!team || team.parent_id == null) {
           return false
         }
         const teamParentId =
@@ -117,6 +117,251 @@ function validatePsoTeam(request) {
 
   return { values, errors, errorSummary }
 }
+const CHECK_ANSWERS_RETURN_TO = 'check-answers'
+const CHECK_ANSWERS_URL = '/account_request/check-answers'
+const MAIN_RMA_URL = '/account_request/main-rma'
+const EA_AREA_URL = '/account_request/ea-area'
+const PSO_TEAM_VIEW = 'account_requests/pso-team/index.njk'
+
+async function loadPsoTeamsForErrorDisplay(request) {
+  const errorDisplaySessionData = request.yar.get('accountRequest') ?? {}
+  const errorDisplaySelectedEaAreaIds =
+    errorDisplaySessionData.eaArea?.eaAreas ?? []
+  const validEaAreaIds = Array.isArray(errorDisplaySelectedEaAreaIds)
+    ? errorDisplaySelectedEaAreaIds
+    : []
+
+  if (validEaAreaIds.length === 0) {
+    return []
+  }
+
+  try {
+    const areas = await getCachedAreas(request.server, getAreas)
+    if (!areas || !Array.isArray(areas) || areas.length === 0) {
+      return []
+    }
+
+    const allPsoAreas = filterAreasByType(areas, 'PSO Area')
+    const psoTeams = filterAreasByParentIds(allPsoAreas, validEaAreaIds)
+
+    if (!Array.isArray(psoTeams) || !Array.isArray(areas)) {
+      return []
+    }
+
+    return groupPsoTeamsByEaArea(psoTeams, areas, validEaAreaIds)
+  } catch (error) {
+    request.server.logger.error(
+      {
+        error: error.message,
+        stack: error.stack
+      },
+      'Error loading PSO teams for error display'
+    )
+    return []
+  }
+}
+
+async function handlePostWithErrors(
+  request,
+  h,
+  postValues,
+  postErrors,
+  postErrorSummary,
+  postReturnTo
+) {
+  const psoTeamsByEaArea = await loadPsoTeamsForErrorDisplay(request)
+  const postSafePsoTeamsByEaArea = Array.isArray(psoTeamsByEaArea)
+    ? psoTeamsByEaArea
+    : []
+
+  return h
+    .view(
+      PSO_TEAM_VIEW,
+      buildViewModel(
+        request,
+        postReturnTo,
+        postValues,
+        postErrors,
+        postErrorSummary,
+        postSafePsoTeamsByEaArea
+      )
+    )
+    .code(statusCodes.badRequest)
+}
+
+function getNextUrl(postReturnTo) {
+  if (postReturnTo === CHECK_ANSWERS_RETURN_TO) {
+    return CHECK_ANSWERS_URL
+  }
+  return MAIN_RMA_URL
+}
+
+function handlePostSuccess(request, h, postValues, postReturnTo) {
+  const postSessionData = request.yar.get('accountRequest') ?? {}
+  postSessionData.psoTeam = postValues
+  request.yar.set('accountRequest', postSessionData)
+
+  const nextUrl = getNextUrl(postReturnTo)
+  return h.redirect(nextUrl)
+}
+
+function getReturnToFromQuery(request) {
+  return request.query.from === CHECK_ANSWERS_RETURN_TO
+    ? CHECK_ANSWERS_RETURN_TO
+    : undefined
+}
+
+function validateEaAreaSelection(
+  request,
+  getSelectedEaAreaIds,
+  getSessionData
+) {
+  if (
+    !Array.isArray(getSelectedEaAreaIds) ||
+    getSelectedEaAreaIds.length === 0
+  ) {
+    request.server.logger.warn(
+      {
+        sessionDataKeys: Object.keys(getSessionData),
+        eaAreaData: getSessionData.eaArea,
+        responsibility: getSessionData.details?.responsibility
+      },
+      'No EA areas selected, redirecting back to ea-area page'
+    )
+    return false
+  }
+  return true
+}
+
+function ensureArray(value) {
+  return Array.isArray(value) ? value : []
+}
+
+function isValidAreasData(areas, validEaAreaIds) {
+  return (
+    areas &&
+    Array.isArray(areas) &&
+    areas.length > 0 &&
+    validEaAreaIds.length > 0
+  )
+}
+
+function logInvalidAreasWarning(request, areas, validEaAreaIds) {
+  request.server.logger.warn(
+    {
+      areasType: typeof areas,
+      areasIsArray: Array.isArray(areas),
+      areasLength: Array.isArray(areas) ? areas.length : 'N/A',
+      selectedEaAreaIds: validEaAreaIds,
+      selectedEaAreaCount: validEaAreaIds.length
+    },
+    'Failed to load PSO teams - invalid areas data or missing EA area selection'
+  )
+}
+
+async function processPsoTeams(request, areas, validEaAreaIds) {
+  try {
+    const allPsoAreas = filterAreasByType(areas, 'PSO Area')
+    const psoTeams = filterAreasByParentIds(allPsoAreas, validEaAreaIds)
+
+    if (!Array.isArray(psoTeams) || !Array.isArray(areas)) {
+      return []
+    }
+
+    const psoTeamsByEaArea = groupPsoTeamsByEaArea(
+      psoTeams,
+      areas,
+      validEaAreaIds
+    )
+
+    request.server.logger.info(
+      {
+        psoTeamsCount: psoTeams.length,
+        groupedCount: psoTeamsByEaArea.length,
+        selectedEaAreaIds: validEaAreaIds,
+        selectedEaAreaCount: validEaAreaIds.length,
+        allPsoAreasCount: allPsoAreas.length
+      },
+      'PSO teams loaded and grouped by EA area for team selection'
+    )
+
+    return psoTeamsByEaArea
+  } catch (groupingError) {
+    request.server.logger.error(
+      {
+        error: groupingError.message,
+        stack: groupingError.stack,
+        validEaAreaIds,
+        areasCount: areas.length
+      },
+      'Error grouping PSO teams by EA area'
+    )
+    return []
+  }
+}
+
+async function loadAndGroupPsoTeams(request, validEaAreaIds) {
+  if (validEaAreaIds.length === 0) {
+    request.server.logger.warn(
+      {
+        selectedEaAreaIds: validEaAreaIds,
+        selectedEaAreaCount: validEaAreaIds.length
+      },
+      'Failed to load PSO teams - missing EA area selection'
+    )
+    return []
+  }
+
+  try {
+    const areas = await getCachedAreas(request.server, getAreas)
+    if (!isValidAreasData(areas, validEaAreaIds)) {
+      logInvalidAreasWarning(request, areas, validEaAreaIds)
+      return []
+    }
+
+    return await processPsoTeams(request, areas, validEaAreaIds)
+  } catch (error) {
+    request.server.logger.error(
+      {
+        error: error.message,
+        stack: error.stack,
+        selectedEaAreaIds: validEaAreaIds
+      },
+      'Error loading PSO teams'
+    )
+    return []
+  }
+}
+
+async function handleGet(request, h) {
+  const getSessionData = request.yar.get('accountRequest') ?? {}
+  const getValues = getSessionData.psoTeam ?? {}
+  const getReturnTo = getReturnToFromQuery(request)
+  const getSelectedEaAreaIds = getSessionData.eaArea?.eaAreas ?? []
+
+  if (!validateEaAreaSelection(request, getSelectedEaAreaIds, getSessionData)) {
+    return h.redirect(EA_AREA_URL)
+  }
+
+  const validEaAreaIds = ensureArray(getSelectedEaAreaIds)
+  const getPsoTeamsByEaArea = await loadAndGroupPsoTeams(
+    request,
+    validEaAreaIds
+  )
+  const safePsoTeamsByEaArea = ensureArray(getPsoTeamsByEaArea)
+
+  return h.view(
+    PSO_TEAM_VIEW,
+    buildViewModel(
+      request,
+      getReturnTo,
+      getValues,
+      undefined,
+      undefined,
+      safePsoTeamsByEaArea
+    )
+  )
+}
 
 export const accountRequestPsoTeamController = {
   async handler(request, h) {
@@ -126,210 +371,20 @@ export const accountRequestPsoTeamController = {
         const returnTo = request.payload?.returnTo
 
         if (errorSummary.length) {
-          // Load PSO teams for error display
-          let psoTeamsByEaArea = []
-          try {
-            const sessionData = request.yar.get('accountRequest') ?? {}
-            const selectedEaAreaIds = sessionData.eaArea?.eaAreas ?? []
-
-            // Ensure selectedEaAreaIds is an array
-            const validEaAreaIds = Array.isArray(selectedEaAreaIds)
-              ? selectedEaAreaIds
-              : []
-
-            if (validEaAreaIds.length > 0) {
-              const areas = await getCachedAreas(request.server, getAreas)
-              if (areas && Array.isArray(areas) && areas.length > 0) {
-                const allPsoAreas = filterAreasByType(areas, 'PSO Area')
-                const psoTeams = filterAreasByParentIds(
-                  allPsoAreas,
-                  validEaAreaIds
-                )
-
-                if (Array.isArray(psoTeams) && Array.isArray(areas)) {
-                  psoTeamsByEaArea = groupPsoTeamsByEaArea(
-                    psoTeams,
-                    areas,
-                    validEaAreaIds
-                  )
-                }
-              }
-            }
-          } catch (error) {
-            request.server.logger.error(
-              {
-                error: error.message,
-                stack: error.stack
-              },
-              'Error loading PSO teams for error display'
-            )
-            // Continue with empty array
-            psoTeamsByEaArea = []
-          }
-
-          // Ensure psoTeamsByEaArea is always an array
-          const safePsoTeamsByEaArea = Array.isArray(psoTeamsByEaArea)
-            ? psoTeamsByEaArea
-            : []
-
-          return h
-            .view(
-              'account_requests/pso-team/index.njk',
-              buildViewModel(
-                request,
-                values,
-                errors,
-                errorSummary,
-                returnTo,
-                safePsoTeamsByEaArea
-              )
-            )
-            .code(statusCodes.badRequest)
-        }
-
-        const sessionData = request.yar.get('accountRequest') ?? {}
-        sessionData.psoTeam = values
-        request.yar.set('accountRequest', sessionData)
-
-        const nextUrl =
-          returnTo === 'check-answers'
-            ? '/account_request/check-answers'
-            : '/account_request/main-rma'
-
-        return h.redirect(nextUrl)
-      }
-
-      // GET handler
-      const sessionData = request.yar.get('accountRequest') ?? {}
-      const values = sessionData.psoTeam ?? {}
-      const returnTo =
-        request.query.from === 'check-answers' ? 'check-answers' : undefined
-
-      // Get selected EA areas from session (array from checkbox selection)
-      const selectedEaAreaIds = sessionData.eaArea?.eaAreas ?? []
-
-      // Validate that we have EA areas selected - if not, redirect back to ea-area page
-      if (!Array.isArray(selectedEaAreaIds) || selectedEaAreaIds.length === 0) {
-        request.server.logger.warn(
-          {
-            sessionDataKeys: Object.keys(sessionData),
-            eaAreaData: sessionData.eaArea,
-            responsibility: sessionData.details?.responsibility
-          },
-          'No EA areas selected, redirecting back to ea-area page'
-        )
-        return h.redirect('/account_request/ea-area')
-      }
-
-      // Load PSO teams filtered by all selected EA areas and group by EA area
-      let psoTeamsByEaArea = []
-      try {
-        // Ensure selectedEaAreaIds is an array
-        const validEaAreaIds = Array.isArray(selectedEaAreaIds)
-          ? selectedEaAreaIds
-          : []
-
-        if (validEaAreaIds.length === 0) {
-          request.server.logger.warn(
-            {
-              selectedEaAreaIds,
-              selectedEaAreaCount: validEaAreaIds.length,
-              sessionDataKeys: Object.keys(sessionData),
-              eaAreaData: sessionData.eaArea
-            },
-            'Failed to load PSO teams - missing EA area selection'
+          return handlePostWithErrors(
+            request,
+            h,
+            values,
+            errors,
+            errorSummary,
+            returnTo
           )
-        } else {
-          const areas = await getCachedAreas(request.server, getAreas)
-          if (
-            areas &&
-            Array.isArray(areas) &&
-            areas.length > 0 &&
-            validEaAreaIds.length > 0
-          ) {
-            try {
-              const allPsoAreas = filterAreasByType(areas, 'PSO Area')
-              const psoTeams = filterAreasByParentIds(
-                allPsoAreas,
-                validEaAreaIds
-              )
-
-              // Only group if we have valid data
-              if (Array.isArray(psoTeams) && Array.isArray(areas)) {
-                psoTeamsByEaArea = groupPsoTeamsByEaArea(
-                  psoTeams,
-                  areas,
-                  validEaAreaIds
-                )
-              }
-
-              request.server.logger.info(
-                {
-                  psoTeamsCount: psoTeams.length,
-                  groupedCount: psoTeamsByEaArea.length,
-                  selectedEaAreaIds: validEaAreaIds,
-                  selectedEaAreaCount: validEaAreaIds.length,
-                  allPsoAreasCount: allPsoAreas.length
-                },
-                'PSO teams loaded and grouped by EA area for team selection'
-              )
-            } catch (groupingError) {
-              request.server.logger.error(
-                {
-                  error: groupingError.message,
-                  stack: groupingError.stack,
-                  validEaAreaIds,
-                  areasCount: areas.length
-                },
-                'Error grouping PSO teams by EA area'
-              )
-              // Continue with empty array
-              psoTeamsByEaArea = []
-            }
-          } else {
-            request.server.logger.warn(
-              {
-                areasType: typeof areas,
-                areasIsArray: Array.isArray(areas),
-                areasLength: Array.isArray(areas) ? areas.length : 'N/A',
-                selectedEaAreaIds: validEaAreaIds,
-                selectedEaAreaCount: validEaAreaIds.length
-              },
-              'Failed to load PSO teams - invalid areas data or missing EA area selection'
-            )
-          }
         }
-      } catch (error) {
-        request.server.logger.error(
-          {
-            error: error.message,
-            stack: error.stack,
-            selectedEaAreaIds,
-            selectedEaAreaIdsType: typeof selectedEaAreaIds,
-            selectedEaAreaIdsIsArray: Array.isArray(selectedEaAreaIds)
-          },
-          'Error loading PSO teams'
-        )
-        // Continue with empty array to allow page to render
-        psoTeamsByEaArea = []
+
+        return handlePostSuccess(request, h, values, returnTo)
       }
 
-      // Ensure psoTeamsByEaArea is always an array
-      const safePsoTeamsByEaArea = Array.isArray(psoTeamsByEaArea)
-        ? psoTeamsByEaArea
-        : []
-
-      return h.view(
-        'account_requests/pso-team/index.njk',
-        buildViewModel(
-          request,
-          values,
-          undefined,
-          undefined,
-          returnTo,
-          safePsoTeamsByEaArea
-        )
-      )
+      return handleGet(request, h)
     } catch (error) {
       request.server.logger.error(
         {
@@ -337,11 +392,10 @@ export const accountRequestPsoTeamController = {
           stack: error.stack,
           method: request.method,
           url: request.url.pathname,
-          sessionData: request.yar.get('accountRequest')
+          sessionData: request?.yar?.get('accountRequest')
         },
         'Unhandled error in pso-team controller'
       )
-      // Re-throw to let Hapi's error handler deal with it
       throw error
     }
   }

@@ -5,13 +5,14 @@ import { filterAreasByType } from '../../common/helpers/area-filters.js'
 
 const CHECK_ANSWERS_RETURN_TO = 'check-answers'
 const EA_ADDITIONAL_AREAS_URL = '/account_request/ea-additional-areas'
+const SAMPLE_SIZE = 3
 
 function buildViewModel(
   request,
+  returnTo,
   values = {},
   errors = {},
   errorSummary = [],
-  returnTo,
   eaAreas = []
 ) {
   return {
@@ -79,7 +80,7 @@ async function handlePostWithErrors(
   return h
     .view(
       'account_requests/ea-main-area/index.njk',
-      buildViewModel(request, values, errors, errorSummary, returnTo, eaAreas)
+      buildViewModel(request, returnTo, values, errors, errorSummary, eaAreas)
     )
     .code(statusCodes.badRequest)
 }
@@ -157,7 +158,7 @@ async function loadEaAreas(request) {
     request.server.logger.info(
       {
         eaAreasCount: eaAreas.length,
-        eaAreasSample: eaAreas.length > 0 ? eaAreas.slice(0, 3) : []
+        eaAreasSample: eaAreas.length > 0 ? eaAreas.slice(0, SAMPLE_SIZE) : []
       },
       'EA areas filtered for main area selection'
     )
@@ -185,7 +186,7 @@ async function handleGet(request, h) {
 
   return h.view(
     'account_requests/ea-main-area/index.njk',
-    buildViewModel(request, values, undefined, undefined, returnTo, eaAreas)
+    buildViewModel(request, returnTo, values, undefined, undefined, eaAreas)
   )
 }
 

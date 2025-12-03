@@ -13,10 +13,10 @@ const ADDITIONAL_RMAS_URL = '/account_request/additional-rmas'
 
 function buildViewModel(
   request,
+  returnTo,
   values = {},
   errors = {},
   errorSummary = [],
-  returnTo,
   rmasByPsoTeam = []
 ) {
   return {
@@ -137,10 +137,10 @@ async function handlePostWithErrors(
       'account_requests/main-rma/index.njk',
       buildViewModel(
         request,
+        returnTo,
         values,
         errors,
         errorSummary,
-        returnTo,
         rmasByPsoTeam
       )
     )
@@ -237,10 +237,10 @@ async function handleGet(request, h) {
     'account_requests/main-rma/index.njk',
     buildViewModel(
       request,
+      returnTo,
       values,
       undefined,
       undefined,
-      returnTo,
       rmasByPsoTeam
     )
   )

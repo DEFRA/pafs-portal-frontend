@@ -12,10 +12,10 @@ const ADDITIONAL_PSO_TEAMS_URL = '/account_request/additional-pso-teams'
 
 function buildViewModel(
   request,
+  returnTo,
   values = {},
   errors = {},
   errorSummary = [],
-  returnTo,
   psoTeamsByEaArea = []
 ) {
   return {
@@ -128,10 +128,10 @@ async function handlePostWithErrors(
       'account_requests/main-pso-team/index.njk',
       buildViewModel(
         request,
+        returnTo,
         values,
         errors,
         errorSummary,
-        returnTo,
         psoTeamsByEaArea
       )
     )
@@ -231,10 +231,10 @@ async function handleGet(request, h) {
     'account_requests/main-pso-team/index.njk',
     buildViewModel(
       request,
+      returnTo,
       values,
       undefined,
       undefined,
-      returnTo,
       psoTeamsByEaArea
     )
   )
