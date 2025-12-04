@@ -53,7 +53,11 @@ function groupPsoTeamsByEaArea(psoTeams, allAreas, selectedEaAreaIds) {
     const eaArea = getAreaById(allAreas, eaAreaId)
     if (eaArea?.id !== undefined && eaArea?.name !== undefined) {
       const teams = psoTeams.filter((team) => {
-        if (!team?.parent_id == null) {
+        // Corrected check: Assigns team?.parent_id (undefined if team is null/undefined)
+        // or the parent_id value itself.
+        const parentId = team?.parent_id
+        if (parentId == null) {
+          // Checks if parentId is null OR undefined
           return false
         }
         const teamParentId =
