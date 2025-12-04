@@ -24,10 +24,12 @@ function groupPsoTeamsByEaArea(psoTeams, allAreas, selectedEaAreaIds) {
       const teams = psoTeams.filter((team) => {
         const teamParentId =
           typeof team.parent_id === 'string'
-            ? parseInt(team.parent_id, 10)
+            ? Number.parseInt(team.parent_id, 10)
             : team.parent_id
         const eaAreaIdNum =
-          typeof eaAreaId === 'string' ? parseInt(eaAreaId, 10) : eaAreaId
+          typeof eaAreaId === 'string'
+            ? Number.parseInt(eaAreaId, 10)
+            : eaAreaId
         return teamParentId === eaAreaIdNum
       })
 

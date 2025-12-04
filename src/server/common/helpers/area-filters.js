@@ -25,12 +25,12 @@ export function filterAreasByParentId(areas, parentId) {
 
   // Convert parentId to number for comparison if needed
   const parentIdNum =
-    typeof parentId === 'string' ? parseInt(parentId, 10) : parentId
+    typeof parentId === 'string' ? Number.parseInt(parentId, 10) : parentId
 
   return areas.filter((area) => {
     const areaParentId =
       typeof area.parent_id === 'string'
-        ? parseInt(area.parent_id, 10)
+        ? Number.parseInt(area.parent_id, 10)
         : area.parent_id
     return areaParentId === parentIdNum
   })
@@ -48,13 +48,16 @@ export function filterAreasExcludingIds(areas, excludeIds) {
   }
 
   // Convert excludeIds to numbers for comparison
-  const excludeIdsNum = excludeIds.map((id) =>
-    typeof id === 'string' ? parseInt(id, 10) : id
+  const excludeIdsNum = new Set(
+    excludeIds.map((id) =>
+      typeof id === 'string' ? Number.parseInt(id, 10) : id
+    )
   )
 
   return areas.filter((area) => {
-    const areaId = typeof area.id === 'string' ? parseInt(area.id, 10) : area.id
-    return !excludeIdsNum.includes(areaId)
+    const areaId =
+      typeof area.id === 'string' ? Number.parseInt(area.id, 10) : area.id
+    return !excludeIdsNum.has(areaId)
   })
 }
 
@@ -69,11 +72,13 @@ export function getAreaById(areas, areaId) {
     return null
   }
 
-  const areaIdNum = typeof areaId === 'string' ? parseInt(areaId, 10) : areaId
+  const areaIdNum =
+    typeof areaId === 'string' ? Number.parseInt(areaId, 10) : areaId
 
   return (
     areas.find((area) => {
-      const id = typeof area.id === 'string' ? parseInt(area.id, 10) : area.id
+      const id =
+        typeof area.id === 'string' ? Number.parseInt(area.id, 10) : area.id
       return id === areaIdNum
     }) || null
   )
@@ -119,15 +124,17 @@ export function filterAreasByParentIds(areas, parentIds) {
   }
 
   // Convert parentIds to numbers for comparison
-  const parentIdsNum = parentIds
-    .map((id) => (typeof id === 'string' ? parseInt(id, 10) : id))
-    .filter((id) => !isNaN(id))
+  const parentIdsNum = new Set(
+    parentIds
+      .map((id) => (typeof id === 'string' ? Number.parseInt(id, 10) : id))
+      .filter((id) => !Number.isNaN(id))
+  )
 
   return areas.filter((area) => {
     const areaParentId =
       typeof area.parent_id === 'string'
-        ? parseInt(area.parent_id, 10)
+        ? Number.parseInt(area.parent_id, 10)
         : area.parent_id
-    return parentIdsNum.includes(areaParentId)
+    return parentIdsNum.has(areaParentId)
   })
 }

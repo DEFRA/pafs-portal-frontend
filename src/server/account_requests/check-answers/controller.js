@@ -215,7 +215,8 @@ async function buildErrorView(request, h, sessionData, statusCode) {
   const areas = await loadAreasForErrorDisplay(request)
   const summaryData = buildSummaryData(sessionData, areas)
   const errorMessage =
-    statusCode >= 400 && statusCode < 500
+    statusCode >= statusCodes.badRequest &&
+    statusCode < statusCodes.internalServerError
       ? ERROR_MESSAGE_RETRY
       : ERROR_MESSAGE_LATER
 
@@ -259,7 +260,7 @@ async function handlePost(request, h) {
       },
       'Error submitting account request to backend API'
     )
-    return await buildErrorView(
+    return buildErrorView(
       request,
       h,
       sessionData,

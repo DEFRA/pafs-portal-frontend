@@ -50,10 +50,12 @@ function groupRmasByPsoTeam(rmas, allAreas, selectedPsoTeamIds) {
       const teamRmas = rmas.filter((rma) => {
         const rmaParentId =
           typeof rma.parent_id === 'string'
-            ? parseInt(rma.parent_id, 10)
+            ? Number.parseInt(rma.parent_id, 10)
             : rma.parent_id
         const psoTeamIdNum =
-          typeof psoTeamId === 'string' ? parseInt(psoTeamId, 10) : psoTeamId
+          typeof psoTeamId === 'string'
+            ? Number.parseInt(psoTeamId, 10)
+            : psoTeamId
         return rmaParentId === psoTeamIdNum
       })
 

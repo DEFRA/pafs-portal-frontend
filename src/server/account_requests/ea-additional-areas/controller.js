@@ -8,17 +8,15 @@ import {
 const CHECK_ANSWERS_URL = '/account_request/check-answers'
 const CHECK_ANSWERS_RETURN_TO = 'check-answers'
 
-function buildViewModel(
-  request,
-  values = {},
-  returnTo,
-  additionalEaAreas = []
-) {
+function buildViewModel(request, values, returnTo, additionalEaAreas) {
+  const safeValues = values ?? {}
+  const safeAdditionalEaAreas = additionalEaAreas ?? []
+
   return {
     title: request.t('account-request.eaAdditionalAreas.heading'),
-    values,
+    values: safeValues,
     returnTo,
-    additionalEaAreas
+    additionalEaAreas: safeAdditionalEaAreas
   }
 }
 

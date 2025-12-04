@@ -71,7 +71,7 @@ function extractCachedData(cached) {
     // Check if it's an array-like object (has numeric keys)
     const keys = Object.keys(cached)
     const hasNumericKeys =
-      keys.length > 0 && keys.every((key) => !isNaN(Number(key)))
+      keys.length > 0 && keys.every((key) => !Number.isNaN(Number(key)))
 
     if (hasNumericKeys) {
       // Convert array-like object to array
@@ -121,7 +121,7 @@ async function fetchAndCache(cache, fetchFunction, _server) {
 async function fetchFromApiDirectly(fetchFunction, server) {
   try {
     const areasResponse = await fetchFunction()
-    return areasResponse && areasResponse.success ? areasResponse.data : null
+    return areasResponse?.success ? areasResponse.data : null
   } catch (fetchError) {
     server.logger.error(
       { error: fetchError.message },

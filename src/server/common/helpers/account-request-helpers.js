@@ -1,5 +1,5 @@
 function parseAreaId(areaId) {
-  return typeof areaId === 'string' ? parseInt(areaId, 10) : areaId
+  return typeof areaId === 'string' ? Number.parseInt(areaId, 10) : areaId
 }
 
 function addArea(areas, areaId, isPrimary) {

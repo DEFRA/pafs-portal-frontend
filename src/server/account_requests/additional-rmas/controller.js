@@ -46,19 +46,24 @@ function groupRmasByPsoTeam(rmas, allAreas, selectedPsoTeamIds, mainRmaId) {
       const teamRmas = rmas.filter((rma) => {
         const rmaParentId =
           typeof rma.parent_id === 'string'
-            ? parseInt(rma.parent_id, 10)
+            ? Number.parseInt(rma.parent_id, 10)
             : rma.parent_id
         const psoTeamIdNum =
-          typeof psoTeamId === 'string' ? parseInt(psoTeamId, 10) : psoTeamId
+          typeof psoTeamId === 'string'
+            ? Number.parseInt(psoTeamId, 10)
+            : psoTeamId
 
         // Check if RMA belongs to this PSO team and is not the main RMA
         const belongsToTeam = rmaParentId === psoTeamIdNum
-        const rmaId = typeof rma.id === 'string' ? parseInt(rma.id, 10) : rma.id
+        const rmaId =
+          typeof rma.id === 'string' ? Number.parseInt(rma.id, 10) : rma.id
 
         let mainRmaIdNum = null
         if (mainRmaId) {
           mainRmaIdNum =
-            typeof mainRmaId === 'string' ? parseInt(mainRmaId, 10) : mainRmaId
+            typeof mainRmaId === 'string'
+              ? Number.parseInt(mainRmaId, 10)
+              : mainRmaId
         }
         const isNotMainRma = !mainRmaIdNum || rmaId !== mainRmaIdNum
 
