@@ -53,18 +53,20 @@ function groupPsoTeamsByEaArea(psoTeams, allAreas, selectedEaAreaIds) {
     const eaArea = getAreaById(allAreas, eaAreaId)
     if (eaArea?.id !== undefined && eaArea?.name !== undefined) {
       const teams = psoTeams.filter((team) => {
-        if (!team || team.parent_id == null) {
+        if (!team?.parent_id == null) {
           return false
         }
         const teamParentId =
           typeof team.parent_id === 'string'
-            ? parseInt(team.parent_id, 10)
+            ? Number.parseInt(team.parent_id, 10)
             : team.parent_id
         const eaAreaIdNum =
-          typeof eaAreaId === 'string' ? parseInt(eaAreaId, 10) : eaAreaId
+          typeof eaAreaId === 'string'
+            ? Number.parseInt(eaAreaId, 10)
+            : eaAreaId
         return (
-          !isNaN(teamParentId) &&
-          !isNaN(eaAreaIdNum) &&
+          !Number.isNaN(teamParentId) &&
+          !Number.isNaN(eaAreaIdNum) &&
           teamParentId === eaAreaIdNum
         )
       })
