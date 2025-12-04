@@ -6,6 +6,7 @@ import {
   Header,
   PasswordInput,
   Radios,
+  ServiceNavigation,
   SkipLink
 } from 'govuk-frontend'
 
@@ -15,4 +16,5 @@ createAll(ErrorSummary)
 createAll(Header)
 createAll(PasswordInput)
 createAll(Radios)
+createAll(ServiceNavigation)
 createAll(SkipLink)

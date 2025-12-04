@@ -7,36 +7,40 @@
 
 {% block usersTable %}
   {% if users | length > 0 %}
-  <table class="govuk-table app-users-table" data-testid="users-table">
-    <caption class="govuk-visually-hidden">{{ t('accounts.manage_users.table.pending_caption') }}</caption>
-    <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-        <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.name') }}</th>
-        <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.email') }}</th>
-        <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.area') }}</th>
-        <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.requested') }}</th>
-        <th scope="col" class="govuk-table__header">
-          <span class="govuk-visually-hidden">{{ t('accounts.manage_users.table.actions') }}</span>
-        </th>
-      </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-      {% for user in users %}
-      <tr class="govuk-table__row" data-testid="users-table-row">
-        <td class="govuk-table__cell" data-testid="user-name">{{ user.firstName }} {{ user.lastName }}</td>
-        <td class="govuk-table__cell" data-testid="user-email">{{ user.email }}</td>
-        <td class="govuk-table__cell" data-testid="user-area">{{ user.primaryArea | default('-') }}</td>
-        <td class="govuk-table__cell" data-testid="user-date">{{ user.createdAt | formatDate('d MMM yyyy') }}</td>
-        <td class="govuk-table__cell">
-          <a href="/admin/users/{{ user.id }}" class="govuk-link" data-testid="user-view-link">
-            {{ t('accounts.manage_users.actions.view') }}<span class="govuk-visually-hidden"> {{ user.firstName }} {{ user.lastName }}</span>
-          </a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <table class="govuk-table app-table--responsive app-users-table" data-testid="users-table">
+      <caption class="govuk-visually-hidden">{{ t('accounts.manage_users.table.pending_caption') }}</caption>
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.name') }}</th>
+          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.email') }}</th>
+          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.area') }}</th>
+          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.requested') }}</th>
+          <th scope="col" class="govuk-table__header">
+            <span class="govuk-visually-hidden">{{ t('accounts.manage_users.table.actions') }}</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for user in users %}
+          <tr class="govuk-table__row" data-testid="users-table-row">
+            <td class="govuk-table__cell" data-label="{{ t('accounts.manage_users.table.name') }}" data-testid="user-name">{{ user.firstName }}
+              {{ user.lastName }}</td>
+            <td class="govuk-table__cell app-!-text-break-all" data-label="{{ t('accounts.manage_users.table.email') }}" data-testid="user-email">{{ user.email }}</td>
+            <td class="govuk-table__cell" data-label="{{ t('accounts.manage_users.table.area') }}" data-testid="user-area">{{ user.primaryArea | default('-') }}</td>
+            <td class="govuk-table__cell" data-label="{{ t('accounts.manage_users.table.requested') }}" data-testid="user-date">{{ user.createdAt | formatDate('d MMM yyyy') }}</td>
+            <td class="govuk-table__cell" data-label="">
+              <a href="/admin/users/{{ user.id }}" class="govuk-link" data-testid="user-view-link">
+                {{ t('accounts.manage_users.actions.view') }}
+                <span class="govuk-visually-hidden">
+                  {{ user.firstName }}
+                  {{ user.lastName }}</span>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   {% else %}
-  <p class="govuk-body" data-testid="users-empty">{{ t('accounts.manage_users.empty.pending') }}</p>
+    <p class="govuk-body" data-testid="users-empty">{{ t('accounts.manage_users.empty.pending') }}</p>
   {% endif %}
 {% endblock %}

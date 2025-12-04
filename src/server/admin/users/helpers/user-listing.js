@@ -31,13 +31,14 @@ export function getPrimaryAreaName(areas) {
  * @returns {Object} Formatted user for display
  */
 export function formatUserForDisplay(user) {
+  const isAdmin = user.admin || false
   return {
     id: user.id,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    isAdmin: user.admin || false,
-    primaryArea: getPrimaryAreaName(user.areas),
+    isAdmin,
+    primaryArea: isAdmin ? '-' : getPrimaryAreaName(user.areas),
     createdAt: user.createdAt,
     lastSignIn: user.lastSignIn || null
   }

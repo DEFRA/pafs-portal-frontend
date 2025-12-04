@@ -67,13 +67,31 @@ describe('User Helpers', () => {
         lastName: 'Smith',
         email: 'john@example.com',
         isAdmin: true,
-        primaryArea: 'Liverpool',
+        primaryArea: '-',
         createdAt: '2025-01-15T10:00:00Z',
         lastSignIn: '2025-01-20T14:30:00Z'
       })
     })
 
-    test('handles user without admin flag', () => {
+    test('formats non-admin user with primary area', () => {
+      const user = {
+        id: 2,
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@example.com',
+        admin: false,
+        createdAt: '2025-01-10T09:00:00Z',
+        lastSignIn: '2025-01-15T10:00:00Z',
+        areas: [{ name: 'Liverpool', primary: true }]
+      }
+
+      const result = formatUserForDisplay(user)
+
+      expect(result.isAdmin).toBe(false)
+      expect(result.primaryArea).toBe('Liverpool')
+    })
+
+    test('handles non-admin user without areas', () => {
       const user = {
         id: 2,
         firstName: 'Jane',

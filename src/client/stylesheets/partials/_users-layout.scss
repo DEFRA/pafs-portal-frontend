@@ -1,4 +1,4 @@
-@use "govuk-frontend/dist/govuk/base" as govuk;
+@use "govuk-frontend/dist/govuk/base" as govuk with ($govuk-new-typography-scale: true);
 
 // Users layout page styles
 // Used by pending and active users pages
