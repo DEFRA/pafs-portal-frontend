@@ -18,6 +18,6 @@ describe('Users Controller', () => {
   test('redirects to pending users page', async () => {
     await usersController.handler(mockRequest, mockH)
 
-    expect(mockH.redirect).toHaveBeenCalledWith('/admin/users/pending')
+    expect(mockH.redirect).toHaveBeenCalledWith('/admin/users/active')
   })
 })

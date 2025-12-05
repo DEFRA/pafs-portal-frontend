@@ -30,8 +30,6 @@
 
 ### Pages/Features Tested
 
-### Unit Tests
-
 ## Screenshots (if applicable)
 
 | ![name of the screengrab](URL) |

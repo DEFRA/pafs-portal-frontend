@@ -1,5 +1,56 @@
 @use "govuk-frontend" as *;
 
+// Responsive table - stacks on mobile with labels
+// Based on WRLS pattern from GOV.UK community
+// Usage: Add class "app-table--responsive" to table
+//        Add data-label="Column Name" to each td
+.app-table--responsive {
+
+  // Mobile: stack rows with labels
+  @media (max-width: 48.0525em) {
+
+    // Hide table header on mobile
+    .govuk-table__head {
+      @include govuk-visually-hidden;
+    }
+
+    // Make each row a block
+    .govuk-table__row {
+      display: block;
+      margin-bottom: govuk-spacing(4);
+      border-bottom: 2px solid $govuk-border-colour;
+      padding-bottom: govuk-spacing(3);
+    }
+
+    // Make each cell a block with label
+    .govuk-table__cell {
+      display: block;
+      padding: govuk-spacing(2) 0;
+      border-bottom: 1px solid $govuk-border-colour;
+      text-align: left;
+
+      // Show label before content
+      &::before {
+        content: attr(data-label);
+        display: block;
+        font-weight: $govuk-font-weight-bold;
+        margin-bottom: govuk-spacing(1);
+      }
+
+      // Last cell in row - no bottom border
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .govuk-table__header,
+  .govuk-table__cell {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
 // Example namespaced custom element style CSS classes
 
 .app-main-wrapper {

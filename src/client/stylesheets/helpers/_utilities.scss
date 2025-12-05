@@ -1,0 +1,12 @@
+// Custom utility classes
+// Following GOV.UK naming convention: app-!-[utility-name]
+// These complement the govuk-!-* utility classes
+
+// Text break utilities
+// Use app-!-text-break-all for long strings without natural break points
+// (e.g., email addresses, URLs, reference numbers)
+// Unlike govuk-!-text-break-word which only breaks at word boundaries,
+// this will break at any character when needed
+.app-\!-text-break-all {
+  word-break: break-all;
+}

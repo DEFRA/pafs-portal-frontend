@@ -1,6 +1,6 @@
 {#
-  Pending Users Page
-  Displays the list of pending user accounts awaiting approval
+  Active Users Page
+  Displays the list of active user accounts
 #}
 
 {% extends "layouts/users-layout.njk" %}
@@ -8,13 +8,14 @@
 {% block usersTable %}
   {% if users | length > 0 %}
     <table class="govuk-table app-table--responsive app-users-table" data-testid="users-table">
-      <caption class="govuk-visually-hidden">{{ t('accounts.manage_users.table.pending_caption') }}</caption>
+      <caption class="govuk-visually-hidden">{{ t('accounts.manage_users.table.active_caption') }}</caption>
       <thead class="govuk-table__head">
         <tr class="govuk-table__row">
           <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.name') }}</th>
           <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.email') }}</th>
           <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.area') }}</th>
-          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.requested') }}</th>
+          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.admin') }}</th>
+          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.last_sign_in') }}</th>
           <th scope="col" class="govuk-table__header">
             <span class="govuk-visually-hidden">{{ t('accounts.manage_users.table.actions') }}</span>
           </th>
@@ -27,7 +28,20 @@
               {{ user.lastName }}</td>
             <td class="govuk-table__cell app-!-text-break-all" data-label="{{ t('accounts.manage_users.table.email') }}" data-testid="user-email">{{ user.email }}</td>
             <td class="govuk-table__cell" data-label="{{ t('accounts.manage_users.table.area') }}" data-testid="user-area">{{ user.primaryArea | default('-') }}</td>
-            <td class="govuk-table__cell" data-label="{{ t('accounts.manage_users.table.requested') }}" data-testid="user-date">{{ user.createdAt | formatDate('d MMM yyyy') }}</td>
+            <td class="govuk-table__cell" data-label="{{ t('accounts.manage_users.table.admin') }}" data-testid="user-admin">
+              {% if user.isAdmin %}
+                {{ t('accounts.manage_users.table.yes') }}
+              {% else %}
+                {{ t('accounts.manage_users.table.no') }}
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell" data-label="{{ t('accounts.manage_users.table.last_sign_in') }}" data-testid="user-last-sign-in">
+              {% if user.lastSignIn %}
+                {{ user.lastSignIn | formatDate('d MMM yyyy') }}
+              {% else %}
+                {{ t('accounts.manage_users.table.never') }}
+              {% endif %}
+            </td>
             <td class="govuk-table__cell" data-label="">
               <a href="/admin/users/{{ user.id }}" class="govuk-link" data-testid="user-view-link">
                 {{ t('accounts.manage_users.actions.view') }}
@@ -41,6 +55,6 @@
       </tbody>
     </table>
   {% else %}
-    <p class="govuk-body" data-testid="users-empty">{{ t('accounts.manage_users.empty.pending') }}</p>
+    <p class="govuk-body" data-testid="users-empty">{{ t('accounts.manage_users.empty.active') }}</p>
   {% endif %}
 {% endblock %}

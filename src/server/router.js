@@ -10,6 +10,7 @@ import { forgotPassword } from './auth/forgot-password/index.js'
 import { resetPassword } from './auth/reset-password/index.js'
 import { users } from './admin/users/index.js'
 import { pendingUsers } from './admin/users/pending/index.js'
+import { activeUsers } from './admin/users/active/index.js'
 import { journeySelection } from './admin/journey-selection/index.js'
 import { accountRequest } from './account_requests/account_request/index.js'
 import { accountRequestDetails } from './account_requests/details/index.js'
@@ -38,7 +39,12 @@ export const router = {
       await server.register([login, logout, forgotPassword, resetPassword])
 
       // Admin routes
-      await server.register([users, pendingUsers, journeySelection])
+      await server.register([
+        users,
+        pendingUsers,
+        activeUsers,
+        journeySelection
+      ])
 
       // General user routes
       await server.register([home, archive, download])
