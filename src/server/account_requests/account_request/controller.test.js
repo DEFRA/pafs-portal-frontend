@@ -7,11 +7,13 @@ describe('#accountRequestController', () => {
   beforeAll(async () => {
     server = await createServer()
     await server.initialize()
-  })
+  }, 30000) // Increase timeout for server initialization
 
   afterAll(async () => {
-    await server.stop({ timeout: 0 })
-  })
+    if (server) {
+      await server.stop({ timeout: 0 })
+    }
+  }, 10000)
 
   test('Should render account request page', async () => {
     const { result, statusCode } = await server.inject({
@@ -21,5 +23,5 @@ describe('#accountRequestController', () => {
 
     expect(result).toEqual(expect.stringContaining('Request an account'))
     expect(statusCode).toBe(statusCodes.ok)
-  })
+  }, 10000)
 })

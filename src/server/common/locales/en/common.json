@@ -33,7 +33,7 @@
         "options": {
           "general_user": {
             "text": "General user journey",
-            "hint": "Explore the user portal as an RMA, PSO, or EA user"
+            "hint": "Explore the user portal as an RMA, PSO or Area user"
           },
           "admin_user": {
             "text": "Admin journey",
@@ -57,6 +57,11 @@
     "organisations": "Organisations",
     "download_projects": "Download Projects",
     "download_rma": "Download RMA"
+  },
+  "pagination": {
+    "summary": "Showing {{from}} to {{to}} of {{total}} {{itemLabel}}",
+    "previous": "Previous",
+    "next": "Next"
   },
   "footer": {
     "contact_html": "Contact the Defra IT Service Desk on <a href=\"tel:08008766458\" class=\"govuk-footer__link\">0800 8766458</a> or email <a href=\"mailto:pafs-support@environment-agency.gov.uk\" class=\"govuk-footer__link\">pafs-support@environment-agency.gov.uk</a>",

@@ -1,0 +1,115 @@
+@use "govuk-frontend/dist/govuk/base" as govuk;
+
+// Users layout page styles
+// Used by pending and active users pages
+
+// Users tabs navigation - button style as per prototype
+.app-users-tabs {
+  margin-bottom: govuk.govuk-spacing(6);
+}
+
+.app-users-tabs__list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.app-users-tabs__item {
+  margin: 0;
+}
+
+.app-users-tabs__link {
+  @include govuk.govuk-font($size: 19);
+  display: inline-block;
+  padding: govuk.govuk-spacing(2) govuk.govuk-spacing(4);
+  text-decoration: none;
+  color: govuk.govuk-colour("black");
+  background-color: govuk.govuk-colour("light-grey");
+
+  &:link,
+  &:visited {
+    color: govuk.govuk-colour("black");
+    text-decoration: none;
+  }
+
+  &:hover {
+    background-color: govuk.govuk-colour("mid-grey");
+    text-decoration: none;
+    color: govuk.govuk-colour("black");
+  }
+
+  &:focus {
+    outline: govuk.$govuk-focus-width solid govuk.govuk-colour("yellow");
+    outline-offset: 0;
+    background-color: govuk.govuk-colour("yellow");
+    color: govuk.govuk-colour("black");
+    text-decoration: none;
+  }
+}
+
+.app-users-tabs__link--active {
+  color: govuk.govuk-colour("white");
+  background-color: govuk.govuk-colour("blue");
+  font-weight: govuk.$govuk-font-weight-bold;
+
+  &:link,
+  &:visited {
+    color: govuk.govuk-colour("white");
+  }
+
+  &:hover {
+    background-color: govuk.govuk-colour("blue");
+    color: govuk.govuk-colour("white");
+  }
+
+  &:focus {
+    color: govuk.govuk-colour("black");
+  }
+}
+
+// Pagination row with summary on left, navigation on right
+.app-pagination-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: govuk.govuk-spacing(4);
+}
+
+.app-pagination-row__summary {
+  margin: 0;
+}
+
+.app-pagination-row__nav {
+
+  // Remove default margins from pagination component
+  .govuk-pagination {
+    margin: 0;
+  }
+}
+
+// Users table
+.app-users-table {
+  margin-top: govuk.govuk-spacing(4);
+}
+
+// Users actions (add/download links) - flex row
+.app-users-actions {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: govuk.govuk-spacing(3);
+}
+
+// Responsive adjustments
+@include govuk.govuk-media-query($until: tablet) {
+  .app-pagination-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .app-users-tabs__link {
+    padding: govuk.govuk-spacing(2) govuk.govuk-spacing(3);
+  }
+}

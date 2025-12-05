@@ -101,7 +101,81 @@ describe('#buildNavigation', () => {
         {
           current: true,
           text: 'common.navigation.users',
-          href: '/admin/users'
+          href: '/admin/users/active'
+        },
+        {
+          current: false,
+          text: 'common.navigation.projects',
+          href: '/admin/projects'
+        },
+        {
+          current: false,
+          text: 'common.navigation.submissions',
+          href: '/admin/submissions'
+        },
+        {
+          current: false,
+          text: 'common.navigation.organisations',
+          href: '/admin/organisations'
+        },
+        {
+          current: false,
+          text: 'common.navigation.download_projects',
+          href: '/admin/download-projects'
+        },
+        {
+          current: false,
+          text: 'common.navigation.download_rma',
+          href: '/admin/download-rma'
+        }
+      ])
+    })
+
+    test('Should highlight Users for /admin/users/pending path', () => {
+      expect(
+        buildNavigation(mockRequest({ path: '/admin/users/pending' }))
+      ).toEqual([
+        {
+          current: true,
+          text: 'common.navigation.users',
+          href: '/admin/users/active'
+        },
+        {
+          current: false,
+          text: 'common.navigation.projects',
+          href: '/admin/projects'
+        },
+        {
+          current: false,
+          text: 'common.navigation.submissions',
+          href: '/admin/submissions'
+        },
+        {
+          current: false,
+          text: 'common.navigation.organisations',
+          href: '/admin/organisations'
+        },
+        {
+          current: false,
+          text: 'common.navigation.download_projects',
+          href: '/admin/download-projects'
+        },
+        {
+          current: false,
+          text: 'common.navigation.download_rma',
+          href: '/admin/download-rma'
+        }
+      ])
+    })
+
+    test('Should highlight Users for /admin/users/active path', () => {
+      expect(
+        buildNavigation(mockRequest({ path: '/admin/users/active' }))
+      ).toEqual([
+        {
+          current: true,
+          text: 'common.navigation.users',
+          href: '/admin/users/active'
         },
         {
           current: false,
@@ -137,7 +211,7 @@ describe('#buildNavigation', () => {
           {
             current: false,
             text: 'common.navigation.users',
-            href: '/admin/users'
+            href: '/admin/users/active'
           },
           {
             current: true,
@@ -175,7 +249,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.users',
-          href: '/admin/users'
+          href: '/admin/users/active'
         },
         {
           current: false,
@@ -212,7 +286,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.users',
-          href: '/admin/users'
+          href: '/admin/users/active'
         },
         {
           current: false,
@@ -249,7 +323,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.users',
-          href: '/admin/users'
+          href: '/admin/users/active'
         },
         {
           current: false,
@@ -286,7 +360,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.users',
-          href: '/admin/users'
+          href: '/admin/users/active'
         },
         {
           current: false,

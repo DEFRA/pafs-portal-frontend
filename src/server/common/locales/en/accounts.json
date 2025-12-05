@@ -1,0 +1,55 @@
+{
+  "manage_users": {
+    "title": "Manage users",
+    "heading": "Manage users",
+    "tabs": {
+      "pending": "Pending",
+      "active": "Active",
+      "aria_label": "User account categories",
+      "view": "View"
+    },
+    "filters": {
+      "search_label": "Search by name or email",
+      "search_hint": "Enter a name or email address to search for users",
+      "area_label": "Filter by area",
+      "all_areas": "All areas",
+      "filter_button": "Filter",
+      "clear_filters": "Clear filters",
+      "aria_label": "Filter users"
+    },
+    "actions": {
+      "add_new_user": "Add new user",
+      "download_all_users": "Download all users",
+      "view": "View"
+    },
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "area": "Area",
+      "admin": "Admin",
+      "requested": "Requested",
+      "last_sign_in": "Last sign in",
+      "action": "Action",
+      "actions": "Actions",
+      "pending_caption": "List of pending user account requests",
+      "active_caption": "List of active user accounts",
+      "yes": "Yes",
+      "no": "No",
+      "never": "Never"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "users": "users",
+      "aria_label": "Results pagination"
+    },
+    "empty": {
+      "pending": "No pending user requests",
+      "active": "No active users found"
+    },
+    "errors": {
+      "fetch_failed": "There was a problem loading user accounts. Please try again later."
+    }
+  }
+}
