@@ -2,7 +2,10 @@ import { ROUTES } from '../../../server/common/constants/routes.js'
 import { translate } from '../../../server/common/helpers/i18n.js'
 
 export function buildNavigation(request) {
-  const session = request?.yar?.get('auth') || null
+  const session =
+    request?.yar && typeof request.yar.get === 'function'
+      ? request.yar.get('auth')
+      : null
 
   if (!session) {
     return []

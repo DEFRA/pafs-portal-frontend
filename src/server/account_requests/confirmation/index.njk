@@ -1,0 +1,48 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% block pageTitle %}{{ t('account-request.confirmation.panelTitle') }} | {{ serviceName }}{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govukPanel({
+        titleText: t('account-request.confirmation.panelTitle'),
+        html: t('account-request.confirmation.panelBody')
+      }) }}
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-7">
+        {{ t('account-request.confirmation.whatHappensNextHeading') }}
+      </h2>
+
+      <p class="govuk-body">
+        {{ t('account-request.confirmation.whatHappensNextPara1') }}
+      </p>
+
+      <p class="govuk-body">
+        {{ t('account-request.confirmation.whatHappensNextPara2') }}
+      </p>
+
+      {{ govukInsetText({
+        text: t('account-request.confirmation.insetBoxText')
+      }) }}
+
+      <h2 class="govuk-heading-m">
+        {{ t('account-request.confirmation.whatYouNeedToDoHeading') }}
+      </h2>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>{{ t('account-request.confirmation.bullet1') }}</li>
+        <li>{{ t('account-request.confirmation.bullet2') }}</li>
+        <li>{{ t('account-request.confirmation.bullet3') }}</li>
+        <li>{{ t('account-request.confirmation.bullet4') }}</li>
+      </ul>
+
+      <p class="govuk-body govuk-!-margin-top-8">
+        <a href="/login" class="govuk-link">{{ t('account-request.confirmation.returnToSignInLink') }}</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}
+
