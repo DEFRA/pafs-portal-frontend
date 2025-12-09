@@ -15,6 +15,16 @@ import { activeUsers } from './admin/users/active/index.js'
 import { journeySelection } from './admin/journey-selection/index.js'
 import { accountRequest } from './account_requests/account_request/index.js'
 import { accountRequestDetails } from './account_requests/details/index.js'
+import { accountRequestEaMainArea } from './account_requests/ea-main-area/index.js'
+import { accountRequestEaAdditionalAreas } from './account_requests/ea-additional-areas/index.js'
+import { accountRequestEaArea } from './account_requests/ea-area/index.js'
+import { accountRequestMainPsoTeam } from './account_requests/main-pso-team/index.js'
+import { accountRequestAdditionalPsoTeams } from './account_requests/additional-pso-teams/index.js'
+import { accountRequestPsoTeam } from './account_requests/pso-team/index.js'
+import { accountRequestMainRma } from './account_requests/main-rma/index.js'
+import { accountRequestAdditionalRmas } from './account_requests/additional-rmas/index.js'
+import { accountRequestCheckAnswers } from './account_requests/check-answers/index.js'
+import { accountRequestConfirmation } from './account_requests/confirmation/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 
 export const router = {
@@ -47,7 +57,20 @@ export const router = {
       await server.register([home, archive, download])
 
       // Account request routes
-      await server.register([accountRequest, accountRequestDetails])
+      await server.register([
+        accountRequest,
+        accountRequestDetails,
+        accountRequestEaMainArea,
+        accountRequestEaAdditionalAreas,
+        accountRequestEaArea,
+        accountRequestMainPsoTeam,
+        accountRequestAdditionalPsoTeams,
+        accountRequestPsoTeam,
+        accountRequestMainRma,
+        accountRequestAdditionalRmas,
+        accountRequestCheckAnswers,
+        accountRequestConfirmation
+      ])
 
       // Static assets
       await server.register([serveStaticFiles])

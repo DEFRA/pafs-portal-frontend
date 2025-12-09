@@ -1,0 +1,73 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}{{ t('account-request.eaArea.heading') }} | {{ serviceName }}{% endblock %}
+
+{% block content %}
+  <a href="/account_request/details" class="govuk-back-link">{{ t('account-request.back') }}</a>
+
+  {% if errorSummary and (errorSummary | length) %}
+    {% set errorList = [] %}
+    {% for item in errorSummary %}
+      {% set errorList = errorList.concat([{
+        text: item.text,
+        href: item.href
+      }]) %}
+    {% endfor %}
+    {{ govukErrorSummary({
+      titleText: t('account-request.details.errorSummaryTitle'),
+      errorList: errorList
+    }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% if returnTo %}
+    <input type="hidden" name="returnTo" value="{{ returnTo }}">
+    {% endif %}
+
+    {% set checkboxItems = [] %}
+    {% if eaAreas and eaAreas.length > 0 %}
+      {% for area in eaAreas %}
+        {% set checkboxItems = checkboxItems.concat([{
+          value: area.id | string,
+          text: area.name,
+          checked: area.id | string in (values.eaAreas or [])
+        }]) %}
+      {% endfor %}
+    {% endif %}
+
+    {% set eaAreasErrorMessage = false %}
+    {% if errors.eaAreas %}
+      {% set eaAreasErrorMessage = {
+        text: errors.eaAreas
+      } %}
+    {% endif %}
+
+    {{ govukCheckboxes({
+      name: "eaAreas",
+      fieldset: {
+        legend: {
+          text: t('account-request.eaArea.heading'),
+          classes: "govuk-fieldset__legend--l",
+          isPageHeading: true
+        }
+      },
+      hint: {
+        text: t('account-request.eaArea.eaAreaHint')
+      },
+      items: checkboxItems,
+      errorMessage: eaAreasErrorMessage
+    }) }}
+
+    {% if not eaAreas or eaAreas.length == 0 %}
+      <p class="govuk-body">{{ t('account-request.eaArea.noAreasAvailable') }}</p>
+    {% endif %}
+
+    {{ govukButton({
+      text: t('account-request.eaArea.continueButton')
+    }) }}
+  </form>
+{% endblock %}
+

@@ -1,4 +1,6 @@
 import { statusCodes } from '../../common/constants/status-codes.js'
+import { getAreas } from '../../common/services/areas/area-service.js'
+import { getCachedAreas } from '../../common/services/areas/areas-cache.js'
 
 function buildViewModel(
   request,
@@ -131,11 +133,21 @@ function getSessionData(request) {
   return request.yar.get('accountRequest') ?? {}
 }
 
-function handlePostRequest(request, h) {
+async function handlePostRequest(request, h) {
   const { values, errors, errorSummary } = validateDetails(request)
   const returnTo = request.payload?.returnTo
 
   if (errorSummary.length) {
+    // Pre-fetch areas to warm up cache for next page
+    try {
+      await getCachedAreas(request.server, getAreas)
+    } catch (error) {
+      request.server.logger.error(
+        { error: error.message },
+        'Error pre-fetching areas for cache'
+      )
+    }
+
     return h
       .view(
         'account_requests/details/index.njk',
@@ -155,22 +167,60 @@ function handlePostRequest(request, h) {
     'Account request details submitted'
   )
 
-  // For now, redirect back to account_request page
-  return h.redirect('/account_request')
+  // Redirect based on responsibility selection
+  function getNextUrl(responsibility) {
+    switch (responsibility) {
+      case 'EA':
+        return '/account_request/ea-main-area'
+      case 'PSO':
+        return '/account_request/ea-area'
+      case 'RMA':
+        return '/account_request/ea-area'
+      default:
+        request.server.logger.warn(
+          { responsibility },
+          'Unknown responsibility value, redirecting to default'
+        )
+        return '/account_request'
+    }
+  }
+
+  const nextUrl = getNextUrl(values.responsibility)
+  return h.redirect(nextUrl)
 }
 
-function handleGetRequest(request, h) {
+async function handleGetRequest(request, h) {
   const sessionData = getSessionData(request)
   const values = sessionData.details ?? {}
+  const returnTo =
+    request.query.from === 'check-answers' ? 'check-answers' : undefined
+
+  // Pre-fetch areas to warm up cache for next page (not used on this page)
+  try {
+    const areas = await getCachedAreas(request.server, getAreas)
+    if (areas) {
+      request.server.logger.info(
+        { areasCount: Array.isArray(areas) ? areas.length : 'unknown' },
+        'Areas pre-fetched and cached for next page'
+      )
+    } else {
+      request.server.logger.warn('Failed to pre-fetch areas')
+    }
+  } catch (error) {
+    request.server.logger.error(
+      { error: error.message },
+      'Error pre-fetching areas for cache'
+    )
+  }
 
   return h.view(
     'account_requests/details/index.njk',
-    buildViewModel(request, values)
+    buildViewModel(request, values, undefined, undefined, returnTo)
   )
 }
 
 export const accountRequestDetailsController = {
-  handler(request, h) {
+  async handler(request, h) {
     if (request.method === 'post') {
       return handlePostRequest(request, h)
     }

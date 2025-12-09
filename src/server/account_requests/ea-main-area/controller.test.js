@@ -14,7 +14,7 @@ vi.mock('../../common/services/areas/area-service.js', () => ({
   })
 }))
 
-describe('#accountRequestDetailsController', () => {
+describe('#accountRequestEaMainAreaController', () => {
   let server
 
   beforeAll(async () => {
@@ -26,33 +26,25 @@ describe('#accountRequestDetailsController', () => {
     await server.stop({ timeout: 0 })
   })
 
-  describe('GET /account_request/details', () => {
-    test('Should render details page', async () => {
+  describe('GET /account_request/ea-main-area', () => {
+    test('Should render ea-main-area page', async () => {
       const { result, statusCode } = await server.inject({
         method: 'GET',
-        url: '/account_request/details'
+        url: '/account_request/ea-main-area'
       })
 
-      expect(result).toEqual(expect.stringContaining('Request an account'))
+      expect(result).toEqual(expect.stringContaining('Select main EA area'))
       expect(statusCode).toBe(statusCodes.ok)
     })
 
     test('Should pre-populate from session when available', async () => {
       // First, submit data via POST to establish session
-      const payload = {
-        firstName: 'John',
-        lastName: 'Doe',
-        emailAddress: 'john@example.com',
-        telephoneNumber: '1234567890',
-        organisation: 'Test Org',
-        jobTitle: 'Developer',
-        responsibility: 'EA'
-      }
-
       const postResponse = await server.inject({
         method: 'POST',
-        url: '/account_request/details',
-        payload
+        url: '/account_request/ea-main-area',
+        payload: {
+          mainEaArea: 'anglian'
+        }
       })
 
       expect(postResponse.statusCode).toBe(302)
@@ -65,14 +57,15 @@ describe('#accountRequestDetailsController', () => {
           // Now GET the page with the session cookie
           const getResponse = await server.inject({
             method: 'GET',
-            url: '/account_request/details',
+            url: '/account_request/ea-main-area',
             headers: {
               cookie: sessionCookie.split(';')[0]
             }
           })
 
-          expect(getResponse.result).toEqual(expect.stringContaining('John'))
-          expect(getResponse.result).toEqual(expect.stringContaining('Doe'))
+          expect(getResponse.result).toEqual(
+            expect.stringContaining('Select main EA area')
+          )
         }
       }
     })
@@ -80,63 +73,63 @@ describe('#accountRequestDetailsController', () => {
     test('Should set returnTo when from=check-answers query param is present', async () => {
       const { result } = await server.inject({
         method: 'GET',
-        url: '/account_request/details?from=check-answers'
+        url: '/account_request/ea-main-area?from=check-answers'
       })
 
-      expect(result).toEqual(expect.stringContaining('Request an account'))
+      expect(result).toEqual(expect.stringContaining('Select main EA area'))
     })
   })
 
-  describe('POST /account_request/details', () => {
+  describe('POST /account_request/ea-main-area', () => {
     test('Should return 400 with errors when validation fails', async () => {
       const { result, statusCode } = await server.inject({
         method: 'POST',
-        url: '/account_request/details',
+        url: '/account_request/ea-main-area',
         payload: {}
       })
 
       expect(statusCode).toBe(statusCodes.badRequest)
       expect(result).toEqual(expect.stringContaining('There is a problem'))
-      expect(result).toEqual(expect.stringContaining('Tell us your first name'))
+      expect(result).toEqual(expect.stringContaining('Select a main EA area'))
     })
 
-    test('Should return 400 when email format is invalid', async () => {
-      const { result, statusCode } = await server.inject({
+    test('Should redirect to ea-additional-areas on successful validation', async () => {
+      const { statusCode, headers } = await server.inject({
         method: 'POST',
-        url: '/account_request/details',
+        url: '/account_request/ea-main-area',
         payload: {
-          firstName: 'John',
-          lastName: 'Doe',
-          emailAddress: 'invalid-email',
-          telephoneNumber: '1234567890',
-          organisation: 'Test Org',
-          jobTitle: 'Developer',
-          responsibility: 'EA'
+          mainEaArea: 'anglian'
         }
       })
 
-      expect(statusCode).toBe(statusCodes.badRequest)
-      expect(result).toEqual(
-        expect.stringContaining(
-          'Enter an email address in the correct format, like name@example.com'
-        )
+      expect(statusCode).toBe(302)
+      expect(headers.location).toBe('/account_request/ea-additional-areas')
+    })
+
+    test('Should redirect to ea-additional-areas with returnTo query param when returnTo is set', async () => {
+      const { statusCode, headers } = await server.inject({
+        method: 'POST',
+        url: '/account_request/ea-main-area',
+        payload: {
+          mainEaArea: 'anglian',
+          returnTo: 'check-answers'
+        }
+      })
+
+      expect(statusCode).toBe(302)
+      expect(headers.location).toBe(
+        '/account_request/ea-additional-areas?returnTo=check-answers'
       )
     })
 
     test('Should store data in session on successful validation', async () => {
       const payload = {
-        firstName: 'John',
-        lastName: 'Doe',
-        emailAddress: 'john@example.com',
-        telephoneNumber: '1234567890',
-        organisation: 'Test Org',
-        jobTitle: 'Developer',
-        responsibility: 'EA'
+        mainEaArea: 'thames'
       }
 
       const response = await server.inject({
         method: 'POST',
-        url: '/account_request/details',
+        url: '/account_request/ea-main-area',
         payload
       })
 
@@ -150,14 +143,15 @@ describe('#accountRequestDetailsController', () => {
         if (sessionCookie) {
           const getResponse = await server.inject({
             method: 'GET',
-            url: '/account_request/details',
+            url: '/account_request/ea-main-area',
             headers: {
               cookie: sessionCookie.split(';')[0]
             }
           })
 
-          expect(getResponse.result).toEqual(expect.stringContaining('John'))
-          expect(getResponse.result).toEqual(expect.stringContaining('Doe'))
+          expect(getResponse.result).toEqual(
+            expect.stringContaining('Select main EA area')
+          )
         }
       }
     })
