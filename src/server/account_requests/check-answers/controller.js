@@ -190,8 +190,7 @@ function preparePayload(sessionData, request) {
 function handlePostSuccess(request, h, response) {
   request.server.logger.info(
     {
-      status: 200,
-      areasCount: response?.data?.areas?.length
+      status: 200
     },
     'Account request submitted successfully to backend API'
   )

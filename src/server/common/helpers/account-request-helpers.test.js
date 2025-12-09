@@ -64,12 +64,11 @@ describe('#account-request-helpers', () => {
       const payload = prepareAccountRequestPayload(sessionData)
 
       expect(payload.user.responsibility).toBe('PSO')
-      expect(payload.areas).toHaveLength(5)
-      expect(payload.areas[0]).toEqual({ area_id: 1, primary: false })
-      expect(payload.areas[1]).toEqual({ area_id: 2, primary: false })
-      expect(payload.areas[2]).toEqual({ area_id: 20, primary: true })
-      expect(payload.areas[3]).toEqual({ area_id: 21, primary: false })
-      expect(payload.areas[4]).toEqual({ area_id: 22, primary: false })
+      expect(payload.areas).toHaveLength(3)
+
+      expect(payload.areas[0]).toEqual({ area_id: 20, primary: true })
+      expect(payload.areas[1]).toEqual({ area_id: 21, primary: false })
+      expect(payload.areas[2]).toEqual({ area_id: 22, primary: false })
     })
 
     test('Should prepare payload for RMA responsibility', () => {
@@ -100,13 +99,10 @@ describe('#account-request-helpers', () => {
       const payload = prepareAccountRequestPayload(sessionData)
 
       expect(payload.user.responsibility).toBe('RMA')
-      expect(payload.areas).toHaveLength(6)
-      expect(payload.areas[0]).toEqual({ area_id: 1, primary: false })
-      expect(payload.areas[1]).toEqual({ area_id: 10, primary: false })
-      expect(payload.areas[2]).toEqual({ area_id: 11, primary: false })
-      expect(payload.areas[3]).toEqual({ area_id: 30, primary: true })
-      expect(payload.areas[4]).toEqual({ area_id: 31, primary: false })
-      expect(payload.areas[5]).toEqual({ area_id: 32, primary: false })
+      expect(payload.areas).toHaveLength(3)
+      expect(payload.areas[0]).toEqual({ area_id: 30, primary: true })
+      expect(payload.areas[1]).toEqual({ area_id: 31, primary: false })
+      expect(payload.areas[2]).toEqual({ area_id: 32, primary: false })
     })
 
     test('Should handle empty session data', () => {

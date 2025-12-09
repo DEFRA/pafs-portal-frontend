@@ -29,24 +29,18 @@ function prepareEaAreas(sessionData, areas) {
 }
 
 function preparePsoAreas(sessionData, areas) {
-  const eaAreaIds = sessionData.eaArea?.eaAreas ?? []
   const mainPsoTeamId = sessionData.mainPsoTeam?.mainPsoTeam
   const additionalPsoTeamIds =
     sessionData.additionalPsoTeams?.additionalPsoTeams ?? []
 
-  addAreas(areas, eaAreaIds, false)
   addArea(areas, mainPsoTeamId, true)
   addAreas(areas, additionalPsoTeamIds, false)
 }
 
 function prepareRmaAreas(sessionData, areas) {
-  const rmaEaAreaIds = sessionData.eaArea?.eaAreas ?? []
-  const psoTeamIds = sessionData.psoTeam?.psoTeams ?? []
   const mainRmaId = sessionData.mainRma?.mainRma
   const additionalRmaIds = sessionData.additionalRmas?.additionalRmas ?? []
 
-  addAreas(areas, rmaEaAreaIds, false)
-  addAreas(areas, psoTeamIds, false)
   addArea(areas, mainRmaId, true)
   addAreas(areas, additionalRmaIds, false)
 }
