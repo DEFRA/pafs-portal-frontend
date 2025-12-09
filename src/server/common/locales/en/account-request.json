@@ -166,5 +166,18 @@
     "bullet3": "Once approved, use the link in the email to set your password",
     "bullet4": "Sign in to the service",
     "returnToSignInLink": "Return to sign in"
+  },
+  "confirmation-approved": {
+    "panelTitle": "Account approved",
+    "panelBody": "Your account has been created",
+    "whatHappensNextHeading": "What happens next",
+    "whatHappensNextPara1": "We have sent you an email with a link to set your account password.",
+    "whatHappensNextPara2": "Once you have set your password, you can sign in and start using the service.",
+    "insetBoxText": "The email may take a few minutes to arrive. If you do not receive it, check your spam folder.",
+    "whatYouNeedToDoHeading": "What you can do now",
+    "bullet1": "Check your email inbox for the password setup link",
+    "bullet2": "Set up your password using the link in the email",
+    "bullet3": "Sign in to the service",
+    "returnToSignInLink": "Return to sign in"
   }
 }

@@ -1,6 +1,13 @@
 function buildViewModel(request) {
+  const confirmation = request.yar.get('accountRequestConfirmation') || {}
+  const isApproved = confirmation.status === 'approved'
   return {
-    title: request.t('account-request.confirmation.panelTitle')
+    // Title switches based on approval status
+    title: isApproved
+      ? request.t('account-request.confirmation-approved.panelTitle')
+      : request.t('account-request.confirmation.panelTitle'),
+    status: confirmation.status,
+    email: confirmation.email
   }
 }
 
