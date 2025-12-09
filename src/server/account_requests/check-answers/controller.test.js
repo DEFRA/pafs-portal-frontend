@@ -782,5 +782,90 @@ describe('#accountRequestCheckAnswersController', () => {
 
       expect(mockH.view).toHaveBeenCalled()
     })
+
+    test('POST should render 400 error view when API returns validation error', async () => {
+      mockRequest.method = 'post'
+      mockRequest.yar.get.mockReturnValue({
+        details: { responsibility: 'EA' },
+        eaMainArea: { mainEaArea: '1' }
+      })
+
+      const { submitAccountRequest } =
+        await import('../../common/services/account-request-service.js')
+      submitAccountRequest.mockResolvedValueOnce({
+        success: false,
+        status: 400,
+        errors: [{ message: 'Validation error' }]
+      })
+
+      const result = await accountRequestCheckAnswersController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.badRequest)
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('account_requests/check-answers/index.njk'),
+        expect.objectContaining({
+          error: expect.stringContaining('Please try again.')
+        })
+      )
+    })
+
+    test('POST should render 500 error view when API throws and areas loader throws', async () => {
+      mockRequest.method = 'post'
+      mockRequest.yar.get.mockReturnValue({
+        details: { responsibility: 'EA' },
+        eaMainArea: { mainEaArea: '1' }
+      })
+
+      // Force submit to throw
+      const { submitAccountRequest } =
+        await import('../../common/services/account-request-service.js')
+      submitAccountRequest.mockRejectedValueOnce(new Error('boom'))
+
+      // Force areas loader to throw inside buildErrorView
+      vi.spyOn(
+        await import('../../common/services/areas/areas-cache.js'),
+        'getCachedAreas'
+      ).mockRejectedValueOnce(new Error('cache boom'))
+
+      const result = await accountRequestCheckAnswersController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.internalServerError)
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('account_requests/check-answers/index.njk'),
+        expect.objectContaining({
+          error: expect.stringContaining('Please try again later.')
+        })
+      )
+    })
+
+    test('GET should handle undefined responsibility with default summary', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        details: { firstName: 'No', lastName: 'Resp' }
+      })
+
+      vi.spyOn(
+        await import('../../common/services/areas/areas-cache.js'),
+        'getCachedAreas'
+      ).mockResolvedValue([{ id: 1, name: 'Thames', area_type: 'EA Area' }])
+
+      const result = await accountRequestCheckAnswersController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBeUndefined() // view without .code defaults to undefined
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('account_requests/check-answers/index.njk'),
+        expect.objectContaining({
+          summaryData: expect.any(Object)
+        })
+      )
+    })
   })
 })
