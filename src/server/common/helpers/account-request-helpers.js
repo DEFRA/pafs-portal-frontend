@@ -69,24 +69,7 @@ function prepareRmaAreas(sessionData, areas) {
  *   ]
  * }
  */
-export function prepareAccountRequestPayload(sessionData) {
-  const details = sessionData.details ?? {}
-  const responsibility = details.responsibility
-
-  // Prepare user data
-  const userData = {
-    firstName: details.firstName ?? '',
-    lastName: details.lastName ?? '',
-    emailAddress: details.emailAddress ?? '',
-    telephoneNumber: details.telephoneNumber ?? '',
-    organisation: details.organisation ?? '',
-    jobTitle: details.jobTitle ?? '',
-    responsibility: responsibility ?? ''
-  }
-
-  // Prepare areas data (without user_id, as backend will handle that)
-  const areas = []
-
+function prepareAreasByResponsibility(responsibility, sessionData, areas) {
   switch (responsibility) {
     case 'EA':
       prepareEaAreas(sessionData, areas)
@@ -104,6 +87,26 @@ export function prepareAccountRequestPayload(sessionData) {
       // Unknown responsibility - leave areas empty
       break
   }
+}
+
+export function prepareAccountRequestPayload(sessionData) {
+  const details = sessionData.details ?? {}
+  const responsibility = details.responsibility
+
+  // Prepare user data
+  const userData = {
+    firstName: details.firstName ?? '',
+    lastName: details.lastName ?? '',
+    emailAddress: details.emailAddress ?? '',
+    telephoneNumber: details.telephoneNumber ?? '',
+    organisation: details.organisation ?? '',
+    jobTitle: details.jobTitle ?? '',
+    responsibility: responsibility ?? ''
+  }
+
+  // Prepare areas data (without user_id, as backend will handle that)
+  const areas = []
+  prepareAreasByResponsibility(responsibility, sessionData, areas)
 
   return {
     user: userData,
