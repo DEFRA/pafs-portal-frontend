@@ -8,6 +8,7 @@ import { login } from './auth/login/index.js'
 import { logout } from './auth/logout/index.js'
 import { forgotPassword } from './auth/forgot-password/index.js'
 import { resetPassword } from './auth/reset-password/index.js'
+import { setPassword } from './auth/set-password/index.js'
 import { users } from './admin/users/index.js'
 import { pendingUsers } from './admin/users/pending/index.js'
 import { activeUsers } from './admin/users/active/index.js'
@@ -26,7 +27,13 @@ export const router = {
       await server.register([health])
 
       // Authentication routes
-      await server.register([login, logout, forgotPassword, resetPassword])
+      await server.register([
+        login,
+        logout,
+        forgotPassword,
+        resetPassword,
+        setPassword
+      ])
 
       // Admin routes
       await server.register([

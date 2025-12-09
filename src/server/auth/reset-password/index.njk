@@ -3,6 +3,10 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
+{# Determine locale key prefix based on flow type #}
+{% set localePrefix = 'auth.set_password' if flowType == 'invitation' else 'auth.reset_password' %}
+{% set formAction = '/set-password' if flowType == 'invitation' else '/reset-password' %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -44,22 +48,25 @@
       {% endif %}
 
       <h1 class="govuk-heading-xl">
-        {{ t('auth.reset_password.heading') }}
+        {{ t(localePrefix + '.heading') }}
       </h1>
 
-      <p class="govuk-body">{{ t('auth.reset_password.requirements_intro') }}</p>
+      <p class="govuk-body">{{ t(localePrefix + '.requirements_intro') }}</p>
 
       <ul class="govuk-list govuk-list--bullet">
-        <li>{{ t('auth.reset_password.requirements.min_length') }}</li>
-        <li>{{ t('auth.reset_password.requirements.uppercase') }}</li>
-        <li>{{ t('auth.reset_password.requirements.lowercase') }}</li>
-        <li>{{ t('auth.reset_password.requirements.number') }}</li>
-        <li>{{ t('auth.reset_password.requirements.special') }}</li>
+        <li>{{ t(localePrefix + '.requirements.min_length') }}</li>
+        <li>{{ t(localePrefix + '.requirements.uppercase') }}</li>
+        <li>{{ t(localePrefix + '.requirements.lowercase') }}</li>
+        <li>{{ t(localePrefix + '.requirements.number') }}</li>
+        <li>{{ t(localePrefix + '.requirements.special') }}</li>
       </ul>
 
-      <p class="govuk-body">{{ t('auth.reset_password.no_reuse') }}</p>
+      {# Only show no_reuse text for reset password flow #}
+      {% if flowType != 'invitation' %}
+        <p class="govuk-body">{{ t('auth.reset_password.no_reuse') }}</p>
+      {% endif %}
 
-      <form action="/reset-password" method="post" novalidate>
+      <form action="{{ formAction }}" method="post" novalidate>
 
         <input type="hidden" name="token" value="{{ token }}">
 
@@ -112,7 +119,7 @@
         }) }}
 
         {{ govukButton({
-          text: t('auth.reset_password.submit_button')
+          text: t(localePrefix + '.submit_button')
         }) }}
 
       </form>

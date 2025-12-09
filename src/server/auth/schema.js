@@ -17,8 +17,7 @@ export const forgotPasswordSchema = Joi.object({
   email: emailSchema
 })
 
-// Reset password uses newPassword/confirmPassword field names
-export const resetPasswordSchema = Joi.object({
+export const passwordFormSchema = Joi.object({
   token: tokenSchema,
   newPassword: passwordStrengthSchema.label('newPassword'),
   confirmPassword: confirmPasswordSchema.valid(Joi.ref('newPassword'))

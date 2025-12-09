@@ -43,6 +43,8 @@
     {% set errorList = errorList.concat([{ text: t('auth.errors.account_locked'), href: "#email" }]) %}
     {% elif errorCode == ERROR_CODES.ACCOUNT_PENDING %}
     {% set errorList = errorList.concat([{ text: t('auth.errors.account_pending'), href: "#email" }]) %}
+    {% elif errorCode == ERROR_CODES.ACCOUNT_SETUP_INCOMPLETE %}
+    {% set errorList = errorList.concat([{ text: t('auth.errors.account_setup_incomplete'), href: "#email" }]) %}
     {% elif errorCode == ERROR_CODES.ACCOUNT_DISABLED %}
     {% set errorList = errorList.concat([{ text: t('auth.errors.account_disabled'), href: "#email" }]) %}
     {% elif errorCode == ERROR_CODES.NETWORK_ERROR %}
@@ -88,6 +90,8 @@
       {% set emailError = { text: t('auth.errors.account_disabled') } %}
       {% elif errorCode == ERROR_CODES.ACCOUNT_PENDING %}
       {% set emailError = { text: t('auth.errors.account_pending') } %}
+      {% elif errorCode == ERROR_CODES.ACCOUNT_SETUP_INCOMPLETE %}
+      {% set emailError = { text: t('auth.errors.account_setup_incomplete') } %}
       {% endif %}
 
       {{ govukInput({

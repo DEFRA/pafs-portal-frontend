@@ -4,7 +4,9 @@ import {
   refreshToken,
   logout,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  validateInvitationToken,
+  setPassword
 } from './auth-service.js'
 
 vi.mock('../../helpers/api-client.js', () => ({
@@ -264,6 +266,81 @@ describe('Auth Service', () => {
       expect(result.error.errorCode).toBe(
         'AUTH_PASSWORD_RESET_PASSWORD_WAS_USED_PREVIOUSLY'
       )
+    })
+  })
+
+  describe('validateInvitationToken', () => {
+    test('calls API with token and INVITATION type', async () => {
+      const mockResponse = {
+        success: true,
+        data: { email: 'test@example.com' }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await validateInvitationToken('invitation-token-123')
+
+      expect(apiRequest).toHaveBeenCalledWith('/api/v1/auth/validate-token', {
+        method: 'POST',
+        body: JSON.stringify({
+          token: 'invitation-token-123',
+          type: 'INVITATION'
+        })
+      })
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('handles invalid invitation token', async () => {
+      const mockError = {
+        success: false,
+        error: { errorCode: 'AUTH_INVITATION_TOKEN_EXPIRED_INVALID' }
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await validateInvitationToken('invalid-token')
+
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('setPassword', () => {
+    test('calls API with token and passwords', async () => {
+      const mockResponse = {
+        success: true,
+        data: { message: 'Password set successful' }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await setPassword(
+        'invitation-token-123',
+        'NewPass123!',
+        'NewPass123!'
+      )
+
+      expect(apiRequest).toHaveBeenCalledWith('/api/v1/auth/set-password', {
+        method: 'POST',
+        body: JSON.stringify({
+          token: 'invitation-token-123',
+          password: 'NewPass123!',
+          confirmPassword: 'NewPass123!'
+        })
+      })
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('handles invalid invitation token error', async () => {
+      const mockError = {
+        success: false,
+        errors: [{ errorCode: 'AUTH_INVITATION_TOKEN_EXPIRED_INVALID' }]
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await setPassword(
+        'invalid-token',
+        'NewPass123!',
+        'NewPass123!'
+      )
+
+      expect(result.success).toBe(false)
     })
   })
 })
