@@ -1,4 +1,4 @@
-import { ACCOUNT_STATUS } from '../../common/constants/accounts'
+import { ACCOUNT_STATUS } from '../../common/constants/accounts.js'
 
 function buildViewModel(request) {
   const confirmation = request.yar.get('accountRequestConfirmation') || {}
