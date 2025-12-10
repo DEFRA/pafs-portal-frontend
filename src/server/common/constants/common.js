@@ -4,7 +4,9 @@ export const AUTH_VIEWS = {
   FORGOT_PASSWORD_REQUEST_CONFIRMATION: 'auth/forgot-password/confirmation',
   RESET_PASSWORD: 'auth/reset-password/index',
   RESET_PASSWORD_SUCCESS: 'auth/reset-password/success',
-  RESET_PASSWORD_TOKEN_EXPIRED: 'auth/reset-password/token-expired'
+  RESET_PASSWORD_TOKEN_EXPIRED: 'auth/reset-password/token-expired',
+  SET_PASSWORD: 'auth/reset-password/index',
+  SET_PASSWORD_TOKEN_EXPIRED: 'auth/set-password/link-expired'
 }
 
 export const ADMIN_VIEWS = {
@@ -16,7 +18,8 @@ export const ADMIN_VIEWS = {
 
 export const LOCALE_KEYS = {
   SIGN_IN: 'auth.login.title',
-  PASSWORD_RESET: 'auth.reset_password.title'
+  PASSWORD_RESET: 'auth.reset_password.title',
+  PASSWORD_SET: 'auth.set_password.title'
 }
 
 export const PAGINATION = {

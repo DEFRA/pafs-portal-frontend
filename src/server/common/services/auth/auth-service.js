@@ -43,3 +43,17 @@ export async function resetPassword(token, newPassword, confirmPassword) {
     body: JSON.stringify({ token, password: newPassword, confirmPassword })
   })
 }
+
+export async function validateInvitationToken(token) {
+  return apiRequest('/api/v1/auth/validate-token', {
+    method: 'POST',
+    body: JSON.stringify({ token, type: 'INVITATION' })
+  })
+}
+
+export async function setPassword(token, newPassword, confirmPassword) {
+  return apiRequest('/api/v1/auth/set-password', {
+    method: 'POST',
+    body: JSON.stringify({ token, password: newPassword, confirmPassword })
+  })
+}

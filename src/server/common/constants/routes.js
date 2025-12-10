@@ -7,6 +7,8 @@ export const ROUTES = {
   RESET_PASSWORD: '/reset-password',
   RESET_PASSWORD_SUCCESS: '/reset-password/success',
   RESET_PASSWORD_TOKEN_EXPIRED: '/reset-password/token-expired',
+  SET_PASSWORD: '/set-password',
+  SET_PASSWORD_TOKEN_EXPIRED: '/set-password/link-expired',
 
   // General user routes
   GENERAL: {
