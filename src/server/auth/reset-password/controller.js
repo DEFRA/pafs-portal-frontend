@@ -6,7 +6,7 @@ import { ROUTES } from '../../common/constants/routes.js'
 import { VIEW_ERROR_CODES } from '../../common/constants/validation.js'
 import { AUTH_VIEWS, LOCALE_KEYS } from '../../common/constants/common.js'
 import { extractJoiErrors } from '../../common/helpers/error-renderer.js'
-import { resetPasswordSchema } from '../schema.js'
+import { passwordFormSchema } from '../schema.js'
 
 /**
  * GET /reset-password - Show reset password form
@@ -55,7 +55,7 @@ export const resetPasswordPostController = {
     }
 
     // Validate input using schema
-    const { error, value } = resetPasswordSchema.validate(
+    const { error, value } = passwordFormSchema.validate(
       { token, newPassword, confirmPassword },
       { abortEarly: false }
     )

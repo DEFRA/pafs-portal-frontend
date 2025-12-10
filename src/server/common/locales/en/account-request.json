@@ -2,7 +2,7 @@
   "back": "Back",
   "index": {
     "heading": "Request an account",
-    "introParagraph": "You can request an account if you work for a risk management authority or an Environment Agency team.",
+    "introParagraph": "You can request an account if you work for a Risk Management Authority or an Environment Agency team.",
     "beforeYouStartHeading": "Before you start",
     "beforeYouStartIntro": "You will need to provide:",
     "bullet1": "your name and contact details",
@@ -13,7 +13,7 @@
   },
   "details": {
     "heading": "Request an account",
-    "introParagraph": "You can request an account if you work for a risk management authority or an Environment Agency team. We will use the information you provide to verify your request for an account.",
+    "introParagraph": "You can request an account if you work for a Risk Management Authority or an Environment Agency team. We will use the information you provide to verify your request for an account.",
     "firstNameLabel": "First name",
     "lastNameLabel": "Last name",
     "emailAddressLabel": "Email address",
