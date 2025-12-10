@@ -171,7 +171,7 @@
     "panelTitle": "Account approved",
     "panelBody": "Your account has been created",
     "whatHappensNextHeading": "What happens next",
-    "whatHappensNextPara1": "We have sent you an email with a link to set your account password.",
+    "whatHappensNextPara1": "We have sent an email to {{ email }} with a link to set your account password.",
     "whatHappensNextPara2": "Once you have set your password, you can sign in and start using the service.",
     "insetBoxText": "The email may take a few minutes to arrive. If you do not receive it, check your spam folder.",
     "whatYouNeedToDoHeading": "What you can do now",

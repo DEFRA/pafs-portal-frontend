@@ -21,7 +21,7 @@
         </h2>
 
         <p class="govuk-body">
-          {{ t('account-request.confirmation-approved.whatHappensNextPara1') }}
+          {{ t('account-request.confirmation-approved.whatHappensNextPara1', { email: '<strong>' + email + '</strong>' }) | safe }}
         </p>
 
         <p class="govuk-body">
