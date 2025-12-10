@@ -1,6 +1,8 @@
+import { ACCOUNT_STATUS } from '../../common/constants/accounts'
+
 function buildViewModel(request) {
   const confirmation = request.yar.get('accountRequestConfirmation') || {}
-  const isApproved = confirmation.status === 'approved'
+  const isApproved = confirmation.status === ACCOUNT_STATUS.APPROVED
   return {
     // Title switches based on approval status
     title: isApproved
