@@ -29,24 +29,18 @@ function prepareEaAreas(sessionData, areas) {
 }
 
 function preparePsoAreas(sessionData, areas) {
-  const eaAreaIds = sessionData.eaArea?.eaAreas ?? []
   const mainPsoTeamId = sessionData.mainPsoTeam?.mainPsoTeam
   const additionalPsoTeamIds =
     sessionData.additionalPsoTeams?.additionalPsoTeams ?? []
 
-  addAreas(areas, eaAreaIds, false)
   addArea(areas, mainPsoTeamId, true)
   addAreas(areas, additionalPsoTeamIds, false)
 }
 
 function prepareRmaAreas(sessionData, areas) {
-  const rmaEaAreaIds = sessionData.eaArea?.eaAreas ?? []
-  const psoTeamIds = sessionData.psoTeam?.psoTeams ?? []
   const mainRmaId = sessionData.mainRma?.mainRma
   const additionalRmaIds = sessionData.additionalRmas?.additionalRmas ?? []
 
-  addAreas(areas, rmaEaAreaIds, false)
-  addAreas(areas, psoTeamIds, false)
   addArea(areas, mainRmaId, true)
   addAreas(areas, additionalRmaIds, false)
 }
@@ -75,24 +69,7 @@ function prepareRmaAreas(sessionData, areas) {
  *   ]
  * }
  */
-export function prepareAccountRequestPayload(sessionData) {
-  const details = sessionData.details ?? {}
-  const responsibility = details.responsibility
-
-  // Prepare user data
-  const userData = {
-    firstName: details.firstName ?? '',
-    lastName: details.lastName ?? '',
-    emailAddress: details.emailAddress ?? '',
-    telephoneNumber: details.telephoneNumber ?? '',
-    organisation: details.organisation ?? '',
-    jobTitle: details.jobTitle ?? '',
-    responsibility: responsibility ?? ''
-  }
-
-  // Prepare areas data (without user_id, as backend will handle that)
-  const areas = []
-
+function prepareAreasByResponsibility(responsibility, sessionData, areas) {
   switch (responsibility) {
     case 'EA':
       prepareEaAreas(sessionData, areas)
@@ -110,6 +87,26 @@ export function prepareAccountRequestPayload(sessionData) {
       // Unknown responsibility - leave areas empty
       break
   }
+}
+
+export function prepareAccountRequestPayload(sessionData) {
+  const details = sessionData.details ?? {}
+  const responsibility = details.responsibility
+
+  // Prepare user data
+  const userData = {
+    firstName: details.firstName ?? '',
+    lastName: details.lastName ?? '',
+    emailAddress: details.emailAddress ?? '',
+    telephoneNumber: details.telephoneNumber ?? '',
+    organisation: details.organisation ?? '',
+    jobTitle: details.jobTitle ?? '',
+    responsibility: responsibility ?? ''
+  }
+
+  // Prepare areas data (without user_id, as backend will handle that)
+  const areas = []
+  prepareAreasByResponsibility(responsibility, sessionData, areas)
 
   return {
     user: userData,

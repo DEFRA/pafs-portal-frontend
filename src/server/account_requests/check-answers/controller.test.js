@@ -29,7 +29,7 @@ vi.mock('../../common/services/account-request-service.js', () => ({
   submitAccountRequest: vi.fn().mockResolvedValue({
     success: true,
     status: 200,
-    data: { id: 123 }
+    data: { id: 123, user: { status: 'pending', email: 'john@example.com' } }
   })
 }))
 
@@ -250,7 +250,7 @@ describe('#accountRequestCheckAnswersController', () => {
       }
     })
 
-    test('Should handle check-answers page with minimal data', async () => {
+    test('Should set confirmation context in session on successful submission', async () => {
       const postResponse = await server.inject({
         method: 'POST',
         url: '/account_request/details',
@@ -264,31 +264,41 @@ describe('#accountRequestCheckAnswersController', () => {
           responsibility: 'EA'
         }
       })
-
       const cookies = postResponse.headers['set-cookie']
       const sessionCookie = cookies?.find((c) => c.startsWith('yar.sid='))
-
       if (sessionCookie) {
-        // Only set main EA area, no additional areas
         await server.inject({
           method: 'POST',
           url: '/account_request/ea-main-area',
           payload: { mainEaArea: '1' },
           headers: { cookie: sessionCookie.split(';')[0] }
         })
-
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
+        const res = await server.inject({
+          method: 'POST',
           url: '/account_request/check-answers',
           headers: { cookie: sessionCookie.split(';')[0] }
         })
-
-        expect(statusCode).toBe(statusCodes.ok)
-        expect(result).toEqual(expect.stringContaining('Check your details'))
+        expect(res.statusCode).toBe(302)
+        // Follow redirect to confirmation to ensure session was set
+        const confRes = await server.inject({
+          method: 'GET',
+          url: '/account_request/confirmation',
+          headers: { cookie: sessionCookie.split(';')[0] }
+        })
+        expect(confRes.statusCode).toBe(statusCodes.ok)
+        expect(confRes.result).toEqual(expect.stringContaining('/login'))
       }
     })
 
-    test('Should handle check-answers page with empty area selections', async () => {
+    test('Should display retry error message when API returns 400', async () => {
+      const { submitAccountRequest } =
+        await import('../../common/services/account-request-service.js')
+      submitAccountRequest.mockResolvedValueOnce({
+        success: false,
+        status: 400,
+        errors: [{ message: 'Validation error' }]
+      })
+
       const postResponse = await server.inject({
         method: 'POST',
         url: '/account_request/details',
@@ -299,30 +309,72 @@ describe('#accountRequestCheckAnswersController', () => {
           telephoneNumber: '1234567890',
           organisation: 'Test Org',
           jobTitle: 'Developer',
-          responsibility: 'PSO'
+          responsibility: 'EA'
         }
       })
-
       const cookies = postResponse.headers['set-cookie']
       const sessionCookie = cookies?.find((c) => c.startsWith('yar.sid='))
-
       if (sessionCookie) {
-        // Set EA areas but no PSO teams
         await server.inject({
           method: 'POST',
-          url: '/account_request/ea-area',
-          payload: { eaAreas: ['1'] },
+          url: '/account_request/ea-main-area',
+          payload: { mainEaArea: '1' },
           headers: { cookie: sessionCookie.split(';')[0] }
         })
-
-        const { result, statusCode } = await server.inject({
-          method: 'GET',
+        const res = await server.inject({
+          method: 'POST',
           url: '/account_request/check-answers',
           headers: { cookie: sessionCookie.split(';')[0] }
         })
 
-        expect(statusCode).toBe(statusCodes.ok)
-        expect(result).toEqual(expect.stringContaining('Check your details'))
+        expect(res.statusCode).toBe(statusCodes.badRequest)
+        expect(res.result).toEqual(
+          expect.stringContaining(
+            'There was a problem submitting your request. Please try again.'
+          )
+        )
+      }
+    })
+
+    test('Should display later error message when API throws exception (500)', async () => {
+      const { submitAccountRequest } =
+        await import('../../common/services/account-request-service.js')
+      submitAccountRequest.mockRejectedValueOnce(new Error('Network failure'))
+
+      const postResponse = await server.inject({
+        method: 'POST',
+        url: '/account_request/details',
+        payload: {
+          firstName: 'John',
+          lastName: 'Doe',
+          emailAddress: 'john@example.com',
+          telephoneNumber: '1234567890',
+          organisation: 'Test Org',
+          jobTitle: 'Developer',
+          responsibility: 'EA'
+        }
+      })
+      const cookies = postResponse.headers['set-cookie']
+      const sessionCookie = cookies?.find((c) => c.startsWith('yar.sid='))
+      if (sessionCookie) {
+        await server.inject({
+          method: 'POST',
+          url: '/account_request/ea-main-area',
+          payload: { mainEaArea: '1' },
+          headers: { cookie: sessionCookie.split(';')[0] }
+        })
+        const res = await server.inject({
+          method: 'POST',
+          url: '/account_request/check-answers',
+          headers: { cookie: sessionCookie.split(';')[0] }
+        })
+
+        expect(res.statusCode).toBe(statusCodes.internalServerError)
+        expect(res.result).toEqual(
+          expect.stringContaining(
+            'There was a problem submitting your request. Please try again later.'
+          )
+        )
       }
     })
   })
@@ -331,7 +383,7 @@ describe('#accountRequestCheckAnswersController', () => {
     let mockRequest
     let mockH
 
-    beforeEach(() => {
+    beforeEach(async () => {
       mockRequest = {
         method: 'get',
         t: vi.fn((key) => key),
@@ -353,9 +405,26 @@ describe('#accountRequestCheckAnswersController', () => {
       }
 
       mockH = {
-        view: vi.fn((template, context) => ({ template, context })),
+        view: vi.fn((template, context) => ({
+          template,
+          context,
+          code: (status) => ({ template, context, statusCode: status })
+        })),
         redirect: vi.fn((url) => ({ url, statusCode: 302 }))
       }
+
+      // Reset and set submitAccountRequest to a successful response for each test in this block
+      const { submitAccountRequest } =
+        await import('../../common/services/account-request-service.js')
+      submitAccountRequest.mockReset()
+      submitAccountRequest.mockResolvedValue({
+        success: true,
+        status: 200,
+        data: {
+          user: { status: 'pending', email: 'john@example.com' },
+          areas: []
+        }
+      })
     })
 
     test('Should call handler for GET request', async () => {
@@ -653,6 +722,16 @@ describe('#accountRequestCheckAnswersController', () => {
         eaMainArea: { mainEaArea: '1' }
       })
 
+      // Ensure successful API submission to avoid error view path
+      vi.spyOn(
+        await import('../../common/services/account-request-service.js'),
+        'submitAccountRequest'
+      ).mockResolvedValueOnce({
+        success: true,
+        status: 200,
+        data: { user: { status: 'pending', email: 'john@example.com' } }
+      })
+
       const result = await accountRequestCheckAnswersController.handler(
         mockRequest,
         mockH
@@ -702,6 +781,91 @@ describe('#accountRequestCheckAnswersController', () => {
       await accountRequestCheckAnswersController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalled()
+    })
+
+    test('POST should render 400 error view when API returns validation error', async () => {
+      mockRequest.method = 'post'
+      mockRequest.yar.get.mockReturnValue({
+        details: { responsibility: 'EA' },
+        eaMainArea: { mainEaArea: '1' }
+      })
+
+      const { submitAccountRequest } =
+        await import('../../common/services/account-request-service.js')
+      submitAccountRequest.mockResolvedValueOnce({
+        success: false,
+        status: 400,
+        errors: [{ message: 'Validation error' }]
+      })
+
+      const result = await accountRequestCheckAnswersController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.badRequest)
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('account_requests/check-answers/index.njk'),
+        expect.objectContaining({
+          error: expect.stringContaining('Please try again.')
+        })
+      )
+    })
+
+    test('POST should render 500 error view when API throws and areas loader throws', async () => {
+      mockRequest.method = 'post'
+      mockRequest.yar.get.mockReturnValue({
+        details: { responsibility: 'EA' },
+        eaMainArea: { mainEaArea: '1' }
+      })
+
+      // Force submit to throw
+      const { submitAccountRequest } =
+        await import('../../common/services/account-request-service.js')
+      submitAccountRequest.mockRejectedValueOnce(new Error('boom'))
+
+      // Force areas loader to throw inside buildErrorView
+      vi.spyOn(
+        await import('../../common/services/areas/areas-cache.js'),
+        'getCachedAreas'
+      ).mockRejectedValueOnce(new Error('cache boom'))
+
+      const result = await accountRequestCheckAnswersController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.internalServerError)
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('account_requests/check-answers/index.njk'),
+        expect.objectContaining({
+          error: expect.stringContaining('Please try again later.')
+        })
+      )
+    })
+
+    test('GET should handle undefined responsibility with default summary', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        details: { firstName: 'No', lastName: 'Resp' }
+      })
+
+      vi.spyOn(
+        await import('../../common/services/areas/areas-cache.js'),
+        'getCachedAreas'
+      ).mockResolvedValue([{ id: 1, name: 'Thames', area_type: 'EA Area' }])
+
+      const result = await accountRequestCheckAnswersController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBeUndefined() // view without .code defaults to undefined
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('account_requests/check-answers/index.njk'),
+        expect.objectContaining({
+          summaryData: expect.any(Object)
+        })
+      )
     })
   })
 })

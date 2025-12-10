@@ -1,6 +1,15 @@
+import { ACCOUNT_STATUS } from '../../common/constants/accounts'
+
 function buildViewModel(request) {
+  const confirmation = request.yar.get('accountRequestConfirmation') || {}
+  const isApproved = confirmation.status === ACCOUNT_STATUS.APPROVED
   return {
-    title: request.t('account-request.confirmation.panelTitle')
+    // Title switches based on approval status
+    title: isApproved
+      ? request.t('account-request.confirmation-approved.panelTitle')
+      : request.t('account-request.confirmation.panelTitle'),
+    status: confirmation.status,
+    email: confirmation.email
   }
 }
 

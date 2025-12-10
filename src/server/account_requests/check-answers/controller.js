@@ -187,14 +187,20 @@ function preparePayload(sessionData, request) {
   return payload
 }
 
-function handlePostSuccess(request, h, payload) {
+function handlePostSuccess(request, h, response) {
   request.server.logger.info(
     {
-      status: 200,
-      areasCount: payload.areas.length
+      status: 200
     },
     'Account request submitted successfully to backend API'
   )
+  // Persist confirmation context (status, email) for the confirmation page
+  const user = response?.data?.user || {}
+  request.yar.set('accountRequestConfirmation', {
+    status: user.status,
+    email: user.email
+  })
+  // Clear the working request data
   request.yar.set('accountRequest', {})
   return h.redirect('/account_request/confirmation')
 }
@@ -248,7 +254,7 @@ async function handlePost(request, h) {
     const response = await submitAccountRequest(payload)
 
     if (response.success) {
-      return handlePostSuccess(request, h, payload)
+      return handlePostSuccess(request, h, response)
     }
 
     return await handleApiError(request, h, sessionData, response)
