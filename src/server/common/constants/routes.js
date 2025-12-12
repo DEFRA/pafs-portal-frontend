@@ -30,5 +30,11 @@ export const ROUTES = {
     ORGANISATIONS: '/admin/organisations',
     DOWNLOAD_PROJECTS: '/admin/download-projects',
     DOWNLOAD_RMA: '/admin/download-rma'
+  },
+
+  // Project Proposal routes
+  PROJECT_PROPOSAL: {
+    PROJECT_NAME: '/project-proposal/project-name',
+    PROJECT_TYPE: '/project-proposal/project-type'
   }
 }

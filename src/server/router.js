@@ -25,6 +25,7 @@ import { accountRequestMainRma } from './account_requests/main-rma/index.js'
 import { accountRequestAdditionalRmas } from './account_requests/additional-rmas/index.js'
 import { accountRequestCheckAnswers } from './account_requests/check-answers/index.js'
 import { accountRequestConfirmation } from './account_requests/confirmation/index.js'
+import { projectName } from './project-proposal/project-name/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 
 export const router = {
@@ -71,6 +72,9 @@ export const router = {
         accountRequestCheckAnswers,
         accountRequestConfirmation
       ])
+
+      // Project proposal routes
+      await server.register([projectName])
 
       // Static assets
       await server.register([serveStaticFiles])

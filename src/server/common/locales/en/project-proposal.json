@@ -1,0 +1,15 @@
+{
+  "project_name": {
+    "heading": "What is the project's name?",
+    "label": "Project name",
+    "intro_paragraph": "The project name should be meaningful and understandable and should not include abbreviations. For example, South Chesham River Colne Flood Alleviation Scheme or Clacton-on-Sea Coastal Erosion Project Phase 4.",
+    "continue_button": "Save and continue",
+    "error_summary_title": "There is a problem",
+    "errors": {
+      "required": "Enter a project Name",
+      "invalid_format": "The project name must only contain letters, underscores, hyphens and numbers",
+      "already_exists": "The project name already exists. Your project must have a unique name.",
+      "validation_error": "An error occurred while validating the project name. Please try again."
+    }
+  }
+}

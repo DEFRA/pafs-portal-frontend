@@ -83,3 +83,10 @@ export const TOKEN_TYPES = {
   RESET: 'RESET',
   INVITATION: 'INVITATION'
 }
+
+/**
+ * Regex Patterns for validation
+ */
+export const VALIDATION_PATTERNS = {
+  PROJECT_NAME: /^[a-zA-Z0-9_-]+$/
+}
