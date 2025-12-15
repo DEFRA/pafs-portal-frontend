@@ -1,4 +1,4 @@
-import { homeController } from './controller.js'
+import { projectProposalStartController } from './controller.js'
 import { requireAuth } from '../../common/helpers/auth/auth-middleware.js'
 import { ROUTES } from '../../common/constants/routes.js'
 
@@ -6,18 +6,18 @@ import { ROUTES } from '../../common/constants/routes.js'
  * Sets up the routes used in the home page.
  * These routes are registered in src/server/router.js.
  */
-export const home = {
+export const projectProposalStart = {
   plugin: {
-    name: 'Your Proposals',
+    name: 'Start Proposal',
     register(server) {
       server.route([
         {
           method: 'GET',
-          path: ROUTES.GENERAL.HOME,
+          path: ROUTES.PROJECT_PROPOSAL.START_PROPOSAL,
           options: {
             pre: [{ method: requireAuth }]
           },
-          ...homeController
+          ...projectProposalStartController
         }
       ])
     }
