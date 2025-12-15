@@ -5,6 +5,7 @@ import { checkProjectNameExists } from '../../common/services/project-proposal/p
 import { getAuthSession } from '../../common/helpers/auth/session-manager.js'
 
 const PROJECT_NAME_VIEW = 'project-proposal/project-name/index.njk'
+const PROJECT_NAME_ERROR_HREF = '#project-name'
 
 function buildViewModel(request, values = {}, errors = {}, errorSummary = []) {
   return {
@@ -21,7 +22,7 @@ function buildErrorResponse(h, request, values, errorKey, statusCode) {
     .view(
       PROJECT_NAME_VIEW,
       buildViewModel(request, values, { projectName: errorMessage }, [
-        { text: errorMessage, href: '#project-name' }
+        { text: errorMessage, href: PROJECT_NAME_ERROR_HREF }
       ])
     )
     .code(statusCode)
@@ -39,7 +40,7 @@ function validateProjectName(request) {
     )
     errorSummary.push({
       text: request.t('project-proposal.project_name.errors.required'),
-      href: '#project-name'
+      href: PROJECT_NAME_ERROR_HREF
     })
   } else if (!VALIDATION_PATTERNS.PROJECT_NAME.test(projectName)) {
     // Validation 2: Check for valid characters (alphanumeric, underscores, hyphens)
@@ -48,8 +49,10 @@ function validateProjectName(request) {
     )
     errorSummary.push({
       text: request.t('project-proposal.project_name.errors.invalid_format'),
-      href: '#project-name'
+      href: PROJECT_NAME_ERROR_HREF
     })
+  } else {
+    // Valid project name, no errors
   }
 
   return {
