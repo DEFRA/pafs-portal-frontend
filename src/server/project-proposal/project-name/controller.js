@@ -15,6 +15,18 @@ function buildViewModel(request, values = {}, errors = {}, errorSummary = []) {
   }
 }
 
+function buildErrorResponse(h, request, values, errorKey, statusCode) {
+  const errorMessage = request.t(errorKey)
+  return h
+    .view(
+      PROJECT_NAME_VIEW,
+      buildViewModel(request, values, { projectName: errorMessage }, [
+        { text: errorMessage, href: '#project-name' }
+      ])
+    )
+    .code(statusCode)
+}
+
 function validateProjectName(request) {
   const projectName = request.payload?.projectName || ''
   const errors = {}
@@ -29,17 +41,15 @@ function validateProjectName(request) {
       text: request.t('project-proposal.project_name.errors.required'),
       href: '#project-name'
     })
-  } else {
+  } else if (!VALIDATION_PATTERNS.PROJECT_NAME.test(projectName)) {
     // Validation 2: Check for valid characters (alphanumeric, underscores, hyphens)
-    if (!VALIDATION_PATTERNS.PROJECT_NAME.test(projectName)) {
-      errors.projectName = request.t(
-        'project-proposal.project_name.errors.invalid_format'
-      )
-      errorSummary.push({
-        text: request.t('project-proposal.project_name.errors.invalid_format'),
-        href: '#project-name'
-      })
-    }
+    errors.projectName = request.t(
+      'project-proposal.project_name.errors.invalid_format'
+    )
+    errorSummary.push({
+      text: request.t('project-proposal.project_name.errors.invalid_format'),
+      href: '#project-name'
+    })
   }
 
   return {
@@ -67,18 +77,13 @@ async function checkProjectNameDuplicate(request, h, values) {
     )
 
     if (response.data?.exists) {
-      const errorMessage = request.t(
-        'project-proposal.project_name.errors.already_exists'
+      return buildErrorResponse(
+        h,
+        request,
+        values,
+        'project-proposal.project_name.errors.already_exists',
+        statusCodes.badRequest
       )
-
-      return h
-        .view(
-          PROJECT_NAME_VIEW,
-          buildViewModel(request, values, { projectName: errorMessage }, [
-            { text: errorMessage, href: '#project-name' }
-          ])
-        )
-        .code(statusCodes.badRequest)
     }
 
     // No duplicate found, return null to indicate success
@@ -92,28 +97,13 @@ async function checkProjectNameDuplicate(request, h, values) {
       'Error checking project name existence'
     )
 
-    return h
-      .view(
-        PROJECT_NAME_VIEW,
-        buildViewModel(
-          request,
-          values,
-          {
-            projectName: request.t(
-              'project-proposal.project_name.errors.validation_error'
-            )
-          },
-          [
-            {
-              text: request.t(
-                'project-proposal.project_name.errors.validation_error'
-              ),
-              href: '#project-name'
-            }
-          ]
-        )
-      )
-      .code(statusCodes.internalServerError)
+    return buildErrorResponse(
+      h,
+      request,
+      values,
+      'project-proposal.project_name.errors.validation_error',
+      statusCodes.internalServerError
+    )
   }
 }
 
