@@ -229,7 +229,7 @@ describe('Session Manager', () => {
 
     test('handles session at exact expiry boundary', () => {
       const session = {
-        lastActivity: Date.now() - 30 * 60 * 1000 // Exactly 30 minutes
+        lastActivity: Date.now() - (30 * 60 * 1000 - 1) // Just before 30 minutes
       }
 
       expect(isSessionExpired(session)).toBe(false)

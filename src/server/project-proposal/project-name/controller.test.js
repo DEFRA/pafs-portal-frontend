@@ -1,15 +1,33 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { statusCodes } from '../../common/constants/status-codes.js'
 import { projectNameController } from './controller.js'
+import { checkProjectNameExists } from '../../common/services/project-proposal/project-proposal-service.js'
+import { getAuthSession } from '../../common/helpers/auth/session-manager.js'
+
+// Mock the service and helpers
+vi.mock(
+  '../../common/services/project-proposal/project-proposal-service.js',
+  () => ({
+    checkProjectNameExists: vi.fn()
+  })
+)
+
+vi.mock('../../common/helpers/auth/session-manager.js', () => ({
+  getAuthSession: vi.fn()
+}))
 
 describe('#projectNameController', () => {
   let mockRequest
   let mockH
 
   beforeEach(() => {
+    // Reset mocks before each test
+    vi.clearAllMocks()
+
     mockRequest = {
       method: 'get',
       t: vi.fn((key) => key),
+      payload: {},
       yar: {
         get: vi.fn(() => ({})),
         set: vi.fn()
@@ -31,6 +49,9 @@ describe('#projectNameController', () => {
       })),
       redirect: vi.fn((url) => ({ redirect: url }))
     }
+
+    // Default mock for getAuthSession
+    getAuthSession.mockReturnValue({ accessToken: 'mock-token' })
   })
 
   describe('GET /project-proposal/project-name', () => {
@@ -72,6 +93,34 @@ describe('#projectNameController', () => {
         expect.stringContaining('project-proposal/project-name/index.njk'),
         expect.objectContaining({
           values: { projectName: 'Test_Project_Name' }
+        })
+      )
+    })
+
+    test('Should handle null session data on GET', async () => {
+      mockRequest.method = 'get'
+      mockRequest.yar.get.mockReturnValue(null)
+
+      await projectNameController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('project-proposal/project-name/index.njk'),
+        expect.objectContaining({
+          values: {}
+        })
+      )
+    })
+
+    test('Should handle undefined session data on GET', async () => {
+      mockRequest.method = 'get'
+      mockRequest.yar.get.mockReturnValue(undefined)
+
+      await projectNameController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('project-proposal/project-name/index.njk'),
+        expect.objectContaining({
+          values: {}
         })
       )
     })
@@ -119,10 +168,13 @@ describe('#projectNameController', () => {
       mockRequest.payload = { projectName: 'Test_Project-Name-123' }
       mockRequest.yar.get.mockReturnValue({})
 
+      // Mock checkProjectNameExists to return no duplicate
+      checkProjectNameExists.mockResolvedValue({ data: { exists: false } })
+
       await projectNameController.handler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        '/project-proposal/project-description'
+        '/project-proposal/project-type'
       )
     })
 
@@ -130,6 +182,9 @@ describe('#projectNameController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { projectName: 'Test_Project' }
       mockRequest.yar.get.mockReturnValue({})
+
+      // Mock checkProjectNameExists to return no duplicate
+      checkProjectNameExists.mockResolvedValue({ data: { exists: false } })
 
       await projectNameController.handler(mockRequest, mockH)
 
@@ -145,6 +200,9 @@ describe('#projectNameController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { projectName: 'Test_Project' }
       mockRequest.yar.get.mockReturnValue({})
+
+      // Mock checkProjectNameExists to return no duplicate
+      checkProjectNameExists.mockResolvedValue({ data: { exists: false } })
 
       await projectNameController.handler(mockRequest, mockH)
 
@@ -176,6 +234,198 @@ describe('#projectNameController', () => {
       const result = await projectNameController.handler(mockRequest, mockH)
 
       expect(result.statusCode).toBe(statusCodes.badRequest)
+    })
+
+    test('Should render error when project name already exists in database', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { projectName: 'Existing_Project' }
+
+      // Mock checkProjectNameExists to return duplicate exists
+      checkProjectNameExists.mockResolvedValue({ data: { exists: true } })
+
+      const result = await projectNameController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('project-proposal/project-name/index.njk'),
+        expect.objectContaining({
+          errors: expect.objectContaining({
+            projectName: 'project-proposal.project_name.errors.already_exists'
+          })
+        })
+      )
+      expect(result.statusCode).toBe(statusCodes.badRequest)
+    })
+
+    test('Should call checkProjectNameExists with correct parameters', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { projectName: 'New_Project' }
+      mockRequest.yar.get.mockReturnValue({})
+
+      // Mock checkProjectNameExists to return no duplicate
+      checkProjectNameExists.mockResolvedValue({ data: { exists: false } })
+      getAuthSession.mockReturnValue({ accessToken: 'test-token-123' })
+
+      await projectNameController.handler(mockRequest, mockH)
+
+      expect(checkProjectNameExists).toHaveBeenCalledWith(
+        'New_Project',
+        'test-token-123'
+      )
+    })
+
+    test('Should handle error when checkProjectNameExists throws', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { projectName: 'Test_Project' }
+
+      // Mock checkProjectNameExists to throw error
+      checkProjectNameExists.mockRejectedValue(new Error('API Error'))
+
+      const result = await projectNameController.handler(mockRequest, mockH)
+
+      expect(mockRequest.server.logger.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error: 'API Error',
+          projectName: 'Test_Project'
+        }),
+        'Error checking project name existence'
+      )
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('project-proposal/project-name/index.njk'),
+        expect.objectContaining({
+          errors: expect.objectContaining({
+            projectName: 'project-proposal.project_name.errors.validation_error'
+          })
+        })
+      )
+      expect(result.statusCode).toBe(statusCodes.internalServerError)
+    })
+
+    test('Should trim whitespace when checking if project name is empty', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { projectName: '   ' }
+
+      await projectNameController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('project-proposal/project-name/index.njk'),
+        expect.objectContaining({
+          errorSummary: expect.arrayContaining([
+            expect.objectContaining({
+              text: 'project-proposal.project_name.errors.required'
+            })
+          ])
+        })
+      )
+    })
+
+    test('Should handle missing payload', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = undefined
+
+      await projectNameController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('project-proposal/project-name/index.njk'),
+        expect.objectContaining({
+          errorSummary: expect.arrayContaining([
+            expect.objectContaining({
+              href: '#project-name'
+            })
+          ])
+        })
+      )
+    })
+
+    test('Should handle null project name in payload', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { projectName: null }
+
+      await projectNameController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.stringContaining('project-proposal/project-name/index.njk'),
+        expect.objectContaining({
+          errorSummary: expect.arrayContaining([
+            expect.objectContaining({
+              text: 'project-proposal.project_name.errors.required'
+            })
+          ])
+        })
+      )
+    })
+
+    test('Should handle missing access token in session', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { projectName: 'Valid_Project' }
+      mockRequest.yar.get.mockReturnValue({})
+
+      // Mock getAuthSession to return null/undefined
+      getAuthSession.mockReturnValue(null)
+
+      // Mock checkProjectNameExists to return no duplicate
+      checkProjectNameExists.mockResolvedValue({ data: { exists: false } })
+
+      await projectNameController.handler(mockRequest, mockH)
+
+      expect(checkProjectNameExists).toHaveBeenCalledWith(
+        'Valid_Project',
+        undefined
+      )
+      expect(mockH.redirect).toHaveBeenCalled()
+    })
+
+    test('Should handle response without data property', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { projectName: 'Valid_Project' }
+      mockRequest.yar.get.mockReturnValue({})
+
+      // Mock checkProjectNameExists to return response without data
+      checkProjectNameExists.mockResolvedValue({ success: true })
+
+      await projectNameController.handler(mockRequest, mockH)
+
+      // Should proceed to redirect since exists is undefined (falsy)
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/project-proposal/project-type'
+      )
+    })
+
+    test('Should handle null session data when saving on POST', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { projectName: 'Test_Project' }
+      mockRequest.yar.get.mockReturnValue(null)
+
+      // Mock checkProjectNameExists to return no duplicate
+      checkProjectNameExists.mockResolvedValue({ data: { exists: false } })
+
+      await projectNameController.handler(mockRequest, mockH)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'projectProposal',
+        expect.objectContaining({
+          projectName: { projectName: 'Test_Project' }
+        })
+      )
+      expect(mockH.redirect).toHaveBeenCalled()
+    })
+
+    test('Should handle undefined session data when saving on POST', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { projectName: 'Test_Project' }
+      mockRequest.yar.get.mockReturnValue(undefined)
+
+      // Mock checkProjectNameExists to return no duplicate
+      checkProjectNameExists.mockResolvedValue({ data: { exists: false } })
+
+      await projectNameController.handler(mockRequest, mockH)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'projectProposal',
+        expect.objectContaining({
+          projectName: { projectName: 'Test_Project' }
+        })
+      )
+      expect(mockH.redirect).toHaveBeenCalled()
     })
   })
 })
