@@ -86,7 +86,9 @@ describe('Routes Constants', () => {
 
   describe('Project Proposal routes', () => {
     test('START_PROPOSAL route is defined', () => {
-      expect(ROUTES.PROJECT_PROPOSAL.START_PROPOSAL).toBe('/project-proposal/start')
+      expect(ROUTES.PROJECT_PROPOSAL.START_PROPOSAL).toBe(
+        '/project-proposal/start'
+      )
     })
   })
 

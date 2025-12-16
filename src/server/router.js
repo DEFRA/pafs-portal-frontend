@@ -73,9 +73,7 @@ export const router = {
         accountRequestConfirmation
       ])
 
-      await server.register([
-        projectProposalStart
-      ])
+      await server.register([projectProposalStart])
 
       // Static assets
       await server.register([serveStaticFiles])

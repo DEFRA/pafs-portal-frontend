@@ -1,10 +1,7 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
-import { proposalStartController } from './controller.js'
+import { projectProposalStartController } from './controller.js'
 
 vi.mock('../../common/helpers/auth/session-manager.js')
-
-const { getAuthSession } =
-  await import('../../common/helpers/auth/session-manager.js')
 
 describe('#projectProposalStartController', () => {
   let mockRequest
@@ -23,16 +20,14 @@ describe('#projectProposalStartController', () => {
   })
 
   test('Should provide expected response', async () => {
-
-    getAuthSession.mockReturnValue({
-      user: { id: 1, email: 'test@example.com' }
-    })
-
     await projectProposalStartController.handler(mockRequest, mockH)
 
-    expect(mockH.view).toHaveBeenCalledWith('project-proposal/start-proposal/index', {
-      pageTitle: 'project-proposal.start_proposal.title',
-      heading: 'project-proposal.start_proposal.heading',
-    })
+    expect(mockH.view).toHaveBeenCalledWith(
+      'project-proposal/start-proposal/index',
+      {
+        pageTitle: 'project-proposal.start_proposal.title',
+        heading: 'project-proposal.start_proposal.heading'
+      }
+    )
   })
 })
