@@ -14,8 +14,13 @@
   "service_error": "There was a problem signing in. Please try again",
   "pages": {
     "home": {
-      "title": "Project Proposals",
-      "heading": "Project Proposals"
+      "title": "Your Proposals",
+      "heading": "Your Proposals",
+      "inset_text": "For submission deadlines please contact your local partnership and strategic overview officer.",
+      "project_label": "Enter a project number or name",
+      "project_input_text": "Enter a project number or name",
+      "search_button": "Search",
+      "new_proposal_button": "Create a new proposal"
     },
     "archive": {
       "title": "Archive",

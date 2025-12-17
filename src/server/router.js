@@ -26,6 +26,7 @@ import { accountRequestAdditionalRmas } from './account_requests/additional-rmas
 import { accountRequestCheckAnswers } from './account_requests/check-answers/index.js'
 import { accountRequestConfirmation } from './account_requests/confirmation/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
+import { projectProposalStart } from './project-proposal/start-proposal/index.js'
 
 export const router = {
   plugin: {
@@ -71,6 +72,8 @@ export const router = {
         accountRequestCheckAnswers,
         accountRequestConfirmation
       ])
+
+      await server.register([projectProposalStart])
 
       // Static assets
       await server.register([serveStaticFiles])
