@@ -84,6 +84,14 @@ describe('Routes Constants', () => {
     })
   })
 
+  describe('Project Proposal routes', () => {
+    test('START_PROPOSAL route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.START_PROPOSAL).toBe(
+        '/project-proposal/start'
+      )
+    })
+  })
+
   describe('Route structure', () => {
     test('all auth routes are defined', () => {
       expect(ROUTES).toHaveProperty('LOGIN')
@@ -110,6 +118,10 @@ describe('Routes Constants', () => {
       expect(ROUTES.ADMIN).toHaveProperty('ORGANISATIONS')
       expect(ROUTES.ADMIN).toHaveProperty('DOWNLOAD_PROJECTS')
       expect(ROUTES.ADMIN).toHaveProperty('DOWNLOAD_RMA')
+    })
+
+    test('all project proposal routes are defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('START_PROPOSAL')
     })
   })
 })

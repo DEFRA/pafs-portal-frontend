@@ -33,7 +33,7 @@ describe('i18n translation service', () => {
     })
 
     test('handles deeply nested translation keys', () => {
-      expect(translate('common.pages.home.title')).toBe('Project Proposals')
+      expect(translate('common.pages.home.title')).toBe('Your Proposals')
     })
   })
 

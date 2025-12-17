@@ -34,6 +34,7 @@ export const ROUTES = {
 
   // Project Proposal routes
   PROJECT_PROPOSAL: {
+    START_PROPOSAL: '/project-proposal/start',
     PROJECT_NAME: '/project-proposal/project-name',
     PROJECT_TYPE: '/project-proposal/project-type'
   }

@@ -27,6 +27,7 @@ import { accountRequestCheckAnswers } from './account_requests/check-answers/ind
 import { accountRequestConfirmation } from './account_requests/confirmation/index.js'
 import { projectName } from './project-proposal/project-name/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
+import { projectProposalStart } from './project-proposal/start-proposal/index.js'
 
 export const router = {
   plugin: {
@@ -74,7 +75,7 @@ export const router = {
       ])
 
       // Project proposal routes
-      await server.register([projectName])
+      await server.register([projectProposalStart, projectName])
 
       // Static assets
       await server.register([serveStaticFiles])
