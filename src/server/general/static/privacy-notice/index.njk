@@ -1,0 +1,110 @@
+{% extends 'layouts/page.njk' %}
+
+{% set privacyNs = 'privacy.pages.privacy_notice' %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading,
+    widthClass: 'govuk-grid-column-full'
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <div class="govuk-body" data-testid="app-page-body">
+
+        <h2 class="govuk-heading-l">{{t(privacyNs ~ '.how_we_use_your_data')}}</h2>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.intro_paragraph_1')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.intro_paragraph_2_prefix')}}
+          <a class="govuk-link" href="{{t(privacyNs ~ '.personal_info_charter_url')}}">{{t(privacyNs ~ '.personal_info_charter_text')}}</a>
+          {{t(privacyNs ~ '.intro_paragraph_2_suffix')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(privacyNs ~ '.the_personal_data_we_need')}}</h2>
+
+        <p class="govuk-body">{{t(privacyNs ~ '.data_list_intro')}}</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{t(privacyNs ~ '.data_full_name')}}</li>
+          <li>{{t(privacyNs ~ '.data_email')}}</li>
+          <li>{{t(privacyNs ~ '.data_feedback')}}</li>
+          <li>{{t(privacyNs ~ '.data_cookies')}}</li>
+        </ul>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.legal_basis_paragraph')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.no_data_consequences')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(privacyNs ~ '.site_analytics_cookies')}}</h2>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.analytics_intro')}}
+          <a class="govuk-link" href="{{t(privacyNs ~ '.cookies_link_url')}}">{{t(privacyNs ~ '.cookies_link_text')}}</a>
+          {{t(privacyNs ~ '.analytics_footer')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(privacyNs ~ '.what_we_do_with_data')}}</h2>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.automated_decision_paragraph')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.data_sharing_paragraph')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(privacyNs ~ '.how_long_keep_data')}}</h2>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.retention_paragraph')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(privacyNs ~ '.where_data_processed')}}</h2>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.data_location_paragraph')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(privacyNs ~ '.contact_details')}}</h2>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.dpo_responsibility')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.contact_intro')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.dpo_title')}}<br/>
+          {{t(privacyNs ~ '.dpo_organisation')}}<br/>
+          {{t(privacyNs ~ '.dpo_address_line1')}}<br/>
+          {{t(privacyNs ~ '.dpo_address_line2')}}<br/>
+          {{t(privacyNs ~ '.dpo_address_line3')}}<br/>
+          {{t(privacyNs ~ '.dpo_postcode')}}<br/>
+          <p class="govuk-body">{{t(privacyNs ~ '.email_text')}}: <a href="mailto:{{t(privacyNs ~ '.dpo_email')}}" class="govuk-link">{{t(privacyNs ~ '.dpo_email')}}</a></p>
+        </p>
+
+        <p class="govuk-body">
+          {{t(privacyNs ~ '.ico_intro')}}
+          <a class="govuk-link" href="{{t(privacyNs ~ '.ico_link_url')}}">{{t(privacyNs ~ '.ico_link_text')}}</a>
+          {{t(privacyNs ~ '.ico_intro_text')}}
+        </p>
+
+        <p class="govuk-body govuk-!-margin-top-6">
+          <strong>{{t(privacyNs ~ '.last_updated')}} {{t(privacyNs ~ '.last_updated_date')}}</strong>
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

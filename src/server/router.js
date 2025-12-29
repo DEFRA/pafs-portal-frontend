@@ -4,6 +4,7 @@ import { home } from './general/home/index.js'
 import { health } from './health/index.js'
 import { download } from './general/download/index.js'
 import { archive } from './general/archive/index.js'
+import { privacyNotice } from './general/static/privacy-notice/index.js'
 import { login } from './auth/login/index.js'
 import { logout } from './auth/logout/index.js'
 import { forgotPassword } from './auth/forgot-password/index.js'
@@ -56,7 +57,7 @@ export const router = {
       ])
 
       // General user routes
-      await server.register([home, archive, download])
+      await server.register([home, archive, download, privacyNotice])
 
       // Account request routes
       await server.register([
