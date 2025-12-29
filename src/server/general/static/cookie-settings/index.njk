@@ -1,0 +1,79 @@
+{% extends 'layouts/page.njk' %}
+
+{% set cookiesNs = 'cookies.pages.settings' %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading,
+    widthClass: 'govuk-grid-column-full'
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <div class="govuk-body" data-testid="app-page-body">
+
+        {% if showConfirmation %}
+          <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title">
+            <div class="govuk-notification-banner__header">
+              <h3 class="govuk-notification-banner__title" id="govuk-notification-banner-title">{{ t(cookiesNs ~ '.banner_title') }}</h3>
+            </div>
+            <div class="govuk-notification-banner__content">
+              <p class="govuk-notification-banner__heading">{{ t(cookiesNs ~ '.banner_message') }}</p>
+            </div>
+          </div>
+        {% endif %}
+
+        <p class="govuk-body">{{ t(cookiesNs ~ '.intro_line1') }}</p>
+        <p class="govuk-body">{{ t(cookiesNs ~ '.description') }}</p>
+
+        <h2 class="govuk-heading-l">{{ t('cookies.pages.cookies.cookie_settings_heading') }}</h2>
+        <p class="govuk-body">{{ t('cookies.pages.cookies.cookie_settings_intro') }}</p>
+
+        <h3 class="govuk-heading-m">{{ t('cookies.pages.cookies.strictly_necessary_heading') }}</h3>
+        <p class="govuk-body">{{ t('cookies.pages.cookies.strictly_necessary_intro') }}</p>
+        <p class="govuk-body">{{ t('cookies.pages.cookies.strictly_will_always_be_on') }}</p>
+
+        <div style="background-color: #f3f2f1!important; padding: 15px; margin: 20px 0;">
+          <p class="govuk-body"><strong>_pafs_session</strong> - {{ t('cookies.pages.cookies.session_purpose') }} ({{ t('cookies.pages.cookies.session_expires') }})</p>
+          <p class="govuk-body"><strong>cookies_preferences_set</strong> - {{ t('cookies.pages.cookies.prefs_purpose') }} ({{ t('cookies.pages.cookies.prefs_expires') }})</p>
+          <p class="govuk-body govuk-!-margin-bottom-0"><strong>cookies_policy</strong> - {{ t('cookies.pages.cookies.policy_purpose') }} ({{ t('cookies.pages.cookies.policy_expires') }})</p>
+        </div>
+
+        <p class="govuk-body"><a class="govuk-link" href="{{ t(cookiesNs ~ '.find_out_more_url') }}" target="_blank" rel="noopener">{{ t(cookiesNs ~ '.find_out_more_text') }}</a></p>
+
+        <h3 class="govuk-heading-m">{{ t(cookiesNs ~ '.analytics_measure_heading') }}</h3>
+        <p class="govuk-body">{{ t('cookies.pages.cookies.analytics_intro') }}</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ t('cookies.pages.cookies.analytics_bullet1') }}</li>
+          <li>{{ t('cookies.pages.cookies.analytics_bullet2') }}</li>
+          <li>{{ t('cookies.pages.cookies.analytics_bullet3') }}</li>
+        </ul>
+
+        <h2 class="govuk-heading-m">{{ t(cookiesNs ~ '.analytics_question') }}</h2>
+
+        <form method="post" action="">
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset" aria-describedby="analytics-hint">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ t(cookiesNs ~ '.analytics_legend') }}</legend>
+              <span id="analytics-hint" class="govuk-hint">{{ t(cookiesNs ~ '.analytics_hint') }}</span>
+
+              <div class="govuk-radios" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="analytics-yes" name="analytics" type="radio" value="yes" {% if analyticsAccepted %}checked{% endif %}>
+                  <label class="govuk-label govuk-radios__label" for="analytics-yes">Yes</label>
+                </div>
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="analytics-no" name="analytics" type="radio" value="no" {% if not analyticsAccepted %}checked{% endif %}>
+                  <label class="govuk-label govuk-radios__label" for="analytics-no">No</label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <button class="govuk-button" data-module="govuk-button" type="submit">{{ t(cookiesNs ~ '.save_button') }}</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}

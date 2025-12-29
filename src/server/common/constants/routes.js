@@ -15,7 +15,9 @@ export const ROUTES = {
     HOME: '/',
     PROPOSALS: '/',
     DOWNLOAD: '/download',
-    ARCHIVE: '/archive'
+    ARCHIVE: '/archive',
+    COOKIES: '/cookies',
+    COOKIE_SETTINGS: '/cookies/settings'
   },
 
   // Admin routes

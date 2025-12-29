@@ -1,0 +1,90 @@
+{% extends 'layouts/page.njk' %}
+
+{% set cookiesNs = 'cookies.pages.cookies' %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading,
+    widthClass: 'govuk-grid-column-full'
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <div class="govuk-body" data-testid="app-page-body">
+
+        <p class="govuk-body">{{ t(cookiesNs ~ '.intro_line1') }}</p>
+        <p class="govuk-body">{{ t(cookiesNs ~ '.intro_line2') }}</p>
+
+        <h2 class="govuk-heading-l">{{ t(cookiesNs ~ '.cookie_settings_heading') }}</h2>
+        <p class="govuk-body">{{ t(cookiesNs ~ '.cookie_settings_intro') }}</p>
+
+        <h3 class="govuk-heading-m">{{ t(cookiesNs ~ '.strictly_necessary_heading') }}</h3>
+        <p class="govuk-body">{{ t(cookiesNs ~ '.strictly_necessary_intro') }}</p>
+
+        <table class="govuk-table govuk-!-margin-bottom-6">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">{{ t(cookiesNs ~ '.table_name') }}</th>
+              <th scope="col" class="govuk-table__header">{{ t(cookiesNs ~ '.table_purpose') }}</th>
+              <th scope="col" class="govuk-table__header">{{ t(cookiesNs ~ '.table_expires') }}</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell govuk-!-font-weight-bold">_pafs_session</td>
+              <td class="govuk-table__cell">{{ t(cookiesNs ~ '.session_purpose') }}</td>
+              <td class="govuk-table__cell">{{ t(cookiesNs ~ '.session_expires') }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell govuk-!-font-weight-bold">cookies_preferences_set</td>
+              <td class="govuk-table__cell">{{ t(cookiesNs ~ '.prefs_purpose') }}</td>
+              <td class="govuk-table__cell">{{ t(cookiesNs ~ '.prefs_expires') }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell govuk-!-font-weight-bold">cookies_policy</td>
+              <td class="govuk-table__cell">{{ t(cookiesNs ~ '.policy_purpose') }}</td>
+              <td class="govuk-table__cell">{{ t(cookiesNs ~ '.policy_expires') }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="govuk-heading-m">{{ t(cookiesNs ~ '.analytics_heading') }}</h3>
+        <p class="govuk-body">{{ t(cookiesNs ~ '.analytics_intro') }}</p>
+        <p class="govuk-body">{{ t(cookiesNs ~ '.analytics_para') }}</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ t(cookiesNs ~ '.analytics_bullet1') }}</li>
+          <li>{{ t(cookiesNs ~ '.analytics_bullet2') }}</li>
+          <li>{{ t(cookiesNs ~ '.analytics_bullet3') }}</li>
+        </ul>
+
+        <table class="govuk-table govuk-!-margin-bottom-6">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">{{ t(cookiesNs ~ '.table_name') }}</th>
+              <th scope="col" class="govuk-table__header">{{ t(cookiesNs ~ '.table_purpose') }}</th>
+              <th scope="col" class="govuk-table__header">{{ t(cookiesNs ~ '.table_expires') }}</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell govuk-!-font-weight-bold">_ga</td>
+              <td class="govuk-table__cell">{{ t(cookiesNs ~ '.ga_purpose') }}</td>
+              <td class="govuk-table__cell">{{ t(cookiesNs ~ '.ga_expires') }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell govuk-!-font-weight-bold">_gid</td>
+              <td class="govuk-table__cell">{{ t(cookiesNs ~ '.gid_purpose') }}</td>
+              <td class="govuk-table__cell">{{ t(cookiesNs ~ '.gid_expires') }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="govuk-body">
+          <a class="govuk-link" href="{{ t(cookiesNs ~ '.change_settings_link') }}">{{ t(cookiesNs ~ '.change_settings_text') }}</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}

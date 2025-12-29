@@ -73,15 +73,15 @@
     "links": {
       "privacy": {
         "text": "Privacy",
-        "url": "https://www.gov.uk/help/privacy-notice"
+        "url": "/privacy-notice"
       },
       "cookies": {
         "text": "Cookies",
-        "url": "https://www.gov.uk/help/cookies"
+        "url": "/cookies"
       },
       "accessibility": {
         "text": "Accessibility",
-        "url": "https://www.gov.uk/help/accessibility-statement"
+        "url": "/accessibility"
       }
     }
   }
