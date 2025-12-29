@@ -15,7 +15,8 @@ export const ROUTES = {
     HOME: '/',
     PROPOSALS: '/',
     DOWNLOAD: '/download',
-    ARCHIVE: '/archive'
+    ARCHIVE: '/archive',
+    ACCESSIBILITY: '/accessibility'
   },
 
   // Admin routes
