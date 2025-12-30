@@ -29,6 +29,8 @@
       "ga_expires": "2 years",
       "gid_purpose": "This helps us count how many people visit the service by tracking if you've visited before",
       "gid_expires": "1 day",
+      "change_settings_text_prefix": "You can",
+      "change_settings_text_postfix": "at any time.",
       "change_settings_text": "Change your cookie settings",
       "change_settings_link": "/cookies/settings"
     },

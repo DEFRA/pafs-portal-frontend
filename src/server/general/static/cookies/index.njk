@@ -79,9 +79,9 @@
             </tr>
           </tbody>
         </table>
-
+        <h2 class="govuk-heading-l">{{ t(cookiesNs ~ '.change_settings_text') }}</h2>
         <p class="govuk-body">
-          <a class="govuk-link" href="{{ t(cookiesNs ~ '.change_settings_link') }}">{{ t(cookiesNs ~ '.change_settings_text') }}</a>
+         {{ t(cookiesNs ~ '.change_settings_text_prefix') }} <a class="govuk-link" href="{{ t(cookiesNs ~ '.change_settings_link') }}">{{ t(cookiesNs ~ '.change_settings_text') }}</a>  {{ t(cookiesNs ~ '.change_settings_text_postfix') }}
         </p>
 
       </div>
