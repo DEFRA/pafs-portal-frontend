@@ -2,7 +2,6 @@ import { config } from '../../../../config/config.js'
 
 const COOKIE_POLICY_NAME = 'cookies_policy'
 const COOKIE_PREFS_SET_NAME = 'cookies_preferences_set'
-const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000
 
 class CookieSettingsController {
   get(request, h) {
@@ -43,7 +42,7 @@ class CookieSettingsController {
         JSON.stringify({ analytics: analyticsAccepted, preferencesSet: true }),
         {
           path: '/',
-          ttl: ONE_YEAR_MS,
+          ttl: config.get('cookie.preferences.ttl'),
           isSecure: config.get('session.cookie.secure'),
           isHttpOnly: true,
           isSameSite: 'Lax'
@@ -52,7 +51,7 @@ class CookieSettingsController {
 
       response.state(COOKIE_PREFS_SET_NAME, 'true', {
         path: '/',
-        ttl: ONE_YEAR_MS,
+        ttl: config.get('cookie.preferences.ttl'),
         isSecure: config.get('session.cookie.secure'),
         isHttpOnly: true,
         isSameSite: 'Lax'
