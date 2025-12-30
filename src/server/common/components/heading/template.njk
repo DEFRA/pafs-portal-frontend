@@ -1,5 +1,6 @@
+{% set colClass = params.widthClass or 'govuk-grid-column-two-thirds' %}
 <div class="govuk-grid-row app-heading" data-testid="app-heading">
-  <div class="govuk-grid-column-two-thirds">
+   <div class="{{ colClass }}">
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-2"
         data-testid="app-heading-title">{{ params.text }}</h1>
 

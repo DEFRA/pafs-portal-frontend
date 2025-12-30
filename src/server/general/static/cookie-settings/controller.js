@@ -6,9 +6,20 @@ const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000
 
 class CookieSettingsController {
   get(request, h) {
-    const policy = request.state[COOKIE_POLICY_NAME]
-    const analyticsAccepted = policy?.analytics === true
+    let analyticsAccepted = false
     const showConfirmation = request.query?.saved === '1'
+
+    // Parse the JSON cookie value
+    const policyRaw = request.state[COOKIE_POLICY_NAME]
+    if (policyRaw) {
+      try {
+        const policy = JSON.parse(policyRaw)
+        analyticsAccepted = policy?.analytics === true
+      } catch (e) {
+        // If parsing fails, default to false
+        analyticsAccepted = false
+      }
+    }
 
     return h.view('general/static/cookie-settings/index', {
       pageTitle: request.t('cookies.pages.settings.title'),
@@ -19,41 +30,45 @@ class CookieSettingsController {
   }
 
   post(request, h) {
-    const { analytics } = request.payload || {}
-    const analyticsAccepted = analytics === 'yes'
+    try {
+      const { analytics } = request.payload || {}
+      const analyticsAccepted = analytics === 'yes'
 
-    // Store preference in cookie
-    const stateOptions = {
-      isSecure: config.get('session.cookie.secure'),
-      isHttpOnly: true,
-      isSameSite: 'Lax',
-      path: '/',
-      ttl: ONE_YEAR_MS
+      // Create redirect response
+      const response = h.redirect(`${request.path}?saved=1`)
+
+      // Set cookies on the response - values must be strings
+      response.state(
+        COOKIE_POLICY_NAME,
+        JSON.stringify({ analytics: analyticsAccepted, preferencesSet: true }),
+        {
+          path: '/',
+          ttl: ONE_YEAR_MS,
+          isSecure: config.get('session.cookie.secure'),
+          isHttpOnly: true,
+          isSameSite: 'Lax'
+        }
+      )
+
+      response.state(COOKIE_PREFS_SET_NAME, 'true', {
+        path: '/',
+        ttl: ONE_YEAR_MS,
+        isSecure: config.get('session.cookie.secure'),
+        isHttpOnly: true,
+        isSameSite: 'Lax'
+      })
+
+      return response
+    } catch (error) {
+      console.error('Error in cookie settings POST:', error)
+      throw error
     }
-
-    h.state(
-      COOKIE_POLICY_NAME,
-      { analytics: analyticsAccepted, preferencesSet: true },
-      stateOptions
-    )
-    h.state(COOKIE_PREFS_SET_NAME, true, stateOptions)
-
-    return h.redirect(`${request.path}?saved=1`)
   }
 }
 
 const controller = new CookieSettingsController()
 
 export const cookieSettingsController = {
-  options: {
-    validate: {
-      payload: (value, options) => value, // accept any payload shape
-      failAction: (request, h, err) => {
-        // fall back to GET with current state; minimal validation needed here
-        return h.redirect(request.path).takeover()
-      }
-    }
-  },
   handler: {
     GET: (request, h) => controller.get(request, h),
     POST: (request, h) => controller.post(request, h)

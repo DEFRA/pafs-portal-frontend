@@ -14,7 +14,11 @@ export const cookieSettings = {
         {
           method: 'POST',
           path: ROUTES.GENERAL.COOKIE_SETTINGS,
-          options: cookieSettingsController.options,
+          options: {
+            validate: {
+              payload: (value) => value
+            }
+          },
           handler: cookieSettingsController.handler.POST
         }
       ])
