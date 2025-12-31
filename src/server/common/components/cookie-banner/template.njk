@@ -1,0 +1,80 @@
+{#
+  Cookie Banner Component
+  
+  Displays cookie consent banner and confirmation messages
+  
+  Params:
+  - showInitialBanner: boolean - Show initial consent banner
+  - showAcceptedMessage: boolean - Show accepted confirmation message
+  - showRejectedMessage: boolean - Show rejected confirmation message
+  - t: function - Translation function
+#}
+
+{% set translate = params.t %}
+
+{% if params.showInitialBanner %}
+<div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="{{ translate('cookies.banner.aria_label') }}" data-testid="cookie-banner">
+  <div class="govuk-cookie-banner__message govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-cookie-banner__heading govuk-heading-m">{{ translate('cookies.banner.heading') }}</h2>
+        <div class="govuk-cookie-banner__content">
+          <p class="govuk-body">{{ translate('cookies.banner.intro_line1') }}</p>
+          <p class="govuk-body">{{ translate('cookies.banner.intro_line2') }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="govuk-button-group">
+      <form method="post" action="/cookies/accept">
+        <button type="submit" class="govuk-button" data-module="govuk-button" data-testid="accept-cookies-btn">
+          {{ translate('cookies.banner.accept_button') }}
+        </button>
+      </form>
+      <form method="post" action="/cookies/reject">
+        <button type="submit" class="govuk-button" data-module="govuk-button" data-testid="reject-cookies-btn">
+          {{ translate('cookies.banner.reject_button') }}
+        </button>
+      </form>
+      <a class="govuk-link" href="{{ translate('common.footer.links.cookies.url') }}" data-testid="view-cookies-link">{{ translate('cookies.banner.view_cookies_link') }}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if params.showAcceptedMessage %}
+<div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="{{ translate('cookies.banner.aria_label') }}" data-testid="cookie-confirmation-accepted">
+  <div class="govuk-cookie-banner__message govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-cookie-banner__content">
+          <p class="govuk-body">{{ translate('cookies.banner.accepted_message') }} <a class="govuk-link" href="{{ translate('common.footer.links.cookies.url') }}">{{ translate('cookies.banner.change_settings_link') }}</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="govuk-button-group">
+      <button type="button" class="govuk-button" data-module="govuk-button" data-testid="hide-cookie-message" data-hide-cookie-banner>
+        {{ translate('cookies.banner.hide_button') }}
+      </button>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if params.showRejectedMessage %}
+<div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="{{ translate('cookies.banner.aria_label') }}" data-testid="cookie-confirmation-rejected">
+  <div class="govuk-cookie-banner__message govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-cookie-banner__content">
+          <p class="govuk-body">{{ translate('cookies.banner.rejected_message') }} <a class="govuk-link" href="{{ translate('common.footer.links.cookies.url') }}">{{ translate('cookies.banner.change_settings_link') }}</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="govuk-button-group">
+      <button type="button" class="govuk-button" data-module="govuk-button" data-testid="hide-cookie-message" data-hide-cookie-banner>
+        {{ translate('cookies.banner.hide_button') }}
+      </button>
+    </div>
+  </div>
+</div>
+{% endif %}

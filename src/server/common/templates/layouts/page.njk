@@ -6,6 +6,7 @@
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
+{% from "cookie-banner/macro.njk" import appCookieBanner %}
 
 {% set mainClasses = "app-main-wrapper" %}
 {% set isAdminPath = request
@@ -16,6 +17,22 @@
 
 {% block head %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
+{% endblock %}
+
+{% block bodyStart %}
+  {# Cookie banner logic #}
+  {% set cookiePolicy = request.state.cookies_policy %}
+  {% set cookieBannerMessage = request.state.cookie_banner_message %}
+  {% set showInitialBanner = not cookiePolicy %}
+  {% set showAcceptedMessage = cookieBannerMessage == 'accepted' %}
+  {% set showRejectedMessage = cookieBannerMessage == 'rejected' %}
+  
+  {{ appCookieBanner({
+    showInitialBanner: showInitialBanner,
+    showAcceptedMessage: showAcceptedMessage,
+    showRejectedMessage: showRejectedMessage,
+    t: t
+  }) }}
 {% endblock %}
 
 {% block header %}
