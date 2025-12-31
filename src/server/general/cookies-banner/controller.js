@@ -3,6 +3,10 @@ import { config } from '../../../config/config.js'
 const COOKIE_POLICY_NAME = 'cookies_policy'
 const COOKIE_PREFS_SET_NAME = 'cookies_preferences_set'
 
+// Define the TTL constant here
+const PREFERENCES_TTL = config.get('cookie.preferences.ttl')
+const IS_SECURE = config.get('session.cookie.secure')
+
 class CookiesBannerController {
   /**
    * Accept analytics cookies
@@ -16,8 +20,8 @@ class CookiesBannerController {
       JSON.stringify({ analytics: true, preferencesSet: true }),
       {
         path: '/',
-        ttl: config.get('cookie.preferences.ttl'),
-        isSecure: config.get('session.cookie.secure'),
+        ttl: PREFERENCES_TTL,
+        isSecure: IS_SECURE,
         isHttpOnly: true,
         isSameSite: 'Lax'
       }
@@ -25,8 +29,8 @@ class CookiesBannerController {
 
     response.state(COOKIE_PREFS_SET_NAME, 'true', {
       path: '/',
-      ttl: config.get('cookie.preferences.ttl'),
-      isSecure: config.get('session.cookie.secure'),
+      ttl: PREFERENCES_TTL,
+      isSecure: IS_SECURE,
       isHttpOnly: true,
       isSameSite: 'Lax'
     })
@@ -35,7 +39,7 @@ class CookiesBannerController {
     response.state('cookie_banner_message', 'accepted', {
       path: '/',
       ttl: 5000, // 5 seconds - just for the redirect
-      isSecure: config.get('session.cookie.secure'),
+      isSecure: IS_SECURE,
       isHttpOnly: true,
       isSameSite: 'Lax'
     })
@@ -55,8 +59,8 @@ class CookiesBannerController {
       JSON.stringify({ analytics: false, preferencesSet: true }),
       {
         path: '/',
-        ttl: config.get('cookie.preferences.ttl'),
-        isSecure: config.get('session.cookie.secure'),
+        ttl: PREFERENCES_TTL,
+        isSecure: IS_SECURE,
         isHttpOnly: true,
         isSameSite: 'Lax'
       }
@@ -64,8 +68,8 @@ class CookiesBannerController {
 
     response.state(COOKIE_PREFS_SET_NAME, 'true', {
       path: '/',
-      ttl: config.get('cookie.preferences.ttl'),
-      isSecure: config.get('session.cookie.secure'),
+      ttl: PREFERENCES_TTL,
+      isSecure: IS_SECURE,
       isHttpOnly: true,
       isSameSite: 'Lax'
     })
@@ -74,7 +78,7 @@ class CookiesBannerController {
     response.state('cookie_banner_message', 'rejected', {
       path: '/',
       ttl: 5000, // 5 seconds - just for the redirect
-      isSecure: config.get('session.cookie.secure'),
+      isSecure: IS_SECURE,
       isHttpOnly: true,
       isSameSite: 'Lax'
     })
