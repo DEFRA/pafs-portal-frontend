@@ -91,7 +91,7 @@ const controller = new CookiesBannerController()
 
 export const cookiesBannerController = {
   handler: {
-    ACCEPT: (request, h) => controller.accept(request, h),
-    REJECT: (request, h) => controller.reject(request, h)
+    accept: (request, h) => controller.accept(request, h),
+    reject: (request, h) => controller.reject(request, h)
   }
 }

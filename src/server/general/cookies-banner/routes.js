@@ -5,13 +5,13 @@ const routes = [
     method: 'POST',
     path: '/cookies/accept',
     ...cookiesBannerController,
-    handler: cookiesBannerController.handler.ACCEPT
+    handler: cookiesBannerController.handler.accept
   },
   {
     method: 'POST',
     path: '/cookies/reject',
     ...cookiesBannerController,
-    handler: cookiesBannerController.handler.REJECT
+    handler: cookiesBannerController.handler.reject
   }
 ]
 

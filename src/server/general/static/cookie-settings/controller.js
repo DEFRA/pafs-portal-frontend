@@ -14,7 +14,8 @@ class CookieSettingsController {
       try {
         const policy = JSON.parse(policyRaw)
         analyticsAccepted = policy?.analytics === true
-      } catch (e) {
+      } catch (error) {
+        console.error('Error parsing cookie policy:', error)
         // If parsing fails, default to false
         analyticsAccepted = false
       }
@@ -69,7 +70,7 @@ const controller = new CookieSettingsController()
 
 export const cookieSettingsController = {
   handler: {
-    GET: (request, h) => controller.get(request, h),
-    POST: (request, h) => controller.post(request, h)
+    get: (request, h) => controller.get(request, h),
+    post: (request, h) => controller.post(request, h)
   }
 }

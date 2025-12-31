@@ -22,7 +22,7 @@ describe('Cookies Banner Controller', () => {
 
   describe('Accept handler', () => {
     test('redirects to referer page', () => {
-      cookiesBannerController.handler.ACCEPT(mockRequest, mockH)
+      cookiesBannerController.handler.accept(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith('/test-page')
     })
@@ -30,7 +30,7 @@ describe('Cookies Banner Controller', () => {
     test('redirects to homepage when no referer', () => {
       mockRequest.headers.referer = undefined
 
-      cookiesBannerController.handler.ACCEPT(mockRequest, mockH)
+      cookiesBannerController.handler.accept(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith('/')
     })
@@ -41,7 +41,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.ACCEPT(mockRequest, mockH)
+      cookiesBannerController.handler.accept(mockRequest, mockH)
 
       // Check cookies_policy cookie
       const policyCall = mockResponse.state.mock.calls.find(
@@ -64,7 +64,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.ACCEPT(mockRequest, mockH)
+      cookiesBannerController.handler.accept(mockRequest, mockH)
 
       // Check cookies_preferences_set cookie
       const prefsCall = mockResponse.state.mock.calls.find(
@@ -80,7 +80,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.ACCEPT(mockRequest, mockH)
+      cookiesBannerController.handler.accept(mockRequest, mockH)
 
       // Check cookie_banner_message cookie
       const messageCall = mockResponse.state.mock.calls.find(
@@ -97,7 +97,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.ACCEPT(mockRequest, mockH)
+      cookiesBannerController.handler.accept(mockRequest, mockH)
 
       const policyCall = mockResponse.state.mock.calls.find(
         (call) => call[0] === 'cookies_policy'
@@ -110,7 +110,7 @@ describe('Cookies Banner Controller', () => {
 
   describe('Reject handler', () => {
     test('redirects to referer page', () => {
-      cookiesBannerController.handler.REJECT(mockRequest, mockH)
+      cookiesBannerController.handler.reject(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith('/test-page')
     })
@@ -118,7 +118,7 @@ describe('Cookies Banner Controller', () => {
     test('redirects to homepage when no referer', () => {
       mockRequest.headers.referer = undefined
 
-      cookiesBannerController.handler.REJECT(mockRequest, mockH)
+      cookiesBannerController.handler.reject(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith('/')
     })
@@ -129,7 +129,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.REJECT(mockRequest, mockH)
+      cookiesBannerController.handler.reject(mockRequest, mockH)
 
       // Check cookies_policy cookie
       const policyCall = mockResponse.state.mock.calls.find(
@@ -152,7 +152,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.REJECT(mockRequest, mockH)
+      cookiesBannerController.handler.reject(mockRequest, mockH)
 
       // Check cookies_preferences_set cookie
       const prefsCall = mockResponse.state.mock.calls.find(
@@ -168,7 +168,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.REJECT(mockRequest, mockH)
+      cookiesBannerController.handler.reject(mockRequest, mockH)
 
       // Check cookie_banner_message cookie
       const messageCall = mockResponse.state.mock.calls.find(
@@ -185,7 +185,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.REJECT(mockRequest, mockH)
+      cookiesBannerController.handler.reject(mockRequest, mockH)
 
       const policyCall = mockResponse.state.mock.calls.find(
         (call) => call[0] === 'cookies_policy'
@@ -203,7 +203,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.ACCEPT(mockRequest, mockH)
+      cookiesBannerController.handler.accept(mockRequest, mockH)
 
       const policyCall = mockResponse.state.mock.calls.find(
         (call) => call[0] === 'cookies_policy'
@@ -219,7 +219,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.REJECT(mockRequest, mockH)
+      cookiesBannerController.handler.reject(mockRequest, mockH)
 
       const policyCall = mockResponse.state.mock.calls.find(
         (call) => call[0] === 'cookies_policy'
@@ -235,7 +235,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.ACCEPT(mockRequest, mockH)
+      cookiesBannerController.handler.accept(mockRequest, mockH)
 
       const policyCall = mockResponse.state.mock.calls.find(
         (call) => call[0] === 'cookies_policy'
@@ -255,7 +255,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      cookiesBannerController.handler.REJECT(mockRequest, mockH)
+      cookiesBannerController.handler.reject(mockRequest, mockH)
 
       const policyCall = mockResponse.state.mock.calls.find(
         (call) => call[0] === 'cookies_policy'
@@ -277,7 +277,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      const result = cookiesBannerController.handler.ACCEPT(mockRequest, mockH)
+      const result = cookiesBannerController.handler.accept(mockRequest, mockH)
 
       expect(result).toBe(mockResponse)
     })
@@ -288,7 +288,7 @@ describe('Cookies Banner Controller', () => {
       }
       mockH.redirect.mockReturnValue(mockResponse)
 
-      const result = cookiesBannerController.handler.REJECT(mockRequest, mockH)
+      const result = cookiesBannerController.handler.reject(mockRequest, mockH)
 
       expect(result).toBe(mockResponse)
     })

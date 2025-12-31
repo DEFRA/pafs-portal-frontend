@@ -9,7 +9,7 @@ export const cookieSettings = {
         {
           method: 'GET',
           path: ROUTES.GENERAL.COOKIE_SETTINGS,
-          handler: cookieSettingsController.handler.GET
+          handler: cookieSettingsController.handler.get
         },
         {
           method: 'POST',
@@ -19,7 +19,7 @@ export const cookieSettings = {
               payload: (value) => value
             }
           },
-          handler: cookieSettingsController.handler.POST
+          handler: cookieSettingsController.handler.post
         }
       ])
     }
