@@ -1,9 +1,9 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { checkProjectNameExists } from './project-proposal-service.js'
-import { apiRequest } from '../../helpers/api-client.js'
+import { apiRequest } from '../../helpers/api-client/index.js'
 
 // Mock the api-client module
-vi.mock('../../helpers/api-client.js', () => ({
+vi.mock('../../helpers/api-client/index.js', () => ({
   apiRequest: vi.fn()
 }))
 

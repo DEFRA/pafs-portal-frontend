@@ -7,13 +7,13 @@ describe('#serveStaticFiles', () => {
   describe('When secure context is disabled', () => {
     beforeEach(async () => {
       server = await createServer()
-    })
+    }, 120000) // Server startup takes 40-50s
 
     afterEach(async () => {
       if (server) {
         await server.stop({ timeout: 0 })
       }
-    })
+    }, 10000)
 
     test('Should serve favicon as expected', async () => {
       const { statusCode } = await server.inject({
@@ -22,7 +22,7 @@ describe('#serveStaticFiles', () => {
       })
 
       expect(statusCode).toBe(statusCodes.noContent)
-    })
+    }, 60000)
 
     test('Should serve assets as expected', async () => {
       // Note npm run build is ran in the postinstall hook in package.json to make sure there is always a file
@@ -33,6 +33,6 @@ describe('#serveStaticFiles', () => {
       })
 
       expect(statusCode).toBe(statusCodes.ok)
-    })
+    }, 60000)
   })
 })

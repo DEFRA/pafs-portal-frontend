@@ -15,7 +15,19 @@ export const ROUTES = {
     HOME: '/',
     PROPOSALS: '/',
     DOWNLOAD: '/download',
-    ARCHIVE: '/archive'
+    ARCHIVE: '/archive',
+    ACCOUNTS: {
+      OLD: '/account_requests/new',
+      START: '/request-account',
+      DETAILS: '/request-account/details',
+      PARENT_AREAS: '/request-account/parent-areas',
+      PARENT_AREAS_EA: '/request-account/parent-areas/ea',
+      PARENT_AREAS_PSO: '/request-account/parent-areas/pso',
+      MAIN_AREA: '/request-account/main-area',
+      ADDITIONAL_AREAS: '/request-account/additional-areas',
+      CHECK_ANSWERS: '/request-account/check-answers',
+      CONFIRMATION: '/request-account/confirmation'
+    }
   },
 
   // Admin routes
@@ -25,6 +37,18 @@ export const ROUTES = {
     USERS_PENDING: '/admin/users/pending',
     USERS_ACTIVE: '/admin/users/active',
     USER_VIEW: '/admin/users/{id}',
+    ACCOUNTS: {
+      START: '/admin/user-account',
+      IS_ADMIN: '/admin/user-account/is-admin',
+      DETAILS: '/admin/user-account/details',
+      PARENT_AREAS: '/admin/user-account/parent-areas',
+      PARENT_AREAS_EA: '/admin/user-account/parent-areas/ea',
+      PARENT_AREAS_PSO: '/admin/user-account/parent-areas/pso',
+      MAIN_AREA: '/admin/user-account/main-area',
+      ADDITIONAL_AREAS: '/admin/user-account/additional-areas',
+      CHECK_ANSWERS: '/admin/user-account/check-answers',
+      CONFIRMATION: '/admin/user-account/confirmation'
+    },
     PROJECTS: '/admin/projects',
     SUBMISSIONS: '/admin/submissions',
     ORGANISATIONS: '/admin/organisations',

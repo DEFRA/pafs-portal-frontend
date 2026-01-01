@@ -18,6 +18,7 @@ export class BaseCacheService {
     this.segment = segment
     this.ttl = ttl || config.get('session.cache.ttl')
     this.enabled = this.isCacheEnabled()
+    this._cache = null
   }
 
   /**
@@ -33,10 +34,24 @@ export class BaseCacheService {
    * @returns {Object} Cache instance
    */
   getCache() {
-    return this.server.cache({
-      segment: this.segment,
-      expiresIn: this.ttl
-    })
+    if (!this._cache) {
+      const cacheConfig = {
+        cache: config.get('session.cache.name'),
+        segment: this.segment
+      }
+
+      // Only add expiresIn if TTL is greater than 0
+      if (this.ttl > 0) {
+        cacheConfig.expiresIn = this.ttl
+      }
+
+      this._cache = this.server.cache(cacheConfig)
+      logger.debug(
+        { segment: this.segment, ttl: this.ttl },
+        'Cache instance created'
+      )
+    }
+    return this._cache
   }
 
   /**

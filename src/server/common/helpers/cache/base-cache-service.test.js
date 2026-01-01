@@ -60,10 +60,12 @@ describe('BaseCacheService', () => {
     test('getCache creates cache with correct segment', () => {
       cacheService.getCache()
 
-      expect(mockServer.cache).toHaveBeenCalledWith({
-        segment: 'test-segment',
-        expiresIn: DEFAULT_TTL
-      })
+      expect(mockServer.cache).toHaveBeenCalledWith(
+        expect.objectContaining({
+          segment: 'test-segment',
+          expiresIn: DEFAULT_TTL
+        })
+      )
     })
 
     describe('getByKey', () => {
@@ -250,10 +252,12 @@ describe('BaseCacheService', () => {
 
       service.getCache()
 
-      expect(mockServer.cache).toHaveBeenCalledWith({
-        segment: 'test-segment',
-        expiresIn: customTtl
-      })
+      expect(mockServer.cache).toHaveBeenCalledWith(
+        expect.objectContaining({
+          segment: 'test-segment',
+          expiresIn: customTtl
+        })
+      )
     })
   })
 
@@ -268,10 +272,12 @@ describe('BaseCacheService', () => {
 
       service.getCache()
 
-      expect(mockServer.cache).toHaveBeenCalledWith({
-        segment: 'custom-segment',
-        expiresIn: DEFAULT_TTL
-      })
+      expect(mockServer.cache).toHaveBeenCalledWith(
+        expect.objectContaining({
+          segment: 'custom-segment',
+          expiresIn: DEFAULT_TTL
+        })
+      )
     })
   })
 })

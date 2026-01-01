@@ -14,7 +14,8 @@ import { sessionCache } from './common/helpers/session-cache/session-cache.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
 import { contentSecurityPolicy } from './common/helpers/content-security-policy.js'
-import { i18nPlugin } from './common/helpers/i18n.js'
+import { i18nPlugin } from './common/helpers/i18n/index.js'
+import { areasPreloader } from './common/helpers/areas/areas-preloader.js'
 
 export async function createServer() {
   setupProxy()
@@ -59,11 +60,12 @@ export async function createServer() {
     requestTracing,
     secureContext,
     pulse,
-    sessionCache,
+    sessionCache, // Register session cache BEFORE nunjucks
     i18nPlugin,
-    nunjucksConfig,
+    nunjucksConfig, // This uses context which needs request.yar
     Scooter,
     contentSecurityPolicy,
+    areasPreloader, // Preload areas on first request
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 

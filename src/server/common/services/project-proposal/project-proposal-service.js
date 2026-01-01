@@ -1,4 +1,4 @@
-import { apiRequest } from '../../helpers/api-client.js'
+import { apiRequest } from '../../helpers/api-client/index.js'
 
 /**
  * Check if project name already exists

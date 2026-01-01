@@ -1,0 +1,141 @@
+{% extends "layouts/page.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/password-input/macro.njk" import govukPasswordInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {# Session notifications #}
+    {% if errorCode == "session-timeout" or errorCode == ERROR_CODES.SESSION_TIMEOUT or errorCode == ERROR_CODES.TOKEN_EXPIRED_OR_INVALID %}
+      {{ govukNotificationBanner({
+        html: '<p class="govuk-notification-banner__heading">' + t('auth.errors.session_timeout') + '</p>'
+      }) }}
+    {% elif errorCode == "session-mismatch" or errorCode == ERROR_CODES.SESSION_MISMATCH %}
+      {{ govukNotificationBanner({
+        type: "important",
+        html: '<p class="govuk-notification-banner__heading">' + t('auth.errors.session_mismatch') + '</p>'
+      }) }}
+    {% endif %}
+
+    {# Build error summary list #}
+    {% set errorList = [] %}
+
+    {# Field validation errors (from frontend Joi or backend validation) #}
+    {% if fieldErrors.email == ERROR_CODES.EMAIL_REQUIRED %}
+    {% set errorList = errorList.concat([{ text: t('auth.validation.email.required'), href: "#email" }]) %}
+    {% elif fieldErrors.email == ERROR_CODES.EMAIL_INVALID_FORMAT or fieldErrors.email == ERROR_CODES.EMAIL_TOO_LONG %}
+    {% set errorList = errorList.concat([{ text: t('auth.validation.email.invalid_format'), href: "#email" }]) %}
+    {% endif %}
+    {% if fieldErrors.password == ERROR_CODES.PASSWORD_REQUIRED %}
+    {% set errorList = errorList.concat([{ text: t('auth.validation.password.required'), href: "#password" }]) %}
+    {% endif %}
+
+    {# Auth errors #}
+    {% if errorCode == ERROR_CODES.INVALID_CREDENTIALS %}
+    {% set errorList = errorList.concat([{ text: t('auth.errors.invalid_credentials'), href: "#email" }]) %}
+    {% elif errorCode == ERROR_CODES.ACCOUNT_LOCKED %}
+    {% set errorList = errorList.concat([{ text: t('auth.errors.account_locked'), href: "#email" }]) %}
+    {% elif errorCode == ERROR_CODES.ACCOUNT_PENDING %}
+    {% set errorList = errorList.concat([{ text: t('auth.errors.account_pending'), href: "#email" }]) %}
+    {% elif errorCode == ERROR_CODES.ACCOUNT_SETUP_INCOMPLETE %}
+    {% set errorList = errorList.concat([{ text: t('auth.errors.account_setup_incomplete'), href: "#email" }]) %}
+    {% elif errorCode == ERROR_CODES.ACCOUNT_DISABLED %}
+    {% set errorList = errorList.concat([{ text: t('auth.errors.account_disabled'), href: "#email" }]) %}
+    {% elif errorCode == ERROR_CODES.NETWORK_ERROR %}
+    {% set errorList = errorList.concat([{ text: t('auth.errors.network_error'), href: "#email" }]) %}
+    {% endif %}
+
+    {% if errorList.length > 0 %}
+    {{ govukErrorSummary({
+    titleText: t('common.error_summary_title'),
+    errorList: errorList
+    }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
+
+    {% if warningCode == ERROR_CODES.LAST_ATTEMPT_WARNING %}
+    {{ govukWarningText({
+    text: t('auth.warnings.last_attempt_warning'),
+    iconFallbackText: "Warning"
+    }) }}
+    {% endif %}
+
+    {% if supportCode == ERROR_CODES.SUPPORT_UNLOCK_ACCOUNT %}
+    <div class="govuk-inset-text">
+      {{ t('auth.support.unlock_account') }}
+    </div>
+    {% endif %}
+
+    <form action="/login" method="post" novalidate>
+
+      {# Email field error #}
+      {% set emailError = false %}
+      {% if fieldErrors.email == ERROR_CODES.EMAIL_REQUIRED %}
+      {% set emailError = { text: t('auth.validation.email.required') } %}
+      {% elif fieldErrors.email == ERROR_CODES.EMAIL_INVALID_FORMAT or fieldErrors.email == ERROR_CODES.EMAIL_TOO_LONG
+      %}
+      {% set emailError = { text: t('auth.validation.email.invalid_format') } %}
+      {% elif errorCode == ERROR_CODES.INVALID_CREDENTIALS %}
+      {% set emailError = { text: t('auth.errors.invalid_credentials') } %}
+      {% elif errorCode == ERROR_CODES.ACCOUNT_LOCKED %}
+      {% set emailError = { text: t('auth.errors.account_locked') } %}
+      {% elif errorCode == ERROR_CODES.ACCOUNT_DISABLED %}
+      {% set emailError = { text: t('auth.errors.account_disabled') } %}
+      {% elif errorCode == ERROR_CODES.ACCOUNT_PENDING %}
+      {% set emailError = { text: t('auth.errors.account_pending') } %}
+      {% elif errorCode == ERROR_CODES.ACCOUNT_SETUP_INCOMPLETE %}
+      {% set emailError = { text: t('auth.errors.account_setup_incomplete') } %}
+      {% endif %}
+
+      {{ govukInput({
+      label: { text: t('auth.labels.email') },
+      id: "email",
+      name: "email",
+      type: "email",
+      autocomplete: "email",
+      value: email,
+      spellcheck: false,
+      errorMessage: emailError
+      }) }}
+
+      {# Password field error #}
+      {% set passwordError = false %}
+      {% if fieldErrors.password == ERROR_CODES.PASSWORD_REQUIRED %}
+      {% set passwordError = { text: t('auth.validation.password.required') } %}
+      {% endif %}
+
+      {{ govukPasswordInput({
+      label: { text: t('auth.labels.password') },
+      id: "password",
+      name: "password",
+      autocomplete: "current-password",
+      errorMessage: passwordError
+      }) }}
+
+      {{ govukButton({ text: t('auth.login.submit_button') }) }}
+
+    </form>
+
+    {% if supportCode == ERROR_CODES.SUPPORT_CONTACT %}
+    <div class="govuk-inset-text">
+      {{ t('auth.support.contact') }}
+    </div>
+    {% endif %}
+
+    <p class="govuk-body govuk-!-margin-top-6">
+      <a href="/forgot-password" class="govuk-link">{{ t('auth.login.forgot_password') }}</a>
+    </p>
+
+    <p class="govuk-body">
+      <a href="/request-account" class="govuk-link">{{ t('auth.login.request_account') }}</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
