@@ -1,12 +1,12 @@
 import inert from '@hapi/inert'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
 
 import { loadModules } from './common/helpers/load-modules/index.js'
 import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const fileName = fileURLToPath(import.meta.url)
+const dirName = dirname(fileName)
 
 export const router = {
   plugin: {
@@ -15,10 +15,10 @@ export const router = {
       await server.register([inert])
 
       // Health-check route. Used by platform to check if service is running, do not remove!
-      await loadModules(server, join(__dirname, 'modules'), ['health'])
+      await loadModules(server, join(dirName, 'modules'), ['health'])
 
       // Authentication routes
-      await loadModules(server, join(__dirname, 'modules/auth'), [
+      await loadModules(server, join(dirName, 'modules/auth'), [
         'login',
         'logout',
         'forgot-password',
@@ -27,7 +27,7 @@ export const router = {
       ])
 
       // Admin routes
-      await loadModules(server, join(__dirname, 'modules/admin'), [
+      await loadModules(server, join(dirName, 'modules/admin'), [
         'users',
         'users/pending',
         'users/active',
@@ -36,7 +36,7 @@ export const router = {
       ])
 
       // General user routes
-      await loadModules(server, join(__dirname, 'modules/general'), [
+      await loadModules(server, join(dirName, 'modules/general'), [
         'home',
         'download',
         'archive',
@@ -44,7 +44,7 @@ export const router = {
       ])
 
       // Project proposal routes
-      await loadModules(server, join(__dirname, 'modules/project-proposal'), [
+      await loadModules(server, join(dirName, 'modules/project-proposal'), [
         'start-proposal',
         'project-name'
       ])

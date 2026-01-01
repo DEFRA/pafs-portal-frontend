@@ -31,160 +31,161 @@ import { requireJourneyStarted } from '../../accounts/helpers.js'
 /**
  * Admin user management routes
  */
+
+// Helper to create route options with authentication
+function createAuthOptions() {
+  return {
+    pre: [{ method: requireAdmin }]
+  }
+}
+
+function createAuthWithJourneyOptions() {
+  return {
+    pre: [{ method: requireAdmin }, { method: requireJourneyStarted(true) }]
+  }
+}
+
+// Route definitions grouped by concern
+function getStartRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.START,
+      options: createAuthOptions(),
+      ...startController
+    }
+  ]
+}
+
+function getAdminFlagRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.IS_ADMIN,
+      options: createAuthWithJourneyOptions(),
+      ...isAdminController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.IS_ADMIN,
+      options: createAuthWithJourneyOptions(),
+      ...isAdminPostController
+    }
+  ]
+}
+
+function getDetailsRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.DETAILS,
+      options: createAuthWithJourneyOptions(),
+      ...detailsController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.DETAILS,
+      options: createAuthWithJourneyOptions(),
+      ...detailsPostController
+    }
+  ]
+}
+
+function getParentAreasRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.PARENT_AREAS + '/{type}',
+      options: createAuthWithJourneyOptions(),
+      ...parentAreasController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.PARENT_AREAS + '/{type}',
+      options: createAuthWithJourneyOptions(),
+      ...parentAreasPostController
+    }
+  ]
+}
+
+function getMainAreaRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.MAIN_AREA,
+      options: createAuthWithJourneyOptions(),
+      ...mainAreaController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.MAIN_AREA,
+      options: createAuthWithJourneyOptions(),
+      ...mainAreaPostController
+    }
+  ]
+}
+
+function getAdditionalAreasRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.ADDITIONAL_AREAS,
+      options: createAuthWithJourneyOptions(),
+      ...additionalAreasController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.ADDITIONAL_AREAS,
+      options: createAuthWithJourneyOptions(),
+      ...additionalAreasPostController
+    }
+  ]
+}
+
+function getCheckAnswersRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.CHECK_ANSWERS,
+      options: createAuthWithJourneyOptions(),
+      ...checkAnswersController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.CHECK_ANSWERS,
+      options: createAuthWithJourneyOptions(),
+      ...checkAnswersPostController
+    }
+  ]
+}
+
+function getConfirmationRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.CONFIRMATION,
+      options: createAuthOptions(),
+      ...confirmationController
+    }
+  ]
+}
+
 export const accounts = {
   plugin: {
     name: 'Admin User Management',
     register(server) {
-      server.route([
-        {
-          method: 'GET',
-          path: ROUTES.ADMIN.ACCOUNTS.START,
-          options: {
-            pre: [{ method: requireAdmin }]
-          },
-          ...startController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.ADMIN.ACCOUNTS.IS_ADMIN,
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...isAdminController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.ADMIN.ACCOUNTS.IS_ADMIN,
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...isAdminPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.ADMIN.ACCOUNTS.DETAILS,
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...detailsController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.ADMIN.ACCOUNTS.DETAILS,
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...detailsPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.ADMIN.ACCOUNTS.PARENT_AREAS + '/{type}',
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...parentAreasController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.ADMIN.ACCOUNTS.PARENT_AREAS + '/{type}',
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...parentAreasPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.ADMIN.ACCOUNTS.MAIN_AREA,
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...mainAreaController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.ADMIN.ACCOUNTS.MAIN_AREA,
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...mainAreaPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.ADMIN.ACCOUNTS.ADDITIONAL_AREAS,
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...additionalAreasController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.ADMIN.ACCOUNTS.ADDITIONAL_AREAS,
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...additionalAreasPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.ADMIN.ACCOUNTS.CHECK_ANSWERS,
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...checkAnswersController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.ADMIN.ACCOUNTS.CHECK_ANSWERS,
-          options: {
-            pre: [
-              { method: requireAdmin },
-              { method: requireJourneyStarted(true) }
-            ]
-          },
-          ...checkAnswersPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.ADMIN.ACCOUNTS.CONFIRMATION,
-          options: {
-            pre: [{ method: requireAdmin }]
-          },
-          ...confirmationController
-        }
-      ])
+      const routes = [
+        ...getStartRoutes(),
+        ...getAdminFlagRoutes(),
+        ...getDetailsRoutes(),
+        ...getParentAreasRoutes(),
+        ...getMainAreaRoutes(),
+        ...getAdditionalAreasRoutes(),
+        ...getCheckAnswersRoutes(),
+        ...getConfirmationRoutes()
+      ]
+
+      server.route(routes)
     }
   }
 }

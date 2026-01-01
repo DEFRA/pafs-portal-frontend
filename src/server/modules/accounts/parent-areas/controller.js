@@ -66,15 +66,14 @@ class ParentAreasController {
 
     return h.view(
       ACCOUNT_VIEWS.PARENT_AREAS,
-      this.buildViewData(
-        request,
+      this.buildViewData(request, {
         isAdmin,
         responsibility,
         parentType,
         parentAreas,
-        selectedParentIds,
+        selectedAreas: selectedParentIds,
         groupedParentAreas
-      )
+      })
     )
   }
 
@@ -111,16 +110,15 @@ class ParentAreasController {
 
       return h.view(
         ACCOUNT_VIEWS.PARENT_AREAS,
-        this.buildViewData(
-          request,
+        this.buildViewData(request, {
           isAdmin,
           responsibility,
           parentType,
           parentAreas,
-          [],
+          selectedAreas: [],
           groupedParentAreas,
-          { hasError: true }
-        )
+          hasError: true
+        })
       )
     }
 
@@ -149,49 +147,35 @@ class ParentAreasController {
     }
 
     const parentIds = new Set()
+    const targetAreaType = this.getTargetAreaType(responsibility, parentType)
+
+    if (!targetAreaType) {
+      return []
+    }
 
     selectedAreas.forEach((areaObj) => {
       const area = findAreaById(areasData, areaObj.areaId)
-      if (!area) return
-
-      // Get parent hierarchy based on responsibility and parent type
-      if (
-        responsibility === RESPONSIBILITY_MAP.PSO &&
-        parentType === RESPONSIBILITY_MAP.EA
-      ) {
-        // For PSO selecting EA: get EA parent of PSO area
-        const parents = getParentAreas(
-          areasData,
-          area.id,
-          AREAS_RESPONSIBILITIES_MAP.EA
-        )
-        parents.forEach((p) => parentIds.add(p.id))
-      } else if (
-        responsibility === RESPONSIBILITY_MAP.RMA &&
-        parentType === RESPONSIBILITY_MAP.EA
-      ) {
-        // For RMA selecting EA: get EA parent of RMA area
-        const parents = getParentAreas(
-          areasData,
-          area.id,
-          AREAS_RESPONSIBILITIES_MAP.EA
-        )
-        parents.forEach((p) => parentIds.add(p.id))
-      } else if (
-        responsibility === RESPONSIBILITY_MAP.RMA &&
-        parentType === RESPONSIBILITY_MAP.PSO
-      ) {
-        // For RMA selecting PSO: get PSO parent of RMA area
-        const parents = getParentAreas(
-          areasData,
-          area.id,
-          AREAS_RESPONSIBILITIES_MAP.PSO
-        )
-        parents.forEach((p) => parentIds.add(p.id))
+      if (!area) {
+        return
       }
+
+      const parents = getParentAreas(areasData, area.id, targetAreaType)
+      parents.forEach((p) => parentIds.add(p.id))
     })
 
     return Array.from(parentIds)
+  }
+
+  getTargetAreaType(responsibility, parentType) {
+    const typeMap = {
+      [`${RESPONSIBILITY_MAP.PSO}-${RESPONSIBILITY_MAP.EA}`]:
+        AREAS_RESPONSIBILITIES_MAP.EA,
+      [`${RESPONSIBILITY_MAP.RMA}-${RESPONSIBILITY_MAP.EA}`]:
+        AREAS_RESPONSIBILITIES_MAP.EA,
+      [`${RESPONSIBILITY_MAP.RMA}-${RESPONSIBILITY_MAP.PSO}`]:
+        AREAS_RESPONSIBILITIES_MAP.PSO
+    }
+    return typeMap[`${responsibility}-${parentType}`] || null
   }
 
   getParentType(urlParam) {
@@ -215,14 +199,17 @@ class ParentAreasController {
   }
 
   getNextRoute(isAdmin, responsibility, parentType) {
+    const routeKey = this.getNextRouteKey(responsibility, parentType)
+    return this.buildRoute(isAdmin, routeKey)
+  }
+
+  getNextRouteKey(responsibility, parentType) {
     // PSO selecting EA → go to PSO main area
     if (
       responsibility === RESPONSIBILITY_MAP.PSO &&
       parentType === RESPONSIBILITY_MAP.EA
     ) {
-      return isAdmin
-        ? ROUTES.ADMIN.ACCOUNTS.MAIN_AREA
-        : ROUTES.GENERAL.ACCOUNTS.MAIN_AREA
+      return 'MAIN_AREA'
     }
 
     // RMA selecting EA → go to RMA PSO areas selection
@@ -230,9 +217,7 @@ class ParentAreasController {
       responsibility === RESPONSIBILITY_MAP.RMA &&
       parentType === RESPONSIBILITY_MAP.EA
     ) {
-      return isAdmin
-        ? ROUTES.ADMIN.ACCOUNTS.PARENT_AREAS_PSO
-        : ROUTES.GENERAL.ACCOUNTS.PARENT_AREAS_PSO
+      return 'PARENT_AREAS_PSO'
     }
 
     // RMA selecting PSO → go to RMA main area
@@ -240,15 +225,16 @@ class ParentAreasController {
       responsibility === RESPONSIBILITY_MAP.RMA &&
       parentType === RESPONSIBILITY_MAP.PSO
     ) {
-      return isAdmin
-        ? ROUTES.ADMIN.ACCOUNTS.MAIN_AREA
-        : ROUTES.GENERAL.ACCOUNTS.MAIN_AREA
+      return 'MAIN_AREA'
     }
 
-    // Default fallback
+    return 'DETAILS'
+  }
+
+  buildRoute(isAdmin, routeKey) {
     return isAdmin
-      ? ROUTES.ADMIN.ACCOUNTS.DETAILS
-      : ROUTES.GENERAL.ACCOUNTS.DETAILS
+      ? ROUTES.ADMIN.ACCOUNTS[routeKey]
+      : ROUTES.GENERAL.ACCOUNTS[routeKey]
   }
 
   getBackLink(isAdmin, responsibility, parentType) {
@@ -314,38 +300,20 @@ class ParentAreasController {
       .filter((group) => group.children.length > 0)
   }
 
-  buildViewData(
-    request,
-    isAdmin,
-    responsibility,
-    parentType,
-    parentAreas,
-    selectedAreas = [],
-    groupedParentAreas = null,
-    options = {}
-  ) {
-    const { hasError = false } = options
+  buildViewData(request, context) {
+    const {
+      isAdmin,
+      responsibility,
+      parentType,
+      parentAreas,
+      selectedAreas = [],
+      groupedParentAreas = null,
+      hasError = false
+    } = context
+
     const localeKey = isAdmin ? 'add_user' : 'request_account'
     const responsibilityLower = responsibility.toLowerCase()
-
-    // Determine which translation keys to use
-    let translationBase
-    if (
-      responsibility === RESPONSIBILITY_MAP.PSO &&
-      parentType === RESPONSIBILITY_MAP.EA
-    ) {
-      translationBase = 'accounts.areas.pso.ea_areas'
-    } else if (
-      responsibility === RESPONSIBILITY_MAP.RMA &&
-      parentType === RESPONSIBILITY_MAP.EA
-    ) {
-      translationBase = 'accounts.areas.rma.ea_areas'
-    } else if (
-      responsibility === RESPONSIBILITY_MAP.RMA &&
-      parentType === RESPONSIBILITY_MAP.PSO
-    ) {
-      translationBase = 'accounts.areas.rma.pso_areas'
-    }
+    const translationBase = this.getTranslationBase(responsibility, parentType)
 
     return {
       pageTitle: request.t(`${translationBase}.title`),
@@ -364,6 +332,31 @@ class ParentAreasController {
       translationBase,
       ERROR_CODES: VIEW_ERROR_CODES
     }
+  }
+
+  getTranslationBase(responsibility, parentType) {
+    if (
+      responsibility === RESPONSIBILITY_MAP.PSO &&
+      parentType === RESPONSIBILITY_MAP.EA
+    ) {
+      return 'accounts.areas.pso.ea_areas'
+    }
+
+    if (
+      responsibility === RESPONSIBILITY_MAP.RMA &&
+      parentType === RESPONSIBILITY_MAP.EA
+    ) {
+      return 'accounts.areas.rma.ea_areas'
+    }
+
+    if (
+      responsibility === RESPONSIBILITY_MAP.RMA &&
+      parentType === RESPONSIBILITY_MAP.PSO
+    ) {
+      return 'accounts.areas.rma.pso_areas'
+    }
+
+    return 'accounts.areas.default'
   }
 }
 

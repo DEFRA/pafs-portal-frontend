@@ -106,62 +106,52 @@ class CheckAnswersController {
 
       // Check if API request was successful
       if (!apiResponse.success) {
-        request.server.logger.error(
-          { apiResponse },
-          'API returned error response'
-        )
-
-        // Check for backend validation errors first
-        if (apiResponse.validationErrors) {
-          return h.view(
-            ACCOUNT_VIEWS.CHECK_ANSWERS,
-            this.buildViewData(
-              request,
-              isAdmin,
-              sessionData,
-              areaDetails,
-              parentAreasDisplay,
-              {
-                fieldErrors: extractApiValidationErrors(apiResponse)
-              }
-            )
-          )
-        }
-
-        // Handle general API errors
-        const apiError = extractApiError(apiResponse)
-        return h.view(
-          ACCOUNT_VIEWS.CHECK_ANSWERS,
-          this.buildViewData(
-            request,
-            isAdmin,
-            sessionData,
-            areaDetails,
-            parentAreasDisplay,
-            {
-              errorCode: apiError?.errorCode || VIEW_ERROR_CODES.NETWORK_ERROR
-            }
-          )
+        return this.handleApiError(
+          request,
+          h,
+          isAdmin,
+          sessionData,
+          areaDetails,
+          parentAreasDisplay,
+          apiResponse
         )
       }
 
-      // Store status for confirmation page
-      const status = apiResponse.data?.status || 'pending'
-      request.yar.set(sessionKey, { ...sessionData, submissionStatus: status })
-
-      // Redirect to confirmation page
-      return h.redirect(
-        isAdmin
-          ? ROUTES.ADMIN.ACCOUNTS.CONFIRMATION
-          : ROUTES.GENERAL.ACCOUNTS.CONFIRMATION
+      // Store status for confirmation page and redirect
+      return this.handleSuccess(
+        request,
+        h,
+        isAdmin,
+        sessionKey,
+        sessionData,
+        apiResponse
       )
     } catch (error) {
-      // This catch block handles unexpected errors (network failures, timeouts, etc.)
-      request.server.logger.error(
-        { error },
-        'Unexpected error during account submission'
+      return this.handleUnexpectedError(
+        request,
+        h,
+        isAdmin,
+        sessionData,
+        areaDetails,
+        parentAreasDisplay,
+        error
       )
+    }
+  }
 
+  handleApiError(
+    request,
+    h,
+    isAdmin,
+    sessionData,
+    areaDetails,
+    parentAreasDisplay,
+    apiResponse
+  ) {
+    request.server.logger.error({ apiResponse }, 'API returned error response')
+
+    // Check for backend validation errors first
+    if (apiResponse.validationErrors) {
       return h.view(
         ACCOUNT_VIEWS.CHECK_ANSWERS,
         this.buildViewData(
@@ -171,11 +161,69 @@ class CheckAnswersController {
           areaDetails,
           parentAreasDisplay,
           {
-            errorCode: VIEW_ERROR_CODES.NETWORK_ERROR
+            fieldErrors: extractApiValidationErrors(apiResponse)
           }
         )
       )
     }
+
+    // Handle general API errors
+    const apiError = extractApiError(apiResponse)
+    return h.view(
+      ACCOUNT_VIEWS.CHECK_ANSWERS,
+      this.buildViewData(
+        request,
+        isAdmin,
+        sessionData,
+        areaDetails,
+        parentAreasDisplay,
+        {
+          errorCode: apiError?.errorCode || VIEW_ERROR_CODES.NETWORK_ERROR
+        }
+      )
+    )
+  }
+
+  handleSuccess(request, h, isAdmin, sessionKey, sessionData, apiResponse) {
+    const status = apiResponse.data?.status || 'pending'
+    request.yar.set(sessionKey, { ...sessionData, submissionStatus: status })
+
+    // Redirect to confirmation page
+    return h.redirect(
+      isAdmin
+        ? ROUTES.ADMIN.ACCOUNTS.CONFIRMATION
+        : ROUTES.GENERAL.ACCOUNTS.CONFIRMATION
+    )
+  }
+
+  handleUnexpectedError(
+    request,
+    h,
+    isAdmin,
+    sessionData,
+    areaDetails,
+    parentAreasDisplay,
+    error
+  ) {
+    // This handles unexpected errors (network failures, timeouts, etc.)
+    request.server.logger.error(
+      { error },
+      'Unexpected error during account submission'
+    )
+
+    return h.view(
+      ACCOUNT_VIEWS.CHECK_ANSWERS,
+      this.buildViewData(
+        request,
+        isAdmin,
+        sessionData,
+        areaDetails,
+        parentAreasDisplay,
+        {
+          errorCode: VIEW_ERROR_CODES.NETWORK_ERROR
+        }
+      )
+    )
   }
 
   buildViewData(
@@ -258,7 +306,9 @@ class CheckAnswersController {
 
     userAreas.forEach((areaObj) => {
       const area = findAreaById(areasData, areaObj.areaId)
-      if (!area) return
+      if (!area) {
+        return
+      }
 
       // For PSO users, get EA parents
       if (responsibility === RESPONSIBILITY_MAP.PSO) {
@@ -270,9 +320,8 @@ class CheckAnswersController {
         eaParents.forEach((parent) =>
           parentAreasSet.add(JSON.stringify({ type: 'EA', area: parent }))
         )
-      }
-      // For RMA users, get both EA and PSO parents
-      else if (responsibility === RESPONSIBILITY_MAP.RMA) {
+      } else if (responsibility === RESPONSIBILITY_MAP.RMA) {
+        // For RMA users, get both EA and PSO parents
         const eaParents = getParentAreas(
           areasData,
           area.id,
@@ -290,6 +339,8 @@ class CheckAnswersController {
         psoParents.forEach((parent) =>
           parentAreasSet.add(JSON.stringify({ type: 'PSO', area: parent }))
         )
+      } else {
+        // EA users or other responsibilities don't need parent areas
       }
     })
 

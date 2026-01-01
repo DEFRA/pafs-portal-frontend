@@ -9,7 +9,7 @@ import {
   VIEW_ERROR_CODES
 } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { getSessionKey } from '../helpers.js'
+import { getSessionKey, buildGroupedAreas } from '../helpers.js'
 import { extractJoiErrors } from '../../../common/helpers/error-renderer/index.js'
 import { mainAreaSchema } from '../schema.js'
 
@@ -42,7 +42,7 @@ class MainAreaController {
     )
 
     // Build grouped areas for PSO and RMA (hierarchical display)
-    const groupedAreas = this.buildGroupedAreas(
+    const groupedAreas = buildGroupedAreas(
       masterAreas,
       sessionData,
       responsibility
@@ -83,13 +83,13 @@ class MainAreaController {
     )
 
     if (error) {
-      const areas = await request.getAreas()
+      const masterAreas = await request.getAreas()
       const availableAreas = getAreasByType(
-        areas,
+        masterAreas,
         AREAS_RESPONSIBILITIES_MAP[responsibility]
       )
-      const groupedAreas = this.buildGroupedAreas(
-        areas,
+      const groupedAreas = buildGroupedAreas(
+        masterAreas,
         sessionData,
         responsibility
       )
@@ -142,79 +142,6 @@ class MainAreaController {
         ? ROUTES.ADMIN.ACCOUNTS.ADDITIONAL_AREAS
         : ROUTES.GENERAL.ACCOUNTS.ADDITIONAL_AREAS
     )
-  }
-
-  /**
-   * Build grouped areas for hierarchical display
-   * PSO: grouped by EA parent
-   * RMA: grouped by EA > PSO parent hierarchy
-   */
-  buildGroupedAreas(masterAreas, sessionData, responsibility) {
-    // EA users don't need grouping (top-level areas)
-    if (responsibility === RESPONSIBILITY_MAP.EA) {
-      return null
-    }
-
-    // PSO: group by EA parent areas
-    if (responsibility === RESPONSIBILITY_MAP.PSO) {
-      const selectedEaAreas = sessionData.eaAreas || []
-      if (selectedEaAreas.length === 0) {
-        return null
-      }
-
-      const eaAreas = getAreasByType(masterAreas, AREAS_RESPONSIBILITIES_MAP.EA)
-      const psoAreas = getAreasByType(
-        masterAreas,
-        AREAS_RESPONSIBILITIES_MAP.PSO
-      )
-
-      return eaAreas
-        .filter((ea) => selectedEaAreas.includes(ea.id))
-        .map((ea) => ({
-          parent: ea,
-          children: psoAreas.filter((pso) => pso.parent_id === ea.id)
-        }))
-        .filter((group) => group.children.length > 0)
-    }
-
-    // RMA: group by EA > PSO parent hierarchy
-    if (responsibility === RESPONSIBILITY_MAP.RMA) {
-      const selectedPsoAreas = sessionData.psoAreas || []
-      if (selectedPsoAreas.length === 0) {
-        return null
-      }
-
-      const eaAreas = getAreasByType(masterAreas, AREAS_RESPONSIBILITIES_MAP.EA)
-      const psoAreas = getAreasByType(
-        masterAreas,
-        AREAS_RESPONSIBILITIES_MAP.PSO
-      )
-      const rmaAreas = getAreasByType(
-        masterAreas,
-        AREAS_RESPONSIBILITIES_MAP.RMA
-      )
-
-      const groups = []
-
-      psoAreas
-        .filter((pso) => selectedPsoAreas.includes(pso.id))
-        .forEach((pso) => {
-          const eaParent = eaAreas.find((ea) => ea.id === pso.parent_id)
-          const children = rmaAreas.filter((rma) => rma.parent_id === pso.id)
-
-          if (eaParent && children.length > 0) {
-            groups.push({
-              parent: pso,
-              eaParent,
-              children
-            })
-          }
-        })
-
-      return groups
-    }
-
-    return null
   }
 
   getBackLink(isAdmin, responsibility) {

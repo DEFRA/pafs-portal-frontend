@@ -48,7 +48,9 @@ export const PAGINATION = {
 export const SESSION = {
   REFRESH_BUFFER_MS: 60000, // Refresh 1 minute before expiry
   INACTIVE_TIMEOUT_MS: 1800000, // 30 minutes
-  TOKEN_REFRESH_MS: 900000 // Default 15 minutes
+  TOKEN_REFRESH_MS: 900000, // Default 15 minutes
+  SESSION_TIMEOUT: 'session-timeout',
+  SESSION_MISMATCH: 'session-mismatch'
 }
 
 /**

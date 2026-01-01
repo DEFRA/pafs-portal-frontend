@@ -9,6 +9,7 @@ import {
 import { ROUTES } from '../../constants/routes.js'
 import { validateSession } from '../../services/auth/auth-service.js'
 import { AUTH_ERROR_CODES } from '../../constants/validation.js'
+import { SESSION } from '../../constants/common.js'
 
 export async function requireAuth(request, h) {
   const session = getAuthSession(request)
@@ -19,7 +20,7 @@ export async function requireAuth(request, h) {
 
   if (isSessionExpired(session)) {
     clearAuthSession(request)
-    request.yar.flash('authError', 'session-timeout')
+    request.yar.flash('authError', SESSION.SESSION_TIMEOUT)
     return h.redirect(ROUTES.LOGIN).takeover()
   }
 
@@ -30,13 +31,13 @@ export async function requireAuth(request, h) {
 
     if (errorCode === AUTH_ERROR_CODES.SESSION_MISMATCH) {
       clearAuthSession(request)
-      request.yar.flash('authError', 'session-mismatch')
+      request.yar.flash('authError', SESSION.SESSION_MISMATCH)
       return h.redirect(ROUTES.LOGIN).takeover()
     }
 
     // Otherwise show session timeout message
     clearAuthSession(request)
-    request.yar.flash('authError', 'session-timeout')
+    request.yar.flash('authError', SESSION.SESSION_TIMEOUT)
     return h.redirect(ROUTES.LOGIN).takeover()
   }
 
@@ -46,11 +47,11 @@ export async function requireAuth(request, h) {
     if (!result.success) {
       // Check for concurrent session (session mismatch)
       if (result.reason === AUTH_ERROR_CODES.SESSION_MISMATCH) {
-        request.yar.flash('authError', 'session-mismatch')
+        request.yar.flash('authError', SESSION.SESSION_MISMATCH)
         return h.redirect(ROUTES.LOGIN).takeover()
       }
       // All other errors show session timeout
-      request.yar.flash('authError', 'session-timeout')
+      request.yar.flash('authError', SESSION.SESSION_TIMEOUT)
       return h.redirect(ROUTES.LOGIN).takeover()
     }
   }

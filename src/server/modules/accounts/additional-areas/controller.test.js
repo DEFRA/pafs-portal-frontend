@@ -5,11 +5,17 @@ import {
 } from './controller.js'
 
 vi.mock('../../../common/helpers/areas/areas-helper.js')
-vi.mock('../helpers.js')
+vi.mock('../helpers.js', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    getSessionKey: vi.fn()
+  }
+})
 
 const { getAreasByType } =
   await import('../../../common/helpers/areas/areas-helper.js')
-const { getSessionKey } = await import('../helpers.js')
+const { getSessionKey, buildGroupedAreas } = await import('../helpers.js')
 const { AdditionalAreasController } = await import('./controller.js')
 
 describe('AdditionalAreasController', () => {
@@ -162,8 +168,7 @@ describe('AdditionalAreasController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'modules/accounts/additional-areas/index',
         expect.objectContaining({
-          responsibility: 'pso',
-          groupedAreas: []
+          responsibility: 'pso'
         })
       )
     })
@@ -180,8 +185,7 @@ describe('AdditionalAreasController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         'modules/accounts/additional-areas/index',
         expect.objectContaining({
-          responsibility: 'rma',
-          groupedAreas: []
+          responsibility: 'rma'
         })
       )
     })
@@ -348,12 +352,12 @@ describe('AdditionalAreasController', () => {
 
   describe('buildGroupedAreas', () => {
     test('returns null for EA responsibility', () => {
-      const result = controller.buildGroupedAreas(mockAreas, {}, 'EA', '1')
+      const result = buildGroupedAreas(mockAreas, {}, 'EA', '1')
       expect(result).toBeNull()
     })
 
     test('returns null for PSO with no EA areas', () => {
-      const result = controller.buildGroupedAreas(
+      const result = buildGroupedAreas(
         mockAreas,
         { responsibility: 'PSO' },
         'PSO',
@@ -363,7 +367,7 @@ describe('AdditionalAreasController', () => {
     })
 
     test('returns null for RMA with no PSO areas', () => {
-      const result = controller.buildGroupedAreas(
+      const result = buildGroupedAreas(
         mockAreas,
         { responsibility: 'RMA' },
         'RMA',
@@ -374,12 +378,7 @@ describe('AdditionalAreasController', () => {
 
     test('builds PSO grouped areas correctly', () => {
       const sessionData = { eaAreas: ['1', '2'] }
-      const result = controller.buildGroupedAreas(
-        mockAreas,
-        sessionData,
-        'PSO',
-        '4'
-      )
+      const result = buildGroupedAreas(mockAreas, sessionData, 'PSO', '4')
 
       // The controller returns empty array when main area is excluded and no children remain
       expect(result).toEqual([])
@@ -387,12 +386,7 @@ describe('AdditionalAreasController', () => {
 
     test('excludes main area from PSO children', () => {
       const sessionData = { eaAreas: ['1'] }
-      const result = controller.buildGroupedAreas(
-        mockAreas,
-        sessionData,
-        'PSO',
-        '4'
-      )
+      const result = buildGroupedAreas(mockAreas, sessionData, 'PSO', '4')
 
       // Result is empty when main area is excluded
       expect(result).toEqual([])
@@ -400,12 +394,7 @@ describe('AdditionalAreasController', () => {
 
     test('builds RMA grouped areas correctly', () => {
       const sessionData = { psoAreas: ['4', '5'] }
-      const result = controller.buildGroupedAreas(
-        mockAreas,
-        sessionData,
-        'RMA',
-        '7'
-      )
+      const result = buildGroupedAreas(mockAreas, sessionData, 'RMA', '7')
 
       // Result is empty when main area is excluded
       expect(result).toEqual([])
@@ -413,12 +402,7 @@ describe('AdditionalAreasController', () => {
 
     test('excludes main area from RMA children', () => {
       const sessionData = { psoAreas: ['4'] }
-      const result = controller.buildGroupedAreas(
-        mockAreas,
-        sessionData,
-        'RMA',
-        '7'
-      )
+      const result = buildGroupedAreas(mockAreas, sessionData, 'RMA', '7')
 
       // Result is empty when main area is excluded
       expect(result).toEqual([])
@@ -426,12 +410,7 @@ describe('AdditionalAreasController', () => {
 
     test('filters groups with no children', () => {
       const sessionData = { psoAreas: ['4'] }
-      const result = controller.buildGroupedAreas(
-        mockAreas,
-        sessionData,
-        'RMA',
-        '8'
-      )
+      const result = buildGroupedAreas(mockAreas, sessionData, 'RMA', '8')
 
       expect(result).toEqual([])
     })
@@ -513,12 +492,7 @@ describe('AdditionalAreasController', () => {
         return []
       })
 
-      const result = controller.buildGroupedAreas(
-        mockAreas,
-        sessionData,
-        'PSO',
-        '5'
-      )
+      const result = buildGroupedAreas(mockAreas, sessionData, 'PSO', '5')
 
       expect(getAreasByType).toHaveBeenCalledWith(mockAreas, 'EA Area')
       expect(getAreasByType).toHaveBeenCalledWith(mockAreas, 'PSO Area')
@@ -539,12 +513,7 @@ describe('AdditionalAreasController', () => {
         return []
       })
 
-      const result = controller.buildGroupedAreas(
-        mockAreas,
-        sessionData,
-        'PSO',
-        '4'
-      )
+      const result = buildGroupedAreas(mockAreas, sessionData, 'PSO', '4')
 
       expect(result).toEqual([])
     })
@@ -560,12 +529,7 @@ describe('AdditionalAreasController', () => {
         return []
       })
 
-      const result = controller.buildGroupedAreas(
-        mockAreas,
-        sessionData,
-        'RMA',
-        '8'
-      )
+      const result = buildGroupedAreas(mockAreas, sessionData, 'RMA', '8')
 
       expect(getAreasByType).toHaveBeenCalledWith(mockAreas, 'EA Area')
       expect(getAreasByType).toHaveBeenCalledWith(mockAreas, 'PSO Area')
@@ -589,12 +553,7 @@ describe('AdditionalAreasController', () => {
         return []
       })
 
-      const result = controller.buildGroupedAreas(
-        mockAreas,
-        sessionData,
-        'RMA',
-        '8'
-      )
+      const result = buildGroupedAreas(mockAreas, sessionData, 'RMA', '8')
 
       expect(result).toEqual([])
     })
@@ -612,12 +571,7 @@ describe('AdditionalAreasController', () => {
         return []
       })
 
-      const result = controller.buildGroupedAreas(
-        mockAreas,
-        sessionData,
-        'RMA',
-        '7'
-      )
+      const result = buildGroupedAreas(mockAreas, sessionData, 'RMA', '7')
 
       expect(result).toEqual([])
     })

@@ -23,7 +23,7 @@ export const areasPreloader = {
     let areasPreloaded = false
 
     // Hook into onPreHandler to preload areas on first request
-    server.ext('onPreHandler', async (request, h) => {
+    server.ext('onPreHandler', async (_request, h) => {
       if (!areasPreloaded) {
         try {
           server.logger.info('First request detected - preloading areas')

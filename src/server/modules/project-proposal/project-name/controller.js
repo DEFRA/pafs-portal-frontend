@@ -44,24 +44,37 @@ function validateProjectName(request) {
       text: request.t('project-proposal.project_name.errors.required'),
       href: PROJECT_NAME_ERROR_HREF
     })
-  } else if (!VALIDATION_PATTERNS.PROJECT_NAME.test(projectName)) {
-    // Validation 2: Check for valid characters (alphanumeric, underscores, hyphens)
-    errors.projectName = request.t(
-      'project-proposal.project_name.errors.invalid_format'
-    )
-    errorSummary.push({
-      text: request.t('project-proposal.project_name.errors.invalid_format'),
-      href: PROJECT_NAME_ERROR_HREF
-    })
-  } else {
-    // Valid project name, no errors
+    return {
+      values: { projectName },
+      errors,
+      errorSummary,
+      isValid: false
+    }
   }
+
+  // Validation 2: Check for valid characters (alphanumeric, underscores, hyphens)
+  if (VALIDATION_PATTERNS.PROJECT_NAME.test(projectName)) {
+    return {
+      values: { projectName },
+      errors: {},
+      errorSummary: [],
+      isValid: true
+    }
+  }
+
+  errors.projectName = request.t(
+    'project-proposal.project_name.errors.invalid_format'
+  )
+  errorSummary.push({
+    text: request.t('project-proposal.project_name.errors.invalid_format'),
+    href: PROJECT_NAME_ERROR_HREF
+  })
 
   return {
     values: { projectName },
     errors,
     errorSummary,
-    isValid: errorSummary.length === 0
+    isValid: false
   }
 }
 

@@ -79,31 +79,8 @@ class DetailsController {
 
       request.yar.set(sessionKey, { ...sessionData, ...value })
 
-      // Redirect based on user type
-      // Admin users go to check answers, non-admin users go to area selection
-      if (isAdmin && value.admin === true) {
-        return h.redirect(ROUTES.ADMIN.ACCOUNTS.CHECK_ANSWERS)
-      }
-
-      // Non-admin users proceed to area selection based on responsibility
-      // PSO and RMA users select EA areas first
-      if (
-        value.responsibility === RESPONSIBILITY_MAP.PSO ||
-        value.responsibility === RESPONSIBILITY_MAP.RMA
-      ) {
-        return h.redirect(
-          isAdmin
-            ? ROUTES.ADMIN.ACCOUNTS.PARENT_AREAS_EA
-            : ROUTES.GENERAL.ACCOUNTS.PARENT_AREAS_EA
-        )
-      }
-
-      // EA users go directly to main area selection
-      return h.redirect(
-        isAdmin
-          ? ROUTES.ADMIN.ACCOUNTS.MAIN_AREA
-          : ROUTES.GENERAL.ACCOUNTS.MAIN_AREA
-      )
+      // Determine next route based on user context and responsibility
+      return h.redirect(this.getNextRoute(isAdmin, value))
     } catch (err) {
       request.server.logger.error({ err }, 'Email validation error')
       return h.view(
@@ -117,11 +94,10 @@ class DetailsController {
 
   buildViewData(request, isAdmin, admin, accountData, options = {}) {
     const { fieldErrors = {}, errorCode = '' } = options
+    const pageTitleKey = this.getPageTitleKey(isAdmin, admin)
 
     return {
-      pageTitle: request.t(
-        `accounts.${isAdmin ? (admin ? 'add_user.admin_details' : 'add_user.details') : 'request_account.details'}.title`
-      ),
+      pageTitle: request.t(`accounts.${pageTitleKey}.title`),
       isAdmin,
       admin,
       accountData,
@@ -133,6 +109,35 @@ class DetailsController {
         : ROUTES.GENERAL.ACCOUNTS.DETAILS,
       ERROR_CODES: VIEW_ERROR_CODES
     }
+  }
+
+  getPageTitleKey(isAdmin, admin) {
+    if (!isAdmin) {
+      return 'request_account.details'
+    }
+    return admin ? 'add_user.admin_details' : 'add_user.details'
+  }
+
+  getNextRoute(isAdmin, value) {
+    // Admin users go to check answers
+    if (isAdmin && value.admin === true) {
+      return ROUTES.ADMIN.ACCOUNTS.CHECK_ANSWERS
+    }
+
+    // PSO and RMA users select EA areas first
+    if (
+      value.responsibility === RESPONSIBILITY_MAP.PSO ||
+      value.responsibility === RESPONSIBILITY_MAP.RMA
+    ) {
+      return isAdmin
+        ? ROUTES.ADMIN.ACCOUNTS.PARENT_AREAS_EA
+        : ROUTES.GENERAL.ACCOUNTS.PARENT_AREAS_EA
+    }
+
+    // EA users go directly to main area selection
+    return isAdmin
+      ? ROUTES.ADMIN.ACCOUNTS.MAIN_AREA
+      : ROUTES.GENERAL.ACCOUNTS.MAIN_AREA
   }
 
   getBackLink(isAdmin, adminFlagSet = false) {

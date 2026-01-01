@@ -1,5 +1,5 @@
-import { pathToFileURL } from 'url'
-import path from 'path'
+import { pathToFileURL } from 'node:url'
+import path from 'node:path'
 
 export async function loadModules(server, basePath, patterns) {
   const modules = []

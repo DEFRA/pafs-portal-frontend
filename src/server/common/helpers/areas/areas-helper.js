@@ -127,7 +127,10 @@ export function buildAreaHierarchy(areasByType, rootTypes = ['EA']) {
       if (parent) {
         parent.children.push(area)
       }
-    } else if (rootTypes.includes(area.area_type)) {
+      return
+    }
+
+    if (rootTypes.includes(area.area_type)) {
       roots.push(area)
     }
   })

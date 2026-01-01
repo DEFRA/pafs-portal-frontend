@@ -29,146 +29,152 @@ import { startController } from '../../accounts/start/controller.js'
 /**
  * Account request routes - for self-registration
  */
+
+// Helper to create route options with not authenticated check
+function createNotAuthOptions() {
+  return {
+    pre: [{ method: requireNotAuthenticated }]
+  }
+}
+
+function createNotAuthWithJourneyOptions() {
+  return {
+    pre: [
+      { method: requireNotAuthenticated },
+      { method: requireJourneyStarted(false) }
+    ]
+  }
+}
+
+// Route definitions grouped by concern
+function getStartRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.GENERAL.ACCOUNTS.OLD,
+      options: createNotAuthOptions(),
+      ...startController
+    },
+    {
+      method: 'GET',
+      path: ROUTES.GENERAL.ACCOUNTS.START,
+      options: createNotAuthOptions(),
+      ...startController
+    }
+  ]
+}
+
+function getDetailsRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.GENERAL.ACCOUNTS.DETAILS,
+      options: createNotAuthWithJourneyOptions(),
+      ...detailsController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.GENERAL.ACCOUNTS.DETAILS,
+      options: createNotAuthWithJourneyOptions(),
+      ...detailsPostController
+    }
+  ]
+}
+
+function getParentAreasRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.GENERAL.ACCOUNTS.PARENT_AREAS + '/{type}',
+      options: createNotAuthWithJourneyOptions(),
+      ...parentAreasController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.GENERAL.ACCOUNTS.PARENT_AREAS + '/{type}',
+      options: createNotAuthWithJourneyOptions(),
+      ...parentAreasPostController
+    }
+  ]
+}
+
+function getMainAreaRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.GENERAL.ACCOUNTS.MAIN_AREA,
+      options: createNotAuthWithJourneyOptions(),
+      ...mainAreaController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.GENERAL.ACCOUNTS.MAIN_AREA,
+      options: createNotAuthWithJourneyOptions(),
+      ...mainAreaPostController
+    }
+  ]
+}
+
+function getAdditionalAreasRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.GENERAL.ACCOUNTS.ADDITIONAL_AREAS,
+      options: createNotAuthWithJourneyOptions(),
+      ...additionalAreasController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.GENERAL.ACCOUNTS.ADDITIONAL_AREAS,
+      options: createNotAuthWithJourneyOptions(),
+      ...additionalAreasPostController
+    }
+  ]
+}
+
+function getCheckAnswersRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.GENERAL.ACCOUNTS.CHECK_ANSWERS,
+      options: createNotAuthWithJourneyOptions(),
+      ...checkAnswersController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.GENERAL.ACCOUNTS.CHECK_ANSWERS,
+      options: createNotAuthWithJourneyOptions(),
+      ...checkAnswersPostController
+    }
+  ]
+}
+
+function getConfirmationRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.GENERAL.ACCOUNTS.CONFIRMATION,
+      options: createNotAuthOptions(),
+      ...confirmationController
+    }
+  ]
+}
+
 export const accounts = {
   plugin: {
     name: 'Accounts',
     register(server) {
-      server.route([
-        {
-          method: 'GET',
-          path: ROUTES.GENERAL.ACCOUNTS.OLD,
-          options: {
-            pre: [{ method: requireNotAuthenticated }]
-          },
-          ...startController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.GENERAL.ACCOUNTS.START,
-          options: {
-            pre: [{ method: requireNotAuthenticated }]
-          },
-          ...startController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.GENERAL.ACCOUNTS.DETAILS,
-          options: {
-            pre: [
-              { method: requireNotAuthenticated },
-              { method: requireJourneyStarted(false) }
-            ]
-          },
-          ...detailsController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.GENERAL.ACCOUNTS.DETAILS,
-          options: {
-            pre: [
-              { method: requireNotAuthenticated },
-              { method: requireJourneyStarted(false) }
-            ]
-          },
-          ...detailsPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.GENERAL.ACCOUNTS.PARENT_AREAS + '/{type}',
-          options: {
-            pre: [
-              { method: requireNotAuthenticated },
-              { method: requireJourneyStarted(false) }
-            ]
-          },
-          ...parentAreasController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.GENERAL.ACCOUNTS.PARENT_AREAS + '/{type}',
-          options: {
-            pre: [
-              { method: requireNotAuthenticated },
-              { method: requireJourneyStarted(false) }
-            ]
-          },
-          ...parentAreasPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.GENERAL.ACCOUNTS.MAIN_AREA,
-          options: {
-            pre: [
-              { method: requireNotAuthenticated },
-              { method: requireJourneyStarted(false) }
-            ]
-          },
-          ...mainAreaController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.GENERAL.ACCOUNTS.MAIN_AREA,
-          options: {
-            pre: [
-              { method: requireNotAuthenticated },
-              { method: requireJourneyStarted(false) }
-            ]
-          },
-          ...mainAreaPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.GENERAL.ACCOUNTS.ADDITIONAL_AREAS,
-          options: {
-            pre: [
-              { method: requireNotAuthenticated },
-              { method: requireJourneyStarted(false) }
-            ]
-          },
-          ...additionalAreasController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.GENERAL.ACCOUNTS.ADDITIONAL_AREAS,
-          options: {
-            pre: [
-              { method: requireNotAuthenticated },
-              { method: requireJourneyStarted(false) }
-            ]
-          },
-          ...additionalAreasPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.GENERAL.ACCOUNTS.CHECK_ANSWERS,
-          options: {
-            pre: [
-              { method: requireNotAuthenticated },
-              { method: requireJourneyStarted(false) }
-            ]
-          },
-          ...checkAnswersController
-        },
-        {
-          method: 'POST',
-          path: ROUTES.GENERAL.ACCOUNTS.CHECK_ANSWERS,
-          options: {
-            pre: [
-              { method: requireNotAuthenticated },
-              { method: requireJourneyStarted(false) }
-            ]
-          },
-          ...checkAnswersPostController
-        },
-        {
-          method: 'GET',
-          path: ROUTES.GENERAL.ACCOUNTS.CONFIRMATION,
-          options: {
-            pre: [{ method: requireNotAuthenticated }]
-          },
-          ...confirmationController
-        }
-      ])
+      const routes = [
+        ...getStartRoutes(),
+        ...getDetailsRoutes(),
+        ...getParentAreasRoutes(),
+        ...getMainAreaRoutes(),
+        ...getAdditionalAreasRoutes(),
+        ...getCheckAnswersRoutes(),
+        ...getConfirmationRoutes()
+      ]
+
+      server.route(routes)
     }
   }
 }

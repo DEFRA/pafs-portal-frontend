@@ -2,7 +2,13 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { mainAreaController, mainAreaPostController } from './controller.js'
 
 vi.mock('../../../common/helpers/areas/areas-helper.js')
-vi.mock('../helpers.js')
+vi.mock('../helpers.js', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    getSessionKey: vi.fn()
+  }
+})
 vi.mock('../../../common/helpers/error-renderer/index.js')
 vi.mock('../schema.js')
 
