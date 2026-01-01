@@ -236,10 +236,15 @@ class CheckAnswersController {
   ) {
     const { responsibility, admin } = sessionData
     const { fieldErrors = {}, errorCode = '' } = options
-    const localeKey = isAdmin ? 'add_user' : 'request_account'
-    const responsibilityLower = responsibility
-      ? responsibility.toLowerCase()
-      : ''
+    const localeKey = this._getLocaleKey(isAdmin)
+    const responsibilityLower = this._getResponsibilityLower(responsibility)
+    const responsibilityLabel = this._getResponsibilityLabel(
+      request,
+      responsibility,
+      responsibilityLower
+    )
+
+    const routes = this._getRoutes(isAdmin)
 
     return {
       pageTitle: request.t(`accounts.${localeKey}.check_answers.title`),
@@ -249,9 +254,31 @@ class CheckAnswersController {
       areaDetails,
       parentAreasDisplay,
       responsibility: responsibilityLower,
-      responsibilityLabel: responsibility
-        ? request.t(`accounts.label.responsibility.${responsibilityLower}`)
-        : '',
+      responsibilityLabel,
+      ...routes,
+      fieldErrors,
+      errorCode,
+      localeKey,
+      ERROR_CODES: VIEW_ERROR_CODES
+    }
+  }
+
+  _getLocaleKey(isAdmin) {
+    return isAdmin ? 'add_user' : 'request_account'
+  }
+
+  _getResponsibilityLower(responsibility) {
+    return responsibility ? responsibility.toLowerCase() : ''
+  }
+
+  _getResponsibilityLabel(request, responsibility, responsibilityLower) {
+    return responsibility
+      ? request.t(`accounts.label.responsibility.${responsibilityLower}`)
+      : ''
+  }
+
+  _getRoutes(isAdmin) {
+    return {
       submitRoute: isAdmin
         ? ROUTES.ADMIN.ACCOUNTS.CHECK_ANSWERS
         : ROUTES.GENERAL.ACCOUNTS.CHECK_ANSWERS,
@@ -270,11 +297,7 @@ class CheckAnswersController {
       parentAreasPsoRoute: isAdmin
         ? ROUTES.ADMIN.ACCOUNTS.PARENT_AREAS_PSO
         : ROUTES.GENERAL.ACCOUNTS.PARENT_AREAS_PSO,
-      isAdminRoute: isAdmin ? ROUTES.ADMIN.ACCOUNTS.IS_ADMIN : null,
-      fieldErrors,
-      errorCode,
-      localeKey,
-      ERROR_CODES: VIEW_ERROR_CODES
+      isAdminRoute: isAdmin ? ROUTES.ADMIN.ACCOUNTS.IS_ADMIN : null
     }
   }
 
