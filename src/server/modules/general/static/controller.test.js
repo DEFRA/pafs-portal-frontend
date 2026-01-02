@@ -3,6 +3,11 @@ import { staticPageController } from './controller.js'
 import { config } from '../../../../config/config.js'
 
 vi.mock('../../../../config/config.js')
+vi.mock('../../../../common/constants/status-codes.js', () => ({
+  statusCodes: {
+    notFound: 404
+  }
+}))
 vi.mock('./static-page-config.js', () => ({
   STATIC_PAGE_CONFIG: {
     '/privacy-notice': {
