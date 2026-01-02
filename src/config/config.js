@@ -232,7 +232,7 @@ export const config = convict({
     lastUpdatedDate: {
       doc: 'Privacy notice last updated date',
       format: String,
-      default: '24 September 2027',
+      default: '24 September 2021',
       env: 'PRIVACY_NOTICE_LAST_UPDATED_DATE'
     }
   },

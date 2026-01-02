@@ -1,6 +1,6 @@
 import { STATIC_PAGE_CONFIG } from './static-page-config.js'
 import { config } from '../../../../config/config.js'
-import { statusCodes } from '../../../../common/constants/status-codes.js'
+import { statusCodes } from '../../../common/constants/status-codes.js'
 
 /**
  * Generic controller for static pages
