@@ -228,6 +228,14 @@ export const config = convict({
       env: 'PAGINATION_DEFAULT_PAGE_SIZE'
     }
   },
+  privacyNotice: {
+    lastUpdatedDate: {
+      doc: 'Privacy notice last updated date',
+      format: String,
+      default: '24 September 2027',
+      env: 'PRIVACY_NOTICE_LAST_UPDATED_DATE'
+    }
+  },
   backendApi: {
     url: {
       doc: 'Backend API base URL',

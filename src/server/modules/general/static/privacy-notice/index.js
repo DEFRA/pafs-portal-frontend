@@ -1,5 +1,5 @@
-import { privacyNoticeController } from './controller.js'
-import { ROUTES } from '../../../common/constants/routes.js'
+import { staticPageController } from '../controller.js'
+import { ROUTES } from '../../../../common/constants/routes.js'
 
 /**
  * Sets up the routes used in the privacy notice page.
@@ -13,7 +13,7 @@ export const privacyNotice = {
         {
           method: 'GET',
           path: ROUTES.GENERAL.PRIVACY_NOTICE,
-          ...privacyNoticeController
+          ...staticPageController
         }
       ])
     }

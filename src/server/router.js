@@ -43,6 +43,11 @@ export const router = {
         'accounts'
       ])
 
+      // Static pages
+      await loadModules(server, join(dirName, 'modules/general/static'), [
+        'privacy-notice'
+      ])
+
       // Project proposal routes
       await loadModules(server, join(dirName, 'modules/project-proposal'), [
         'start-proposal',
