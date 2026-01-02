@@ -80,15 +80,20 @@ describe('StaticPageController', () => {
       mockRequest.t.mockImplementation((key) => {
         const translations = {
           'privacy.pages.privacy_notice.title': 'Privacy Notice',
-          'privacy.pages.privacy_notice.heading': 'Project Application and Funding Service Privacy Notice'
+          'privacy.pages.privacy_notice.heading':
+            'Project Application and Funding Service Privacy Notice'
         }
         return translations[key] || `missing_${key}`
       })
 
       staticPageController.handler(mockRequest, mockH)
 
-      expect(mockRequest.t).toHaveBeenCalledWith('privacy.pages.privacy_notice.title')
-      expect(mockRequest.t).toHaveBeenCalledWith('privacy.pages.privacy_notice.heading')
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        'privacy.pages.privacy_notice.title'
+      )
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        'privacy.pages.privacy_notice.heading'
+      )
       expect(mockH.view).toHaveBeenCalledWith(
         'modules/general/static/privacy-notice/index',
         {
