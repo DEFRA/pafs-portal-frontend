@@ -1,5 +1,6 @@
 {
   "back_link": "Back",
+  "cancel_link": "Cancel",
   "service_name": "Submit a flood risk management proposal",
   "service_name_admin": "PAFS Admin",
   "sign_in": "Sign in",
@@ -11,47 +12,10 @@
   "header_navigation_label": "Profile",
   "service_navigation_menu_button_text": "Menu",
   "back_to_sign_in": "Back to sign in",
-  "service_error": "There was a problem signing in. Please try again",
-  "pages": {
-    "home": {
-      "title": "Your Proposals",
-      "heading": "Your Proposals",
-      "inset_text": "For submission deadlines please contact your local partnership and strategic overview officer.",
-      "project_label": "Enter a project number or name",
-      "project_input_text": "Enter a project number or name",
-      "search_button": "Search",
-      "new_proposal_button": "Create a new proposal"
-    },
-    "archive": {
-      "title": "Archive",
-      "heading": "Archive"
-    },
-    "download": {
-      "title": "Download",
-      "heading": "Download"
-    },
-    "admin": {
-      "journey_selection": {
-        "title": "Which journey would you like to access?",
-        "heading": "Which journey would you like to access?",
-        "context": "As an administrator, you can explore both the general user journey and the admin journey.",
-        "options": {
-          "general_user": {
-            "text": "General user journey",
-            "hint": "Explore the user portal as an RMA, PSO or Area user"
-          },
-          "admin_user": {
-            "text": "Admin journey",
-            "hint": "Explore the admin portal for managing users, proposals, and organisations"
-          }
-        }
-      },
-      "users": {
-        "title": "Users",
-        "heading": "Users"
-      }
-    }
-  },
+  "service_error": "There was a problem with the service. Please try again",
+  "optional": "Optional",
+  "change": "Change",
+  "select_area_option": "Select an area",
   "navigation": {
     "your_proposals": "Your proposals",
     "download_all": "Download All",
@@ -67,6 +31,11 @@
     "summary": "Showing {{from}} to {{to}} of {{total}} {{itemLabel}}",
     "previous": "Previous",
     "next": "Next"
+  },
+  "buttons": {
+    "search": "Search",
+    "continue": "Continue",
+    "start_now": "Start now"
   },
   "footer": {
     "contact_html": "Contact the Defra IT Service Desk on <a href=\"tel:08008766458\" class=\"govuk-footer__link\">0800 8766458</a> or email <a href=\"mailto:pafs-support@environment-agency.gov.uk\" class=\"govuk-footer__link\">pafs-support@environment-agency.gov.uk</a>",

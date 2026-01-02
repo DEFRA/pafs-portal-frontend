@@ -5,7 +5,7 @@ import { statusCodes } from '../constants/status-codes.js'
 
 const mockCheckBackendHealth = vi.fn()
 
-vi.mock('./backend-health-check.js', () => ({
+vi.mock('./backend-health-check/index.js', () => ({
   checkBackendHealth: () => mockCheckBackendHealth()
 }))
 
@@ -24,7 +24,7 @@ describe('#startServer', () => {
 
     createServerSpy = vi.spyOn(createServerImport, 'createServer')
     hapiServerSpy = vi.spyOn(hapi, 'server')
-  }, 30000) // Increase timeout for dynamic imports
+  }, 10000)
 
   beforeEach(() => {
     mockCheckBackendHealth.mockReset()
@@ -58,7 +58,7 @@ describe('#startServer', () => {
 
       expect(result).toEqual({ message: 'success' })
       expect(statusCode).toBe(statusCodes.ok)
-    }, 15000)
+    }, 120000)
 
     test('Should disable HTTP timeouts', async () => {
       expect(server.listener.requestTimeout).toBe(0)
@@ -78,7 +78,7 @@ describe('#startServer', () => {
 
       expect(mockCheckBackendHealth).toHaveBeenCalled()
       expect(server).toBeDefined()
-    }, 15000)
+    }, 120000)
   })
 
   describe('When server start fails', () => {

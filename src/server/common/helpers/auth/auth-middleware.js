@@ -7,6 +7,9 @@ import {
   clearAuthSession
 } from './session-manager.js'
 import { ROUTES } from '../../constants/routes.js'
+import { validateSession } from '../../services/auth/auth-service.js'
+import { AUTH_ERROR_CODES } from '../../constants/validation.js'
+import { SESSION } from '../../constants/common.js'
 
 export async function requireAuth(request, h) {
   const session = getAuthSession(request)
@@ -17,15 +20,39 @@ export async function requireAuth(request, h) {
 
   if (isSessionExpired(session)) {
     clearAuthSession(request)
-    return h.redirect(`${ROUTES.LOGIN}?error=session-timeout`).takeover()
+    request.yar.flash('authError', SESSION.SESSION_TIMEOUT)
+    return h.redirect(ROUTES.LOGIN).takeover()
+  }
+
+  // Validate session on every page load with lightweight API call
+  const validationResult = await validateSession(session.accessToken)
+  if (!validationResult.success) {
+    const errorCode = validationResult.errors?.[0]?.errorCode
+
+    if (errorCode === AUTH_ERROR_CODES.SESSION_MISMATCH) {
+      clearAuthSession(request)
+      request.yar.flash('authError', SESSION.SESSION_MISMATCH)
+      return h.redirect(ROUTES.LOGIN).takeover()
+    }
+
+    // Otherwise show session timeout message
+    clearAuthSession(request)
+    request.yar.flash('authError', SESSION.SESSION_TIMEOUT)
+    return h.redirect(ROUTES.LOGIN).takeover()
   }
 
   if (shouldRefreshToken(session)) {
     const result = await refreshAuthSession(request)
 
     if (!result.success) {
-      // Always show session timeout message for any refresh failure
-      return h.redirect(`${ROUTES.LOGIN}?error=session-timeout`).takeover()
+      // Check for concurrent session (session mismatch)
+      if (result.reason === AUTH_ERROR_CODES.SESSION_MISMATCH) {
+        request.yar.flash('authError', SESSION.SESSION_MISMATCH)
+        return h.redirect(ROUTES.LOGIN).takeover()
+      }
+      // All other errors show session timeout
+      request.yar.flash('authError', SESSION.SESSION_TIMEOUT)
+      return h.redirect(ROUTES.LOGIN).takeover()
     }
   }
 

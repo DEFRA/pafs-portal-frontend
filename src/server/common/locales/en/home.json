@@ -1,0 +1,11 @@
+{
+  "title": "Your Proposals",
+  "heading": "Your Proposals",
+  "inset_text": "For submission deadlines please contact your local partnership and strategic overview officer.",
+  "labels": {
+    "project": "Enter a project number or name"
+  },
+  "buttons": {
+    "new_proposal": "Create a new proposal"
+  }
+}

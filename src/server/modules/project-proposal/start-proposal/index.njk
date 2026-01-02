@@ -1,0 +1,28 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-body" data-testid="app-page-body">
+        <p class="govuk-body">{{t('project-proposal.start_proposal.intro_paragraph')}}</p>
+
+        <h2 class="govuk-heading-m">{{t('project-proposal.start_proposal.before_you_start_heading')}}</h2>
+
+        <p class="govuk-body">{{t('project-proposal.start_proposal.before_you_start_intro')}}</p>
+
+        <a href="/project-proposal/project-name" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button" data-govuk-button-init="">
+          {{t('project-proposal.start_proposal.start_button')}}
+          <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
+          </svg>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

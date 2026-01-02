@@ -1,6 +1,7 @@
 import yar from '@hapi/yar'
 
 import { config } from '../../../../config/config.js'
+import { CACHE_SEGMENTS } from '../../constants/common.js'
 
 const sessionConfig = config.get('session')
 
@@ -13,6 +14,7 @@ export const sessionCache = {
     name: sessionConfig.cache.name,
     cache: {
       cache: sessionConfig.cache.name,
+      segment: CACHE_SEGMENTS.SESSION,
       expiresIn: sessionConfig.cache.ttl
     },
     storeBlank: false,

@@ -15,7 +15,7 @@ vi.mock('../../../server/common/helpers/logging/logger.js', () => ({
   createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
 }))
 
-vi.mock('../../../server/common/helpers/i18n.js', () => ({
+vi.mock('../../../server/common/helpers/i18n/index.js', () => ({
   translate: (key) => key
 }))
 

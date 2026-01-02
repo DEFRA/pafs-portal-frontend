@@ -1,6 +1,6 @@
 import { createServer } from '../../server.js'
 import { config } from '../../../config/config.js'
-import { checkBackendHealth } from './backend-health-check.js'
+import { checkBackendHealth } from './backend-health-check/index.js'
 
 async function startServer() {
   const server = await createServer()

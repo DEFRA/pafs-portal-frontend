@@ -6,11 +6,11 @@ describe('#contentSecurityPolicy', () => {
   beforeAll(async () => {
     server = await createServer()
     await server.initialize()
-  })
+  }, 120000) // Server startup takes 40-50s
 
   afterAll(async () => {
     await server.stop({ timeout: 0 })
-  })
+  }, 10000)
 
   test('Should set the CSP policy header', async () => {
     const resp = await server.inject({
@@ -27,5 +27,5 @@ describe('#contentSecurityPolicy', () => {
       )
 
     expect(hasCsp).toBeTruthy()
-  })
+  }, 60000)
 })

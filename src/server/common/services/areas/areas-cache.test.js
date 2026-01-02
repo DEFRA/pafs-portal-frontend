@@ -1,317 +1,274 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, beforeEach, vi } from 'vitest'
+import { AreasCacheService, createAreasCacheService } from './areas-cache.js'
 
-// Mock config before importing
 vi.mock('../../../../config/config.js', () => ({
   config: {
     get: vi.fn((key) => {
-      if (key === 'session.cache.name') {
-        return 'test-cache'
-      }
+      if (key === 'session.cache.ttl') return 1800000
+      if (key === 'session.cache.engine') return 'redis'
       return null
     })
   }
 }))
 
-// Import after mocks
-let getCachedAreas
+vi.mock('../../helpers/logging/logger.js', () => ({
+  createLogger: vi.fn(() => ({
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
+  }))
+}))
 
-describe('#areas-cache', () => {
+const { config } = await import('../../../../config/config.js')
+
+describe('AreasCacheService', () => {
   let mockServer
   let mockCache
-  let mockFetchFunction
+  let cacheService
 
-  beforeEach(async () => {
-    vi.clearAllMocks()
-    vi.resetModules()
-
-    // Re-import after reset to get fresh module state
-    const module = await import('./areas-cache.js')
-    getCachedAreas = module.getCachedAreas
-
+  beforeEach(() => {
     mockCache = {
       get: vi.fn(),
-      set: vi.fn()
+      set: vi.fn(),
+      drop: vi.fn()
     }
 
     mockServer = {
-      cache: vi.fn(() => mockCache),
-      logger: {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn()
-      }
+      cache: vi.fn(() => mockCache)
     }
 
-    mockFetchFunction = vi.fn()
-  })
-
-  afterEach(() => {
     vi.clearAllMocks()
   })
 
-  describe('getCachedAreas', () => {
-    test('Should return data from cache when available (standard Catbox format)', async () => {
-      const mockCachedData = {
-        item: [{ id: 1, name: 'Cached Area' }],
-        stored: Date.now()
-      }
-
-      mockCache.get.mockResolvedValue(mockCachedData)
-
-      const result = await getCachedAreas(mockServer, mockFetchFunction)
-
-      expect(mockCache.get).toHaveBeenCalledWith('areas')
-      expect(mockFetchFunction).not.toHaveBeenCalled()
-      expect(result).toEqual([{ id: 1, name: 'Cached Area' }])
-      expect(mockServer.logger.info).toHaveBeenCalledWith(
-        'Areas retrieved from cache'
-      )
-    })
-
-    test('Should return data from cache when cached is already an array', async () => {
-      const mockCachedData = [{ id: 1, name: 'Cached Area' }]
-
-      mockCache.get.mockResolvedValue(mockCachedData)
-
-      const result = await getCachedAreas(mockServer, mockFetchFunction)
-
-      expect(result).toEqual(mockCachedData)
-      expect(mockFetchFunction).not.toHaveBeenCalled()
-    })
-
-    test('Should return data from cache when cached is array-like object', async () => {
-      const mockCachedData = {
-        0: { id: 1, name: 'Area 1' },
-        1: { id: 2, name: 'Area 2' }
-      }
-
-      mockCache.get.mockResolvedValue(mockCachedData)
-
-      const result = await getCachedAreas(mockServer, mockFetchFunction)
-
-      expect(Array.isArray(result)).toBe(true)
-      expect(result).toHaveLength(2)
-      expect(mockFetchFunction).not.toHaveBeenCalled()
-    })
-
-    test('Should fetch from API when cache miss', async () => {
-      const mockApiData = [{ id: 1, name: 'Fetched Area' }]
-
-      mockCache.get.mockResolvedValue(null)
-      mockFetchFunction.mockResolvedValue({
-        success: true,
-        data: mockApiData
+  describe('when caching is enabled (Redis)', () => {
+    beforeEach(() => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'session.cache.ttl') return 1800000
+        return null
       })
-      mockCache.set.mockResolvedValue(undefined)
-
-      const result = await getCachedAreas(mockServer, mockFetchFunction)
-
-      expect(mockCache.get).toHaveBeenCalledWith('areas')
-      expect(mockFetchFunction).toHaveBeenCalled()
-      expect(mockCache.set).toHaveBeenCalledWith('areas', mockApiData)
-      expect(result).toEqual(mockApiData)
+      cacheService = new AreasCacheService(mockServer)
     })
 
-    test('Should return null when API response is not successful', async () => {
-      mockCache.get.mockResolvedValue(null)
-      mockFetchFunction.mockResolvedValue({
-        success: false,
-        error: 'API Error'
+    test('isCacheEnabled returns true', () => {
+      expect(cacheService.isCacheEnabled()).toBe(true)
+    })
+
+    describe('generateKey', () => {
+      test('generates consistent key for areas-by-type', () => {
+        const key = cacheService.generateKey()
+        expect(key).toBe('areas-by-type')
       })
 
-      const result = await getCachedAreas(mockServer, mockFetchFunction)
+      test('always returns same key (singleton pattern)', () => {
+        const key1 = cacheService.generateKey()
+        const key2 = cacheService.generateKey()
+        expect(key1).toBe(key2)
+      })
+    })
+
+    describe('getAreasByType', () => {
+      test('returns cached areas on cache hit', async () => {
+        const mockAreas = {
+          EA: [{ id: '1', name: 'Wessex', area_type: 'EA' }],
+          PSO: [
+            { id: '2', name: 'PSO West', area_type: 'PSO', parent_id: '1' }
+          ],
+          RMA: [{ id: '3', name: 'Bristol', area_type: 'RMA', parent_id: '2' }]
+        }
+        mockCache.get.mockResolvedValue(mockAreas)
+
+        const result = await cacheService.getAreasByType()
+
+        expect(result).toEqual(mockAreas)
+        expect(mockCache.get).toHaveBeenCalledWith('areas-by-type')
+      })
+
+      test('returns null on cache miss', async () => {
+        mockCache.get.mockResolvedValue(null)
+
+        const result = await cacheService.getAreasByType()
+
+        expect(result).toBeNull()
+      })
+
+      test('returns null on cache error', async () => {
+        mockCache.get.mockRejectedValue(new Error('Cache error'))
+
+        const result = await cacheService.getAreasByType()
+
+        expect(result).toBeNull()
+      })
+
+      test('handles empty areas object', async () => {
+        mockCache.get.mockResolvedValue({})
+
+        const result = await cacheService.getAreasByType()
+
+        expect(result).toEqual({})
+      })
+    })
+
+    describe('setAreasByType', () => {
+      test('stores areas in cache with no expiration by default', async () => {
+        const mockAreas = {
+          EA: [{ id: '1', name: 'Wessex', area_type: 'EA' }]
+        }
+
+        await cacheService.setAreasByType(mockAreas)
+
+        expect(mockCache.set).toHaveBeenCalledWith(
+          'areas-by-type',
+          mockAreas,
+          0
+        )
+      })
+
+      test('stores areas with custom TTL when provided', async () => {
+        const mockAreas = {
+          EA: [{ id: '1', name: 'Wessex', area_type: 'EA' }]
+        }
+        const customTtl = 3600000
+
+        await cacheService.setAreasByType(mockAreas, customTtl)
+
+        expect(mockCache.set).toHaveBeenCalledWith(
+          'areas-by-type',
+          mockAreas,
+          customTtl
+        )
+      })
+
+      test('handles cache error gracefully', async () => {
+        mockCache.set.mockRejectedValue(new Error('Cache error'))
+
+        await expect(
+          cacheService.setAreasByType({ EA: [] })
+        ).resolves.not.toThrow()
+      })
+
+      test('caches complex area hierarchy', async () => {
+        const complexAreas = {
+          EA: [
+            { id: '1', name: 'Wessex', area_type: 'EA', parent_id: null },
+            { id: '2', name: 'Thames', area_type: 'EA', parent_id: null }
+          ],
+          PSO: [
+            { id: '3', name: 'PSO West', area_type: 'PSO', parent_id: '1' },
+            { id: '4', name: 'PSO London', area_type: 'PSO', parent_id: '2' }
+          ],
+          RMA: [
+            { id: '5', name: 'Bristol', area_type: 'RMA', parent_id: '3' },
+            { id: '6', name: 'Westminster', area_type: 'RMA', parent_id: '4' }
+          ]
+        }
+
+        await cacheService.setAreasByType(complexAreas)
+
+        expect(mockCache.set).toHaveBeenCalledWith(
+          'areas-by-type',
+          complexAreas,
+          0
+        )
+      })
+    })
+
+    describe('invalidateAreas', () => {
+      test('drops areas cache', async () => {
+        await cacheService.invalidateAreas()
+
+        expect(mockCache.drop).toHaveBeenCalledWith('areas-by-type')
+      })
+
+      test('handles cache error gracefully', async () => {
+        mockCache.drop.mockRejectedValue(new Error('Cache error'))
+
+        await expect(cacheService.invalidateAreas()).resolves.not.toThrow()
+      })
+    })
+
+    describe('cache workflow - typical usage pattern', () => {
+      test('first request: cache miss, fetch from API, then cache', async () => {
+        mockCache.get.mockResolvedValue(null)
+
+        const result = await cacheService.getAreasByType()
+        expect(result).toBeNull()
+
+        const apiData = {
+          EA: [{ id: '1', name: 'Wessex', area_type: 'EA' }]
+        }
+        await cacheService.setAreasByType(apiData)
+
+        expect(mockCache.set).toHaveBeenCalledWith('areas-by-type', apiData, 0)
+      })
+
+      test('subsequent requests: cache hit', async () => {
+        const cachedAreas = {
+          EA: [{ id: '1', name: 'Wessex', area_type: 'EA' }]
+        }
+        mockCache.get.mockResolvedValue(cachedAreas)
+
+        const result = await cacheService.getAreasByType()
+
+        expect(result).toEqual(cachedAreas)
+        expect(mockCache.set).not.toHaveBeenCalled()
+      })
+
+      test('refresh workflow: invalidate then fetch fresh', async () => {
+        await cacheService.invalidateAreas()
+        expect(mockCache.drop).toHaveBeenCalledWith('areas-by-type')
+
+        mockCache.get.mockResolvedValue(null)
+        const result = await cacheService.getAreasByType()
+        expect(result).toBeNull()
+      })
+    })
+  })
+
+  describe('when caching is disabled (memory)', () => {
+    beforeEach(() => {
+      config.get.mockReturnValue('memory')
+      cacheService = new AreasCacheService(mockServer)
+    })
+
+    test('isCacheEnabled returns false', () => {
+      expect(cacheService.isCacheEnabled()).toBe(false)
+    })
+
+    test('getAreasByType returns null without calling cache', async () => {
+      const result = await cacheService.getAreasByType()
 
       expect(result).toBeNull()
-      expect(mockCache.set).not.toHaveBeenCalled()
+      expect(mockServer.cache).not.toHaveBeenCalled()
     })
 
-    test('Should fetch from API when cache is not available', async () => {
-      // Mock server without cache
-      const serverWithoutCache = {
-        cache: vi.fn(() => null),
-        logger: {
-          info: vi.fn(),
-          warn: vi.fn(),
-          error: vi.fn()
-        }
-      }
+    test('setAreasByType does nothing', async () => {
+      await cacheService.setAreasByType({ EA: [] })
 
-      const mockApiData = [{ id: 1, name: 'Fetched Area' }]
-
-      mockFetchFunction.mockResolvedValue({
-        success: true,
-        data: mockApiData
-      })
-
-      const result = await getCachedAreas(serverWithoutCache, mockFetchFunction)
-
-      expect(mockFetchFunction).toHaveBeenCalled()
-      expect(result).toEqual(mockApiData)
+      expect(mockServer.cache).not.toHaveBeenCalled()
     })
 
-    test('Should return null when cache is not available and API fails', async () => {
-      const serverWithoutCache = {
-        cache: vi.fn(() => null),
-        logger: {
-          info: vi.fn(),
-          warn: vi.fn(),
-          error: vi.fn()
-        }
-      }
+    test('invalidateAreas does nothing', async () => {
+      await cacheService.invalidateAreas()
 
-      mockFetchFunction.mockResolvedValue({
-        success: false,
-        error: 'API Error'
-      })
+      expect(mockServer.cache).not.toHaveBeenCalled()
+    })
+  })
 
-      const result = await getCachedAreas(serverWithoutCache, mockFetchFunction)
+  describe('createAreasCacheService', () => {
+    test('creates cache service instance', () => {
+      config.get.mockReturnValue('redis')
+      const service = createAreasCacheService(mockServer)
 
-      expect(result).toBeNull()
+      expect(service).toBeInstanceOf(AreasCacheService)
     })
 
-    test('Should handle cache get errors and fallback to API', async () => {
-      const mockApiData = [{ id: 1, name: 'Fetched Area' }]
+    test('service has correct segment', () => {
+      config.get.mockReturnValue('redis')
+      const service = createAreasCacheService(mockServer)
 
-      mockCache.get.mockRejectedValue(new Error('Cache error'))
-      mockFetchFunction.mockResolvedValue({
-        success: true,
-        data: mockApiData
-      })
-
-      const result = await getCachedAreas(mockServer, mockFetchFunction)
-
-      expect(mockServer.logger.error).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: 'Cache error'
-        }),
-        'Error accessing areas cache'
-      )
-      expect(mockFetchFunction).toHaveBeenCalled()
-      expect(result).toEqual(mockApiData)
-    })
-
-    test('Should handle both cache and API errors gracefully', async () => {
-      mockCache.get.mockRejectedValue(new Error('Cache error'))
-      mockFetchFunction.mockRejectedValue(new Error('API error'))
-
-      const result = await getCachedAreas(mockServer, mockFetchFunction)
-
-      expect(mockServer.logger.error).toHaveBeenCalledTimes(2)
-      expect(result).toBeNull()
-    })
-
-    test('Should handle cache set errors gracefully', async () => {
-      const mockApiData = [{ id: 1, name: 'Fetched Area' }]
-
-      mockCache.get.mockResolvedValue(null)
-      mockFetchFunction.mockResolvedValue({
-        success: true,
-        data: mockApiData
-      })
-      mockCache.set.mockRejectedValue(new Error('Cache set error'))
-
-      const result = await getCachedAreas(mockServer, mockFetchFunction)
-
-      // Should still return data even if cache set fails
-      expect(result).toEqual(mockApiData)
-    })
-
-    test('Should handle primitive cached values', async () => {
-      mockCache.get.mockResolvedValue('primitive-value')
-
-      const result = await getCachedAreas(mockServer, mockFetchFunction)
-
-      expect(result).toBe('primitive-value')
-      expect(mockFetchFunction).not.toHaveBeenCalled()
-    })
-
-    test('Should handle plain object cached values', async () => {
-      const mockCachedData = {
-        id: 1,
-        name: 'Plain Object',
-        stored: undefined,
-        item: undefined
-      }
-
-      mockCache.get.mockResolvedValue(mockCachedData)
-
-      const result = await getCachedAreas(mockServer, mockFetchFunction)
-
-      expect(result).toEqual(mockCachedData)
-      expect(mockFetchFunction).not.toHaveBeenCalled()
-    })
-
-    test('Should handle cache segment creation error', async () => {
-      // Reset modules to get fresh state
-      vi.resetModules()
-      const module = await import('./areas-cache.js')
-      const freshGetCachedAreas = module.getCachedAreas
-
-      const serverWithError = {
-        cache: vi.fn(() => {
-          throw new Error('Cannot provision the same cache segment')
-        }),
-        logger: {
-          info: vi.fn(),
-          warn: vi.fn(),
-          error: vi.fn()
-        }
-      }
-
-      const mockApiData = [{ id: 1, name: 'Fetched Area' }]
-
-      mockFetchFunction.mockResolvedValue({
-        success: true,
-        data: mockApiData
-      })
-
-      const result = await freshGetCachedAreas(
-        serverWithError,
-        mockFetchFunction
-      )
-
-      expect(serverWithError.logger.warn).toHaveBeenCalledWith(
-        'Cache segment already exists - caching will be disabled. This may happen if the server was restarted.'
-      )
-      expect(result).toEqual(mockApiData)
-    })
-
-    test('Should handle other cache creation errors', async () => {
-      // Reset modules to get fresh state
-      vi.resetModules()
-      const module = await import('./areas-cache.js')
-      const freshGetCachedAreas = module.getCachedAreas
-
-      const serverWithError = {
-        cache: vi.fn(() => {
-          throw new Error('Other cache error')
-        }),
-        logger: {
-          info: vi.fn(),
-          warn: vi.fn(),
-          error: vi.fn()
-        }
-      }
-
-      const mockApiData = [{ id: 1, name: 'Fetched Area' }]
-
-      mockFetchFunction.mockResolvedValue({
-        success: true,
-        data: mockApiData
-      })
-
-      const result = await freshGetCachedAreas(
-        serverWithError,
-        mockFetchFunction
-      )
-
-      expect(serverWithError.logger.error).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: 'Other cache error'
-        }),
-        'Error creating cache segment - caching disabled'
-      )
-      expect(result).toEqual(mockApiData)
+      expect(service.segment).toBe('areas')
     })
   })
 })

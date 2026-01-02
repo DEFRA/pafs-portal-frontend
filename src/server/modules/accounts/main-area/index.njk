@@ -1,0 +1,101 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}
+  {% if backLink %}
+    <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    
+    {# Build error summary list #}
+    {% set errorList = [] %}
+    
+    {% if fieldErrors.mainArea %}
+      {% set errorList = errorList.concat([{ 
+        text: t('accounts.areas.' + responsibility + '.main.validation.' + ('required_admin' if isAdmin else 'required')), 
+        href: "#mainArea" 
+      }]) %}
+    {% endif %}
+
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l">
+      {{ t('accounts.areas.' + responsibility + '.main.' + ('heading_admin' if isAdmin else 'heading')) }}
+    </h1>
+
+    <form method="post" action="{{ submitRoute }}" novalidate>
+      
+      {% if groupedAreas and groupedAreas.length > 0 %}
+        {# PSO/RMA: Use raw HTML for optgroups #}
+        <div class="govuk-form-group {% if fieldErrors.mainArea %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label govuk-label--m" for="mainArea">
+            {{ t('accounts.areas.' + responsibility + '.main.label') }}
+          </label>
+          <div id="mainArea-hint" class="govuk-hint">
+            {{ t('accounts.areas.' + responsibility + '.main.' + ('hint_admin' if isAdmin else 'hint')) }}
+          </div>
+          {% if fieldErrors.mainArea %}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span>
+              {{ t('accounts.areas.' + responsibility + '.main.validation.' + ('required_admin' if isAdmin else 'required')) }}
+            </p>
+          {% endif %}
+          <select class="govuk-select {% if fieldErrors.mainArea %}govuk-select--error{% endif %}" 
+                  id="mainArea" 
+                  name="mainArea" 
+                  aria-describedby="mainArea-hint">
+            <option value="">{{ t('common.select_area_option') }}</option>
+            {% for group in groupedAreas %}
+              <optgroup label="{% if responsibility == 'pso' %}{{ group.parent.name }}{% elif responsibility == 'rma' %}{{ group.eaParent.name }} - {{ group.parent.name }}{% endif %}">
+                {% for area in group.children %}
+                  <option value="{{ area.id }}" {% if mainArea == area.id %}selected{% endif %}>{{ area.name }}</option>
+                {% endfor %}
+              </optgroup>
+            {% endfor %}
+          </select>
+        </div>
+      {% else %}
+        {# EA or ungrouped: Use GOV.UK macro #}
+        {% set selectOptions = [{ value: '', text: t('common.select_area_option'), selected: not mainArea }] %}
+        {% for area in availableAreas %}
+          {% set selectOptions = selectOptions.concat([{
+            value: area.id,
+            text: area.name,
+            selected: mainArea == area.id
+          }]) %}
+        {% endfor %}
+
+        {{ govukSelect({
+          id: "mainArea",
+          name: "mainArea",
+          label: {
+            text: t('accounts.areas.' + responsibility + '.main.label'),
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: t('accounts.areas.' + responsibility + '.main.' + ('hint_admin' if isAdmin else 'hint'))
+          },
+          items: selectOptions,
+          errorMessage: { text: t('accounts.areas.' + responsibility + '.main.validation.' + ('required_admin' if isAdmin else 'required')) } if fieldErrors.mainArea else false
+        }) }}
+      {% endif %}
+
+      {{ govukButton({
+        text: t('common.buttons.continue')
+      }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}

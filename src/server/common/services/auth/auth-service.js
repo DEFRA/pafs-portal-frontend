@@ -1,4 +1,4 @@
-import { apiRequest } from '../../helpers/api-client.js'
+import { apiRequest } from '../../helpers/api-client/index.js'
 
 export async function login(email, password) {
   return apiRequest('/api/v1/auth/login', {
@@ -55,5 +55,14 @@ export async function setPassword(token, newPassword, confirmPassword) {
   return apiRequest('/api/v1/auth/set-password', {
     method: 'POST',
     body: JSON.stringify({ token, password: newPassword, confirmPassword })
+  })
+}
+
+export async function validateSession(accessToken) {
+  return apiRequest('/api/v1/auth/validate-session', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
   })
 }

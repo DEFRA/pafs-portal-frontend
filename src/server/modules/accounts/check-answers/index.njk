@@ -1,0 +1,214 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block beforeContent %}
+  {% if backLink %}
+    <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    
+    {# Build error summary list #}
+    {% set errorList = [] %}
+
+    {# Field-specific validation errors #}
+    {% if fieldErrors.firstName %}
+      {% set errorList = (errorList.push({ text: t('accounts.validation.common.VALIDATION_FIRST_NAME_REQUIRED'), href: detailsRoute }), errorList) %}
+    {% endif %}
+    {% if fieldErrors.lastName %}
+      {% set errorList = (errorList.push({ text: t('accounts.validation.common.VALIDATION_LAST_NAME_REQUIRED'), href: detailsRoute }), errorList) %}
+    {% endif %}
+    {% if fieldErrors.email == ERROR_CODES.EMAIL_DUPLICATE or errorCode == 'DUPLICATE_ENTRY' %}
+      {% set errorList = (errorList.push({ text: t('accounts.validation.common.VALIDATION_EMAIL_DUPLICATE'), href: detailsRoute }), errorList) %}
+    {% elif fieldErrors.email %}
+      {% set errorList = (errorList.push({ text: t('accounts.validation.common.VALIDATION_EMAIL_INVALID_FORMAT'), href: detailsRoute }), errorList) %}
+    {% endif %}
+    {% if fieldErrors.telephoneNumber %}
+      {% set errorList = (errorList.push({ text: t('accounts.validation.common.VALIDATION_TELEPHONE_REQUIRED'), href: detailsRoute }), errorList) %}
+    {% endif %}
+    {% if fieldErrors.organisation %}
+      {% set errorList = (errorList.push({ text: t('accounts.validation.common.VALIDATION_ORGANISATION_REQUIRED'), href: detailsRoute }), errorList) %}
+    {% endif %}
+    {% if fieldErrors.jobTitle %}
+      {% set errorList = (errorList.push({ text: t('accounts.validation.common.VALIDATION_JOB_TITLE_REQUIRED'), href: detailsRoute }), errorList) %}
+    {% endif %}
+    {% if fieldErrors.responsibility %}
+      {% set errorList = (errorList.push({ text: t('accounts.validation.common.VALIDATION_RESPONSIBILITY_REQUIRED'), href: detailsRoute }), errorList) %}
+    {% endif %}
+    {% if fieldErrors.areas %}
+      {% set errorList = (errorList.push({ text: t('accounts.validation.common.VALIDATION_AREAS_REQUIRED'), href: mainAreaRoute }), errorList) %}
+    {% endif %}
+
+    {# General API errors #}
+    {% if errorCode == ERROR_CODES.NETWORK_ERROR %}
+      {% set errorList = (errorList.push({ text: t('common.service_error') }), errorList) %}
+    {% elif errorCode == 'UPSERT_FAILED' %}
+      {% set errorList = (errorList.push({ text: t('accounts.check_answers.error.submission_failed') }), errorList) %}
+    {% elif errorCode and not fieldErrors.email %}
+      {% set errorList = (errorList.push({ text: t('accounts.check_answers.error.submission_failed') }), errorList) %}
+    {% endif %}
+
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-xl">{{ t('accounts.' + localeKey + '.check_answers.heading') }}</h1>
+
+    {# Personal Details Summary Card #}
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title">{{ t('accounts.' + localeKey + '.check_answers.personal_details') }}</h2>
+        <ul class="govuk-summary-card__actions">
+          <li class="govuk-summary-card__action">
+            <a class="govuk-link" href="{{ detailsRoute }}">
+              {{ t('common.change') }}<span class="govuk-visually-hidden"> {{ t('accounts.' + localeKey + '.check_answers.change_personal') }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="govuk-summary-card__content">
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('accounts.label.first_name') }}</dt>
+            <dd class="govuk-summary-list__value">{{ userData.firstName or t('accounts.check_answers.not_provided') }}</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('accounts.label.last_name') }}</dt>
+            <dd class="govuk-summary-list__value">{{ userData.lastName or t('accounts.check_answers.not_provided') }}</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('accounts.label.email') }}</dt>
+            <dd class="govuk-summary-list__value">{{ userData.email or t('accounts.check_answers.not_provided') }}</dd>
+          </div>
+          {% if not admin %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('accounts.label.telephone') }}</dt>
+            <dd class="govuk-summary-list__value">{{ userData.telephoneNumber or t('accounts.check_answers.not_provided') }}</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('accounts.label.organisation') }}</dt>
+            <dd class="govuk-summary-list__value">{{ userData.organisation or t('accounts.check_answers.not_provided') }}</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('accounts.label.job_title') }}</dt>
+            <dd class="govuk-summary-list__value">{{ userData.jobTitle or t('accounts.check_answers.not_provided') }}</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('accounts.label.responsibility_legend') }}</dt>
+            <dd class="govuk-summary-list__value">{{ responsibilityLabel }}</dd>
+          </div>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+
+    {# Admin Status Card (for admin flow only) #}
+    {% if isAdmin %}
+      <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+          <h2 class="govuk-summary-card__title">{{ t('accounts.add_user.check_answers.additional_info') }}</h2>
+          <ul class="govuk-summary-card__actions">
+            <li class="govuk-summary-card__action">
+              <a class="govuk-link" href="{{ isAdminRoute }}">
+                {{ t('common.change') }}<span class="govuk-visually-hidden"> {{ t('accounts.add_user.check_answers.change_admin_status') }}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="govuk-summary-card__content">
+          <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('accounts.add_user.check_answers.will_be_admin') }}</dt>
+              <dd class="govuk-summary-list__value">{{ t('accounts.add_user.admin_question.' + ('yes' if admin else 'no')) }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    {% endif %}
+
+    {# Area Selection Card (only for non-admin users) #}
+    {% if not admin %}
+      <div class="govuk-summary-card">
+        <div class="govuk-summary-card__title-wrapper">
+          <h2 class="govuk-summary-card__title">{{ t('accounts.check_answers.area_selection') }}</h2>
+        </div>
+        <div class="govuk-summary-card__content">
+          <dl class="govuk-summary-list">
+            {# Show EA areas for PSO and RMA users #}
+            {% if parentAreasDisplay and parentAreasDisplay.eaAreas %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ t('accounts.check_answers.ea_areas') }}</dt>
+                <dd class="govuk-summary-list__value">{{ parentAreasDisplay.eaAreas }}</dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="{{ parentAreasEaRoute }}">
+                    {{ t('common.change') }}<span class="govuk-visually-hidden"> {{ t('accounts.check_answers.ea_areas') | lower }}</span>
+                  </a>
+                </dd>
+              </div>
+            {% endif %}
+            
+            {# Show PSO areas for RMA users #}
+            {% if parentAreasDisplay and parentAreasDisplay.psoAreas %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ t('accounts.check_answers.pso_areas') }}</dt>
+                <dd class="govuk-summary-list__value">{{ parentAreasDisplay.psoAreas }}</dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="{{ parentAreasPsoRoute }}">
+                    {{ t('common.change') }}<span class="govuk-visually-hidden"> {{ t('accounts.check_answers.pso_areas') | lower }}</span>
+                  </a>
+                </dd>
+              </div>
+            {% endif %}
+
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('accounts.areas.' + responsibility + '.main.label') }}</dt>
+              <dd class="govuk-summary-list__value">{{ areaDetails.mainArea.name if areaDetails.mainArea else t('accounts.check_answers.not_selected') }}</dd>
+              <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" href="{{ mainAreaRoute }}">
+                  {{ t('common.change') }}<span class="govuk-visually-hidden"> {{ t('accounts.areas.' + responsibility + '.main.label') | lower }}</span>
+                </a>
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('accounts.areas.' + responsibility + '.additional.legend') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if areaDetails.additionalAreas.length > 0 %}
+                  {% for area in areaDetails.additionalAreas %}{{ area.name }}{% if not loop.last %}, {% endif %}{% endfor %}
+                {% else %}
+                  {{ t('accounts.check_answers.not_selected') }}
+                {% endif %}
+              </dd>
+              <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" href="{{ additionalAreasRoute }}">
+                  {{ t('common.change') }}<span class="govuk-visually-hidden"> {{ t('accounts.areas.' + responsibility + '.additional.legend') | lower }}</span>
+                </a>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if not isAdmin %}
+    <p class="govuk-body">{{ t('accounts.' + localeKey + '.check_answers.confirmation_text') }}</p>
+    {% endif %}
+
+    {# Submit Form #}
+    <form method="post" action="{{ submitRoute }}" novalidate>
+      {{ govukButton({
+        text: t('accounts.' + localeKey + '.check_answers.submit_button'),
+        preventDoubleClick: true
+      }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}
