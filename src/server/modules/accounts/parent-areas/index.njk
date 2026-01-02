@@ -1,0 +1,97 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block beforeContent %}
+  {% if backLink %}
+    <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    
+    {% if hasError %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: [
+          {
+            text: t(translationBase + '.validation.' + ('required_admin' if isAdmin else 'required')),
+            href: "#parentAreas"
+          }
+        ]
+      }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l">{{ t(translationBase + '.heading') }}</h1>
+    
+    <p class="govuk-body">{{ t(translationBase + '.intro' + ('_admin' if isAdmin else '')) }}</p>
+
+    <form method="post" action="{{ submitRoute }}" novalidate>
+      {% if groupedParentAreas and groupedParentAreas.length > 0 %}
+        {# RMA selecting PSO: Display grouped checkboxes with fieldset legends #}
+        {% for group in groupedParentAreas %}
+          <div class="govuk-form-group govuk-!-margin-bottom-8 {% if hasError %}govuk-form-group--error{% endif %}">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend">
+                <strong>{{ group.parent.name }} - PSO areas</strong>
+              </legend>
+              {% if hasError and loop.first %}
+                <p class="govuk-error-message">
+                  <span class="govuk-visually-hidden">Error:</span> 
+                  {{ t(translationBase + '.validation.' + ('required_admin' if isAdmin else 'required')) }}
+                </p>
+              {% endif %}
+              <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                {% for area in group.children %}
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" 
+                           id="parentAreas-{{ area.id }}" 
+                           name="parentAreas" 
+                           type="checkbox" 
+                           value="{{ area.id }}" 
+                           {% if area.id in selectedAreas %}checked{% endif %}>
+                    <label class="govuk-label govuk-checkboxes__label" for="parentAreas-{{ area.id }}">
+                      {{ area.name }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </fieldset>
+          </div>
+        {% endfor %}
+      {% else %}
+        {# PSO selecting EA or ungrouped: Display flat checkbox list #}
+        {% set checkboxItems = [] %}
+        {% for area in parentAreas %}
+          {% set checkboxItems = checkboxItems.concat([{
+            value: area.id,
+            text: area.name,
+            checked: area.id in selectedAreas
+          }]) %}
+        {% endfor %}
+
+        {{ govukCheckboxes({
+          name: "parentAreas",
+          fieldset: {
+            legend: {
+              text: t(translationBase + '.label')
+            }
+          },
+          errorMessage: {
+            text: t(translationBase + '.validation.' + ('required_admin' if isAdmin else 'required'))
+          } if hasError else false,
+          items: checkboxItems
+        }) }}
+      {% endif %}
+
+      {{ govukButton({
+        text: t('common.buttons.continue')
+      }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}

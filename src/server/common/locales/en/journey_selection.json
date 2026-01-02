@@ -1,0 +1,15 @@
+{
+  "title": "Which journey would you like to access?",
+  "heading": "Which journey would you like to access?",
+  "context": "As an administrator, you can explore both the general user journey and the admin journey.",
+  "options": {
+    "general_user": {
+      "text": "General user journey",
+      "hint": "Explore the user portal as an RMA, PSO or Area user"
+    },
+    "admin_user": {
+      "text": "Admin journey",
+      "hint": "Explore the admin portal for managing users, proposals, and organisations"
+    }
+  }
+}

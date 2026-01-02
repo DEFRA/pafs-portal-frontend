@@ -2,6 +2,7 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { requireAuth, requireAdmin, redirectIfAuth } from './auth-middleware.js'
 
 vi.mock('./session-manager.js')
+vi.mock('../../services/auth/auth-service.js')
 
 const {
   getAuthSession,
@@ -12,12 +13,18 @@ const {
   clearAuthSession
 } = await import('./session-manager.js')
 
+const { validateSession } = await import('../../services/auth/auth-service.js')
+
 describe('Auth Middleware', () => {
   let mockRequest
   let mockH
 
   beforeEach(() => {
-    mockRequest = {}
+    mockRequest = {
+      yar: {
+        flash: vi.fn()
+      }
+    }
     mockH = {
       redirect: vi.fn((url) => ({
         redirect: url,
@@ -47,15 +54,18 @@ describe('Auth Middleware', () => {
       await requireAuth(mockRequest, mockH)
 
       expect(clearAuthSession).toHaveBeenCalled()
-      expect(mockH.redirect).toHaveBeenCalledWith(
-        '/login?error=session-timeout'
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith(
+        'authError',
+        'session-timeout'
       )
+      expect(mockH.redirect).toHaveBeenCalledWith('/login')
     })
 
     test('refreshes token if needed', async () => {
-      const session = { user: { id: 1 } }
+      const session = { user: { id: 1 }, accessToken: 'valid-token' }
       getAuthSession.mockReturnValue(session)
       isSessionExpired.mockReturnValue(false)
+      validateSession.mockResolvedValue({ success: true })
       shouldRefreshToken.mockReturnValue(true)
       refreshAuthSession.mockResolvedValue({ success: true })
 
@@ -67,46 +77,105 @@ describe('Auth Middleware', () => {
     })
 
     test('redirects if refresh fails', async () => {
-      getAuthSession.mockReturnValue({ user: { id: 1 } })
+      getAuthSession.mockReturnValue({
+        user: { id: 1 },
+        accessToken: 'valid-token'
+      })
       isSessionExpired.mockReturnValue(false)
+      validateSession.mockResolvedValue({ success: true })
       shouldRefreshToken.mockReturnValue(true)
       refreshAuthSession.mockResolvedValue({
         success: false,
-        reason: 'SESSION_TIMEOUT'
+        reason: 'AUTH_TOKEN_EXPIRED'
       })
 
       await requireAuth(mockRequest, mockH)
 
-      expect(mockH.redirect).toHaveBeenCalledWith(
-        '/login?error=session-timeout'
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith(
+        'authError',
+        'session-timeout'
       )
+      expect(mockH.redirect).toHaveBeenCalledWith('/login')
     })
 
     test('handles concurrent session', async () => {
-      getAuthSession.mockReturnValue({ user: { id: 1 } })
+      getAuthSession.mockReturnValue({
+        user: { id: 1 },
+        accessToken: 'valid-token'
+      })
       isSessionExpired.mockReturnValue(false)
+      validateSession.mockResolvedValue({ success: true })
       shouldRefreshToken.mockReturnValue(true)
       refreshAuthSession.mockResolvedValue({
         success: false,
-        reason: 'SESSION_TIMEOUT'
+        reason: 'AUTH_SESSION_MISMATCH'
       })
 
       await requireAuth(mockRequest, mockH)
 
-      expect(mockH.redirect).toHaveBeenCalledWith(
-        '/login?error=session-timeout'
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith(
+        'authError',
+        'session-mismatch'
       )
+      expect(mockH.redirect).toHaveBeenCalledWith('/login')
     })
 
     test('allows access for valid session', async () => {
-      getAuthSession.mockReturnValue({ user: { id: 1 } })
+      getAuthSession.mockReturnValue({
+        user: { id: 1 },
+        accessToken: 'valid-token'
+      })
       isSessionExpired.mockReturnValue(false)
+      validateSession.mockResolvedValue({ success: true })
       shouldRefreshToken.mockReturnValue(false)
 
       const result = await requireAuth(mockRequest, mockH)
 
+      expect(validateSession).toHaveBeenCalledWith('valid-token')
       expect(updateActivity).toHaveBeenCalled()
       expect(result).toBe(mockH.continue)
+    })
+
+    test('redirects on session validation failure with session mismatch', async () => {
+      getAuthSession.mockReturnValue({
+        user: { id: 1 },
+        accessToken: 'invalid-token'
+      })
+      isSessionExpired.mockReturnValue(false)
+      validateSession.mockResolvedValue({
+        success: false,
+        errors: [{ errorCode: 'AUTH_SESSION_MISMATCH' }]
+      })
+
+      await requireAuth(mockRequest, mockH)
+
+      expect(clearAuthSession).toHaveBeenCalled()
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith(
+        'authError',
+        'session-mismatch'
+      )
+      expect(mockH.redirect).toHaveBeenCalledWith('/login')
+    })
+
+    test('redirects on session validation failure with generic error', async () => {
+      getAuthSession.mockReturnValue({
+        user: { id: 1 },
+        accessToken: 'invalid-token'
+      })
+      isSessionExpired.mockReturnValue(false)
+      validateSession.mockResolvedValue({
+        success: false,
+        errors: [{ errorCode: 'AUTH_TOKEN_EXPIRED' }]
+      })
+
+      await requireAuth(mockRequest, mockH)
+
+      expect(clearAuthSession).toHaveBeenCalled()
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith(
+        'authError',
+        'session-timeout'
+      )
+      expect(mockH.redirect).toHaveBeenCalledWith('/login')
     })
   })
 
@@ -120,11 +189,19 @@ describe('Auth Middleware', () => {
     })
 
     test('redirects non-admin to home', async () => {
-      getAuthSession.mockReturnValue({
-        user: { id: 1, admin: false }
+      // First call for requireAuth
+      getAuthSession.mockReturnValueOnce({
+        user: { id: 1, admin: false },
+        accessToken: 'valid-token'
+      })
+      // Second call after requireAuth passes
+      getAuthSession.mockReturnValueOnce({
+        user: { id: 1, admin: false },
+        accessToken: 'valid-token'
       })
       isSessionExpired.mockReturnValue(false)
       shouldRefreshToken.mockReturnValue(false)
+      validateSession.mockResolvedValue({ success: true })
 
       await requireAdmin(mockRequest, mockH)
 
@@ -132,11 +209,19 @@ describe('Auth Middleware', () => {
     })
 
     test('allows admin access', async () => {
-      getAuthSession.mockReturnValue({
-        user: { id: 1, admin: true }
+      // First call for requireAuth
+      getAuthSession.mockReturnValueOnce({
+        user: { id: 1, admin: true },
+        accessToken: 'valid-token'
+      })
+      // Second call after requireAuth passes
+      getAuthSession.mockReturnValueOnce({
+        user: { id: 1, admin: true },
+        accessToken: 'valid-token'
       })
       isSessionExpired.mockReturnValue(false)
       shouldRefreshToken.mockReturnValue(false)
+      validateSession.mockResolvedValue({ success: true })
 
       const result = await requireAdmin(mockRequest, mockH)
 

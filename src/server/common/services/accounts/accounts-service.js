@@ -1,4 +1,4 @@
-import { apiRequest } from '../../helpers/api-client.js'
+import { apiRequest } from '../../helpers/api-client/index.js'
 import { ACCOUNT_STATUS } from '../../constants/accounts.js'
 import { getDefaultPageSize } from '../../helpers/pagination/index.js'
 import { PAGINATION } from '../../constants/common.js'
@@ -116,4 +116,23 @@ export function getPendingCount(accessToken, cacheService) {
 
 export function getActiveCount(accessToken, cacheService) {
   return getAccountsCount(ACCOUNT_STATUS.ACTIVE, accessToken, cacheService)
+}
+
+export async function validateEmail(email) {
+  return apiRequest('/api/v1/validate-email', {
+    method: 'POST',
+    body: JSON.stringify({ email })
+  })
+}
+
+export async function upsertAccount(accountData, accessToken = '') {
+  return apiRequest('/api/v1/accounts', {
+    method: 'POST',
+    ...(accessToken && {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    }),
+    body: JSON.stringify(accountData)
+  })
 }

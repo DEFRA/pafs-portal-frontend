@@ -1,0 +1,386 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{# Set locale keys based on context #}
+{% set localeKey = 'add_user.details' if isAdmin else 'request_account.details' %}
+{% if isAdmin and admin %}
+  {% set localeKey = 'add_user.admin_details' %}
+{% endif %}
+{% set validationContext = 'add_user' if isAdmin else 'request_account' %}
+
+{% block beforeContent %}
+  {% if backLink %}
+    <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    
+    {# Build error summary list #}
+    {% set errorList = [] %}
+
+    {# First name errors #}
+    {% if fieldErrors.firstName == ERROR_CODES.FIRST_NAME_REQUIRED %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.' + validationContext + '.VALIDATION_FIRST_NAME_REQUIRED'), href: "#firstName" }]) %}
+    {% elif fieldErrors.firstName == ERROR_CODES.FIRST_NAME_TOO_LONG %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_FIRST_NAME_TOO_LONG'), href: "#firstName" }]) %}
+    {% elif fieldErrors.firstName == ERROR_CODES.FIRST_NAME_INVALID_FORMAT %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_FIRST_NAME_INVALID_FORMAT'), href: "#firstName" }]) %}
+    {% endif %}
+
+    {# Last name errors #}
+    {% if fieldErrors.lastName == ERROR_CODES.LAST_NAME_REQUIRED %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.' + validationContext + '.VALIDATION_LAST_NAME_REQUIRED'), href: "#lastName" }]) %}
+    {% elif fieldErrors.lastName == ERROR_CODES.LAST_NAME_TOO_LONG %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_LAST_NAME_TOO_LONG'), href: "#lastName" }]) %}
+    {% elif fieldErrors.lastName == ERROR_CODES.LAST_NAME_INVALID_FORMAT %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_LAST_NAME_INVALID_FORMAT'), href: "#lastName" }]) %}
+    {% endif %}
+
+    {# Email errors #}
+    {% if fieldErrors.email == ERROR_CODES.EMAIL_REQUIRED %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.' + validationContext + '.VALIDATION_EMAIL_REQUIRED'), href: "#email" }]) %}
+    {% elif fieldErrors.email == ERROR_CODES.EMAIL_INVALID_FORMAT %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_EMAIL_INVALID_FORMAT'), href: "#email" }]) %}
+    {% elif fieldErrors.email == ERROR_CODES.EMAIL_TOO_LONG %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_EMAIL_TOO_LONG'), href: "#email" }]) %}
+    {% elif fieldErrors.email == ERROR_CODES.EMAIL_LOCAL_TOO_LONG %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_EMAIL_LOCAL_TOO_LONG'), href: "#email" }]) %}
+    {% elif fieldErrors.email == ERROR_CODES.EMAIL_DISPOSABLE %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_EMAIL_DISPOSABLE'), href: "#email" }]) %}
+    {% elif fieldErrors.email == ERROR_CODES.EMAIL_DOMAIN_INVALID %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_EMAIL_DOMAIN_INVALID'), href: "#email" }]) %}
+    {% elif fieldErrors.email == ERROR_CODES.EMAIL_DUPLICATE %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_EMAIL_DUPLICATE'), href: "#email" }]) %}
+    {% endif %}
+
+    {# Telephone errors #}
+    {% if fieldErrors.telephoneNumber == ERROR_CODES.TELEPHONE_REQUIRED %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.' + validationContext + '.VALIDATION_TELEPHONE_REQUIRED'), href: "#telephoneNumber" }]) %}
+    {% elif fieldErrors.telephoneNumber == ERROR_CODES.TELEPHONE_INVALID_FORMAT %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_TELEPHONE_INVALID_FORMAT'), href: "#telephoneNumber" }]) %}
+    {% elif fieldErrors.telephoneNumber == ERROR_CODES.TELEPHONE_TOO_LONG %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_TELEPHONE_TOO_LONG'), href: "#telephoneNumber" }]) %}
+    {% endif %}
+
+    {# Organisation errors #}
+    {% if fieldErrors.organisation == ERROR_CODES.ORGANISATION_REQUIRED %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.' + validationContext + '.VALIDATION_ORGANISATION_REQUIRED'), href: "#organisation" }]) %}
+    {% elif fieldErrors.organisation == ERROR_CODES.ORGANISATION_TOO_LONG %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_ORGANISATION_TOO_LONG'), href: "#organisation" }]) %}
+    {% elif fieldErrors.organisation == ERROR_CODES.ORGANISATION_INVALID_FORMAT %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_ORGANISATION_INVALID_FORMAT'), href: "#organisation" }]) %}
+    {% endif %}
+
+    {# Job title errors #}
+    {% if fieldErrors.jobTitle == ERROR_CODES.JOB_TITLE_REQUIRED %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.' + validationContext + '.VALIDATION_JOB_TITLE_REQUIRED'), href: "#jobTitle" }]) %}
+    {% elif fieldErrors.jobTitle == ERROR_CODES.JOB_TITLE_TOO_LONG %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_JOB_TITLE_TOO_LONG'), href: "#jobTitle" }]) %}
+    {% elif fieldErrors.jobTitle == ERROR_CODES.JOB_TITLE_INVALID_FORMAT %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_JOB_TITLE_INVALID_FORMAT'), href: "#jobTitle" }]) %}
+    {% endif %}
+
+    {# Responsibility errors #}
+    {% if fieldErrors.responsibility == ERROR_CODES.RESPONSIBILITY_REQUIRED %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.' + validationContext + '.VALIDATION_RESPONSIBILITY_REQUIRED'), href: "#responsibility" }]) %}
+    {% elif fieldErrors.responsibility == ERROR_CODES.RESPONSIBILITY_INVALID %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_RESPONSIBILITY_INVALID'), href: "#responsibility" }]) %}
+    {% endif %}
+
+    {# General API errors (not field-specific) #}
+    {% if errorCode == ERROR_CODES.NETWORK_ERROR %}
+      {% set errorList = errorList.concat([{ text: t('common.service_error') }]) %}
+    {% elif errorCode %}
+      {% set errorList = errorList.concat([{ text: t('common.service_error') }]) %}
+    {% endif %}
+
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
+    
+    <h1 class="govuk-heading-xl">{{ t('accounts.' + localeKey + '.heading') }}</h1>
+
+    <p class="govuk-body">{{ t('accounts.' + localeKey + '.intro') }}</p>
+
+    <form method="post" action="{{ submitRoute }}" novalidate>
+      {# First name field error #}
+      {% set firstNameError = false %}
+      {% if fieldErrors.firstName == ERROR_CODES.FIRST_NAME_REQUIRED %}
+        {% set firstNameError = { text: t('accounts.validation.' + validationContext + '.VALIDATION_FIRST_NAME_REQUIRED') } %}
+      {% elif fieldErrors.firstName == ERROR_CODES.FIRST_NAME_TOO_LONG %}
+        {% set firstNameError = { text: t('accounts.validation.common.VALIDATION_FIRST_NAME_TOO_LONG') } %}
+      {% elif fieldErrors.firstName == ERROR_CODES.FIRST_NAME_INVALID_FORMAT %}
+        {% set firstNameError = { text: t('accounts.validation.common.VALIDATION_FIRST_NAME_INVALID_FORMAT') } %}
+      {% endif %}
+
+      {{ govukInput({
+        label: {
+          text: t('accounts.label.first_name')
+        },
+        id: "firstName",
+        name: "firstName",
+        value: accountData.firstName,
+        autocomplete: "given-name",
+        classes: "govuk-!-width-two-thirds",
+        errorMessage: firstNameError
+      }) }}
+
+      {# Last name field error #}
+      {% set lastNameError = false %}
+      {% if fieldErrors.lastName == ERROR_CODES.LAST_NAME_REQUIRED %}
+        {% set lastNameError = { text: t('accounts.validation.' + validationContext + '.VALIDATION_LAST_NAME_REQUIRED') } %}
+      {% elif fieldErrors.lastName == ERROR_CODES.LAST_NAME_TOO_LONG %}
+        {% set lastNameError = { text: t('accounts.validation.common.VALIDATION_LAST_NAME_TOO_LONG') } %}
+      {% elif fieldErrors.lastName == ERROR_CODES.LAST_NAME_INVALID_FORMAT %}
+        {% set lastNameError = { text: t('accounts.validation.common.VALIDATION_LAST_NAME_INVALID_FORMAT') } %}
+      {% endif %}
+
+      {{ govukInput({
+        label: {
+          text: t('accounts.label.last_name')
+        },
+        id: "lastName",
+        name: "lastName",
+        value: accountData.lastName,
+        autocomplete: "family-name",
+        classes: "govuk-!-width-two-thirds",
+        errorMessage: lastNameError
+      }) }}
+
+      {# Email field error #}
+      {% set emailError = false %}
+      {% if fieldErrors.email == ERROR_CODES.EMAIL_REQUIRED %}
+        {% set emailError = { text: t('accounts.validation.' + validationContext + '.VALIDATION_EMAIL_REQUIRED') } %}
+      {% elif fieldErrors.email == ERROR_CODES.EMAIL_INVALID_FORMAT %}
+        {% set emailError = { text: t('accounts.validation.common.VALIDATION_EMAIL_INVALID_FORMAT') } %}
+      {% elif fieldErrors.email == ERROR_CODES.EMAIL_TOO_LONG %}
+        {% set emailError = { text: t('accounts.validation.common.VALIDATION_EMAIL_TOO_LONG') } %}
+      {% elif fieldErrors.email == ERROR_CODES.EMAIL_LOCAL_TOO_LONG %}
+        {% set emailError = { text: t('accounts.validation.common.VALIDATION_EMAIL_LOCAL_TOO_LONG') } %}
+      {% elif fieldErrors.email == ERROR_CODES.EMAIL_DISPOSABLE %}
+        {% set emailError = { text: t('accounts.validation.common.VALIDATION_EMAIL_DISPOSABLE') } %}
+      {% elif fieldErrors.email == ERROR_CODES.EMAIL_DOMAIN_INVALID %}
+        {% set emailError = { text: t('accounts.validation.common.VALIDATION_EMAIL_DOMAIN_INVALID') } %}
+      {% elif fieldErrors.email == ERROR_CODES.EMAIL_DUPLICATE %}
+        {% set emailError = { text: t('accounts.validation.common.VALIDATION_EMAIL_DUPLICATE') } %}
+      {% endif %}
+
+      {{ govukInput({
+        label: {
+          text: t('accounts.label.email')
+        },
+        id: "email",
+        name: "email",
+        type: "email",
+        value: accountData.email,
+        autocomplete: "email",
+        spellcheck: false,
+        classes: "govuk-!-width-two-thirds",
+        errorMessage: emailError
+      }) }}
+
+      {% if not isAdmin or (isAdmin and not admin) %}
+        {# Telephone field error #}
+        {% set telephoneError = false %}
+        {% if fieldErrors.telephoneNumber == ERROR_CODES.TELEPHONE_REQUIRED %}
+          {% set telephoneError = { text: t('accounts.validation.' + validationContext + '.VALIDATION_TELEPHONE_REQUIRED') } %}
+        {% elif fieldErrors.telephoneNumber == ERROR_CODES.TELEPHONE_INVALID_FORMAT %}
+          {% set telephoneError = { text: t('accounts.validation.common.VALIDATION_TELEPHONE_INVALID_FORMAT') } %}
+        {% elif fieldErrors.telephoneNumber == ERROR_CODES.TELEPHONE_TOO_LONG %}
+          {% set telephoneError = { text: t('accounts.validation.common.VALIDATION_TELEPHONE_TOO_LONG') } %}
+        {% endif %}
+
+        {{ govukInput({
+          label: {
+            text: t('accounts.label.telephone')
+          },
+          hint: {
+            text: t('common.optional')
+          } if isAdmin else null,
+          id: "telephoneNumber",
+          name: "telephoneNumber",
+          type: "tel",
+          value: accountData.telephoneNumber,
+          autocomplete: "tel",
+          classes: "govuk-!-width-two-thirds",
+          errorMessage: telephoneError
+        }) }}
+
+        {# Organisation field error #}
+        {% set organisationError = false %}
+        {% if fieldErrors.organisation == ERROR_CODES.ORGANISATION_REQUIRED %}
+          {% set organisationError = { text: t('accounts.validation.' + validationContext + '.VALIDATION_ORGANISATION_REQUIRED') } %}
+        {% elif fieldErrors.organisation == ERROR_CODES.ORGANISATION_TOO_LONG %}
+          {% set organisationError = { text: t('accounts.validation.common.VALIDATION_ORGANISATION_TOO_LONG') } %}
+        {% elif fieldErrors.organisation == ERROR_CODES.ORGANISATION_INVALID_FORMAT %}
+          {% set organisationError = { text: t('accounts.validation.common.VALIDATION_ORGANISATION_INVALID_FORMAT') } %}
+        {% endif %}
+
+        {{ govukInput({
+          label: {
+            text: t('accounts.label.organisation')
+          },
+          hint: {
+            text: t('common.optional')
+          } if isAdmin else null,
+          id: "organisation",
+          name: "organisation",
+          value: accountData.organisation,
+          autocomplete: "organization",
+          classes: "govuk-!-width-two-thirds",
+          errorMessage: organisationError
+        }) }}
+
+        {# Job title field error #}
+        {% set jobTitleError = false %}
+        {% if fieldErrors.jobTitle == ERROR_CODES.JOB_TITLE_REQUIRED %}
+          {% set jobTitleError = { text: t('accounts.validation.' + validationContext + '.VALIDATION_JOB_TITLE_REQUIRED') } %}
+        {% elif fieldErrors.jobTitle == ERROR_CODES.JOB_TITLE_TOO_LONG %}
+          {% set jobTitleError = { text: t('accounts.validation.common.VALIDATION_JOB_TITLE_TOO_LONG') } %}
+        {% elif fieldErrors.jobTitle == ERROR_CODES.JOB_TITLE_INVALID_FORMAT %}
+          {% set jobTitleError = { text: t('accounts.validation.common.VALIDATION_JOB_TITLE_INVALID_FORMAT') } %}
+        {% endif %}
+
+        {{ govukInput({
+          label: {
+            text: t('accounts.label.job_title')
+          },
+          hint: {
+            text: t('common.optional')
+          } if isAdmin else null,
+          id: "jobTitle",
+          name: "jobTitle",
+          value: accountData.jobTitle,
+          autocomplete: "organization-title",
+          classes: "govuk-!-width-two-thirds",
+          errorMessage: jobTitleError
+        }) }}
+
+        {# Responsibility field error #}
+        {% set responsibilityError = false %}
+        {% if fieldErrors.responsibility == ERROR_CODES.RESPONSIBILITY_REQUIRED %}
+          {% set responsibilityError = { text: t('accounts.validation.' + validationContext + '.VALIDATION_RESPONSIBILITY_REQUIRED') } %}
+        {% elif fieldErrors.responsibility == ERROR_CODES.RESPONSIBILITY_INVALID %}
+          {% set responsibilityError = { text: t('accounts.validation.common.VALIDATION_RESPONSIBILITY_INVALID') } %}
+        {% endif %}
+
+        {{ govukRadios({
+          name: "responsibility",
+          fieldset: {
+            legend: {
+              text: t('accounts.label.responsibility_legend')
+            }
+          },
+          items: [
+            {
+              value: "EA",
+              text: t('accounts.label.responsibility.ea'),
+              hint: {
+                text: t('accounts.label.responsibility.ea_hint')
+              },
+              checked: accountData.responsibility == "EA"
+            },
+            {
+              value: "PSO",
+              text: t('accounts.label.responsibility.pso'),
+              hint: {
+                text: t('accounts.label.responsibility.pso_hint')
+              },
+              checked: accountData.responsibility == "PSO"
+            },
+            {
+              value: "RMA",
+              text: t('accounts.label.responsibility.rma'),
+              hint: {
+                text: t('accounts.label.responsibility.rma_hint')
+              },
+              checked: accountData.responsibility == "RMA"
+            }
+          ],
+          errorMessage: responsibilityError
+        }) }}
+      {% endif %}
+
+      {% if not isAdmin %}
+        <h2 class="govuk-heading-m">{{ t('accounts.request_account.details.footer.privacyPolicyHeading') }}</h2>
+
+        <p class="govuk-body">
+          {{ t('accounts.request_account.details.footer.privacyPolicyIntro') }}<a href="{{ t('accounts.request_account.details.footer.privacyPolicyLink') }}" class="govuk-link" target="_blank">{{ t('accounts.request_account.details.footer.privacyPolicyLink') }}</a>
+        </p>
+
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">{{ t('accounts.request_account.details.footer.dataCollectedQuestion') }}</span>
+          </summary>
+          <div class="govuk-details__text">
+            <p class="govuk-body govuk-!-font-weight-bold">Personal data is collected to:</p>
+            <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('accounts.request_account.details.footer.dataCollectedBullet1') }}</li>
+              <li>{{ t('accounts.request_account.details.footer.dataCollectedBullet2') }}</li>
+              <li>{{ t('accounts.request_account.details.footer.dataCollectedBullet3') }}</li>
+              <li>{{ t('accounts.request_account.details.footer.dataCollectedBullet4') }}</li>
+            </ul>
+            <p class="govuk-body">{{ t('accounts.request_account.details.footer.dataCollectedStatement') }}</p>
+          </div>
+        </details>
+
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">{{ t('accounts.request_account.details.footer.dataSharedQuestion') }}</span>
+          </summary>
+          <div class="govuk-details__text">
+            <p class="govuk-body">{{ t('accounts.request_account.details.footer.dataSharedAnswer') }}</p>
+          </div>
+        </details>
+
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">{{ t('accounts.request_account.details.footer.dataTransferredQuestion') }}</span>
+          </summary>
+          <div class="govuk-details__text">
+            <p class="govuk-body">{{ t('accounts.request_account.details.footer.dataTransferredAnswer') }}</p>
+          </div>
+        </details>
+
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">{{ t('accounts.request_account.details.footer.dataHeldQuestion') }}</span>
+          </summary>
+          <div class="govuk-details__text">
+            <p class="govuk-body">{{ t('accounts.request_account.details.footer.dataHeldAnswer') }}</p>
+          </div>
+        </details>
+
+        <details class="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">{{ t('accounts.request_account.details.footer.automatedDecisionMakingQuestion') }}</span>
+          </summary>
+          <div class="govuk-details__text">
+            <p class="govuk-body">{{ t('accounts.request_account.details.footer.automatedDecisionMakingAnswer') }}</p>
+          </div>
+        </details>
+      {% endif %}
+
+      {{ govukButton({
+        text: t('common.buttons.continue')
+      }) }}
+    </form>
+
+    {% if not isAdmin %}
+    <p class="govuk-body govuk-!-margin-top-6">
+      <a href="/login" class="govuk-link">{{ t('common.back_to_sign_in') }}</a>
+    </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

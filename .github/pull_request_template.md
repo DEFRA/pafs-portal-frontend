@@ -6,12 +6,6 @@
 
 ## Changes Made
 
-### Active Users Feature
-
-### Controller Refactoring
-
-### Pending Users Feature (previously completed)
-
 ## Type of Change
 
 - [ ] Bug fix
