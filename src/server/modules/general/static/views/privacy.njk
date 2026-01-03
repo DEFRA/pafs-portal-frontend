@@ -1,0 +1,109 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading,
+    widthClass: 'govuk-grid-column-full'
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <div class="govuk-body" data-testid="app-page-body">
+
+        <h2 class="govuk-heading-l">{{t(localeNamespace ~ '.how_we_use_your_data')}}</h2>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.intro_paragraph_1')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.intro_paragraph_2_prefix')}}
+          <a class="govuk-link" href="{{t(localeNamespace ~ '.personal_info_charter_url')}}">{{t(localeNamespace ~ '.personal_info_charter_text')}}</a>
+          {{t(localeNamespace ~ '.intro_paragraph_2_suffix')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(localeNamespace ~ '.the_personal_data_we_need')}}</h2>
+        <p class="govuk-body">{{t(localeNamespace ~ '.data_list_intro')}}</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{t(localeNamespace ~ '.data_full_name')}}</li>
+          <li>{{t(localeNamespace ~ '.data_email')}}</li>
+          <li>{{t(localeNamespace ~ '.data_feedback')}}</li>
+          <li>{{t(localeNamespace ~ '.data_cookies')}}</li>
+        </ul>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.legal_basis_paragraph')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.no_data_consequences')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(localeNamespace ~ '.site_analytics_cookies')}}</h2>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.analytics_intro')}}
+          <a class="govuk-link" href="{{t(localeNamespace ~ '.cookies_link_url')}}">{{t(localeNamespace ~ '.cookies_link_text')}}</a>
+          {{t(localeNamespace ~ '.analytics_footer')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(localeNamespace ~ '.what_we_do_with_data')}}</h2>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.automated_decision_paragraph')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.data_sharing_paragraph')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(localeNamespace ~ '.how_long_keep_data')}}</h2>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.retention_paragraph')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(localeNamespace ~ '.where_data_processed')}}</h2>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.data_location_paragraph')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(localeNamespace ~ '.contact_details')}}</h2>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.dpo_responsibility')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.contact_intro')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.dpo_title')}}<br/>
+          {{t(localeNamespace ~ '.dpo_organisation')}}<br/>
+          {{t(localeNamespace ~ '.dpo_address_line1')}}<br/>
+          {{t(localeNamespace ~ '.dpo_address_line2')}}<br/>
+          {{t(localeNamespace ~ '.dpo_address_line3')}}<br/>
+          {{t(localeNamespace ~ '.dpo_postcode')}}<br/>
+          <p class="govuk-body">{{t(localeNamespace ~ '.email_text')}}: <a href="mailto:{{t(localeNamespace ~ '.dpo_email')}}" class="govuk-link">{{t(localeNamespace ~ '.dpo_email')}}</a>
+          </p>
+        </p>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.ico_intro')}}
+          <a class="govuk-link" href="{{t(localeNamespace ~ '.ico_link_url')}}">{{t(localeNamespace ~ '.ico_link_text')}}</a>
+          {{t(localeNamespace ~ '.ico_intro_text')}}
+        </p>
+
+        <p class="govuk-body govuk-!-margin-top-6">
+          <strong>{{t(localeNamespace ~ '.last_updated')}}
+            {{privacyLastUpdatedDate}}</strong>
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

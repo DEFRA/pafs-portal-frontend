@@ -40,12 +40,8 @@ export const router = {
         'home',
         'download',
         'archive',
-        'accounts'
-      ])
-
-      // Static pages
-      await loadModules(server, join(dirName, 'modules/general/static'), [
-        'privacy-notice'
+        'accounts',
+        'static'
       ])
 
       // Project proposal routes
