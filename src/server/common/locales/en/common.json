@@ -35,7 +35,8 @@
   "buttons": {
     "search": "Search",
     "continue": "Continue",
-    "start_now": "Start now"
+    "start_now": "Start now",
+    "save_and_continue": "Save and continue"
   },
   "footer": {
     "contact_html": "Contact the Defra IT Service Desk on <a href=\"tel:08008766458\" class=\"govuk-footer__link\">0800 8766458</a> or email <a href=\"mailto:pafs-support@environment-agency.gov.uk\" class=\"govuk-footer__link\">pafs-support@environment-agency.gov.uk</a>",
