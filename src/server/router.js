@@ -40,7 +40,8 @@ export const router = {
         'home',
         'download',
         'archive',
-        'accounts'
+        'accounts',
+        'static'
       ])
 
       // Project proposal routes

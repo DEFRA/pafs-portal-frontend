@@ -16,6 +16,9 @@ export const ROUTES = {
     PROPOSALS: '/',
     DOWNLOAD: '/download',
     ARCHIVE: '/archive',
+    STATIC_PAGES: {
+      PRIVACY_NOTICE: '/privacy-notice'
+    },
     ACCOUNTS: {
       OLD: '/account_requests/new',
       START: '/request-account',

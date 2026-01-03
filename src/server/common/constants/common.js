@@ -32,6 +32,12 @@ export const PROPOSAL_VIEWS = {
   PROJECT_NAME: 'modules/project-proposal/project-name/index'
 }
 
+export const GENERAL_VIEWS = {
+  STATIC_PAGES: {
+    PRIVACY: 'modules/general/static/views/privacy'
+  }
+}
+
 export const LOCALE_KEYS = {
   SIGN_IN: 'auth.login.title',
   PASSWORD_RESET: 'auth.reset_password.title',
