@@ -1,0 +1,95 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}
+  {% if backLink %}
+    <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    
+    <h1 class="govuk-heading-l">
+      {{ t('accounts.areas.' + responsibility + '.additional.heading') }}
+    </h1>
+
+    <p class="govuk-body">
+      {{ t('accounts.areas.' + responsibility + '.additional.' + ('intro_admin' if isAdmin else 'intro')) }}
+    </p>
+
+    <form method="post" action="{{ submitRoute }}" novalidate>
+      
+      {% if groupedAreas and groupedAreas.length > 0 %}
+        {# PSO/RMA: Display grouped checkboxes with headings #}
+        <fieldset class="govuk-fieldset govuk-!-margin-bottom-6">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            {{ t('accounts.areas.' + responsibility + '.additional.legend') }}
+          </legend>
+          
+          {% for group in groupedAreas %}
+            {# Display group heading #}
+            <h3 class="govuk-heading-s govuk-!-margin-top-4">
+              {% if responsibility == 'pso' %}
+                {{ group.parent.name }}
+              {% elif responsibility == 'rma' %}
+                {{ group.eaParent.name }} - {{ group.parent.name }}
+              {% endif %}
+            </h3>
+            
+            {# Display checkboxes for this group #}
+            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+              {% for area in group.children %}
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" 
+                         id="additionalAreas-{{ area.id }}" 
+                         name="additionalAreas" 
+                         type="checkbox" 
+                         value="{{ area.id }}" 
+                         {% if area.id in additionalAreas %}checked{% endif %}>
+                  <label class="govuk-label govuk-checkboxes__label" for="additionalAreas-{{ area.id }}">
+                    {{ area.name }}
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </fieldset>
+      {% else %}
+        {# EA or ungrouped: Display flat checkbox list #}
+        {% set checkboxItems = [] %}
+        {% for area in availableAreas %}
+          {% set isChecked = area.id in additionalAreas %}
+          {% set checkboxItems = checkboxItems.concat([{
+            value: area.id,
+            text: area.name,
+            checked: isChecked
+          }]) %}
+        {% endfor %}
+
+        {% if checkboxItems.length > 0 %}
+          {{ govukCheckboxes({
+            name: "additionalAreas",
+            fieldset: {
+              legend: {
+                text: t('accounts.areas.' + responsibility + '.additional.legend'),
+                classes: "govuk-fieldset__legend--m"
+              }
+            },
+            items: checkboxItems
+          }) }}
+        {% else %}
+          <p class="govuk-body">No additional areas available.</p>
+        {% endif %}
+      {% endif %}
+
+      {{ govukButton({
+        text: t('common.buttons.continue')
+      }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}

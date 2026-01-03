@@ -60,6 +60,7 @@
     "hapi-pino": "13.0.0",
     "hapi-pulse": "3.0.1",
     "i18next": "25.6.3",
+    "i18next-fs-backend": "2.6.1",
     "ioredis": "5.8.2",
     "joi": "18.0.2",
     "lodash": "4.17.21",

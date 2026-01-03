@@ -163,14 +163,15 @@ describe('Session Manager', () => {
       mockRequest.yar.get.mockReturnValue(session)
       refreshToken.mockResolvedValue({
         success: false,
-        error: {
-          errorCode: 'AUTH_CONCURRENT_SESSION'
-        }
+        errors: [{ errorCode: 'AUTH_SESSION_MISMATCH' }]
       })
 
       const result = await refreshAuthSession(mockRequest)
 
-      expect(result).toEqual({ success: false, reason: 'SESSION_TIMEOUT' })
+      expect(result).toEqual({
+        success: false,
+        reason: 'AUTH_SESSION_MISMATCH'
+      })
       expect(mockRequest.yar.reset).toHaveBeenCalled()
     })
 
@@ -186,6 +187,25 @@ describe('Session Manager', () => {
       const result = await refreshAuthSession(mockRequest)
 
       expect(result).toEqual({ success: false, reason: 'SESSION_TIMEOUT' })
+    })
+
+    test('returns error if session expired during refresh attempt', async () => {
+      const session = {
+        user: { id: 1 },
+        refreshToken: 'refresh123',
+        lastActivity: Date.now() - 31 * 60 * 1000 // 31 minutes ago (expired)
+      }
+
+      mockRequest.yar.get.mockReturnValue(session)
+
+      const result = await refreshAuthSession(mockRequest)
+
+      expect(result).toEqual({ success: false, reason: 'SESSION_TIMEOUT' })
+      expect(mockRequest.yar.reset).toHaveBeenCalled()
+      expect(mockRequest.server.logger.info).toHaveBeenCalledWith(
+        { userId: 1 },
+        'Session expired due to inactivity'
+      )
     })
   })
 
@@ -229,7 +249,7 @@ describe('Session Manager', () => {
 
     test('handles session at exact expiry boundary', () => {
       const session = {
-        lastActivity: Date.now() - (30 * 60 * 1000 - 1) // Just before 30 minutes
+        lastActivity: Date.now() - (30 * 60 * 1000 - 1) // Exactly 30 minutes
       }
 
       expect(isSessionExpired(session)).toBe(false)
@@ -391,12 +411,12 @@ describe('Session Manager', () => {
       mockRequest.yar.get.mockReturnValue(session)
       refreshToken.mockResolvedValue({
         success: false,
-        error: { errorCode: 'AUTH_TOKEN_INVALID' }
+        errors: [{ errorCode: 'AUTH_TOKEN_INVALID' }]
       })
 
       const result = await refreshAuthSession(mockRequest)
 
-      expect(result).toEqual({ success: false, reason: 'SESSION_TIMEOUT' })
+      expect(result).toEqual({ success: false, reason: 'AUTH_TOKEN_INVALID' })
       expect(mockRequest.yar.reset).toHaveBeenCalled()
     })
   })

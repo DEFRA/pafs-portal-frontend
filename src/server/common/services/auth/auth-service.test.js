@@ -6,10 +6,11 @@ import {
   forgotPassword,
   resetPassword,
   validateInvitationToken,
-  setPassword
+  setPassword,
+  validateSession
 } from './auth-service.js'
 
-vi.mock('../../helpers/api-client.js', () => ({
+vi.mock('../../helpers/api-client/index.js', () => ({
   apiRequest: vi.fn()
 }))
 
@@ -17,7 +18,7 @@ describe('Auth Service', () => {
   let apiRequest
 
   beforeEach(async () => {
-    const apiClient = await import('../../helpers/api-client.js')
+    const apiClient = await import('../../helpers/api-client/index.js')
     apiRequest = apiClient.apiRequest
     vi.clearAllMocks()
   })
@@ -127,7 +128,7 @@ describe('Auth Service', () => {
   describe('validateResetToken', () => {
     it('calls API with token', async () => {
       const { validateResetToken } = await import('./auth-service.js')
-      const { apiRequest } = await import('../../helpers/api-client.js')
+      const { apiRequest } = await import('../../helpers/api-client/index.js')
 
       apiRequest.mockResolvedValue({ success: true })
 
@@ -142,7 +143,7 @@ describe('Auth Service', () => {
 
     it('handles invalid token', async () => {
       const { validateResetToken } = await import('./auth-service.js')
-      const { apiRequest } = await import('../../helpers/api-client.js')
+      const { apiRequest } = await import('../../helpers/api-client/index.js')
 
       apiRequest.mockResolvedValue({
         success: false,
@@ -160,7 +161,7 @@ describe('Auth Service', () => {
 
     it('handles expired token', async () => {
       const { validateResetToken } = await import('./auth-service.js')
-      const { apiRequest } = await import('../../helpers/api-client.js')
+      const { apiRequest } = await import('../../helpers/api-client/index.js')
 
       apiRequest.mockResolvedValue({
         success: false,
@@ -339,6 +340,141 @@ describe('Auth Service', () => {
         'NewPass123!',
         'NewPass123!'
       )
+
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('validateSession', () => {
+    test('calls API with access token in Authorization header', async () => {
+      const mockResponse = {
+        success: true,
+        data: { valid: true }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await validateSession('access-token-123')
+
+      expect(apiRequest).toHaveBeenCalledWith('/api/v1/auth/validate-session', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer access-token-123'
+        }
+      })
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('returns success for valid session', async () => {
+      const mockResponse = {
+        success: true,
+        data: { valid: true }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await validateSession('valid-token')
+
+      expect(result.success).toBe(true)
+      expect(result.data.valid).toBe(true)
+    })
+
+    test('handles session mismatch error (concurrent login)', async () => {
+      const mockError = {
+        success: false,
+        status: 401,
+        errors: [{ errorCode: 'AUTH_SESSION_MISMATCH' }],
+        validationErrors: null
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await validateSession('old-session-token')
+
+      expect(result.success).toBe(false)
+      expect(result.errors[0].errorCode).toBe('AUTH_SESSION_MISMATCH')
+    })
+
+    test('handles expired token error', async () => {
+      const mockError = {
+        success: false,
+        status: 401,
+        errors: [{ errorCode: 'AUTH_TOKEN_EXPIRED_INVALID' }],
+        validationErrors: null
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await validateSession('expired-token')
+
+      expect(result.success).toBe(false)
+      expect(result.errors[0].errorCode).toBe('AUTH_TOKEN_EXPIRED_INVALID')
+    })
+
+    test('handles account disabled error', async () => {
+      const mockError = {
+        success: false,
+        status: 401,
+        errors: [{ errorCode: 'AUTH_ACCOUNT_DISABLED' }],
+        validationErrors: null
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await validateSession('token-for-disabled-account')
+
+      expect(result.success).toBe(false)
+      expect(result.errors[0].errorCode).toBe('AUTH_ACCOUNT_DISABLED')
+    })
+
+    test('handles account locked error', async () => {
+      const mockError = {
+        success: false,
+        status: 401,
+        errors: [{ errorCode: 'AUTH_ACCOUNT_LOCKED' }],
+        validationErrors: null
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await validateSession('token-for-locked-account')
+
+      expect(result.success).toBe(false)
+      expect(result.errors[0].errorCode).toBe('AUTH_ACCOUNT_LOCKED')
+    })
+
+    test('handles account not found error', async () => {
+      const mockError = {
+        success: false,
+        status: 401,
+        errors: [{ errorCode: 'AUTH_ACCOUNT_NOT_FOUND' }],
+        validationErrors: null
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await validateSession('token-for-deleted-user')
+
+      expect(result.success).toBe(false)
+      expect(result.errors[0].errorCode).toBe('AUTH_ACCOUNT_NOT_FOUND')
+    })
+
+    test('handles network errors', async () => {
+      const mockError = {
+        success: false,
+        status: 0,
+        errors: [{ errorCode: 'NETWORK_ERROR', message: 'Network timeout' }]
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await validateSession('any-token')
+
+      expect(result.success).toBe(false)
+      expect(result.errors[0].errorCode).toBe('NETWORK_ERROR')
+    })
+
+    test('handles server errors', async () => {
+      const mockError = {
+        success: false,
+        status: 500,
+        errors: [{ errorCode: 'UNKNOWN_ERROR' }]
+      }
+      apiRequest.mockResolvedValue(mockError)
+
+      const result = await validateSession('any-token')
 
       expect(result.success).toBe(false)
     })

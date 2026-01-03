@@ -1,0 +1,52 @@
+{% extends "layouts/page.njk" %}
+
+{% set localeKey = 'add_user.start' if isAdmin else 'request_account.start' %}
+
+{% block beforeContent %}
+  {% if isAdmin %}
+    <a href="/admin/users/active" class="govuk-back-link">{{ t('common.back_link') }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl">{{ t('accounts.' + localeKey + '.heading') }}</h1>
+
+    <p class="govuk-body">{{ t('accounts.' + localeKey + '.intro') }}</p>
+
+    <h2 class="govuk-heading-m">{{ t('accounts.' + localeKey + '.before_start') }}</h2>
+
+    <p class="govuk-body">{{ t('accounts.' + localeKey + '.need_to_provide') }}</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      {% if isAdmin %}
+        <li>{{ t('accounts.' + localeKey + '.list.name_email') }}</li>
+        <li>{{ t('accounts.' + localeKey + '.list.admin_status') }}</li>
+        <li>{{ t('accounts.' + localeKey + '.list.responsibility') }}</li>
+      {% else %}
+        <li>{{ t('accounts.' + localeKey + '.list.name_contact') }}</li>
+        <li>{{ t('accounts.' + localeKey + '.list.organisation_job') }}</li>
+        <li>{{ t('accounts.' + localeKey + '.list.responsibility') }}</li>
+      {% endif %}
+    </ul>
+
+    {% if not isAdmin %}
+    <p class="govuk-body">{{ t('accounts.' + localeKey + '.review_notice') }}</p>
+    {% endif %}
+
+    <a href="{{ nextRoute }}" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
+      {{ t('common.buttons.start_now') }}
+      <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
+      </svg>
+    </a>
+
+    {% if not isAdmin %}
+    <p class="govuk-body govuk-!-margin-top-6">
+      <a href="{{ loginRoute }}" class="govuk-link">{{ t('common.back_to_sign_in') }}</a>
+    </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

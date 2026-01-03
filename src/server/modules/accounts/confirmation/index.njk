@@ -1,0 +1,61 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    
+    {# Success Panel #}
+    {{ govukPanel({
+      titleText: t(translationBase + '.panelTitle'),
+      html: t(translationBase + '.panelBody')
+    }) }}
+
+    {# What happens next section #}
+    <h2 class="govuk-heading-m">{{ t(translationBase + '.whatHappensNextHeading') }}</h2>
+    
+    <p class="govuk-body">
+      {% if status == 'approved' and email %}
+        {{ t(translationBase + '.whatHappensNextPara1', { email: email }) | safe }}
+      {% else %}
+        {{ t(translationBase + '.whatHappensNextPara1') }}
+      {% endif %}
+    </p>
+    
+    <p class="govuk-body">{{ t(translationBase + '.whatHappensNextPara2') }}</p>
+
+    {# Inset text with timing information #}
+    {{ govukInsetText({
+      text: t(translationBase + '.insetBoxText')
+    }) }}
+
+    {# What you need to do / can do section #}
+    <h2 class="govuk-heading-m">
+      {% if status == 'pending' %}
+        {{ t(translationBase + '.whatYouNeedToDoHeading') }}
+      {% else %}
+        {{ t(translationBase + '.whatYouCanDoNowHeading') }}
+      {% endif %}
+    </h2>
+    
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ t(translationBase + '.bullet1') }}</li>
+      <li>{{ t(translationBase + '.bullet2') }}</li>
+      <li>{{ t(translationBase + '.bullet3') }}</li>
+      {% if status == 'pending' %}
+        <li>{{ t(translationBase + '.bullet4') }}</li>
+      {% endif %}
+    </ul>
+
+    {# Link back to sign in #}
+    {% if not isAdmin %}
+      <p class="govuk-body govuk-!-margin-top-8">
+        <a href="{{ signInRoute }}" class="govuk-link">{{ t('accounts.confirmation.return_to_sign_in') }}</a>
+      </p>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

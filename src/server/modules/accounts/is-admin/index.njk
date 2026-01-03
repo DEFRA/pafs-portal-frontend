@@ -1,0 +1,53 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}
+  <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    
+    {% if errorSummary %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: errorSummary
+      }) }}
+    {% endif %}
+    
+    <form method="post" action="{{ submitRoute }}" novalidate>
+      {{ govukRadios({
+        name: "admin",
+        fieldset: {
+          legend: {
+            text: t('accounts.add_user.admin_question.heading'),
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        items: [
+          {
+            value: true,
+            text: t('accounts.add_user.admin_question.yes'),
+            checked: admin === true
+          },
+          {
+            value: false,
+            text: t('accounts.add_user.admin_question.no'),
+            checked: admin === false
+          }
+        ],
+        errorMessage: errors.admin if errors and errors.admin
+      }) }}
+
+      {{ govukButton({
+        text: t('common.buttons.continue')
+      }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}

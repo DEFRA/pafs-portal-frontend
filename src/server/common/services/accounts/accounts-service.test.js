@@ -5,9 +5,9 @@ import {
   getActiveCount
 } from './accounts-service.js'
 
-vi.mock('../../helpers/api-client.js')
+vi.mock('../../helpers/api-client/index.js')
 
-const { apiRequest } = await import('../../helpers/api-client.js')
+const { apiRequest } = await import('../../helpers/api-client/index.js')
 
 describe('Accounts Service', () => {
   beforeEach(() => {

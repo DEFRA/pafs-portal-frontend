@@ -1,4 +1,4 @@
-import { SESSION } from '../../constants/session.js'
+import { SESSION } from '../../constants/common.js'
 import { AUTH_ERROR_CODES } from '../../constants/validation.js'
 import { refreshToken } from '../../services/auth/auth-service.js'
 
@@ -63,13 +63,13 @@ export async function refreshAuthSession(request) {
 
     if (!result.success) {
       const userId = session.user?.id
-      const errorCode = result.error?.errorCode || 'TOKEN_REFRESH_FAILED'
+      const errorCode = result.errors?.[0]?.errorCode || 'TOKEN_REFRESH_FAILED'
 
       logger?.warn({ userId, errorCode }, 'Token refresh failed')
       clearAuthSession(request)
 
-      // Always return session timeout for user-friendly message
-      return { success: false, reason: AUTH_ERROR_CODES.SESSION_TIMEOUT }
+      // Return the actual error code for proper handling
+      return { success: false, reason: errorCode }
     }
 
     const now = Date.now()
