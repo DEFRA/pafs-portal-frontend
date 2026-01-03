@@ -76,3 +76,47 @@ describe('StaticPageController - privacy page', () => {
     })
   })
 })
+
+describe('StaticPageController - accessibility page', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('renders accessibility page with correct template and viewData', () => {
+    const lastUpdatedDate = '2026-06-06'
+    config.get.mockReturnValue(lastUpdatedDate)
+
+    const request = {
+      path: ROUTES.GENERAL.STATIC_PAGES.ACCESSIBILITY,
+      t: vi.fn((key) => `translated_${key}`)
+    }
+
+    const h = {
+      view: vi.fn((template, data) => ({ template, data })),
+      response: vi.fn()
+    }
+
+    const result = staticPageController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledTimes(1)
+    expect(h.view).toHaveBeenCalledWith(
+      GENERAL_VIEWS.STATIC_PAGES.ACCESSIBILITY,
+      {
+        pageTitle: 'translated_static-pages.accessibility.title',
+        heading: 'translated_static-pages.accessibility.heading',
+        privacyLastUpdatedDate: lastUpdatedDate,
+        localeNamespace: 'static-pages.accessibility'
+      }
+    )
+    expect(config.get).toHaveBeenCalledWith('privacyNotice.lastUpdatedDate')
+    expect(result).toEqual({
+      template: GENERAL_VIEWS.STATIC_PAGES.ACCESSIBILITY,
+      data: {
+        pageTitle: 'translated_static-pages.accessibility.title',
+        heading: 'translated_static-pages.accessibility.heading',
+        privacyLastUpdatedDate: lastUpdatedDate,
+        localeNamespace: 'static-pages.accessibility'
+      }
+    })
+  })
+})

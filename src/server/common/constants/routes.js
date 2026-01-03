@@ -17,7 +17,8 @@ export const ROUTES = {
     DOWNLOAD: '/download',
     ARCHIVE: '/archive',
     STATIC_PAGES: {
-      PRIVACY_NOTICE: '/privacy-notice'
+      PRIVACY_NOTICE: '/privacy-notice',
+      ACCESSIBILITY: '/accessibility'
     },
     ACCOUNTS: {
       OLD: '/account_requests/new',

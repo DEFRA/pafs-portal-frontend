@@ -14,6 +14,11 @@ export const staticPages = {
           method: 'GET',
           path: ROUTES.GENERAL.STATIC_PAGES.PRIVACY_NOTICE,
           ...staticPageController
+        },
+        {
+          method: 'GET',
+          path: ROUTES.GENERAL.STATIC_PAGES.ACCESSIBILITY,
+          ...staticPageController
         }
       ])
     }

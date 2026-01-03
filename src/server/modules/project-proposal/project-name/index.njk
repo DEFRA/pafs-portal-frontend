@@ -2,23 +2,26 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% block pageTitle %}{{ t('project-proposal.project_name.heading') }} | {{ serviceName }}{% endblock %}
+{% block pageTitle %}{{ t('project-proposal.project_name.heading') }} | {{ serviceName }}
+{% endblock %}
 
 {% block content %}
   <a href="/project-proposal/start" class="govuk-back-link">{{ t('common.back_link') }}</a>
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      {% if errorSummary and (errorSummary | length) %}
+      {% if errorSummary and(errorSummary | length) %}
         {% set errorList = [] %}
         {% for item in errorSummary %}
-          {% set errorList = errorList.concat([{
-            text: item.text,
-            href: item.href
-          }]) %}
+          {% set errorList = errorList.concat([
+            {
+              text: item.text,
+              href: item.href
+            }
+          ]) %}
         {% endfor %}
         {{ govukErrorSummary({
-          titleText: t('project-proposal.project_name.error_summary_title'),
+          titleText: t('common.error_summary_title'),
           errorList: errorList
         }) }}
       {% endif %}
@@ -37,7 +40,8 @@
 
           {% if errors.projectName %}
             <p id="project-name-error" class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ errors.projectName }}
+              <span class="govuk-visually-hidden">Error:</span>
+              {{ errors.projectName }}
             </p>
           {% endif %}
 
@@ -52,7 +56,7 @@
         </div>
 
         {{ govukButton({
-          text: t('project-proposal.project_name.continue_button')
+          text: t('common.buttons.save_and_continue')
         }) }}
       </form>
     </div>

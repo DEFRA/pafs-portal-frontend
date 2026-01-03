@@ -1,0 +1,99 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading,
+    widthClass: 'govuk-grid-column-full'
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <div class="govuk-body" data-testid="app-page-body">
+
+        <h2 class="govuk-heading-l">{{ t(localeNamespace ~ '.using_this_website') }}</h2>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.using_intro') }}</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ t(localeNamespace ~ '.using_bullet_change_contrast') }}</li>
+          <li>{{ t(localeNamespace ~ '.using_bullet_zoom') }}</li>
+          <li>{{ t(localeNamespace ~ '.using_bullet_keyboard') }}</li>
+          <li>{{ t(localeNamespace ~ '.using_bullet_navigation') }}</li>
+          <li>{{ t(localeNamespace ~ '.using_bullet_screenreader') }}</li>
+        </ul>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.using_we_make_changes') }}</p>
+        <p class="govuk-body">
+          <a class="govuk-link" href="{{ t(localeNamespace ~ '.using_ability_link') }}" rel="noopener" target="_blank">{{ t(localeNamespace ~ '.using_ability_text') }}</a>
+          {{ t(localeNamespace ~ '.using_ability_text_suffix') }}
+        </p>
+
+        <h2 class="govuk-heading-l">{{ t(localeNamespace ~ '.how_accessible_heading') }}</h2>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.how_accessible_intro') }}</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ t(localeNamespace ~ '.how_accessible_bullet1') }}</li>
+          <li>{{ t(localeNamespace ~ '.how_accessible_bullet2') }}</li>
+          <li>{{ t(localeNamespace ~ '.how_accessible_bullet3') }}</li>
+        </ul>
+
+        <h2 class="govuk-heading-l">{{ t(localeNamespace ~ '.disproportionate_burden_heading') }}</h2>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.disproportionate_burden_intro') }}</p>
+
+        <h2 class="govuk-heading-l">{{ t(localeNamespace ~ '.cannot_access_heading') }}</h2>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.cannot_access_intro') }}</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ t(localeNamespace ~ '.contact_email_text') }}
+            <a class="govuk-link" href="mailto:{{ t(localeNamespace ~ '.contact_email') }}">{{ t(localeNamespace ~ '.contact_email') }}</a>
+          </li>
+          <li>{{ t(localeNamespace ~ '.constact_phone_text') }}
+            <a class="govuk-link" href="tel:{{ t(localeNamespace ~ '.contact_phone') }}">{{ t(localeNamespace ~ '.contact_phone_human') }}</a>{{ t(localeNamespace ~ '.contact_hours') }}</li>
+        </ul>
+
+        <h2 class="govuk-heading-l">{{ t(localeNamespace ~ '.reporting_problems_heading') }}</h2>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.reporting_intro') }}</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ t(localeNamespace ~ '.contact_email_text') }}
+            <a class="govuk-link" href="mailto:{{ t(localeNamespace ~ '.contact_email') }}">{{ t(localeNamespace ~ '.contact_email') }}</a>
+          </li>
+          <li>{{ t(localeNamespace ~ '.constact_phone_text') }}
+            <a class="govuk-link" href="tel:{{ t(localeNamespace ~ '.contact_phone') }}">{{ t(localeNamespace ~ '.contact_phone_human') }}</a>{{ t(localeNamespace ~ '.contact_hours') }}</li>
+        </ul>
+
+        <h2 class="govuk-heading-l">{{ t(localeNamespace ~ '.enforcement_procedure_heading') }}</h2>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.enforcement_intro') }}
+          <a class="govuk-link" href="{{ t(localeNamespace ~ '.eass_link') }}" target="_blank" rel="noopener">{{ t(localeNamespace ~ '.eass_text') }}</a>
+        </p>
+
+        <h2 class="govuk-heading-l">{{ t(localeNamespace ~ '.contacting_us_heading') }}</h2>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.contacting_intro') }}</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>phone on  <a class="govuk-link" href="tel:{{ t(localeNamespace ~ '.contact_phone') }}">{{ t(localeNamespace ~ '.contact_phone_human') }}</a>
+            {{ t(localeNamespace ~ '.contact_hours') }}</li>
+          <li>email at <a class="govuk-link" href="mailto:{{ t(localeNamespace ~ '.contact_email') }}">{{ t(localeNamespace ~ '.contact_email') }}</a>
+          </li>
+          <li>Twitter @ <a class="govuk-link" href="{{ t(localeNamespace ~ '.twitter_url') }}" target="_blank" rel="noopener">{{ t(localeNamespace ~ '.twitter_text') }}</a>
+          </li>
+          <li>Facebook @ <a class="govuk-link" href="{{ t(localeNamespace ~ '.facebook_url') }}" target="_blank" rel="noopener">{{ t(localeNamespace ~ '.facebook_text') }}</a>
+          </li>
+        </ul>
+        <p class="govuk-body">
+          <a class="govuk-link" href="{{ t(localeNamespace ~ '.visit_offices_url') }}" target="_blank" rel="noopener">{{ t(localeNamespace ~ '.visit_offices_text') }}</a>.</p>
+
+        <h2 class="govuk-heading-l">{{ t(localeNamespace ~ '.technical_info_heading') }}</h2>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.technical_info_intro') }}</p>
+
+        <h2 class="govuk-heading-l">{{ t(localeNamespace ~ '.compliance_status_heading') }}</h2>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.compliance_status_intro') }}</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ t(localeNamespace ~ '.compliance_bullet1') }}</li>
+          <li>{{ t(localeNamespace ~ '.compliance_bullet2') }}</li>
+          <li>{{ t(localeNamespace ~ '.compliance_bullet3') }}</li>
+        </ul>
+
+        <h2 class="govuk-heading-l">{{ t(localeNamespace ~ '.how_we_tested_heading') }}</h2>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.how_we_tested_intro') }}</p>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.tested_by') }}</p>
+        <p class="govuk-body">{{ t(localeNamespace ~ '.prepared_on_text') }}
+          {{ t(localeNamespace ~ '.prepared_on_date') }}</p>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -16,7 +16,9 @@ export default defineConfig({
         'coverage',
         'postcss.config.js',
         'stylelint.config.js',
-        'src/client/javascripts/**'
+        'src/client/javascripts/**',
+        '**/*.md',
+        '**/*.njk'
       ]
     }
   }

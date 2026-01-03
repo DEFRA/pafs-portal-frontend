@@ -13,6 +13,9 @@ class StaticPageController {
     if (path === ROUTES.GENERAL.STATIC_PAGES.PRIVACY_NOTICE) {
       pageKey = 'privacy'
     }
+    if (path === ROUTES.GENERAL.STATIC_PAGES.ACCESSIBILITY) {
+      pageKey = 'accessibility'
+    }
     return pageKey
   }
 
