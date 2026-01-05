@@ -72,7 +72,7 @@ class StaticPageController {
     // Default to "no" if nothing was selected
     const consentValue = analyticsConsent === 'yes' ? 'yes' : 'no'
 
-    const response = h.redirect(`${request.path}?saved=1`)
+    const response = h.redirect(`${request.path}?saved=true`)
     // Set cookies on the response - values must be strings
     response.state(
       COOKIE_POLICY_NAME,

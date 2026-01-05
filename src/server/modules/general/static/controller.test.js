@@ -253,7 +253,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
     const response = staticPageController.postHandler(request, h)
 
     expect(redirectSpy).toHaveBeenCalledWith(
-      `${ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS}?saved=1`
+      `${ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS}?saved=true`
     )
 
     expect(stateSpy).toHaveBeenCalledWith(
