@@ -10,6 +10,9 @@ import { GENERAL_VIEWS } from '../../../common/constants/common.js'
 
 const COOKIE_POLICY_NAME = 'cookies_policy'
 const COOKIE_PREFS_SET_NAME = 'cookies_preferences_set'
+const COOKIE_TTL_CONFIG_KEY = 'cookie.preferences.ttl'
+const COOKIE_SECURE_CONFIG_KEY = 'session.cookie.secure'
+
 class StaticPageController {
   getPageKey(path) {
     let pageKey = null
@@ -80,8 +83,8 @@ class StaticPageController {
       JSON.stringify({ analytics: consentValue, preferencesSet: true }),
       {
         path: '/',
-        ttl: config.get('cookie.preferences.ttl'),
-        isSecure: config.get('session.cookie.secure'),
+        ttl: config.get(COOKIE_TTL_CONFIG_KEY),
+        isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
         isHttpOnly: true,
         isSameSite: 'Lax'
       }
@@ -89,8 +92,8 @@ class StaticPageController {
 
     response.state(COOKIE_PREFS_SET_NAME, 'true', {
       path: '/',
-      ttl: config.get('cookie.preferences.ttl'),
-      isSecure: config.get('session.cookie.secure'),
+      ttl: config.get(COOKIE_TTL_CONFIG_KEY),
+      isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
       isHttpOnly: true,
       isSameSite: 'Lax'
     })
@@ -135,8 +138,8 @@ class StaticPageController {
       JSON.stringify({ analytics: consentValue, preferencesSet: true }),
       {
         path: '/',
-        ttl: config.get('cookie.preferences.ttl'),
-        isSecure: config.get('session.cookie.secure'),
+        ttl: config.get(COOKIE_TTL_CONFIG_KEY),
+        isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
         isHttpOnly: true,
         isSameSite: 'Lax'
       }
@@ -144,8 +147,8 @@ class StaticPageController {
 
     response.state(COOKIE_PREFS_SET_NAME, 'true', {
       path: '/',
-      ttl: config.get('cookie.preferences.ttl'),
-      isSecure: config.get('session.cookie.secure'),
+      ttl: config.get(COOKIE_TTL_CONFIG_KEY),
+      isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
       isHttpOnly: true,
       isSameSite: 'Lax'
     })
@@ -154,7 +157,7 @@ class StaticPageController {
     response.state('show_cookie_confirmation', 'true', {
       path: '/',
       ttl: null, // Session cookie
-      isSecure: config.get('session.cookie.secure'),
+      isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
       isHttpOnly: false,
       isSameSite: 'Lax'
     })

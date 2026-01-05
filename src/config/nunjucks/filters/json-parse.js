@@ -11,7 +11,7 @@ export function jsonParse(str, defaultValue = {}) {
 
   try {
     return JSON.parse(str)
-  } catch (error) {
+  } catch {
     return defaultValue
   }
 }
