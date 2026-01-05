@@ -35,7 +35,9 @@ export const PROPOSAL_VIEWS = {
 export const GENERAL_VIEWS = {
   STATIC_PAGES: {
     PRIVACY: 'modules/general/static/views/privacy',
-    ACCESSIBILITY: 'modules/general/static/views/accessibility'
+    ACCESSIBILITY: 'modules/general/static/views/accessibility',
+    COOKIES: 'modules/general/static/views/cookies',
+    COOKIE_SETTINGS: 'modules/general/static/views/cookie-settings'
   }
 }
 

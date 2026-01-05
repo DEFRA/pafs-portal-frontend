@@ -1,0 +1,103 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading,
+    widthClass: 'govuk-grid-column-full'
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <div class="govuk-body" data-testid="app-page-body">
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.cookies_intro')}}
+        </p>
+
+        <h2 class="govuk-heading-m">{{t(localeNamespace ~ '.cookie_settings_heading')}}</h2>
+
+        <p class="govuk-body">{{t(localeNamespace ~ '.cookie_settings_intro')}}</p>
+
+        <h3 class="govuk-heading-s">{{t(localeNamespace ~ '.strictly_necessary_heading')}}</h3>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.strictly_necessary_intro')}}
+        </p>
+
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m">Strictly necessary cookies</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">{{t(localeNamespace ~ '.cookie_table_name_header')}}</th>
+              <th scope="col" class="govuk-table__header">{{t(localeNamespace ~ '.cookie_table_purpose_header')}}</th>
+              <th scope="col" class="govuk-table__header">{{t(localeNamespace ~ '.cookie_table_expires_header')}}</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.session_cookie_name')}}</td>
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.session_cookie_purpose')}}</td>
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.session_cookie_expires')}}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.preferences_cookie_name')}}</td>
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.preferences_cookie_purpose')}}</td>
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.preferences_cookie_expires')}}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.policy_cookie_name')}}</td>
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.policy_cookie_purpose')}}</td>
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.policy_cookie_expires')}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="govuk-heading-s">{{t(localeNamespace ~ '.analytics_heading')}}</h3>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.analytics_intro')}}
+        </p>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.analytics_text')}}
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{t(localeNamespace ~ '.analytics_bullet1')}}</li>
+          <li>{{t(localeNamespace ~ '.analytics_bullet2')}}</li>
+          <li>{{t(localeNamespace ~ '.analytics_bullet3')}}</li>
+        </ul>
+
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m">Google Analytics cookies</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">{{t(localeNamespace ~ '.cookie_table_name_header')}}</th>
+              <th scope="col" class="govuk-table__header">{{t(localeNamespace ~ '.cookie_table_purpose_header')}}</th>
+              <th scope="col" class="govuk-table__header">{{t(localeNamespace ~ '.cookie_table_expires_header')}}</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.analytics_ga_cookie_name')}}</td>
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.analytics_ga_cookie_purpose')}}</td>
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.analytics_ga_cookie_expires')}}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.analytics_gid_cookie_name')}}</td>
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.analytics_gid_cookie_purpose')}}</td>
+              <td class="govuk-table__cell">{{t(localeNamespace ~ '.analytics_gid_cookie_expires')}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 class="govuk-heading-m">{{t(localeNamespace ~ '.change_settings_heading')}}</h2>
+
+        <p class="govuk-body">
+          {{t(localeNamespace ~ '.change_settings_link_pre_text')}} <a href="/cookie-settings" class="govuk-link">{{t(localeNamespace ~ '.change_settings_link')}}</a> {{t(localeNamespace ~ '.change_settings_link_post_text')}}
+        </p>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -18,7 +18,9 @@ export const ROUTES = {
     ARCHIVE: '/archive',
     STATIC_PAGES: {
       PRIVACY_NOTICE: '/privacy-notice',
-      ACCESSIBILITY: '/accessibility'
+      ACCESSIBILITY: '/accessibility',
+      COOKIES: '/cookies',
+      COOKIE_SETTINGS: '/cookie-settings'
     },
     ACCOUNTS: {
       OLD: '/account_requests/new',

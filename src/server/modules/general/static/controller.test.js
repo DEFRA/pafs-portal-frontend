@@ -120,3 +120,189 @@ describe('StaticPageController - accessibility page', () => {
     })
   })
 })
+describe('StaticPageController - cookies page', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('renders cookies page with correct template and viewData', () => {
+    const lastUpdatedDate = '2026-01-05'
+    config.get.mockReturnValue(lastUpdatedDate)
+
+    const request = {
+      path: ROUTES.GENERAL.STATIC_PAGES.COOKIES,
+      t: vi.fn((key) => `translated_${key}`)
+    }
+
+    const h = {
+      view: vi.fn((template, data) => ({ template, data })),
+      response: vi.fn()
+    }
+
+    const result = staticPageController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledTimes(1)
+    expect(h.view).toHaveBeenCalledWith(GENERAL_VIEWS.STATIC_PAGES.COOKIES, {
+      pageTitle: 'translated_static-pages.cookies.title',
+      heading: 'translated_static-pages.cookies.heading',
+      privacyLastUpdatedDate: lastUpdatedDate,
+      localeNamespace: 'static-pages.cookies'
+    })
+    expect(config.get).toHaveBeenCalledWith('privacyNotice.lastUpdatedDate')
+    expect(result).toEqual({
+      template: GENERAL_VIEWS.STATIC_PAGES.COOKIES,
+      data: {
+        pageTitle: 'translated_static-pages.cookies.title',
+        heading: 'translated_static-pages.cookies.heading',
+        privacyLastUpdatedDate: lastUpdatedDate,
+        localeNamespace: 'static-pages.cookies'
+      }
+    })
+  })
+})
+
+describe('StaticPageController - cookie settings page (GET)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('renders with saved flag and existing consent', () => {
+    config.get.mockImplementation((key) => {
+      if (key === 'privacyNotice.lastUpdatedDate') return '2026-02-02'
+      return null
+    })
+
+    const request = {
+      path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS,
+      state: { analytics_consent: 'yes' },
+      query: { saved: 'true' },
+      t: vi.fn((key) => `translated_${key}`)
+    }
+
+    const h = {
+      view: vi.fn((template, data) => ({ template, data })),
+      response: vi.fn()
+    }
+
+    const result = staticPageController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      GENERAL_VIEWS.STATIC_PAGES.COOKIE_SETTINGS,
+      expect.objectContaining({
+        pageTitle: 'translated_static-pages.cookie_settings.title',
+        heading: 'translated_static-pages.cookie_settings.heading',
+        localeNamespace: 'static-pages.cookie_settings',
+        analyticsConsent: 'yes',
+        savedSuccessfully: true
+      })
+    )
+    expect(result.template).toBe(GENERAL_VIEWS.STATIC_PAGES.COOKIE_SETTINGS)
+  })
+
+  it('defaults consent to "no" and saved flag to false', () => {
+    config.get.mockReturnValue('2026-02-03')
+
+    const request = {
+      path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS,
+      state: {},
+      query: {},
+      t: vi.fn((key) => `translated_${key}`)
+    }
+
+    const h = {
+      view: vi.fn((template, data) => ({ template, data })),
+      response: vi.fn()
+    }
+
+    staticPageController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      GENERAL_VIEWS.STATIC_PAGES.COOKIE_SETTINGS,
+      expect.objectContaining({
+        analyticsConsent: 'no',
+        savedSuccessfully: false
+      })
+    )
+  })
+})
+
+describe('StaticPageController - cookie settings page (POST)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('sets analytics consent cookie and preferences cookie then redirects with saved flag', () => {
+    config.get.mockImplementation((key) => {
+      if (key === 'cookie.preferences.ttl') return 1000
+      if (key === 'session.cookie.secure') return true
+      return null
+    })
+
+    const request = {
+      path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS,
+      payload: { analyticsConsent: 'yes' }
+    }
+
+    const stateSpy = vi.fn().mockReturnThis()
+    const redirectSpy = vi.fn(() => ({ state: stateSpy }))
+
+    const h = {
+      redirect: redirectSpy
+    }
+
+    const response = staticPageController.postHandler(request, h)
+
+    expect(redirectSpy).toHaveBeenCalledWith(
+      `${ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS}?saved=1`
+    )
+
+    expect(stateSpy).toHaveBeenCalledWith(
+      'cookies_policy',
+      JSON.stringify({ analytics: 'yes', preferencesSet: true }),
+      expect.objectContaining({
+        ttl: 1000,
+        isSecure: true,
+        isHttpOnly: true,
+        isSameSite: 'Lax'
+      })
+    )
+
+    expect(stateSpy).toHaveBeenCalledWith(
+      'cookies_preferences_set',
+      'true',
+      expect.objectContaining({
+        ttl: 1000,
+        isSecure: true,
+        isHttpOnly: true,
+        isSameSite: 'Lax'
+      })
+    )
+
+    expect(response).toBeDefined()
+  })
+
+  it('defaults analytics consent to "no" when payload missing or not yes', () => {
+    config.get.mockImplementation((key) => {
+      if (key === 'cookie.preferences.ttl') return 500
+      if (key === 'session.cookie.secure') return false
+      return null
+    })
+
+    const request = {
+      path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS,
+      payload: {}
+    }
+
+    const stateSpy = vi.fn().mockReturnThis()
+    const redirectSpy = vi.fn(() => ({ state: stateSpy }))
+    const h = { redirect: redirectSpy }
+
+    staticPageController.postHandler(request, h)
+
+    expect(stateSpy).toHaveBeenCalledWith(
+      'cookies_policy',
+      JSON.stringify({ analytics: 'no', preferencesSet: true }),
+      expect.any(Object)
+    )
+  })
+})

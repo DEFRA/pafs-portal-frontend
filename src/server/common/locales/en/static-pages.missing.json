@@ -1,0 +1,14 @@
+{
+  "cookie_settings": {
+    "analytics_no_share_text": "cookie_settings.analytics_no_share_text",
+    "session_cookie_name": "cookie_settings.session_cookie_name",
+    "session_cookie_purpose": "cookie_settings.session_cookie_purpose",
+    "session_cookie_expires": "cookie_settings.session_cookie_expires",
+    "preferences_cookie_name": "cookie_settings.preferences_cookie_name",
+    "preferences_cookie_purpose": "cookie_settings.preferences_cookie_purpose",
+    "preferences_cookie_expires": "cookie_settings.preferences_cookie_expires",
+    "policy_cookie_name": "cookie_settings.policy_cookie_name",
+    "policy_cookie_purpose": "cookie_settings.policy_cookie_purpose",
+    "policy_cookie_expires": "cookie_settings.policy_cookie_expires"
+  }
+}
