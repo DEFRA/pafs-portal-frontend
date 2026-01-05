@@ -165,5 +165,18 @@
     "option_no": "No",
     "save_button": "Save changes",
     "saved_message": "Your cookie preferences have been saved."
+  },
+  "cookie_banner": {
+    "heading": "Cookies on Project Application and Funding Service",
+    "intro": "We use some essential cookies to make this service work.",
+    "analytics_intro": "We'd also like to use analytics cookies so we can understand how you use the service and make improvements.",
+    "accept_button": "Accept analytics cookies",
+    "reject_button": "Reject analytics cookies",
+    "view_cookies_link": "View cookies",
+    "accepted_message": "You've accepted analytics cookies. You can",
+    "rejected_message": "You've rejected analytics cookies. You can",
+    "change_settings_link": "change your cookie settings",
+    "at_any_time": "at any time.",
+    "hide_button": "Hide this message"
   }
 }

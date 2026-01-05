@@ -68,12 +68,13 @@ class StaticPageController {
    */
   post(request, h) {
     const { analyticsConsent } = request.payload
-
     // Default to "no" if nothing was selected
     const consentValue = analyticsConsent === 'yes' ? 'yes' : 'no'
 
+    // For cookie settings page, don't show banner confirmation
+    // The page has its own success notification
     const response = h.redirect(`${request.path}?saved=true`)
-    // Set cookies on the response - values must be strings
+
     response.state(
       COOKIE_POLICY_NAME,
       JSON.stringify({ analytics: consentValue, preferencesSet: true }),
@@ -96,11 +97,81 @@ class StaticPageController {
 
     return response
   }
+
+  /**
+   * Accept analytics cookies from banner
+   */
+  acceptCookies(request, h) {
+    return this._setCookieConsent(h, 'yes', request.headers.referer || '/')
+  }
+
+  /**
+   * Reject analytics cookies from banner
+   */
+  rejectCookies(request, h) {
+    return this._setCookieConsent(h, 'no', request.headers.referer || '/')
+  }
+
+  /**
+   * Hide the confirmation message
+   */
+  hideMessage(request, h) {
+    const response = h.redirect(request.headers.referer || '/')
+    // Clear the confirmation cookie so banner doesn't show
+    response.unstate('show_cookie_confirmation', {
+      path: '/'
+    })
+    return response
+  }
+
+  /**
+   * Helper to set cookie consent
+   */
+  _setCookieConsent(h, consentValue, redirectPath) {
+    const response = h.redirect(redirectPath)
+
+    response.state(
+      COOKIE_POLICY_NAME,
+      JSON.stringify({ analytics: consentValue, preferencesSet: true }),
+      {
+        path: '/',
+        ttl: config.get('cookie.preferences.ttl'),
+        isSecure: config.get('session.cookie.secure'),
+        isHttpOnly: true,
+        isSameSite: 'Lax'
+      }
+    )
+
+    response.state(COOKIE_PREFS_SET_NAME, 'true', {
+      path: '/',
+      ttl: config.get('cookie.preferences.ttl'),
+      isSecure: config.get('session.cookie.secure'),
+      isHttpOnly: true,
+      isSameSite: 'Lax'
+    })
+
+    // Set a session cookie to show confirmation message
+    response.state('show_cookie_confirmation', 'true', {
+      path: '/',
+      ttl: null, // Session cookie
+      isSecure: config.get('session.cookie.secure'),
+      isHttpOnly: false,
+      isSameSite: 'Lax'
+    })
+
+    // Clear hide message cookie so confirmation shows
+    response.unstate('hide_cookie_message')
+
+    return response
+  }
 }
 
 const controller = new StaticPageController()
 
 export const staticPageController = {
   handler: (request, h) => controller.get(request, h),
-  postHandler: (request, h) => controller.post(request, h)
+  postHandler: (request, h) => controller.post(request, h),
+  acceptCookiesHandler: (request, h) => controller.acceptCookies(request, h),
+  rejectCookiesHandler: (request, h) => controller.rejectCookies(request, h),
+  hideMessageHandler: (request, h) => controller.hideMessage(request, h)
 }

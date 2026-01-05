@@ -306,3 +306,171 @@ describe('StaticPageController - cookie settings page (POST)', () => {
     )
   })
 })
+
+describe('StaticPageController - cookie banner accept', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('accepts analytics cookies and sets show_cookie_confirmation', () => {
+    config.get.mockImplementation((key) => {
+      if (key === 'cookie.preferences.ttl') return 31536000
+      if (key === 'session.cookie.secure') return true
+      return null
+    })
+
+    const request = {
+      headers: { referer: '/home' }
+    }
+
+    const stateSpy = vi.fn().mockReturnThis()
+    const unstateSpy = vi.fn().mockReturnThis()
+    const redirectSpy = vi.fn(() => ({
+      state: stateSpy,
+      unstate: unstateSpy
+    }))
+
+    const h = {
+      redirect: redirectSpy
+    }
+
+    const response = staticPageController.acceptCookiesHandler(request, h)
+
+    expect(redirectSpy).toHaveBeenCalledWith('/home')
+    expect(stateSpy).toHaveBeenCalledWith(
+      'cookies_policy',
+      JSON.stringify({ analytics: 'yes', preferencesSet: true }),
+      expect.objectContaining({
+        isSecure: true,
+        isHttpOnly: true,
+        isSameSite: 'Lax'
+      })
+    )
+    expect(stateSpy).toHaveBeenCalledWith(
+      'show_cookie_confirmation',
+      'true',
+      expect.objectContaining({
+        isSameSite: 'Lax'
+      })
+    )
+    expect(response).toBeDefined()
+  })
+
+  it('accepts cookies and defaults to / when no referer', () => {
+    config.get.mockImplementation((key) => {
+      if (key === 'cookie.preferences.ttl') return 31536000
+      if (key === 'session.cookie.secure') return false
+      return null
+    })
+
+    const request = {
+      headers: {}
+    }
+
+    const stateSpy = vi.fn().mockReturnThis()
+    const unstateSpy = vi.fn().mockReturnThis()
+    const redirectSpy = vi.fn(() => ({
+      state: stateSpy,
+      unstate: unstateSpy
+    }))
+
+    const h = {
+      redirect: redirectSpy
+    }
+
+    staticPageController.acceptCookiesHandler(request, h)
+
+    expect(redirectSpy).toHaveBeenCalledWith('/')
+  })
+})
+
+describe('StaticPageController - cookie banner reject', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('rejects analytics cookies and sets show_cookie_confirmation', () => {
+    config.get.mockImplementation((key) => {
+      if (key === 'cookie.preferences.ttl') return 31536000
+      if (key === 'session.cookie.secure') return true
+      return null
+    })
+
+    const request = {
+      headers: { referer: '/home' }
+    }
+
+    const stateSpy = vi.fn().mockReturnThis()
+    const unstateSpy = vi.fn().mockReturnThis()
+    const redirectSpy = vi.fn(() => ({
+      state: stateSpy,
+      unstate: unstateSpy
+    }))
+
+    const h = {
+      redirect: redirectSpy
+    }
+
+    const response = staticPageController.rejectCookiesHandler(request, h)
+
+    expect(redirectSpy).toHaveBeenCalledWith('/home')
+    expect(stateSpy).toHaveBeenCalledWith(
+      'cookies_policy',
+      JSON.stringify({ analytics: 'no', preferencesSet: true }),
+      expect.objectContaining({
+        isSecure: true,
+        isHttpOnly: true,
+        isSameSite: 'Lax'
+      })
+    )
+    expect(response).toBeDefined()
+  })
+})
+
+describe('StaticPageController - hide cookie message', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('clears show_cookie_confirmation cookie', () => {
+    const request = {
+      headers: { referer: '/home' }
+    }
+
+    const unstateSpy = vi.fn().mockReturnThis()
+    const redirectSpy = vi.fn(() => ({
+      unstate: unstateSpy
+    }))
+
+    const h = {
+      redirect: redirectSpy
+    }
+
+    const response = staticPageController.hideMessageHandler(request, h)
+
+    expect(redirectSpy).toHaveBeenCalledWith('/home')
+    expect(unstateSpy).toHaveBeenCalledWith('show_cookie_confirmation', {
+      path: '/'
+    })
+    expect(response).toBeDefined()
+  })
+
+  it('hides message and defaults to / when no referer', () => {
+    const request = {
+      headers: {}
+    }
+
+    const unstateSpy = vi.fn().mockReturnThis()
+    const redirectSpy = vi.fn(() => ({
+      unstate: unstateSpy
+    }))
+
+    const h = {
+      redirect: redirectSpy
+    }
+
+    staticPageController.hideMessageHandler(request, h)
+
+    expect(redirectSpy).toHaveBeenCalledWith('/')
+  })
+})

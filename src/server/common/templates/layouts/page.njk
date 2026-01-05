@@ -16,6 +16,10 @@
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
 {% endblock %}
 
+{% block bodyStart %}
+  {% include "cookie-banner.njk" %}
+{% endblock %}
+
 {% block header %}
   {% set headerNav = [] %}
 

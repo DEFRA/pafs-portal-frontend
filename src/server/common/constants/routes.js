@@ -20,7 +20,10 @@ export const ROUTES = {
       PRIVACY_NOTICE: '/privacy-notice',
       ACCESSIBILITY: '/accessibility',
       COOKIES: '/cookies',
-      COOKIE_SETTINGS: '/cookie-settings'
+      COOKIE_SETTINGS: '/cookie-settings',
+      COOKIE_CONSENT_ACCEPT: '/cookies/accept',
+      COOKIE_CONSENT_REJECT: '/cookies/reject',
+      COOKIE_CONSENT_HIDE: '/cookies/hide-message'
     },
     ACCOUNTS: {
       OLD: '/account_requests/new',

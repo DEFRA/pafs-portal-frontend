@@ -34,6 +34,21 @@ export const staticPages = {
           method: 'POST',
           path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS,
           handler: staticPageController.postHandler
+        },
+        {
+          method: 'POST',
+          path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_CONSENT_ACCEPT,
+          handler: staticPageController.acceptCookiesHandler
+        },
+        {
+          method: 'POST',
+          path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_CONSENT_REJECT,
+          handler: staticPageController.rejectCookiesHandler
+        },
+        {
+          method: 'POST',
+          path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_CONSENT_HIDE,
+          handler: staticPageController.hideMessageHandler
         }
       ])
     }
