@@ -24,7 +24,7 @@
       </div>
       <div class="govuk-button-group">
         <form method="POST" action="/cookies/hide-message" style="display: inline;">
-          <button type="submit" class="govuk-link" style="background: none; border: none; padding: 0; text-decoration: underline; cursor: pointer;">
+          <button type="submit" class="govuk-button" data-module="govuk-button">
             {{ t('static-pages:cookie_banner.hide_button') }}
           </button>
         </form>
@@ -52,7 +52,7 @@
             {{ t('static-pages:cookie_banner.reject_button') }}
           </button>
         </form>
-        <a class="govuk-link" href="/cookies">{{ t('static-pages:cookie_banner.view_cookies_link') }}</a>
+        <a class="govuk-link" href="/cookies" style="align-self: center;">{{ t('static-pages:cookie_banner.view_cookies_link') }}</a>
       </div>
     {% endif %}
     

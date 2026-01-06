@@ -174,7 +174,12 @@ describe('StaticPageController - cookie settings page (GET)', () => {
 
     const request = {
       path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS,
-      state: { analytics_consent: 'yes' },
+      state: {
+        cookies_policy: JSON.stringify({
+          analytics: 'yes',
+          preferencesSet: true
+        })
+      },
       query: { saved: 'true' },
       t: vi.fn((key) => `translated_${key}`)
     }

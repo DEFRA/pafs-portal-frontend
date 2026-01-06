@@ -52,7 +52,16 @@ class StaticPageController {
     }
 
     if (pageKey === 'cookie_settings') {
-      viewData.analyticsConsent = request.state.analytics_consent || 'no'
+      // Parse the cookies_policy JSON to get the current analytics preference
+      let cookiePolicy = {}
+      try {
+        cookiePolicy = request.state.cookies_policy
+          ? JSON.parse(request.state.cookies_policy)
+          : {}
+      } catch {
+        cookiePolicy = {}
+      }
+      viewData.analyticsConsent = cookiePolicy.analytics || 'no'
       viewData.savedSuccessfully = request.query.saved === 'true'
     }
 
