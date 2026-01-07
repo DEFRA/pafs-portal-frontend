@@ -8,6 +8,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const thirtyMinutesMs = 1800000
 const oneWeekMs = 604800000
+const oneYearMs = 31536000000
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
@@ -158,6 +159,16 @@ export const config = convict({
         format: Boolean,
         default: isProduction,
         env: 'SESSION_COOKIE_SECURE'
+      }
+    }
+  },
+  cookie: {
+    preferences: {
+      ttl: {
+        doc: 'Cookie preferences TTL in milliseconds (default: 1 year)',
+        format: Number,
+        default: oneYearMs,
+        env: 'COOKIE_PREFERENCES_TTL'
       }
     }
   },

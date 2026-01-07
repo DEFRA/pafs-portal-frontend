@@ -1,0 +1,61 @@
+{% set cookiePolicy = cookies.cookies_policy | jsonParse %}
+{% set prefsSet = cookies.cookies_preferences_set %}
+{% set showConfirmation = cookies.show_cookie_confirmation %}
+
+{% if showConfirmation or (not prefsSet) %}
+<div class="govuk-cookie-banner" role="region" aria-label="{{ t('static-pages:cookie_banner.heading') }}">
+  <div class="govuk-cookie-banner__message govuk-width-container">
+    
+    {# Show confirmation message if preferences just set #}
+    {% if showConfirmation %}
+      {% set accepted = cookiePolicy.analytics == 'yes' %}
+      {% set confirmationMessage = t('static-pages:cookie_banner.accepted_message') if accepted else t('static-pages:cookie_banner.rejected_message') %}
+      
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <div class="govuk-cookie-banner__content">
+            <p class="govuk-body">
+              {{ confirmationMessage }} 
+              <a class="govuk-link" href="/cookie-settings">{{ t('static-pages:cookie_banner.change_settings_link') }}</a> 
+              {{ t('static-pages:cookie_banner.at_any_time') }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="govuk-button-group">
+        <form method="POST" action="/cookies/hide-message" style="display: inline;">
+          <button type="submit" class="govuk-button" data-module="govuk-button">
+            {{ t('static-pages:cookie_banner.hide_button') }}
+          </button>
+        </form>
+      </div>
+    
+    {# Show initial consent banner if preferences not set #}
+    {% elif not prefsSet %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <h2 class="govuk-cookie-banner__heading govuk-heading-m">{{ t('static-pages:cookie_banner.heading') }}</h2>
+          <div class="govuk-cookie-banner__content">
+            <p class="govuk-body">{{ t('static-pages:cookie_banner.intro') }}</p>
+            <p class="govuk-body">{{ t('static-pages:cookie_banner.analytics_intro') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="govuk-button-group">
+        <form method="POST" action="/cookies/accept" style="display: inline;">
+          <button type="submit" class="govuk-button" data-module="govuk-button">
+            {{ t('static-pages:cookie_banner.accept_button') }}
+          </button>
+        </form>
+        <form method="POST" action="/cookies/reject" style="display: inline;">
+          <button type="submit" class="govuk-button" data-module="govuk-button">
+            {{ t('static-pages:cookie_banner.reject_button') }}
+          </button>
+        </form>
+        <a class="govuk-link" href="/cookies" style="align-self: center;">{{ t('static-pages:cookie_banner.view_cookies_link') }}</a>
+      </div>
+    {% endif %}
+    
+  </div>
+</div>
+{% endif %}

@@ -13,12 +13,42 @@ export const staticPages = {
         {
           method: 'GET',
           path: ROUTES.GENERAL.STATIC_PAGES.PRIVACY_NOTICE,
-          ...staticPageController
+          handler: staticPageController.handler
         },
         {
           method: 'GET',
           path: ROUTES.GENERAL.STATIC_PAGES.ACCESSIBILITY,
-          ...staticPageController
+          handler: staticPageController.handler
+        },
+        {
+          method: 'GET',
+          path: ROUTES.GENERAL.STATIC_PAGES.COOKIES,
+          handler: staticPageController.handler
+        },
+        {
+          method: 'GET',
+          path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS,
+          handler: staticPageController.handler
+        },
+        {
+          method: 'POST',
+          path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS,
+          handler: staticPageController.postHandler
+        },
+        {
+          method: 'POST',
+          path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_CONSENT_ACCEPT,
+          handler: staticPageController.acceptCookiesHandler
+        },
+        {
+          method: 'POST',
+          path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_CONSENT_REJECT,
+          handler: staticPageController.rejectCookiesHandler
+        },
+        {
+          method: 'POST',
+          path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_CONSENT_HIDE,
+          handler: staticPageController.hideMessageHandler
         }
       ])
     }

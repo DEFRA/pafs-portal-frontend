@@ -38,6 +38,7 @@ export function context(request) {
     navigation,
     user: session?.user,
     request,
+    cookies: request.state || {},
     t: (key, params) => translate(key, 'en', params),
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]

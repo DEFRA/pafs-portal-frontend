@@ -375,5 +375,71 @@ describe('Nunjucks context builder', () => {
       expect(result.getAssetPath('test.js')).toBe('/public/test.js')
       expect(mockLoggerError).toHaveBeenCalled()
     })
+
+    test('includes cookies from request state', async () => {
+      const contextModule = await import('./context.js')
+      mockReadFileSync.mockReturnValue(
+        JSON.stringify({
+          'application.js': 'javascripts/application.js'
+        })
+      )
+      const mockState = {
+        cookies_policy: JSON.stringify({ analytics: 'yes' }),
+        show_cookie_confirmation: 'true'
+      }
+      const mockReq = {
+        path: '/',
+        yar: {
+          get: vi.fn(() => ({ user: { id: 1, email: 'test@example.com' } }))
+        },
+        state: mockState
+      }
+      const result = contextModule.context(mockReq)
+
+      expect(result.cookies).toEqual(mockState)
+    })
+
+    test('includes empty cookies object when state is undefined', async () => {
+      const contextModule = await import('./context.js')
+      mockReadFileSync.mockReturnValue(
+        JSON.stringify({
+          'application.js': 'javascripts/application.js'
+        })
+      )
+      const mockReq = {
+        path: '/',
+        yar: {
+          get: vi.fn(() => ({ user: { id: 1, email: 'test@example.com' } }))
+        },
+        state: undefined
+      }
+      const result = contextModule.context(mockReq)
+
+      expect(result.cookies).toEqual({})
+    })
+
+    test('includes cookies in context along with other properties', async () => {
+      const contextModule = await import('./context.js')
+      mockReadFileSync.mockReturnValue(
+        JSON.stringify({
+          'application.js': 'javascripts/application.js'
+        })
+      )
+      const mockState = {
+        cookies_preferences_set: 'true'
+      }
+      const mockReq = {
+        path: '/',
+        yar: {
+          get: vi.fn(() => ({ user: { id: 1, email: 'test@example.com' } }))
+        },
+        state: mockState
+      }
+      const result = contextModule.context(mockReq)
+
+      expect(result.cookies).toBeDefined()
+      expect(result.t).toBeTypeOf('function')
+      expect(result.assetPath).toBeDefined()
+    })
   })
 })
