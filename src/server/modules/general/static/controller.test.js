@@ -176,8 +176,7 @@ describe('StaticPageController - cookie settings page (GET)', () => {
       path: ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS,
       state: {
         cookies_policy: JSON.stringify({
-          analytics: 'yes',
-          preferencesSet: true
+          analytics: 'yes'
         })
       },
       query: { saved: 'true' },
@@ -263,7 +262,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
 
     expect(stateSpy).toHaveBeenCalledWith(
       'cookies_policy',
-      JSON.stringify({ analytics: 'yes', preferencesSet: true }),
+      JSON.stringify({ analytics: 'yes' }),
       expect.objectContaining({
         ttl: 1000,
         isSecure: true,
@@ -306,7 +305,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
 
     expect(stateSpy).toHaveBeenCalledWith(
       'cookies_policy',
-      JSON.stringify({ analytics: 'no', preferencesSet: true }),
+      JSON.stringify({ analytics: 'no' }),
       expect.any(Object)
     )
   })
@@ -344,7 +343,7 @@ describe('StaticPageController - cookie banner accept', () => {
     expect(redirectSpy).toHaveBeenCalledWith('/home')
     expect(stateSpy).toHaveBeenCalledWith(
       'cookies_policy',
-      JSON.stringify({ analytics: 'yes', preferencesSet: true }),
+      JSON.stringify({ analytics: 'yes' }),
       expect.objectContaining({
         isSecure: true,
         isHttpOnly: true,
@@ -421,7 +420,7 @@ describe('StaticPageController - cookie banner reject', () => {
     expect(redirectSpy).toHaveBeenCalledWith('/home')
     expect(stateSpy).toHaveBeenCalledWith(
       'cookies_policy',
-      JSON.stringify({ analytics: 'no', preferencesSet: true }),
+      JSON.stringify({ analytics: 'no' }),
       expect.objectContaining({
         isSecure: true,
         isHttpOnly: true,
