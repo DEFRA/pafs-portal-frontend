@@ -89,7 +89,7 @@ class StaticPageController {
 
     response.state(
       COOKIE_POLICY_NAME,
-      JSON.stringify({ analytics: consentValue, preferencesSet: true }),
+      JSON.stringify({ analytics: consentValue }),
       {
         path: '/',
         ttl: config.get(COOKIE_TTL_CONFIG_KEY),
@@ -144,7 +144,7 @@ class StaticPageController {
 
     response.state(
       COOKIE_POLICY_NAME,
-      JSON.stringify({ analytics: consentValue, preferencesSet: true }),
+      JSON.stringify({ analytics: consentValue }),
       {
         path: '/',
         ttl: config.get(COOKIE_TTL_CONFIG_KEY),
