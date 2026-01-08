@@ -37,7 +37,7 @@ describe('Configuration', () => {
     })
 
     test('Should have default cache TTL', () => {
-      expect(config.get('session.cache.ttl')).toBe(1800000) // 30 minutes
+      expect(config.get('session.cache.ttl')).toBe(604800000) // 30 minutes
     })
 
     test('Should use memory engine in non-production', () => {

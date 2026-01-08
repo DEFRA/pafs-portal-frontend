@@ -15,6 +15,8 @@ import {
   extractApiValidationErrors,
   extractApiError
 } from '../../../common/helpers/error-renderer/index.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
+import { createAccountsCacheService } from '../../../common/services/accounts/accounts-cache.js'
 
 /**
  * Check Answers Controller
@@ -101,8 +103,11 @@ class CheckAnswersController {
       // Prepare payload for API submission
       const payload = this.prepareApiPayload(sessionData)
 
+      // Get access token for admin users
+      const accessToken = isAdmin ? getAuthSession(request)?.accessToken : ''
+
       // Submit to backend API
-      const apiResponse = await upsertAccount(payload)
+      const apiResponse = await upsertAccount(payload, accessToken)
 
       // Check if API request was successful
       if (!apiResponse.success) {
@@ -186,14 +191,33 @@ class CheckAnswersController {
 
   handleSuccess(request, h, isAdmin, sessionKey, sessionData, apiResponse) {
     const status = apiResponse.data?.status || 'pending'
-    request.yar.set(sessionKey, { ...sessionData, submissionStatus: status })
 
-    // Redirect to confirmation page
-    return h.redirect(
-      isAdmin
-        ? ROUTES.ADMIN.ACCOUNTS.CONFIRMATION
-        : ROUTES.GENERAL.ACCOUNTS.CONFIRMATION
-    )
+    if (isAdmin) {
+      // For admin, set flash notification and redirect to active users
+      const { firstName, lastName } = sessionData
+      request.yar.flash('userCreated', {
+        name: `${firstName} ${lastName}`,
+        userId: apiResponse.data?.userId
+      })
+
+      // Invalidate accounts cache to refresh counts and lists after adding new accoun
+      const cacheService = createAccountsCacheService(request.server)
+      cacheService.invalidateByStatus(status).catch((error) => {
+        request.server.logger.warn(
+          { error },
+          'Failed to invalidate accounts cache'
+        )
+      })
+
+      // Clear session data
+      request.yar.set(sessionKey, undefined)
+
+      return h.redirect(ROUTES.ADMIN.USERS_ACTIVE)
+    } else {
+      // For anonymous user, show confirmation page
+      request.yar.set(sessionKey, { ...sessionData, submissionStatus: status })
+      return h.redirect(ROUTES.GENERAL.ACCOUNTS.CONFIRMATION)
+    }
   }
 
   handleUnexpectedError(

@@ -75,12 +75,12 @@ export class AccountsCacheService extends BaseCacheService {
    * @param {string} status - Account status ('pending' or 'active')
    * @returns {Promise<void>}
    */
-  async invalidateByStatus(status) {
+  async invalidateByStatus(_status) {
     if (!this.enabled) {
       return
     }
 
-    await this.dropByKey(`${status}:*`)
+    await this.invalidateAll()
   }
 
   /**

@@ -298,6 +298,10 @@
     },
     "errors": {
       "fetch_failed": "There was a problem loading user accounts. Please try again later."
+    },
+    "notifications": {
+      "user_added_success_heading": "User has been added successfully",
+      "user_added_success_body": "has been added to the system."
     }
   },
   "validation": {

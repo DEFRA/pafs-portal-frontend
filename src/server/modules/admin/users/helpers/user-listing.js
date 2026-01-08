@@ -79,6 +79,7 @@ export function getAreaFilterOptions(t) {
  * @param {string} params.currentTab - Current tab ('pending' or 'active')
  * @param {string} params.baseUrl - Base URL for form and pagination
  * @param {string} [params.error] - Error message if any
+ * @param {Object} [params.successNotification] - Success notification data
  * @returns {Object} View model
  */
 export function buildUsersViewModel({
@@ -91,7 +92,8 @@ export function buildUsersViewModel({
   filters,
   currentTab,
   baseUrl,
-  error
+  error,
+  successNotification
 }) {
   const currentPage =
     pagination.page || pagination.currentPage || PAGINATION.DEFAULT_PAGE
@@ -121,7 +123,8 @@ export function buildUsersViewModel({
       pending: '/admin/users/pending',
       active: '/admin/users/active'
     },
-    ...(error && { error })
+    ...(error && { error }),
+    ...(successNotification && { successNotification })
   }
 }
 
@@ -135,6 +138,7 @@ export function buildUsersViewModel({
  * @param {string} params.currentTab - Current tab
  * @param {string} params.baseUrl - Base URL
  * @param {string} params.error - Error message
+ * @param {Object} [params.successNotification] - Success notification data
  * @returns {Object} Empty view model
  */
 export function getEmptyUsersViewModel({
@@ -143,7 +147,8 @@ export function getEmptyUsersViewModel({
   filters,
   currentTab,
   baseUrl,
-  error
+  error,
+  successNotification
 }) {
   return buildUsersViewModel({
     request,
@@ -160,6 +165,7 @@ export function getEmptyUsersViewModel({
     filters,
     currentTab,
     baseUrl,
-    error
+    error,
+    successNotification
   })
 }

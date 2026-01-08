@@ -14,7 +14,7 @@
           <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.name') }}</th>
           <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.email') }}</th>
           <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.area') }}</th>
-          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.requested') }}</th>
+          <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">{{ t('accounts.manage_users.table.requested') }}</th>
           <th scope="col" class="govuk-table__header">
             <span class="govuk-visually-hidden">{{ t('accounts.manage_users.table.actions') }}</span>
           </th>
@@ -27,7 +27,10 @@
               {{ user.lastName }}</td>
             <td class="govuk-table__cell app-!-text-break-all" data-label="{{ t('accounts.manage_users.table.email') }}" data-testid="user-email">{{ user.email }}</td>
             <td class="govuk-table__cell" data-label="{{ t('accounts.manage_users.table.area') }}" data-testid="user-area">{{ user.primaryArea | default('-') }}</td>
-            <td class="govuk-table__cell" data-label="{{ t('accounts.manage_users.table.requested') }}" data-testid="user-date">{{ user.createdAt | formatDate('d MMM yyyy') }}</td>
+            <td class="govuk-table__cell govuk-!-white-space-nowrap" data-label="{{ t('accounts.manage_users.table.requested') }}" data-testid="user-date">
+              {{ user.createdAt | formatDate('d MMM yyyy') }}&nbsp;
+              <span class="govuk-hint govuk-!-font-size-16">{{ user.createdAt | formatDate('HH:mm') }}</span>
+            </td>
             <td class="govuk-table__cell" data-label="">
               <a href="/admin/users/{{ user.id }}" class="govuk-link" data-testid="user-view-link">
                 {{ t('accounts.manage_users.actions.view') }}

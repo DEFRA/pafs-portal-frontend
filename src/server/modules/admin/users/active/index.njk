@@ -12,11 +12,11 @@
       <thead class="govuk-table__head">
         <tr class="govuk-table__row">
           <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.name') }}</th>
-          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.email') }}</th>
-          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.area') }}</th>
-          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.admin') }}</th>
-          <th scope="col" class="govuk-table__header">{{ t('accounts.manage_users.table.last_sign_in') }}</th>
-          <th scope="col" class="govuk-table__header">
+          <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">{{ t('accounts.manage_users.table.email') }}</th>
+          <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">{{ t('accounts.manage_users.table.area') }}</th>
+          <th scope="col" class="govuk-table__header govuk-!-width-one-tenth">{{ t('accounts.manage_users.table.admin') }}</th>
+          <th scope="col" class="govuk-table__header govuk-!-width-half-quarter">{{ t('accounts.manage_users.table.last_sign_in') }}</th>
+          <th scope="col" class="govuk-table__header govuk-!-width-one-tenth">
             <span class="govuk-visually-hidden">{{ t('accounts.manage_users.table.actions') }}</span>
           </th>
         </tr>
@@ -35,9 +35,10 @@
                 {{ t('accounts.manage_users.table.no') }}
               {% endif %}
             </td>
-            <td class="govuk-table__cell" data-label="{{ t('accounts.manage_users.table.last_sign_in') }}" data-testid="user-last-sign-in">
+            <td class="govuk-table__cell govuk-!-white-space-nowrap" data-label="{{ t('accounts.manage_users.table.last_sign_in') }}" data-testid="user-last-sign-in">
               {% if user.lastSignIn %}
-                {{ user.lastSignIn | formatDate('d MMM yyyy') }}
+                {{ user.lastSignIn | formatDate('d MMM yyyy') }}&nbsp;
+                <span class="govuk-hint govuk-!-font-size-16">{{ user.lastSignIn | formatDate('HH:mm') }}</span>
               {% else %}
                 {{ t('accounts.manage_users.table.never') }}
               {% endif %}

@@ -2,7 +2,9 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import {
   getAccounts,
   getPendingCount,
-  getActiveCount
+  getActiveCount,
+  validateEmail,
+  upsertAccount
 } from './accounts-service.js'
 
 vi.mock('../../helpers/api-client/index.js')
@@ -336,6 +338,55 @@ describe('Accounts Service', () => {
         expect(mockCacheService.setByKey).toHaveBeenCalledWith(
           'count:active',
           30
+        )
+      })
+    })
+    describe('validateEmail and upsertAccount', () => {
+      test('validateEmail posts email to API', async () => {
+        apiRequest.mockResolvedValue({ success: true })
+
+        const email = 'test@example.com'
+        await validateEmail(email)
+
+        expect(apiRequest).toHaveBeenCalledWith(
+          '/api/v1/validate-email',
+          expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify({ email })
+          })
+        )
+      })
+
+      test('upsertAccount posts account data without token', async () => {
+        apiRequest.mockResolvedValue({ success: true })
+
+        const accountData = { email: 'a@b.com' }
+        await upsertAccount(accountData)
+
+        const calledArgs = apiRequest.mock.calls[0]
+        expect(calledArgs[0]).toBe('/api/v1/accounts')
+        expect(calledArgs[1]).toEqual(
+          expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify(accountData)
+          })
+        )
+        expect(calledArgs[1].headers).toBeUndefined()
+      })
+
+      test('upsertAccount includes authorization header when token provided', async () => {
+        apiRequest.mockResolvedValue({ success: true })
+
+        const accountData = { email: 'a@b.com' }
+        await upsertAccount(accountData, 'abc123')
+
+        expect(apiRequest).toHaveBeenCalledWith(
+          '/api/v1/accounts',
+          expect.objectContaining({
+            method: 'POST',
+            headers: { Authorization: 'Bearer abc123' },
+            body: JSON.stringify(accountData)
+          })
         )
       })
     })
