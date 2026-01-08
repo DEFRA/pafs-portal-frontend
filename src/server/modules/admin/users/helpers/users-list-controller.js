@@ -37,6 +37,11 @@ export function createUsersListController({ status, viewTemplate, baseUrl }) {
       // Create cache service instance for this request
       const cacheService = createAccountsCacheService(request.server)
 
+      // Get flash notification if present
+      const userCreatedFlash = request.yar.flash('userCreated')
+      const successNotification =
+        userCreatedFlash.length > 0 ? userCreatedFlash[0] : null
+
       const page =
         Number.parseInt(request.query.page, 10) || PAGINATION.DEFAULT_PAGE
       const search = request.query.search || ''
@@ -72,7 +77,8 @@ export function createUsersListController({ status, viewTemplate, baseUrl }) {
               filters,
               currentTab: status,
               baseUrl,
-              error: request.t('accounts.manage_users.errors.fetch_failed')
+              error: request.t('accounts.manage_users.errors.fetch_failed'),
+              successNotification
             })
           )
         }
@@ -90,7 +96,8 @@ export function createUsersListController({ status, viewTemplate, baseUrl }) {
             activeCount,
             filters,
             currentTab: status,
-            baseUrl
+            baseUrl,
+            successNotification
           })
         )
       } catch (error) {
@@ -104,7 +111,8 @@ export function createUsersListController({ status, viewTemplate, baseUrl }) {
             filters,
             currentTab: status,
             baseUrl,
-            error: request.t('accounts.manage_users.errors.fetch_failed')
+            error: request.t('accounts.manage_users.errors.fetch_failed'),
+            successNotification
           })
         )
       }

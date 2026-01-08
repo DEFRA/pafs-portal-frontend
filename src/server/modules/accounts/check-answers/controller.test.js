@@ -8,6 +8,7 @@ vi.mock('../../../common/helpers/areas/areas-helper.js')
 vi.mock('../helpers.js')
 vi.mock('../../../common/services/accounts/accounts-service.js')
 vi.mock('../../../common/helpers/error-renderer/index.js')
+vi.mock('../../../common/helpers/auth/session-manager.js')
 
 const { findAreaById, getParentAreas } =
   await import('../../../common/helpers/areas/areas-helper.js')
@@ -16,6 +17,8 @@ const { upsertAccount } =
   await import('../../../common/services/accounts/accounts-service.js')
 const { extractApiValidationErrors, extractApiError } =
   await import('../../../common/helpers/error-renderer/index.js')
+const { getAuthSession } =
+  await import('../../../common/helpers/auth/session-manager.js')
 
 describe('CheckAnswersController', () => {
   let mockRequest
@@ -204,7 +207,8 @@ describe('CheckAnswersController', () => {
           responsibility: 'EA',
           admin: false,
           areas: [{ areaId: '1', primary: true }]
-        })
+        }),
+        '' // No access token for non-admin
       )
     })
 
@@ -276,20 +280,27 @@ describe('CheckAnswersController', () => {
       )
     })
 
-    test('redirects admin to admin confirmation', async () => {
+    test('redirects admin to active users page with flash notification', async () => {
       mockRequest.path = '/admin/accounts/check-answers'
       mockRequest.yar.get.mockReturnValue({
         firstName: 'John',
+        lastName: 'Doe',
         email: 'test@example.com',
         admin: true
       })
-      upsertAccount.mockResolvedValue({ success: true })
+      mockRequest.yar.flash = vi.fn()
+      upsertAccount.mockResolvedValue({
+        success: true,
+        data: { userId: 123, status: 'approved' }
+      })
 
       await checkAnswersPostController.handler(mockRequest, mockH)
 
-      expect(mockH.redirect).toHaveBeenCalledWith(
-        '/admin/user-account/confirmation'
-      )
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith('userCreated', {
+        name: 'John Doe',
+        userId: 123
+      })
+      expect(mockH.redirect).toHaveBeenCalledWith('/admin/users/active')
     })
 
     test('handles network errors gracefully', async () => {
@@ -318,6 +329,9 @@ describe('CheckAnswersController', () => {
         email: 'test@example.com',
         admin: true
       })
+      getAuthSession.mockReturnValue({
+        accessToken: 'admin-access-token-123'
+      })
       upsertAccount.mockResolvedValue({
         success: true,
         data: { status: 'active' }
@@ -330,7 +344,8 @@ describe('CheckAnswersController', () => {
           firstName: 'John',
           email: 'test@example.com',
           admin: true
-        })
+        }),
+        'admin-access-token-123'
       )
     })
 
@@ -390,7 +405,8 @@ describe('CheckAnswersController', () => {
         expect.not.objectContaining({
           telephoneNumber: null,
           organisation: undefined
-        })
+        }),
+        '' // No access token for anonymous user
       )
     })
   })

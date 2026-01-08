@@ -154,28 +154,28 @@ describe('AccountsCacheService', () => {
     })
 
     describe('invalidateByStatus', () => {
-      test('drops cache for specified status', async () => {
+      test('drops all cache (not just specified status)', async () => {
         await cacheService.invalidateByStatus('pending')
 
-        expect(mockCache.drop).toHaveBeenCalledWith('pending:*')
+        expect(mockCache.drop).toHaveBeenCalledWith('*')
       })
     })
 
     describe('addToList', () => {
-      test('invalidates status cache when adding account to list', async () => {
+      test('invalidates all cache when adding account to list', async () => {
         const account = { id: 1, status: 'pending' }
 
         await cacheService.addToList(account, { status: 'pending' })
 
-        expect(mockCache.drop).toHaveBeenCalledWith('pending:*')
+        expect(mockCache.drop).toHaveBeenCalledWith('*')
       })
     })
 
     describe('removeFromList', () => {
-      test('invalidates status cache and drops account key', async () => {
+      test('invalidates all cache and drops account key', async () => {
         await cacheService.removeFromList(1, 'pending')
 
-        expect(mockCache.drop).toHaveBeenCalledWith('pending:*')
+        expect(mockCache.drop).toHaveBeenCalledWith('*')
         expect(mockCache.drop).toHaveBeenCalledWith('account:1')
       })
     })
@@ -215,7 +215,7 @@ describe('AccountsCacheService', () => {
     })
 
     describe('updateAccount', () => {
-      test('updates account and invalidates status cache', async () => {
+      test('updates account and invalidates all cache', async () => {
         const account = { id: 1, status: 'active' }
 
         await cacheService.updateAccount(1, account)
@@ -225,16 +225,17 @@ describe('AccountsCacheService', () => {
           account,
           DEFAULT_TTL
         )
-        expect(mockCache.drop).toHaveBeenCalledWith('active:*')
+        expect(mockCache.drop).toHaveBeenCalledWith('*')
       })
 
-      test('invalidates both statuses when status changes', async () => {
+      test('invalidates all cache twice when status changes', async () => {
         const account = { id: 1, status: 'active' }
 
         await cacheService.updateAccount(1, account, 'pending')
 
-        expect(mockCache.drop).toHaveBeenCalledWith('active:*')
-        expect(mockCache.drop).toHaveBeenCalledWith('pending:*')
+        // Called twice because both new and old status trigger invalidateAll
+        expect(mockCache.drop).toHaveBeenCalledWith('*')
+        expect(mockCache.drop).toHaveBeenCalledTimes(2)
       })
     })
   })

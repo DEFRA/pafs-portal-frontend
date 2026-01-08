@@ -80,7 +80,7 @@ export class AccountsCacheService extends BaseCacheService {
       return
     }
 
-    await this.dropByKey(`${status}:*`)
+    await this.invalidateAll()
   }
 
   /**
