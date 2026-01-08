@@ -285,5 +285,57 @@ describe('BaseCacheService', () => {
         })
       )
     })
+
+    test('includes cache name when configured', () => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'session.cache.ttl') return DEFAULT_TTL
+        if (key === 'session.cache.name') return 'redisCache'
+        return null
+      })
+      const service = new BaseCacheService(mockServer, 'test-segment')
+
+      service.getCache()
+
+      expect(mockServer.cache).toHaveBeenCalledWith(
+        expect.objectContaining({
+          segment: 'test-segment',
+          cache: 'redisCache',
+          expiresIn: DEFAULT_TTL
+        })
+      )
+    })
+
+    test('excludes expiresIn when TTL is 0', () => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'session.cache.ttl') return 0
+        return null
+      })
+      const service = new BaseCacheService(mockServer, 'test-segment')
+
+      service.getCache()
+
+      const callArgs = mockServer.cache.mock.calls[0][0]
+      expect(callArgs).toEqual({
+        segment: 'test-segment',
+        shared: true
+      })
+      expect(callArgs).not.toHaveProperty('expiresIn')
+    })
+
+    test('throws error when cache creation fails', () => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'session.cache.ttl') return DEFAULT_TTL
+        return null
+      })
+      mockServer.cache.mockImplementation(() => {
+        throw new Error('Cache creation failed')
+      })
+      const service = new BaseCacheService(mockServer, 'test-segment')
+
+      expect(() => service.getCache()).toThrow('Cache creation failed')
+    })
   })
 })

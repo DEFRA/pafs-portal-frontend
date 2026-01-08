@@ -19,11 +19,9 @@ import {
   getEmptyUsersViewModel
 } from './user-listing.js'
 
-// Extract filters and page from request - outer scope helper
 function buildRequestContext(request) {
   const session = getAuthSession(request)
   const logger = request.server.logger
-
   const cacheService = createAccountsCacheService(request.server)
 
   const userCreatedFlash = request.yar.flash('userCreated')
@@ -39,79 +37,165 @@ function buildRequestContext(request) {
   return { session, logger, cacheService, successNotification, page, filters }
 }
 
-/**
- * Creates a users list controller for a specific status
- *
- * @param {Object} config - Controller configuration
- * @param {string} config.status - Account status to filter by ('pending' or 'active')
- * @param {string} config.viewTemplate - View template path
- * @param {string} config.baseUrl - Base URL for pagination and filters
- * @returns {Object} Hapi controller object
- */
-export function createUsersListController({ status, viewTemplate, baseUrl }) {
-  // helper functions are defined in outer or inner scope
+async function fetchUsersData({
+  status,
+  session,
+  cacheService,
+  page,
+  filters
+}) {
+  const { search, areaId } = filters
 
-  async function fetchData({ session, cacheService, page, filters }) {
-    const { search, areaId } = filters
+  return Promise.all([
+    getAccounts({
+      status,
+      search,
+      areaId,
+      page,
+      pageSize: getDefaultPageSize(),
+      accessToken: session?.accessToken,
+      cacheService
+    }),
+    getPendingCount(session?.accessToken, cacheService),
+    getActiveCount(session?.accessToken, cacheService)
+  ])
+}
 
-    return Promise.all([
-      getAccounts({
-        status,
-        search,
-        areaId,
-        page,
-        pageSize: getDefaultPageSize(),
-        accessToken: session?.accessToken,
-        cacheService
-      }),
-      getPendingCount(session?.accessToken, cacheService),
-      getActiveCount(session?.accessToken, cacheService)
-    ])
-  }
-
-  function renderEmptyView(h, request, session, filters, successNotification) {
-    return h.view(
-      viewTemplate,
-      getEmptyUsersViewModel({
-        request,
-        session,
-        filters,
-        currentTab: status,
-        baseUrl,
-        error: request.t('accounts.manage_users.errors.fetch_failed'),
-        successNotification
-      })
-    )
-  }
-
-  function renderUsersView(
+function renderEmptyView(params) {
+  const {
     h,
     request,
+    viewTemplate,
+    status,
+    baseUrl,
+    session,
+    filters,
+    successNotification
+  } = params
+
+  return h.view(
+    viewTemplate,
+    getEmptyUsersViewModel({
+      request,
+      session,
+      filters,
+      currentTab: status,
+      baseUrl,
+      error: request.t('accounts.manage_users.errors.fetch_failed'),
+      successNotification
+    })
+  )
+}
+
+function renderUsersView(params) {
+  const {
+    h,
+    request,
+    viewTemplate,
+    status,
+    baseUrl,
     session,
     users,
     pagination,
-    options = {}
-  ) {
-    const { pendingCount, activeCount, filters, successNotification } = options
-    return h.view(
-      viewTemplate,
-      buildUsersViewModel({
-        request,
-        session,
-        users: formatUsersForDisplay(users),
-        pagination,
-        pendingCount,
-        activeCount,
-        filters,
-        currentTab: status,
-        baseUrl,
-        successNotification
-      })
+    pendingCount,
+    activeCount,
+    filters,
+    successNotification
+  } = params
+
+  return h.view(
+    viewTemplate,
+    buildUsersViewModel({
+      request,
+      session,
+      users: formatUsersForDisplay(users),
+      pagination,
+      pendingCount,
+      activeCount,
+      filters,
+      currentTab: status,
+      baseUrl,
+      successNotification
+    })
+  )
+}
+
+function handleSuccessResponse(params) {
+  const {
+    h,
+    request,
+    viewTemplate,
+    status,
+    baseUrl,
+    session,
+    accountsResult,
+    pendingCount,
+    activeCount,
+    filters,
+    successNotification
+  } = params
+
+  const { data: users, pagination } = accountsResult.data
+  return renderUsersView({
+    h,
+    request,
+    viewTemplate,
+    status,
+    baseUrl,
+    session,
+    users,
+    pagination,
+    pendingCount,
+    activeCount,
+    filters,
+    successNotification
+  })
+}
+
+/**
+ * Handle failed data fetch
+ * @param {Object} params - Handler parameters
+ * @returns {Object} Hapi response
+ */
+function handleErrorResponse(params) {
+  const {
+    h,
+    request,
+    viewTemplate,
+    status,
+    baseUrl,
+    session,
+    filters,
+    successNotification,
+    logger,
+    error
+  } = params
+
+  if (error) {
+    logger.error({ error }, `Error loading ${status} users page`)
+  } else {
+    logger.error(
+      { errors: params.errors },
+      `Failed to fetch ${status} accounts`
     )
   }
 
+  return renderEmptyView({
+    h,
+    request,
+    viewTemplate,
+    status,
+    baseUrl,
+    session,
+    filters,
+    successNotification
+  })
+}
+
+export function createUsersListController({ status, viewTemplate, baseUrl }) {
   return {
     async handler(request, h) {
+      const context = buildRequestContext(request)
       const {
         session,
         logger,
@@ -119,46 +203,59 @@ export function createUsersListController({ status, viewTemplate, baseUrl }) {
         successNotification,
         page,
         filters
-      } = buildRequestContext(request)
+      } = context
 
       try {
-        const [accountsResult, pendingCount, activeCount] = await fetchData({
-          session,
-          cacheService,
-          page,
-          filters
-        })
+        const [accountsResult, pendingCount, activeCount] =
+          await fetchUsersData({
+            status,
+            session,
+            cacheService,
+            page,
+            filters
+          })
 
         if (!accountsResult.success) {
-          logger.error(
-            { errors: accountsResult.errors },
-            `Failed to fetch ${status} accounts`
-          )
-          return renderEmptyView(
+          return handleErrorResponse({
             h,
             request,
+            viewTemplate,
+            status,
+            baseUrl,
             session,
             filters,
-            successNotification
-          )
+            successNotification,
+            logger,
+            errors: accountsResult.errors
+          })
         }
 
-        const { data: users, pagination } = accountsResult.data
-        return renderUsersView(h, request, session, users, pagination, {
+        return handleSuccessResponse({
+          h,
+          request,
+          viewTemplate,
+          status,
+          baseUrl,
+          session,
+          accountsResult,
           pendingCount,
           activeCount,
           filters,
           successNotification
         })
       } catch (error) {
-        logger.error({ error }, `Error loading ${status} users page`)
-        return renderEmptyView(
+        return handleErrorResponse({
           h,
           request,
+          viewTemplate,
+          status,
+          baseUrl,
           session,
           filters,
-          successNotification
-        )
+          successNotification,
+          logger,
+          error
+        })
       }
     }
   }

@@ -239,10 +239,33 @@ describe('User Helpers', () => {
         pendingCount: 0,
         activeCount: 0,
         filters: {},
+        currentTab: 'pending',
+        baseUrl: '/admin/users/pending',
         error: 'Something went wrong'
       })
 
       expect(result.error).toBe('Something went wrong')
+    })
+
+    test('includes successNotification when provided', () => {
+      const notification = {
+        name: 'John Doe',
+        userId: 123
+      }
+      const result = buildUsersViewModel({
+        request: mockRequest,
+        session: mockSession,
+        users: [],
+        pagination: { page: 1, totalPages: 0, total: 0, pageSize: 20 },
+        pendingCount: 0,
+        activeCount: 0,
+        filters: {},
+        currentTab: 'active',
+        baseUrl: '/admin/users/active',
+        successNotification: notification
+      })
+
+      expect(result.successNotification).toEqual(notification)
     })
 
     test('handles pagination with currentPage field', () => {

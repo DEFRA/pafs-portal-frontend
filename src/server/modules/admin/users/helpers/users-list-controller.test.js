@@ -460,5 +460,45 @@ describe('createUsersListController', () => {
         mockCacheService
       )
     })
+
+    test('displays success notification when user was created', async () => {
+      const flashData = { name: 'John Doe', userId: 123 }
+      mockRequest.yar.flash = vi.fn(() => [flashData])
+
+      getAuthSession.mockReturnValue({
+        user: mockUser,
+        accessToken: 'test-token'
+      })
+      getAccounts.mockResolvedValue(mockAccountsResponse)
+      getPendingCount.mockResolvedValue(5)
+      getActiveCount.mockResolvedValue(10)
+
+      await controller.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'admin/users/pending/index',
+        expect.objectContaining({
+          successNotification: flashData
+        })
+      )
+    })
+
+    test('does not display notification when no flash message', async () => {
+      mockRequest.yar.flash = vi.fn(() => [])
+
+      getAuthSession.mockReturnValue({
+        user: mockUser,
+        accessToken: 'test-token'
+      })
+      getAccounts.mockResolvedValue(mockAccountsResponse)
+      getPendingCount.mockResolvedValue(5)
+      getActiveCount.mockResolvedValue(10)
+
+      await controller.handler(mockRequest, mockH)
+
+      const viewCall = mockH.view.mock.calls[0]
+      expect(viewCall[0]).toBe('admin/users/pending/index')
+      expect(viewCall[1]).not.toHaveProperty('successNotification')
+    })
   })
 })
