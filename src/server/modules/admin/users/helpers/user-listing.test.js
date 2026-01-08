@@ -44,6 +44,14 @@ describe('User Helpers', () => {
       const areas = [{ name: 'Only Area' }]
       expect(getPrimaryAreaName(areas)).toBe('Only Area')
     })
+
+    test('chooses first primary when multiple primaries exist', () => {
+      const areas = [
+        { name: 'Area A', primary: true },
+        { name: 'Area B', primary: true }
+      ]
+      expect(getPrimaryAreaName(areas)).toBe('Area A')
+    })
   })
 
   describe('formatUserForDisplay', () => {

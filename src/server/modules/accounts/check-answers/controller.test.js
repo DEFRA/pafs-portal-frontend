@@ -131,6 +131,8 @@ describe('CheckAnswersController', () => {
           })
         })
       )
+      // ensure session key helper was used to read session data
+      expect(getSessionKey).toHaveBeenCalled()
     })
 
     test('renders check answers view for EA user with areas', async () => {

@@ -261,6 +261,12 @@ describe('BaseCacheService', () => {
     })
   })
 
+  test('generateKey returns JSON string for object params', () => {
+    const service = new BaseCacheService(mockServer, 'test-segment')
+    const key = service.generateKey({ a: 1, b: 'x' })
+    expect(key).toBe(JSON.stringify({ a: 1, b: 'x' }))
+  })
+
   describe('segment configuration', () => {
     test('uses provided segment name', () => {
       config.get.mockImplementation((key) => {
