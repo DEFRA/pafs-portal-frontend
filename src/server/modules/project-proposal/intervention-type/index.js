@@ -1,0 +1,29 @@
+import { interventionTypeController } from './controller.js'
+import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
+import { ROUTES } from '../../../common/constants/routes.js'
+
+export const interventionType = {
+  plugin: {
+    name: 'Project Proposal - Intervention Type',
+    register(server) {
+      server.route([
+        {
+          method: 'GET',
+          path: ROUTES.PROJECT_PROPOSAL.INTERVENTION_TYPE,
+          options: {
+            pre: [{ method: requireAuth }]
+          },
+          ...interventionTypeController
+        },
+        {
+          method: 'POST',
+          path: ROUTES.PROJECT_PROPOSAL.INTERVENTION_TYPE,
+          options: {
+            pre: [{ method: requireAuth }]
+          },
+          ...interventionTypeController
+        }
+      ])
+    }
+  }
+}
