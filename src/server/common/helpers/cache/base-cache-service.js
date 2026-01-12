@@ -36,8 +36,14 @@ export class BaseCacheService {
   getCache() {
     if (!this._cache) {
       const cacheConfig = {
-        cache: config.get('session.cache.name'),
-        segment: this.segment
+        segment: this.segment,
+        shared: true
+      }
+
+      // Use the named cache if specified, otherwise use default
+      const cacheName = config.get('session.cache.name')
+      if (cacheName) {
+        cacheConfig.cache = cacheName
       }
 
       // Only add expiresIn if TTL is greater than 0
@@ -45,11 +51,19 @@ export class BaseCacheService {
         cacheConfig.expiresIn = this.ttl
       }
 
-      this._cache = this.server.cache(cacheConfig)
-      logger.debug(
-        { segment: this.segment, ttl: this.ttl },
-        'Cache instance created'
-      )
+      try {
+        this._cache = this.server.cache(cacheConfig)
+        logger.debug(
+          { segment: this.segment, ttl: this.ttl, cacheName },
+          'Cache instance created'
+        )
+      } catch (error) {
+        logger.error(
+          { error, segment: this.segment, cacheConfig },
+          'Failed to create cache instance'
+        )
+        throw error
+      }
     }
     return this._cache
   }

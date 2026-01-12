@@ -8,6 +8,8 @@ vi.mock('../../../common/helpers/areas/areas-helper.js')
 vi.mock('../helpers.js')
 vi.mock('../../../common/services/accounts/accounts-service.js')
 vi.mock('../../../common/helpers/error-renderer/index.js')
+vi.mock('../../../common/helpers/auth/session-manager.js')
+vi.mock('../../../common/services/accounts/accounts-cache.js')
 
 const { findAreaById, getParentAreas } =
   await import('../../../common/helpers/areas/areas-helper.js')
@@ -16,6 +18,10 @@ const { upsertAccount } =
   await import('../../../common/services/accounts/accounts-service.js')
 const { extractApiValidationErrors, extractApiError } =
   await import('../../../common/helpers/error-renderer/index.js')
+const { getAuthSession } =
+  await import('../../../common/helpers/auth/session-manager.js')
+const { createAccountsCacheService } =
+  await import('../../../common/services/accounts/accounts-cache.js')
 
 describe('CheckAnswersController', () => {
   let mockRequest
@@ -43,7 +49,8 @@ describe('CheckAnswersController', () => {
       server: {
         logger: {
           info: vi.fn(),
-          error: vi.fn()
+          error: vi.fn(),
+          warn: vi.fn()
         }
       },
       t: vi.fn((key) => key)
@@ -61,6 +68,12 @@ describe('CheckAnswersController', () => {
         .find((a) => a.id === id)
     })
     getParentAreas.mockReturnValue([])
+
+    // Setup default mock for cache service
+    vi.mocked(createAccountsCacheService).mockReturnValue({
+      invalidateByStatus: vi.fn().mockResolvedValue(undefined)
+    })
+
     vi.clearAllMocks()
   })
 
@@ -128,6 +141,8 @@ describe('CheckAnswersController', () => {
           })
         })
       )
+      // ensure session key helper was used to read session data
+      expect(getSessionKey).toHaveBeenCalled()
     })
 
     test('renders check answers view for EA user with areas', async () => {
@@ -204,7 +219,8 @@ describe('CheckAnswersController', () => {
           responsibility: 'EA',
           admin: false,
           areas: [{ areaId: '1', primary: true }]
-        })
+        }),
+        '' // No access token for non-admin
       )
     })
 
@@ -276,19 +292,63 @@ describe('CheckAnswersController', () => {
       )
     })
 
-    test('redirects admin to admin confirmation', async () => {
+    test('redirects admin to active users page with flash notification', async () => {
       mockRequest.path = '/admin/accounts/check-answers'
       mockRequest.yar.get.mockReturnValue({
         firstName: 'John',
+        lastName: 'Doe',
         email: 'test@example.com',
         admin: true
       })
-      upsertAccount.mockResolvedValue({ success: true })
+      mockRequest.yar.flash = vi.fn()
+      upsertAccount.mockResolvedValue({
+        success: true,
+        data: { userId: 123, status: 'approved' }
+      })
 
       await checkAnswersPostController.handler(mockRequest, mockH)
 
-      expect(mockH.redirect).toHaveBeenCalledWith(
-        '/admin/user-account/confirmation'
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith('userCreated', {
+        name: 'John Doe',
+        userId: 123
+      })
+      expect(mockH.redirect).toHaveBeenCalledWith('/admin/users/active')
+    })
+
+    test('handles cache invalidation failure gracefully', async () => {
+      mockRequest.path = '/admin/accounts/check-answers'
+      mockRequest.yar.get.mockReturnValue({
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'test@example.com',
+        admin: true
+      })
+      mockRequest.yar.flash = vi.fn()
+      mockRequest.server.logger.warn = vi.fn()
+
+      // Mock createAccountsCacheService to return a cache service that fails
+      const { createAccountsCacheService } =
+        await import('../../../common/services/accounts/accounts-cache.js')
+      vi.mocked(createAccountsCacheService).mockReturnValue({
+        invalidateByStatus: vi.fn().mockRejectedValue(new Error('Cache error'))
+      })
+
+      upsertAccount.mockResolvedValue({
+        success: true,
+        data: { userId: 123, status: 'approved' }
+      })
+
+      await checkAnswersPostController.handler(mockRequest, mockH)
+
+      // Should still redirect successfully even if cache invalidation fails
+      expect(mockH.redirect).toHaveBeenCalledWith('/admin/users/active')
+
+      // Wait for the catch handler to execute
+      await new Promise((resolve) => setTimeout(resolve, 10))
+
+      expect(mockRequest.server.logger.warn).toHaveBeenCalledWith(
+        { error: expect.any(Error) },
+        'Failed to invalidate accounts cache'
       )
     })
 
@@ -318,6 +378,9 @@ describe('CheckAnswersController', () => {
         email: 'test@example.com',
         admin: true
       })
+      getAuthSession.mockReturnValue({
+        accessToken: 'admin-access-token-123'
+      })
       upsertAccount.mockResolvedValue({
         success: true,
         data: { status: 'active' }
@@ -330,7 +393,8 @@ describe('CheckAnswersController', () => {
           firstName: 'John',
           email: 'test@example.com',
           admin: true
-        })
+        }),
+        'admin-access-token-123'
       )
     })
 
@@ -390,7 +454,8 @@ describe('CheckAnswersController', () => {
         expect.not.objectContaining({
           telephoneNumber: null,
           organisation: undefined
-        })
+        }),
+        '' // No access token for anonymous user
       )
     })
   })

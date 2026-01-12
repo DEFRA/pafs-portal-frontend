@@ -91,7 +91,7 @@ describe('Session Manager', () => {
 
     test('returns true for inactive session', () => {
       const session = {
-        lastActivity: Date.now() - 31 * 60 * 1000 // 31 minutes ago
+        lastActivity: Date.now() - 61 * 60 * 1000 // 61 minutes ago (> 1 hour inactivity timeout)
       }
 
       expect(isSessionExpired(session)).toBe(true)
@@ -193,7 +193,7 @@ describe('Session Manager', () => {
       const session = {
         user: { id: 1 },
         refreshToken: 'refresh123',
-        lastActivity: Date.now() - 31 * 60 * 1000 // 31 minutes ago (expired)
+        lastActivity: Date.now() - 61 * 60 * 1000 // 61 minutes ago (> 1 hour inactivity timeout)
       }
 
       mockRequest.yar.get.mockReturnValue(session)
@@ -257,7 +257,7 @@ describe('Session Manager', () => {
 
     test('handles session just past expiry', () => {
       const session = {
-        lastActivity: Date.now() - (30 * 60 * 1000 + 1) // 1ms past 30 minutes
+        lastActivity: Date.now() - (60 * 60 * 1000 + 1) // 1ms past 1 hour
       }
 
       expect(isSessionExpired(session)).toBe(true)
@@ -265,7 +265,7 @@ describe('Session Manager', () => {
 
     test('handles token at exact refresh boundary', () => {
       const session = {
-        expiresAt: Date.now() + 60000 // Exactly 1 minute
+        expiresAt: Date.now() + 300000 // Exactly 5 minutes (refresh buffer)
       }
 
       expect(shouldRefreshToken(session)).toBe(false)
