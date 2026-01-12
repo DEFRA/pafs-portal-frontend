@@ -47,6 +47,9 @@ describe('Pending Users Controller', () => {
     mockRequest = {
       query: {},
       t: vi.fn((key) => key),
+      yar: {
+        flash: vi.fn(() => [])
+      },
       server: {
         logger: {
           info: vi.fn(),
