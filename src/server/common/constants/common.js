@@ -29,7 +29,8 @@ export const ACCOUNT_VIEWS = {
 
 export const PROPOSAL_VIEWS = {
   START: 'modules/project-proposal/start-proposal/index',
-  PROJECT_NAME: 'modules/project-proposal/project-name/index'
+  PROJECT_NAME: 'modules/project-proposal/project-name/index',
+  RMA_SELECTION: 'modules/project-proposal/rma-selection/index'
 }
 
 export const GENERAL_VIEWS = {
@@ -81,7 +82,7 @@ export const VALIDATION_PATTERNS = {
   // Names: letters, spaces, hyphens, apostrophes
   NAME: /^[a-zA-Z\s'-]+$/,
 
-  PROJECT_NAME: /^[a-zA-Z0-9_-]+$/,
+  PROJECT_NAME: /^[a-zA-Z0-9_\s-]+$/,
 
   // Job title and organisation: letters, digits, spaces, common punctuation
   // Allows: letters, numbers, spaces, period, comma, ampersand, parentheses, hyphen, apostrophe, forward slash
