@@ -51,7 +51,7 @@ describe('projectType plugin', () => {
 
     const routes = mockServer.route.mock.calls[0][0]
     expect(routes[0].options.pre).toBeDefined()
-    expect(routes[0].options.pre).toHaveLength(1)
+    expect(routes[0].options.pre).toHaveLength(2)
     expect(routes[0].options.pre[0]).toHaveProperty('method')
     expect(routes[1].options.pre).toBeDefined()
   })

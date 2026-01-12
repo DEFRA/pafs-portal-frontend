@@ -1,5 +1,10 @@
 import { primaryInterventionTypeController } from './controller.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
+import {
+  requireProjectName,
+  requireProjectType,
+  requireInterventionType
+} from '../common/proposal-guard.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 
 export const primaryInterventionType = {
@@ -11,7 +16,12 @@ export const primaryInterventionType = {
           method: 'GET',
           path: ROUTES.PROJECT_PROPOSAL.PRIMARY_INTERVENTION_TYPE,
           options: {
-            pre: [{ method: requireAuth }]
+            pre: [
+              { method: requireAuth },
+              requireProjectName,
+              requireProjectType,
+              requireInterventionType
+            ]
           },
           ...primaryInterventionTypeController
         },
@@ -19,7 +29,12 @@ export const primaryInterventionType = {
           method: 'POST',
           path: ROUTES.PROJECT_PROPOSAL.PRIMARY_INTERVENTION_TYPE,
           options: {
-            pre: [{ method: requireAuth }]
+            pre: [
+              { method: requireAuth },
+              requireProjectName,
+              requireProjectType,
+              requireInterventionType
+            ]
           },
           ...primaryInterventionTypeController
         }

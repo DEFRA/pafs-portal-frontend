@@ -1,5 +1,6 @@
 import { projectTypeController } from './controller.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
+import { requireProjectName } from '../common/proposal-guard.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 
 export const projectType = {
@@ -11,7 +12,7 @@ export const projectType = {
           method: 'GET',
           path: ROUTES.PROJECT_PROPOSAL.PROJECT_TYPE,
           options: {
-            pre: [{ method: requireAuth }]
+            pre: [{ method: requireAuth }, requireProjectName]
           },
           ...projectTypeController
         },
@@ -19,7 +20,7 @@ export const projectType = {
           method: 'POST',
           path: ROUTES.PROJECT_PROPOSAL.PROJECT_TYPE,
           options: {
-            pre: [{ method: requireAuth }]
+            pre: [{ method: requireAuth }, requireProjectName]
           },
           ...projectTypeController
         }
