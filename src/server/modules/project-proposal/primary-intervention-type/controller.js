@@ -90,7 +90,7 @@ async function handleGet(request, h) {
   }
 
   const values =
-    (request.yar.get('projectProposal') ?? {}).primaryInterventionType ?? {}
+    request.yar.get('projectProposal')?.primaryInterventionType ?? {}
 
   return h.view(
     PROPOSAL_VIEWS.PRIMARY_INTERVENTION_TYPE,

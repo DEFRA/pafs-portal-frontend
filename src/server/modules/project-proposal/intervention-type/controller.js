@@ -6,10 +6,10 @@ const INTERVENTION_TYPE_ERROR_HREF = '#intervention-type'
 
 function buildViewModel(
   request,
+  projectType,
   values = {},
   errors = {},
-  errorSummary = [],
-  projectType
+  errorSummary = []
 ) {
   return {
     title: request.t('project-proposal.intervention_type.heading'),
@@ -75,15 +75,15 @@ function handlePostSuccess(request, h, values, selectedInterventions) {
 async function handlePost(request, h) {
   const { values, errors, errorSummary, isValid } =
     validateInterventionTypes(request)
-  const projectType = (request.yar.get('projectProposal') ?? {}).projectType
-    ?.projectType
+  const projectType =
+    request.yar.get('projectProposal')?.projectType?.projectType
   const selectedInterventions = values.interventionTypes || []
 
   if (!isValid) {
     return h
       .view(
         PROPOSAL_VIEWS.INTERVENTION_TYPE,
-        buildViewModel(request, values, errors, errorSummary, projectType)
+        buildViewModel(request, projectType, values, errors, errorSummary)
       )
       .code(statusCodes.badRequest)
   }
@@ -98,7 +98,7 @@ async function handleGet(request, h) {
 
   return h.view(
     PROPOSAL_VIEWS.INTERVENTION_TYPE,
-    buildViewModel(request, values, undefined, undefined, projectType)
+    buildViewModel(request, projectType, values)
   )
 }
 
