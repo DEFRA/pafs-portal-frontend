@@ -48,6 +48,7 @@ export const router = {
       await loadModules(server, join(dirName, 'modules/project-proposal'), [
         'start-proposal',
         'project-name',
+        'rma-selection',
         'project-type',
         'intervention-type',
         'primary-intervention-type'
