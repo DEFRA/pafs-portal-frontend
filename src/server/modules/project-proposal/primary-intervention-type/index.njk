@@ -1,0 +1,66 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}{{ t('project-proposal.primary_intervention_type.heading') }} | {{ serviceName }}
+{% endblock %}
+
+{% block content %}
+  <a href="/project-proposal/intervention-type" class="govuk-back-link">{{ t('common.back_link') }}</a>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errorSummary and(errorSummary | length) %}
+        {% set errorList = [] %}
+        {% for item in errorSummary %}
+          {% set errorList = errorList.concat([
+            {
+              text: item.text,
+              href: item.href
+            }
+          ]) %}
+        {% endfor %}
+        {{ govukErrorSummary({
+          titleText: t('common.error_summary_title'),
+          errorList: errorList
+        }) }}
+      {% endif %}
+
+      {% set items = [] %}
+      {% for code in selectedInterventions %}
+        {% set labelKey = 'project-proposal.intervention_type.options.' + code %}
+        {% set items = items.concat([
+          {
+            value: code,
+            text: t(labelKey),
+            checked: values.primaryInterventionType == code
+          }
+        ]) %}
+      {% endfor %}
+
+      <form method="post" novalidate>
+        {% set errorMessage = null %}
+        {% if errors.primaryInterventionType %}
+          {% set errorMessage = { text: errors.primaryInterventionType } %}
+        {% endif %}
+        {{ govukRadios({
+          idPrefix: 'primary-intervention-type',
+          name: 'primaryInterventionType',
+          fieldset: {
+            legend: {
+              text: t('project-proposal.primary_intervention_type.heading'),
+              classes: 'govuk-fieldset__legend--l'
+            }
+          },
+          errorMessage: errorMessage,
+          items: items
+        }) }}
+
+        {{ govukButton({
+          text: t('common.buttons.save_and_continue')
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

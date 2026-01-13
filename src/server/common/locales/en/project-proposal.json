@@ -24,5 +24,39 @@
     "errors": {
       "required": "Select a lead risk management authority"
     }
+  },
+  "project_type": {
+    "heading": "Which project type are you proposing?",
+    "options": {
+      "def": "Create a new flood and coastal erosion risk management asset, or change an existing approach to risk management in an area already with assets (this could include natural flood management measures, property flood resilience or sustainable drainage systems)",
+      "rep": "Replace an existing flood and coastal erosion risk management asset that is at the end of its life with another asset which sustains the standard of service and the design performance on an equivalent basis (this could include natural flood management measures, property flood resilience or sustainable drainage systems)",
+      "ref": "Substantially renew or replace, one or more asset elements or components in an existing flood and coastal erosion risk management asset (this could include natural flood management measures or sustainable drainage systems)",
+      "hcr": "Protect, compensate or restore habitats and natural functions, to support coastal risk management legal compliance (Habitat Regulations) and wider environmental outcomes",
+      "str": "Produce a strategy for complex flood or coastal erosion risk situations across several interconnected areas",
+      "stu": "Produce a study to support the case that a project is needed to resolve a flood or coastal erosion risk problem – helping to define the scope, purpose, and viability of any future project(s)",
+      "elo": "Implement measures to address impacts arising from existing or historic flood or coastal erosion risk management assets or actions to comply with specified environmental legislation - Sites of Special Scientific Interest (SSSIs) and Water Environment Regulations (WER)"
+    },
+    "errors": {
+      "required": "Select a project type"
+    }
+  },
+  "intervention_type": {
+    "heading": "Which of these interventions feature in your proposed project?",
+    "options": {
+      "nfm": "Natural Flood Management",
+      "pfr": "Property Flood Resilience",
+      "sds": "Sustainable Drainage Systems",
+      "other": "Other"
+    },
+    "errors": {
+      "required": "Select at least one intervention type"
+    }
+  },
+  "primary_intervention_type": {
+    "heading": "Which of the interventions will provide the most benefit to properties?",
+    "errors": {
+      "required": "Select which intervention will provide the most benefit",
+      "invalid": "Select a primary intervention type from your previous choices"
+    }
   }
 }

@@ -30,7 +30,11 @@ export const ACCOUNT_VIEWS = {
 export const PROPOSAL_VIEWS = {
   START: 'modules/project-proposal/start-proposal/index',
   PROJECT_NAME: 'modules/project-proposal/project-name/index',
-  RMA_SELECTION: 'modules/project-proposal/rma-selection/index'
+  RMA_SELECTION: 'modules/project-proposal/rma-selection/index',
+  PROJECT_TYPE: 'modules/project-proposal/project-type/index',
+  INTERVENTION_TYPE: 'modules/project-proposal/intervention-type/index',
+  PRIMARY_INTERVENTION_TYPE:
+    'modules/project-proposal/primary-intervention-type/index'
 }
 
 export const GENERAL_VIEWS = {

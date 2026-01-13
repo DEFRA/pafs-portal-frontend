@@ -70,6 +70,8 @@ export const ROUTES = {
     START_PROPOSAL: '/project-proposal/start',
     PROJECT_NAME: '/project-proposal/project-name',
     RMA_SELECTION: '/project-proposal/rma-selection',
-    PROJECT_TYPE: '/project-proposal/project-type'
+    PROJECT_TYPE: '/project-proposal/project-type',
+    INTERVENTION_TYPE: '/project-proposal/intervention-type',
+    PRIMARY_INTERVENTION_TYPE: '/project-proposal/primary-intervention-type'
   }
 }
