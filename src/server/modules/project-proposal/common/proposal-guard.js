@@ -73,3 +73,20 @@ export const requireInterventionType = {
     return h.continue
   }
 }
+/**
+ * Guard middleware to ensure first financial year has been provided
+ * Redirects to first-financial-year page if not found in session
+ */
+export const requireFirstFinancialYear = {
+  method: (request, h) => {
+    const sessionData = request.yar.get('projectProposal') ?? {}
+    const firstFinancialYear =
+      sessionData.firstFinancialYear?.firstFinancialYear
+
+    if (!firstFinancialYear) {
+      return h.redirect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR).takeover()
+    }
+
+    return h.continue
+  }
+}

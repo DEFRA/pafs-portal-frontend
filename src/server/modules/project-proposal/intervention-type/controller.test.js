@@ -132,7 +132,7 @@ describe('#interventionTypeController', () => {
           interventionTypes: { interventionTypes: ['nfm'] }
         })
       )
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should save multiple intervention types and redirect to primary-intervention-type', async () => {

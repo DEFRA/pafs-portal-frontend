@@ -1,0 +1,57 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}{{ t('project-proposal.first_financial_year.heading') }} | {{ serviceName }}
+{% endblock %}
+
+{% block content %}
+  <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errorSummary and(errorSummary | length) %}
+        {% set errorList = [] %}
+        {% for item in errorSummary %}
+          {% set errorList = errorList.concat([
+            {
+              text: item.text,
+              href: item.href
+            }
+          ]) %}
+        {% endfor %}
+        {{ govukErrorSummary({
+          titleText: t('common.error_summary_title'),
+          errorList: errorList
+        }) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-l">{{ title }}</h1>
+
+      <form method="post" novalidate>
+        {% set errorMessage = null %}
+        {% if errors.firstFinancialYear %}
+          {% set errorMessage = { text: errors.firstFinancialYear } %}
+        {% endif %}
+
+        {{ govukInput({
+          id: 'first-financial-year',
+          name: 'firstFinancialYear',
+          value: values.firstFinancialYear,
+          label: {
+            text: label
+          },
+          hint: {
+            text: hint
+          },
+          errorMessage: errorMessage
+        }) }}
+
+        {{ govukButton({
+          text: t('common.buttons.save_and_continue')
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

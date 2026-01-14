@@ -104,7 +104,7 @@ describe('#projectTypeController', () => {
         'projectProposal',
         expect.objectContaining({ projectType: { projectType: 'nfm' } })
       )
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should return bad request status code on validation error', async () => {
@@ -157,44 +157,44 @@ describe('#projectTypeController', () => {
       expect(result.redirect).toBe('/project-proposal/intervention-type')
     })
 
-    test('Should redirect to home when HCR is selected', async () => {
+    test('Should redirect to first financial year when HCR is selected', async () => {
       mockRequest.method = 'post'
       mockRequest.payload = { projectType: 'HCR' }
       mockRequest.yar.get.mockReturnValue({})
 
       const result = await projectTypeController.handler(mockRequest, mockH)
 
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
-    test('Should redirect to home when STR is selected', async () => {
+    test('Should redirect to first financial year when STR is selected', async () => {
       mockRequest.method = 'post'
       mockRequest.payload = { projectType: 'STR' }
       mockRequest.yar.get.mockReturnValue({})
 
       const result = await projectTypeController.handler(mockRequest, mockH)
 
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
-    test('Should redirect to home when STU is selected', async () => {
+    test('Should redirect to first financial year when STU is selected', async () => {
       mockRequest.method = 'post'
       mockRequest.payload = { projectType: 'STU' }
       mockRequest.yar.get.mockReturnValue({})
 
       const result = await projectTypeController.handler(mockRequest, mockH)
 
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
-    test('Should redirect to home when ELO is selected', async () => {
+    test('Should redirect to first financial year when ELO is selected', async () => {
       mockRequest.method = 'post'
       mockRequest.payload = { projectType: 'ELO' }
       mockRequest.yar.get.mockReturnValue({})
 
       const result = await projectTypeController.handler(mockRequest, mockH)
 
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should log info message on successful submission', async () => {

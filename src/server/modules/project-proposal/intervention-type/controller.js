@@ -68,8 +68,7 @@ function handlePostSuccess(request, h, values, selectedInterventions) {
     return h.redirect(ROUTES.PROJECT_PROPOSAL.PRIMARY_INTERVENTION_TYPE)
   }
 
-  // TODO: Redirect to next step when defined
-  return h.redirect(ROUTES.GENERAL.HOME)
+  return h.redirect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR)
 }
 
 async function handlePost(request, h) {

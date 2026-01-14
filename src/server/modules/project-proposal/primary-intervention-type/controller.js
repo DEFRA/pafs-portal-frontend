@@ -77,8 +77,7 @@ function handlePostSuccess(request, h, values) {
     'Primary intervention type selected and stored in session'
   )
 
-  // Placeholder: redirect to next step when defined
-  return h.redirect(ROUTES.GENERAL.HOME)
+  return h.redirect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR)
 }
 
 async function handleGet(request, h) {
@@ -86,7 +85,7 @@ async function handleGet(request, h) {
 
   // If only one or none selected, skip this page
   if (!selectedInterventions || selectedInterventions.length <= 1) {
-    return h.redirect(ROUTES.GENERAL.HOME)
+    return h.redirect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR)
   }
 
   const values =
@@ -103,7 +102,7 @@ async function handlePost(request, h) {
 
   // If only one or none selected, skip this page
   if (!selectedInterventions || selectedInterventions.length <= 1) {
-    return h.redirect(ROUTES.GENERAL.HOME)
+    return h.redirect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR)
   }
 
   const { values, errors, errorSummary, isValid } = validatePrimaryIntervention(

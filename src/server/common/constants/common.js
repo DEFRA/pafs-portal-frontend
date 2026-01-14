@@ -34,7 +34,13 @@ export const PROPOSAL_VIEWS = {
   PROJECT_TYPE: 'modules/project-proposal/project-type/index',
   INTERVENTION_TYPE: 'modules/project-proposal/intervention-type/index',
   PRIMARY_INTERVENTION_TYPE:
-    'modules/project-proposal/primary-intervention-type/index'
+    'modules/project-proposal/primary-intervention-type/index',
+  FIRST_FINANCIAL_YEAR: 'modules/project-proposal/first-financial-year/index',
+  FIRST_FINANCIAL_YEAR_MANUAL:
+    'modules/project-proposal/first-financial-year-manual/index',
+  LAST_FINANCIAL_YEAR: 'modules/project-proposal/last-financial-year/index',
+  LAST_FINANCIAL_YEAR_MANUAL:
+    'modules/project-proposal/last-financial-year-manual/index'
 }
 
 export const GENERAL_VIEWS = {

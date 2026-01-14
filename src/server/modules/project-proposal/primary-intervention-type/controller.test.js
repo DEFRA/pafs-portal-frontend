@@ -46,7 +46,7 @@ describe('#primaryInterventionTypeController', () => {
         mockH
       )
 
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should redirect to home when only one intervention selected', async () => {
@@ -60,7 +60,7 @@ describe('#primaryInterventionTypeController', () => {
         mockH
       )
 
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should render page when two interventions selected', async () => {
@@ -123,7 +123,7 @@ describe('#primaryInterventionTypeController', () => {
         mockH
       )
 
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should handle undefined session data on GET', async () => {
@@ -135,7 +135,7 @@ describe('#primaryInterventionTypeController', () => {
         mockH
       )
 
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
   })
 
@@ -150,7 +150,7 @@ describe('#primaryInterventionTypeController', () => {
         mockH
       )
 
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should redirect to home when only one intervention in session', async () => {
@@ -165,7 +165,7 @@ describe('#primaryInterventionTypeController', () => {
         mockH
       )
 
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should render error when primary intervention is not selected', async () => {
@@ -229,7 +229,7 @@ describe('#primaryInterventionTypeController', () => {
           primaryInterventionType: { primaryInterventionType: 'nfm' }
         })
       )
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should return bad request status on validation error', async () => {
@@ -275,7 +275,7 @@ describe('#primaryInterventionTypeController', () => {
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalled()
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should handle null payload on POST', async () => {
@@ -320,7 +320,7 @@ describe('#primaryInterventionTypeController', () => {
       )
 
       // When converted to array, 'sds' is the only option, so no primary page
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
     test('Should display error summary with correct href', async () => {

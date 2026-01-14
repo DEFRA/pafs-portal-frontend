@@ -61,8 +61,7 @@ function handlePostSuccess(request, h, values) {
     return h.redirect(ROUTES.PROJECT_PROPOSAL.INTERVENTION_TYPE)
   }
 
-  // For other project types, redirect to home (update when next step is defined)
-  return h.redirect(ROUTES.GENERAL.HOME)
+  return h.redirect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR)
 }
 
 async function handlePost(request, h) {
