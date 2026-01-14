@@ -1,6 +1,9 @@
 import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest'
 import { statusCodes } from '../../../common/constants/status-codes.js'
 import { lastFinancialYearManualController } from './controller.js'
+import * as projectProposalService from '../../../common/services/project-proposal/project-proposal-service.js'
+
+vi.mock('../../../common/services/project-proposal/project-proposal-service.js')
 
 describe('#lastFinancialYearManualController', () => {
   let mockRequest
@@ -17,6 +20,11 @@ describe('#lastFinancialYearManualController', () => {
       yar: {
         get: vi.fn(() => ({})),
         set: vi.fn()
+      },
+      auth: {
+        credentials: {
+          accessToken: 'test-token-123'
+        }
       },
       server: {
         logger: {
@@ -35,10 +43,20 @@ describe('#lastFinancialYearManualController', () => {
       })),
       redirect: vi.fn((url) => ({ redirect: url }))
     }
+
+    // Mock the createProjectProposal function to resolve successfully
+    projectProposalService.createProjectProposal.mockResolvedValue({
+      success: true,
+      data: {
+        id: 1,
+        reference_number: 'ANC501E/000A/001A'
+      }
+    })
   })
 
   afterEach(() => {
     vi.useRealTimers()
+    vi.clearAllMocks()
   })
 
   describe('GET', () => {
@@ -125,8 +143,20 @@ describe('#lastFinancialYearManualController', () => {
     test('saves entry to session and redirects to home', async () => {
       mockRequest.method = 'post'
       mockRequest.payload = { lastFinancialYear: '2035' }
-      mockRequest.yar.get.mockReturnValue({
-        firstFinancialYear: { firstFinancialYear: '2032' }
+      mockRequest.yar.get.mockImplementation((key) => {
+        if (key === 'projectProposal') {
+          return {
+            projectName: { projectName: 'Test Project' },
+            projectType: { projectType: 'DEF' },
+            interventionTypes: { interventionTypes: ['TYPE_1'] },
+            primaryInterventionType: { primaryInterventionType: 'MAIN' },
+            firstFinancialYear: { firstFinancialYear: '2032' }
+          }
+        }
+        if (key === 'auth') {
+          return { accessToken: 'test-token-123' }
+        }
+        return {}
       })
 
       const result = await lastFinancialYearManualController.handler(
@@ -141,13 +171,32 @@ describe('#lastFinancialYearManualController', () => {
         })
       )
       expect(result.redirect).toBe('/')
+      expect(projectProposalService.createProjectProposal).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Test Project',
+          project_end_financial_year: '2035'
+        }),
+        'test-token-123'
+      )
     })
 
     test('allows last year same as first year', async () => {
       mockRequest.method = 'post'
       mockRequest.payload = { lastFinancialYear: '2032' }
-      mockRequest.yar.get.mockReturnValue({
-        firstFinancialYear: { firstFinancialYear: '2032' }
+      mockRequest.yar.get.mockImplementation((key) => {
+        if (key === 'projectProposal') {
+          return {
+            projectName: { projectName: 'Test Project' },
+            projectType: { projectType: 'DEF' },
+            interventionTypes: { interventionTypes: [] },
+            primaryInterventionType: { primaryInterventionType: null },
+            firstFinancialYear: { firstFinancialYear: '2032' }
+          }
+        }
+        if (key === 'auth') {
+          return { accessToken: 'test-token-123' }
+        }
+        return {}
       })
 
       const result = await lastFinancialYearManualController.handler(
@@ -162,7 +211,20 @@ describe('#lastFinancialYearManualController', () => {
     test('allows entry when no first financial year is set', async () => {
       mockRequest.method = 'post'
       mockRequest.payload = { lastFinancialYear: '2035' }
-      mockRequest.yar.get.mockReturnValue({})
+      mockRequest.yar.get.mockImplementation((key) => {
+        if (key === 'projectProposal') {
+          return {
+            projectName: { projectName: 'Test Project' },
+            projectType: { projectType: 'DEF' },
+            interventionTypes: { interventionTypes: [] },
+            primaryInterventionType: { primaryInterventionType: null }
+          }
+        }
+        if (key === 'auth') {
+          return { accessToken: 'test-token-123' }
+        }
+        return {}
+      })
 
       const result = await lastFinancialYearManualController.handler(
         mockRequest,
