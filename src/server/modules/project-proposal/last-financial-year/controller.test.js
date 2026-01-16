@@ -26,26 +26,26 @@ describe('#lastFinancialYearController', () => {
         get: vi.fn(() => ({})),
         set: vi.fn()
       },
-        getAreas: vi.fn(async () => ({
-          EA: [{ id: '3', name: 'EA Area', area_type: 'EA', parent_id: null }],
-          PSO: [
-            {
-              id: '2',
-              name: 'PSO Area',
-              area_type: 'PSO',
-              parent_id: '3',
-              sub_type: 'AN'
-            }
-          ],
-          RMA: [
-            {
-              id: '1',
-              name: 'RMA Area',
-              area_type: 'RMA',
-              parent_id: '2'
-            }
-          ]
-        })),
+      getAreas: vi.fn(async () => ({
+        EA: [{ id: '3', name: 'EA Area', area_type: 'EA', parent_id: null }],
+        PSO: [
+          {
+            id: '2',
+            name: 'PSO Area',
+            area_type: 'PSO',
+            parent_id: '3',
+            sub_type: 'AN'
+          }
+        ],
+        RMA: [
+          {
+            id: '1',
+            name: 'RMA Area',
+            area_type: 'RMA',
+            parent_id: '2'
+          }
+        ]
+      })),
       server: {
         logger: {
           info: vi.fn(),
