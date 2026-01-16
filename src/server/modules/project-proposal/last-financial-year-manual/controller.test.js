@@ -21,6 +21,26 @@ describe('#lastFinancialYearManualController', () => {
         get: vi.fn(() => ({})),
         set: vi.fn()
       },
+      getAreas: vi.fn(async () => ({
+        EA: [{ id: '3', name: 'EA Area', area_type: 'EA', parent_id: null }],
+        PSO: [
+          {
+            id: '2',
+            name: 'PSO Area',
+            area_type: 'PSO',
+            parent_id: '3',
+            sub_type: 'AN'
+          }
+        ],
+        RMA: [
+          {
+            id: '1',
+            name: 'RMA Area',
+            area_type: 'RMA',
+            parent_id: '2'
+          }
+        ]
+      })),
       auth: {
         credentials: {
           accessToken: 'test-token-123'
@@ -48,8 +68,11 @@ describe('#lastFinancialYearManualController', () => {
     projectProposalService.createProjectProposal.mockResolvedValue({
       success: true,
       data: {
-        id: 1,
-        reference_number: 'ANC501E/000A/001A'
+        success: true,
+        data: {
+          id: '1',
+          reference_number: 'ANC501E/000A/001A'
+        }
       }
     })
   })
@@ -150,7 +173,8 @@ describe('#lastFinancialYearManualController', () => {
             projectType: { projectType: 'DEF' },
             interventionTypes: { interventionTypes: ['TYPE_1'] },
             primaryInterventionType: { primaryInterventionType: 'MAIN' },
-            firstFinancialYear: { firstFinancialYear: '2032' }
+            firstFinancialYear: { firstFinancialYear: '2032' },
+            rmaSelection: { rmaSelection: '1' }
           }
         }
         if (key === 'auth') {
@@ -170,11 +194,13 @@ describe('#lastFinancialYearManualController', () => {
           lastFinancialYear: { lastFinancialYear: '2035' }
         })
       )
-      expect(result.redirect).toBe('/')
+      // Session should be cleared after successful submission
+      expect(mockRequest.yar.set).toHaveBeenCalledWith('projectProposal', {})
+      expect(result.redirect).toBe('/project-overview/ANC501E/000A/001A')
       expect(projectProposalService.createProjectProposal).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Test Project',
-          project_end_financial_year: '2035'
+          projectEndFinancialYear: '2035'
         }),
         'test-token-123'
       )
@@ -190,7 +216,8 @@ describe('#lastFinancialYearManualController', () => {
             projectType: { projectType: 'DEF' },
             interventionTypes: { interventionTypes: [] },
             primaryInterventionType: { primaryInterventionType: null },
-            firstFinancialYear: { firstFinancialYear: '2032' }
+            firstFinancialYear: { firstFinancialYear: '2032' },
+            rmaSelection: { rmaSelection: '1' }
           }
         }
         if (key === 'auth') {
@@ -205,7 +232,7 @@ describe('#lastFinancialYearManualController', () => {
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalled()
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-overview/ANC501E/000A/001A')
     })
 
     test('allows entry when no first financial year is set', async () => {
@@ -217,7 +244,8 @@ describe('#lastFinancialYearManualController', () => {
             projectName: { projectName: 'Test Project' },
             projectType: { projectType: 'DEF' },
             interventionTypes: { interventionTypes: [] },
-            primaryInterventionType: { primaryInterventionType: null }
+            primaryInterventionType: { primaryInterventionType: null },
+            rmaSelection: { rmaSelection: '1' }
           }
         }
         if (key === 'auth') {
@@ -232,7 +260,7 @@ describe('#lastFinancialYearManualController', () => {
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalled()
-      expect(result.redirect).toBe('/')
+      expect(result.redirect).toBe('/project-overview/ANC501E/000A/001A')
     })
   })
 })

@@ -5,6 +5,7 @@ import {
   getAfterMarchYear,
   getCurrentFinancialYearStartYear
 } from '../common/financial-year.js'
+import { getRfccCodeFromArea, getAreaNameById } from '../common/rfcc-helper.js'
 import { createProjectProposal } from '../../../common/services/project-proposal/project-proposal-service.js'
 
 const LAST_FINANCIAL_YEAR_MANUAL_ERROR_HREF = '#last-financial-year'
@@ -92,16 +93,46 @@ async function handlePostSuccess(request, h, values) {
     'Last financial year stored in session (manual entry)'
   )
 
+  // Get areas data from cache
+  const areasData = await request.getAreas()
+  const rmaSelection = sessionData.rmaSelection?.rmaSelection
+
+  // Extract RFCC code from area data
+  const rfccCode = getRfccCodeFromArea(rmaSelection, areasData)
+  const rmaName = getAreaNameById(rmaSelection, areasData)
+
+  if (!rfccCode) {
+    request.server.logger.error(
+      { areaId: rmaSelection },
+      'Failed to determine RFCC code from selected area'
+    )
+
+    const msg = request.t(
+      'project-proposal.last_financial_year_manual.errors.api_error'
+    )
+    return h
+      .view(
+        PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR_MANUAL,
+        buildViewModel(request, values, { lastFinancialYear: msg }, [
+          { text: msg, href: LAST_FINANCIAL_YEAR_MANUAL_ERROR_HREF }
+        ])
+      )
+      .code(statusCodes.badRequest)
+  }
+
   // Prepare data for backend API
   const proposalData = {
     name: sessionData.projectName?.projectName,
-    project_type: sessionData.projectType?.projectType,
-    project_intervesion_types:
+    projectType: sessionData.projectType?.projectType,
+    projectIntervesionTypes:
       sessionData.interventionTypes?.interventionTypes || [],
-    main_intervension_type:
+    mainIntervensionType:
       sessionData.primaryInterventionType?.primaryInterventionType || null,
-    pending_financial_year: sessionData.firstFinancialYear?.firstFinancialYear,
-    project_end_financial_year: values.lastFinancialYear
+    projectStartFinancialYear:
+      sessionData.firstFinancialYear?.firstFinancialYear,
+    projectEndFinancialYear: values.lastFinancialYear,
+    rmaName,
+    rfccCode
   }
 
   const authSession = request.yar.get('auth')
@@ -131,8 +162,8 @@ async function handlePostSuccess(request, h, values) {
 
   request.server.logger.info(
     {
-      referenceNumber: apiResponse.data?.reference_number,
-      projectId: apiResponse.data?.id
+      referenceNumber: apiResponse.data?.data?.reference_number,
+      projectId: apiResponse.data?.data?.id
     },
     'Project proposal created successfully'
   )
@@ -140,7 +171,11 @@ async function handlePostSuccess(request, h, values) {
   // Clear session data after successful submission
   request.yar.set('projectProposal', {})
 
-  return h.redirect(ROUTES.GENERAL.HOME)
+  const projectOverviewUrl = ROUTES.PROJECT_PROPOSAL.PROJECT_OVERVIEW.replace(
+    '{reference_number}',
+    apiResponse.data?.data?.reference_number
+  )
+  return h.redirect(projectOverviewUrl)
 }
 
 async function handleGet(request, h) {

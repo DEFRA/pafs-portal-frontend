@@ -110,7 +110,11 @@ async function attemptRequest(url, options) {
 
 export async function apiRequest(path, options = {}) {
   const url = `${BASE_URL}${path}`
-  const retries = options.retries ?? MAX_RETRIES
+  // Don't retry POST/PUT/DELETE requests as they are not idempotent
+  const isNonIdempotent = ['POST', 'PUT', 'DELETE'].includes(
+    options.method?.toUpperCase()
+  )
+  const retries = isNonIdempotent ? 0 : (options.retries ?? MAX_RETRIES)
   let lastError = null
   let lastResponse = null
 

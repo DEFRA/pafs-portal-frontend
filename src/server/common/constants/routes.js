@@ -77,6 +77,7 @@ export const ROUTES = {
     FIRST_FINANCIAL_YEAR_MANUAL:
       '/project-proposal/first-financial-year-manual',
     LAST_FINANCIAL_YEAR: '/project-proposal/last-financial-year',
-    LAST_FINANCIAL_YEAR_MANUAL: '/project-proposal/last-financial-year-manual'
+    LAST_FINANCIAL_YEAR_MANUAL: '/project-proposal/last-financial-year-manual',
+    PROJECT_OVERVIEW: '/project-overview/{reference_number}'
   }
 }
