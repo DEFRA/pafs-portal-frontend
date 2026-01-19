@@ -6,8 +6,15 @@ import {
   getAfterMarchYear,
   getCurrentFinancialYearStartYear
 } from '../common/financial-year.js'
-import { getRfccCodeFromArea, getAreaNameById } from '../common/rfcc-helper.js'
-import { createProjectProposal } from '../../../common/services/project-proposal/project-proposal-service.js'
+import {
+  getAreaDetailsForProposal,
+  buildProposalDataForSubmission,
+  buildProjectOverviewUrlForProposal,
+  submitProposalToBackend,
+  logProposalSuccess,
+  logAreaDetailsError,
+  logProposalError
+} from '../common/proposal-submission-helper.js'
 
 const LAST_FINANCIAL_YEAR_ERROR_HREF = '#last-financial-year'
 const FINANCIAL_YEAR_RANGE = 6
@@ -92,50 +99,39 @@ async function handlePostSuccess(request, h, values) {
     'Last financial year selected and stored in session'
   )
 
-  const { rfccCode, rmaName, rmaSelection } = await getAreaDetails(
+  const { rfccCode, rmaName, rmaSelection } = await getAreaDetailsForProposal(
     request,
     sessionData
   )
 
   if (!rfccCode) {
-    request.server.logger.error(
-      { areaId: rmaSelection },
-      'Failed to determine RFCC code from selected area'
-    )
-
+    logAreaDetailsError(request, rmaSelection)
     const msg = request.t(
       'project-proposal.last_financial_year.errors.api_error'
     )
     return renderError(request, h, values, msg)
   }
 
-  const proposalData = buildProposalData(sessionData, values, rmaName, rfccCode)
-  const apiResponse = await submitProposal(request, proposalData)
+  const proposalData = buildProposalDataForSubmission(
+    sessionData,
+    values,
+    rmaName,
+    rfccCode
+  )
+  const apiResponse = await submitProposalToBackend(request, proposalData)
 
   if (!apiResponse.success) {
-    request.server.logger.error(
-      { errors: apiResponse.errors, status: apiResponse.status },
-      'Failed to create project proposal'
-    )
-
+    logProposalError(request, apiResponse)
     const msg = request.t(
       'project-proposal.last_financial_year.errors.api_error'
     )
     return renderError(request, h, values, msg)
   }
 
-  request.server.logger.info(
-    {
-      referenceNumber: apiResponse.data?.data?.reference_number,
-      projectId: apiResponse.data?.data?.id
-    },
-    'Project proposal created successfully'
-  )
-
-  // Clear session data after successful submission
+  logProposalSuccess(request, apiResponse)
   request.yar.set('projectProposal', {})
 
-  const projectOverviewUrl = buildProjectOverviewUrl(
+  const projectOverviewUrl = buildProjectOverviewUrlForProposal(
     apiResponse.data?.data?.reference_number
   )
   return h.redirect(projectOverviewUrl)
@@ -150,46 +146,6 @@ function renderError(request, h, values, message) {
       ])
     )
     .code(statusCodes.badRequest)
-}
-
-async function getAreaDetails(request, sessionData) {
-  const areasData = await request.getAreas()
-  const rmaSelection = sessionData.rmaSelection?.rmaSelection
-
-  return {
-    rfccCode: getRfccCodeFromArea(rmaSelection, areasData),
-    rmaName: getAreaNameById(rmaSelection, areasData),
-    rmaSelection
-  }
-}
-
-function buildProposalData(sessionData, values, rmaName, rfccCode) {
-  return {
-    name: sessionData.projectName?.projectName,
-    projectType: sessionData.projectType?.projectType,
-    projectIntervesionTypes:
-      sessionData.interventionTypes?.interventionTypes || [],
-    mainIntervensionType:
-      sessionData.primaryInterventionType?.primaryInterventionType || null,
-    projectStartFinancialYear:
-      sessionData.firstFinancialYear?.firstFinancialYear,
-    projectEndFinancialYear: values.lastFinancialYear,
-    rmaName,
-    rfccCode
-  }
-}
-
-function buildProjectOverviewUrl(referenceNumber) {
-  return ROUTES.PROJECT_PROPOSAL.PROJECT_OVERVIEW.replace(
-    '{reference_number}',
-    referenceNumber
-  )
-}
-
-async function submitProposal(request, proposalData) {
-  const authSession = request.yar.get('auth')
-  const accessToken = authSession?.accessToken
-  return createProjectProposal(proposalData, accessToken)
 }
 
 async function handleGet(request, h) {
