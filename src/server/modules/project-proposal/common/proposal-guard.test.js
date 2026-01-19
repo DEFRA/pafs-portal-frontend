@@ -2,7 +2,8 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import {
   requireProjectName,
   requireProjectType,
-  requireInterventionType
+  requireInterventionType,
+  requireFirstFinancialYear
 } from './proposal-guard.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 
@@ -334,6 +335,29 @@ describe('Project Proposal Guards', () => {
       // Should redirect to PROJECT_TYPE due to invalid type, not INTERVENTION_TYPE
       expect(mockH.redirect).toHaveBeenCalledWith(
         ROUTES.PROJECT_PROPOSAL.PROJECT_TYPE
+      )
+    })
+  })
+
+  describe('#requireFirstFinancialYear', () => {
+    test('Should allow access when first financial year exists in session', () => {
+      mockRequest.yar.get.mockReturnValue({
+        firstFinancialYear: { firstFinancialYear: '2024-2025' }
+      })
+
+      const result = requireFirstFinancialYear.method(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+      expect(mockH.redirect).not.toHaveBeenCalled()
+    })
+
+    test('Should redirect when first financial year is missing', () => {
+      mockRequest.yar.get.mockReturnValue({})
+
+      requireFirstFinancialYear.method(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR
       )
     })
   })

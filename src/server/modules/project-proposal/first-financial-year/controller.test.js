@@ -81,6 +81,43 @@ describe('#firstFinancialYearController', () => {
         })
       )
     })
+
+    test('sets back link to primary intervention when multiple interventions selected', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectType: { projectType: 'DEF' },
+        interventionTypes: { interventionTypes: ['TYPE_A', 'TYPE_B'] }
+      })
+
+      await firstFinancialYearController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.backLink).toBe(
+        '/project-proposal/primary-intervention-type'
+      )
+    })
+
+    test('sets back link to intervention type when project type is DEF', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectType: { projectType: 'DEF' },
+        interventionTypes: { interventionTypes: ['TYPE_A'] }
+      })
+
+      await firstFinancialYearController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.backLink).toBe('/project-proposal/intervention-type')
+    })
+
+    test('sets back link to project type when no interventions and project type not in DEF/REP/REF', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectType: { projectType: 'OTHER' }
+      })
+
+      await firstFinancialYearController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.backLink).toBe('/project-proposal/project-type')
+    })
   })
 
   describe('POST', () => {

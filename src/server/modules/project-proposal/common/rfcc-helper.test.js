@@ -49,6 +49,18 @@ const buildAreasData = () => ({
       name: 'RMA Orphan',
       area_type: 'RMA',
       parent_id: '999'
+    },
+    {
+      id: '303',
+      name: 'RMA With EA Parent',
+      area_type: 'RMA',
+      parent_id: '100'
+    },
+    {
+      id: '304',
+      name: 'RMA Without Parent',
+      area_type: 'RMA',
+      parent_id: null
     }
   ]
 })
@@ -70,6 +82,21 @@ describe('rfcc-helper', () => {
       const areasData = buildAreasData()
       expect(getRfccCodeFromArea('301', areasData)).toBeNull()
       expect(getRfccCodeFromArea('302', areasData)).toBeNull()
+    })
+
+    it('returns null when PSO area has no RFCC code', () => {
+      const areasData = buildAreasData()
+      expect(getRfccCodeFromArea('201', areasData)).toBeNull()
+    })
+
+    it('returns null when RMA parent is not a PSO area', () => {
+      const areasData = buildAreasData()
+      expect(getRfccCodeFromArea('303', areasData)).toBeNull()
+    })
+
+    it('returns null when RMA area has no parent', () => {
+      const areasData = buildAreasData()
+      expect(getRfccCodeFromArea('304', areasData)).toBeNull()
     })
 
     it('returns null for EA or unknown areas', () => {
@@ -128,6 +155,17 @@ describe('rfcc-helper', () => {
           type: 'EA',
           subType: undefined
         }
+      })
+    })
+
+    it('returns hierarchy for EA area without parent', () => {
+      const areasData = buildAreasData()
+      expect(getAreaHierarchy('100', areasData)).toEqual({
+        id: '100',
+        name: 'EA North',
+        type: 'EA',
+        subType: undefined,
+        parent: null
       })
     })
 

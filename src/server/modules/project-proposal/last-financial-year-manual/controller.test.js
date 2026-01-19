@@ -163,6 +163,74 @@ describe('#lastFinancialYearManualController', () => {
       )
     })
 
+    test('renders error when RFCC code cannot be determined', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { lastFinancialYear: '2035' }
+      mockRequest.getAreas.mockResolvedValue({ PSO: [], RMA: [] })
+      mockRequest.yar.get.mockImplementation((key) => {
+        if (key === 'projectProposal') {
+          return {
+            projectName: { projectName: 'Test Project' },
+            projectType: { projectType: 'DEF' },
+            interventionTypes: { interventionTypes: [] },
+            primaryInterventionType: { primaryInterventionType: null },
+            firstFinancialYear: { firstFinancialYear: '2032' },
+            rmaSelection: { rmaSelection: '1' }
+          }
+        }
+        return {}
+      })
+
+      const result = await lastFinancialYearManualController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.badRequest)
+      expect(mockRequest.server.logger.error).toHaveBeenCalledWith(
+        { areaId: '1' },
+        'Failed to determine RFCC code from selected area'
+      )
+    })
+
+    test('renders error when API submission fails', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { lastFinancialYear: '2035' }
+      mockRequest.yar.get.mockImplementation((key) => {
+        if (key === 'projectProposal') {
+          return {
+            projectName: { projectName: 'Test Project' },
+            projectType: { projectType: 'DEF' },
+            interventionTypes: { interventionTypes: [] },
+            primaryInterventionType: { primaryInterventionType: null },
+            firstFinancialYear: { firstFinancialYear: '2032' },
+            rmaSelection: { rmaSelection: '1' }
+          }
+        }
+        if (key === 'auth') {
+          return { accessToken: 'test-token-123' }
+        }
+        return {}
+      })
+
+      projectProposalService.createProjectProposal.mockResolvedValue({
+        success: false,
+        errors: [{ message: 'API error' }],
+        status: 500
+      })
+
+      const result = await lastFinancialYearManualController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.badRequest)
+      expect(mockRequest.server.logger.error).toHaveBeenCalledWith(
+        { errors: [{ message: 'API error' }], status: 500 },
+        'Failed to create project proposal'
+      )
+    })
+
     test('saves entry to session and redirects to home', async () => {
       mockRequest.method = 'post'
       mockRequest.payload = { lastFinancialYear: '2035' }
