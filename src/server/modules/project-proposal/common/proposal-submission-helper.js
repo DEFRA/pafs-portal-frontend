@@ -5,7 +5,7 @@ import { createProjectProposal } from '../../../common/services/project-proposal
 
 /**
  * Render error view for proposal submission
- * @param {Object} request - Hapi request object
+ * @param {Object} _request - Hapi request object (unused)
  * @param {Object} h - Hapi response toolkit
  * @param {string} viewType - View type constant (PROPOSAL_VIEWS.*)
  * @param {Object} values - Form values
@@ -14,7 +14,7 @@ import { createProjectProposal } from '../../../common/services/project-proposal
  * @returns {Object} Error response
  */
 export function renderProposalError(
-  request,
+  _request,
   h,
   viewType,
   values,
