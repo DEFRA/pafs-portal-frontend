@@ -7,10 +7,14 @@ import {
 } from '../common/financial-year.js'
 
 const FIRST_FINANCIAL_YEAR_MANUAL_ERROR_HREF = '#first-financial-year'
+const FINANCIAL_YEARS_TO_DISPLAY = 6
 
 function buildViewModel(request, values = {}, errors = {}, errorSummary = []) {
   const currentFinancialYearStart = getCurrentFinancialYearStartYear()
-  const afterMarchYear = getAfterMarchYear(currentFinancialYearStart, 6)
+  const afterMarchYear = getAfterMarchYear(
+    currentFinancialYearStart,
+    FINANCIAL_YEARS_TO_DISPLAY
+  )
 
   return {
     title: request.t('project-proposal.first_financial_year_manual.heading'),

@@ -23,7 +23,7 @@ export function renderProposalError(
 ) {
   return h
     .view(viewType, {
-      ...buildViewModel(request, values, { lastFinancialYear: message }, [
+      ...buildViewModel(values, { lastFinancialYear: message }, [
         { text: message, href: errorHref }
       ]),
       values,
@@ -35,13 +35,12 @@ export function renderProposalError(
 
 /**
  * Build minimal view model with error info
- * @param {Object} request - Hapi request
  * @param {Object} values - Form values
  * @param {Object} errors - Form errors
  * @param {Array} errorSummary - Error summary
  * @returns {Object} View model
  */
-function buildViewModel(request, values, errors, errorSummary) {
+function buildViewModel(values, errors, errorSummary) {
   return { values, errors, errorSummary }
 }
 
