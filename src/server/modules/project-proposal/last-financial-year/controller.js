@@ -10,21 +10,19 @@ import { getRfccCodeFromArea, getAreaNameById } from '../common/rfcc-helper.js'
 import { createProjectProposal } from '../../../common/services/project-proposal/project-proposal-service.js'
 
 const LAST_FINANCIAL_YEAR_ERROR_HREF = '#last-financial-year'
+const FINANCIAL_YEAR_RANGE = 6
 
-function buildViewModel(
-  request,
-  sessionData,
-  values = {},
-  errors = {},
-  errorSummary = []
-) {
+function buildViewModel(request, values = {}, errors = {}, errorSummary = []) {
   const currentFinancialYearStart = getCurrentFinancialYearStartYear()
   const financialYearOptions = buildFinancialYearOptions(
     currentFinancialYearStart,
-    6
+    FINANCIAL_YEAR_RANGE
   )
 
-  const afterMarchYear = getAfterMarchYear(currentFinancialYearStart, 6)
+  const afterMarchYear = getAfterMarchYear(
+    currentFinancialYearStart,
+    FINANCIAL_YEAR_RANGE
+  )
 
   return {
     title: request.t('project-proposal.last_financial_year.heading'),
@@ -94,13 +92,10 @@ async function handlePostSuccess(request, h, values) {
     'Last financial year selected and stored in session'
   )
 
-  // Get areas data from cache
-  const areasData = await request.getAreas()
-  const rmaSelection = sessionData.rmaSelection?.rmaSelection
-
-  // Extract RFCC code from area data
-  const rfccCode = getRfccCodeFromArea(rmaSelection, areasData)
-  const rmaName = getAreaNameById(rmaSelection, areasData)
+  const { rfccCode, rmaName, rmaSelection } = await getAreaDetails(
+    request,
+    sessionData
+  )
 
   if (!rfccCode) {
     request.server.logger.error(
@@ -111,40 +106,11 @@ async function handlePostSuccess(request, h, values) {
     const msg = request.t(
       'project-proposal.last_financial_year.errors.api_error'
     )
-    return h
-      .view(
-        PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR,
-        buildViewModel(
-          request,
-          sessionData,
-          values,
-          { lastFinancialYear: msg },
-          [{ text: msg, href: LAST_FINANCIAL_YEAR_ERROR_HREF }]
-        )
-      )
-      .code(statusCodes.badRequest)
+    return renderError(request, h, values, msg)
   }
 
-  // Prepare data for backend API
-  const proposalData = {
-    name: sessionData.projectName?.projectName,
-    projectType: sessionData.projectType?.projectType,
-    projectIntervesionTypes:
-      sessionData.interventionTypes?.interventionTypes || [],
-    mainIntervensionType:
-      sessionData.primaryInterventionType?.primaryInterventionType || null,
-    projectStartFinancialYear:
-      sessionData.firstFinancialYear?.firstFinancialYear,
-    projectEndFinancialYear: values.lastFinancialYear,
-    rmaName,
-    rfccCode
-  }
-
-  const authSession = request.yar.get('auth')
-  const accessToken = authSession?.accessToken
-
-  // Call backend API to create project proposal
-  const apiResponse = await createProjectProposal(proposalData, accessToken)
+  const proposalData = buildProposalData(sessionData, values, rmaName, rfccCode)
+  const apiResponse = await submitProposal(request, proposalData)
 
   if (!apiResponse.success) {
     request.server.logger.error(
@@ -155,18 +121,7 @@ async function handlePostSuccess(request, h, values) {
     const msg = request.t(
       'project-proposal.last_financial_year.errors.api_error'
     )
-    return h
-      .view(
-        PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR,
-        buildViewModel(
-          request,
-          sessionData,
-          values,
-          { lastFinancialYear: msg },
-          [{ text: msg, href: LAST_FINANCIAL_YEAR_ERROR_HREF }]
-        )
-      )
-      .code(statusCodes.badRequest)
+    return renderError(request, h, values, msg)
   }
 
   request.server.logger.info(
@@ -180,11 +135,61 @@ async function handlePostSuccess(request, h, values) {
   // Clear session data after successful submission
   request.yar.set('projectProposal', {})
 
-  const projectOverviewUrl = ROUTES.PROJECT_PROPOSAL.PROJECT_OVERVIEW.replace(
-    '{reference_number}',
+  const projectOverviewUrl = buildProjectOverviewUrl(
     apiResponse.data?.data?.reference_number
   )
   return h.redirect(projectOverviewUrl)
+}
+
+function renderError(request, h, values, message) {
+  return h
+    .view(
+      PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR,
+      buildViewModel(request, values, { lastFinancialYear: message }, [
+        { text: message, href: LAST_FINANCIAL_YEAR_ERROR_HREF }
+      ])
+    )
+    .code(statusCodes.badRequest)
+}
+
+async function getAreaDetails(request, sessionData) {
+  const areasData = await request.getAreas()
+  const rmaSelection = sessionData.rmaSelection?.rmaSelection
+
+  return {
+    rfccCode: getRfccCodeFromArea(rmaSelection, areasData),
+    rmaName: getAreaNameById(rmaSelection, areasData),
+    rmaSelection
+  }
+}
+
+function buildProposalData(sessionData, values, rmaName, rfccCode) {
+  return {
+    name: sessionData.projectName?.projectName,
+    projectType: sessionData.projectType?.projectType,
+    projectIntervesionTypes:
+      sessionData.interventionTypes?.interventionTypes || [],
+    mainIntervensionType:
+      sessionData.primaryInterventionType?.primaryInterventionType || null,
+    projectStartFinancialYear:
+      sessionData.firstFinancialYear?.firstFinancialYear,
+    projectEndFinancialYear: values.lastFinancialYear,
+    rmaName,
+    rfccCode
+  }
+}
+
+function buildProjectOverviewUrl(referenceNumber) {
+  return ROUTES.PROJECT_PROPOSAL.PROJECT_OVERVIEW.replace(
+    '{reference_number}',
+    referenceNumber
+  )
+}
+
+async function submitProposal(request, proposalData) {
+  const authSession = request.yar.get('auth')
+  const accessToken = authSession?.accessToken
+  return createProjectProposal(proposalData, accessToken)
 }
 
 async function handleGet(request, h) {
@@ -193,7 +198,7 @@ async function handleGet(request, h) {
 
   return h.view(
     PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR,
-    buildViewModel(request, sessionData, values)
+    buildViewModel(request, values)
   )
 }
 
@@ -208,7 +213,7 @@ async function handlePost(request, h) {
     return h
       .view(
         PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR,
-        buildViewModel(request, sessionData, values, errors, errorSummary)
+        buildViewModel(request, values, errors, errorSummary)
       )
       .code(statusCodes.badRequest)
   }

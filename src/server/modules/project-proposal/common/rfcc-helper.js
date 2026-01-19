@@ -19,16 +19,44 @@
 function buildAreaLookupMap(areasData) {
   const lookupMap = {}
 
-  for (const areaType in areasData) {
+  Object.keys(areasData).forEach((areaType) => {
     const areas = areasData[areaType]
     if (Array.isArray(areas)) {
       areas.forEach((area) => {
         lookupMap[String(area.id)] = area
       })
     }
-  }
+  })
 
   return lookupMap
+}
+
+/**
+ * Check if an area is a PSO type
+ * @param {Object} area - The area object
+ * @returns {boolean} True if area is PSO type
+ */
+function isPsoArea(area) {
+  return area.area_type === 'PSO Area' || area.area_type === 'PSO'
+}
+
+/**
+ * Get RFCC code from parent PSO area
+ * @param {Object} area - The RMA area
+ * @param {Object} areaLookup - Area lookup map
+ * @returns {string|null} Parent PSO's RFCC code or null
+ */
+function getRfccFromParent(area, areaLookup) {
+  if (!area.parent_id) {
+    return null
+  }
+
+  const parentArea = areaLookup[String(area.parent_id)]
+  if (!parentArea || !isPsoArea(parentArea)) {
+    return null
+  }
+
+  return parentArea.sub_type || null
 }
 
 /**
@@ -46,40 +74,21 @@ export function getRfccCodeFromArea(areaId, areasData) {
     return null
   }
 
-  // Build lookup map for quick area access
   const areaLookup = buildAreaLookupMap(areasData)
-  const areaIdStr = String(areaId)
+  const selectedArea = areaLookup[String(areaId)]
 
-  // Find the selected area
-  const selectedArea = areaLookup[areaIdStr]
   if (!selectedArea) {
     return null
   }
 
-  // If it's a PSO area, RFCC code is in its sub_type
-  if (
-    selectedArea.area_type === 'PSO Area' ||
-    selectedArea.area_type === 'PSO'
-  ) {
+  if (isPsoArea(selectedArea)) {
     return selectedArea.sub_type || null
   }
 
-  // If it's an RMA area, find parent PSO and get its sub_type
-  if (selectedArea.area_type === 'RMA' && selectedArea.parent_id) {
-    const parentIdStr = String(selectedArea.parent_id)
-    const parentArea = areaLookup[parentIdStr]
-
-    // Verify parent is a PSO area and has RFCC code
-    if (
-      parentArea &&
-      (parentArea.area_type === 'PSO Area' || parentArea.area_type === 'PSO') &&
-      parentArea.sub_type
-    ) {
-      return parentArea.sub_type
-    }
+  if (selectedArea.area_type === 'RMA') {
+    return getRfccFromParent(selectedArea, areaLookup)
   }
 
-  // EA areas or other types don't have RFCC codes
   return null
 }
 

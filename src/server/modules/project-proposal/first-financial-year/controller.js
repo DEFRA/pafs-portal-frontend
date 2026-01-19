@@ -8,6 +8,7 @@ import {
 } from '../common/financial-year.js'
 
 const FIRST_FINANCIAL_YEAR_ERROR_HREF = '#first-financial-year'
+const FINANCIAL_YEARS_TO_DISPLAY = 6
 
 function getBackLink(sessionData) {
   const projectType = sessionData?.projectType?.projectType
@@ -18,6 +19,8 @@ function getBackLink(sessionData) {
     interventions = selected
   } else if (selected) {
     interventions = [selected]
+  } else {
+    interventions = []
   }
 
   if (interventions.length > 1) {
@@ -41,10 +44,13 @@ function buildViewModel(
   const currentFinancialYearStart = getCurrentFinancialYearStartYear()
   const financialYearOptions = buildFinancialYearOptions(
     currentFinancialYearStart,
-    6
+    FINANCIAL_YEARS_TO_DISPLAY
   )
 
-  const afterMarchYear = getAfterMarchYear(currentFinancialYearStart, 6)
+  const afterMarchYear = getAfterMarchYear(
+    currentFinancialYearStart,
+    FINANCIAL_YEARS_TO_DISPLAY
+  )
 
   return {
     title: request.t('project-proposal.first_financial_year.heading'),
