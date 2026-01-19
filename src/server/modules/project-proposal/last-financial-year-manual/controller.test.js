@@ -196,7 +196,9 @@ describe('#lastFinancialYearManualController', () => {
       )
       // Session should be cleared after successful submission
       expect(mockRequest.yar.set).toHaveBeenCalledWith('projectProposal', {})
-      expect(result.redirect).toBe('/project-overview/ANC501E/000A/001A')
+      expect(result.redirect).toBe(
+        '/project-proposal/project-overview/ANC501E-000A-001A'
+      )
       expect(projectProposalService.createProjectProposal).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Test Project',
@@ -232,7 +234,9 @@ describe('#lastFinancialYearManualController', () => {
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalled()
-      expect(result.redirect).toBe('/project-overview/ANC501E/000A/001A')
+      expect(result.redirect).toBe(
+        '/project-proposal/project-overview/ANC501E-000A-001A'
+      )
     })
 
     test('allows entry when no first financial year is set', async () => {
@@ -260,7 +264,9 @@ describe('#lastFinancialYearManualController', () => {
       )
 
       expect(mockRequest.yar.set).toHaveBeenCalled()
-      expect(result.redirect).toBe('/project-overview/ANC501E/000A/001A')
+      expect(result.redirect).toBe(
+        '/project-proposal/project-overview/ANC501E-000A-001A'
+      )
     })
   })
 })

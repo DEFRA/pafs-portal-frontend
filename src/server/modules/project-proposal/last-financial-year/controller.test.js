@@ -221,7 +221,9 @@ describe('#lastFinancialYearController', () => {
       )
       // Session should be cleared after successful submission
       expect(mockRequest.yar.set).toHaveBeenCalledWith('projectProposal', {})
-      expect(result.redirect).toBe('/project-overview/ANC501E/000A/001A')
+      expect(result.redirect).toBe(
+        '/project-proposal/project-overview/ANC501E-000A-001A'
+      )
       expect(projectProposalService.createProjectProposal).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Test Project',
@@ -257,7 +259,9 @@ describe('#lastFinancialYearController', () => {
         mockH
       )
 
-      expect(result.redirect).toBe('/project-overview/ANC501E/000A/001A')
+      expect(result.redirect).toBe(
+        '/project-proposal/project-overview/ANC501E-000A-001A'
+      )
       expect(projectProposalService.createProjectProposal).toHaveBeenCalled()
     })
 

@@ -93,13 +93,14 @@ export function buildProposalDataForSubmission(
 
 /**
  * Build project overview URL from reference number
- * @param {string} referenceNumber - Project reference number
- * @returns {string} Project overview URL
+ * @param {string} referenceNumber - Project reference number (e.g., 'abcd/efgh/ijklm')
+ * @returns {string} Project overview URL with hyphens instead of slashes (e.g., 'abcd-efgh-ijklm')
  */
 export function buildProjectOverviewUrlForProposal(referenceNumber) {
+  const formattedReferenceNumber = referenceNumber.replace(/\//g, '-')
   return ROUTES.PROJECT_PROPOSAL.PROJECT_OVERVIEW.replace(
-    '{reference_number}',
-    referenceNumber
+    '{referenceNumber}',
+    formattedReferenceNumber
   )
 }
 
