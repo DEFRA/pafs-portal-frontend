@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { mainAreaController, mainAreaPostController } from './controller.js'
 
 vi.mock('../../../common/helpers/areas/areas-helper.js')
-vi.mock('../helpers.js', async (importOriginal) => {
+vi.mock('../helpers/session-helpers.js', async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
@@ -14,7 +14,7 @@ vi.mock('../schema.js')
 
 const { getAreasByType, findAreaById } =
   await import('../../../common/helpers/areas/areas-helper.js')
-const { getSessionKey } = await import('../helpers.js')
+const { getSessionKey } = await import('../helpers/session-helpers.js')
 const { extractJoiErrors } =
   await import('../../../common/helpers/error-renderer/index.js')
 const { mainAreaSchema } = await import('../schema.js')
@@ -502,6 +502,52 @@ describe('MainAreaController', () => {
         expect.objectContaining({
           backLink: '/admin/user-account/details'
         })
+      )
+    })
+
+    test('returns details link for users with unknown responsibility', async () => {
+      mockRequest.yar.get.mockReturnValue({ responsibility: 'UNKNOWN' })
+
+      await mainAreaController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/accounts/main-area/index',
+        expect.objectContaining({
+          backLink: '/request-account/details'
+        })
+      )
+    })
+  })
+
+  describe('Edit mode navigation', () => {
+    test('redirects to additional areas in edit mode for EA user', async () => {
+      mockRequest.params = { encodedId: 'abc123' }
+      mockRequest.yar.get.mockReturnValue({
+        responsibility: 'EA'
+      })
+      mockRequest.payload = { mainArea: '1' }
+      mainAreaSchema.validate.mockReturnValue({ error: null })
+
+      await mainAreaPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/admin/user-account/additional-areas/abc123/edit'
+      )
+    })
+
+    test('redirects to additional areas in edit mode for admin EA user', async () => {
+      mockRequest.path = '/admin/accounts/main-area'
+      mockRequest.params = { encodedId: 'xyz789' }
+      mockRequest.yar.get.mockReturnValue({
+        responsibility: 'EA'
+      })
+      mockRequest.payload = { mainArea: '1' }
+      mainAreaSchema.validate.mockReturnValue({ error: null })
+
+      await mainAreaPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/admin/user-account/additional-areas/xyz789/edit'
       )
     })
   })

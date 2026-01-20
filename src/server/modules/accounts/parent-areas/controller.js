@@ -5,13 +5,36 @@ import {
   VIEW_ERROR_CODES
 } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { getSessionKey } from '../helpers.js'
+import { buildGroupedAreas, getSessionKey } from '../helpers/session-helpers.js'
 import {
   getAreasByType,
   findAreaById,
   getParentAreas
 } from '../../../common/helpers/areas/areas-helper.js'
 import Joi from 'joi'
+import { addEditModeContext } from '../helpers/view-data-helper.js'
+import { getEditModeContext } from '../helpers/navigation-helper.js'
+
+// Workflow configuration for responsibility-parentType combinations
+const WORKFLOW_CONFIG = {
+  [`${RESPONSIBILITY_MAP.PSO}-${RESPONSIBILITY_MAP.EA}`]: {
+    nextRoute: 'MAIN_AREA',
+    backRoute: 'DETAILS',
+    translationKey: 'pso.ea_areas'
+  },
+  [`${RESPONSIBILITY_MAP.RMA}-${RESPONSIBILITY_MAP.EA}`]: {
+    nextRoute: 'PARENT_AREAS',
+    nextRouteParams: { type: 'pso' },
+    backRoute: 'DETAILS',
+    translationKey: 'rma.ea_areas'
+  },
+  [`${RESPONSIBILITY_MAP.RMA}-${RESPONSIBILITY_MAP.PSO}`]: {
+    nextRoute: 'MAIN_AREA',
+    backRoute: 'PARENT_AREAS',
+    backRouteParams: { type: 'ea' },
+    translationKey: 'rma.pso_areas'
+  }
+}
 
 /**
  * Parent Areas Selection Controller
@@ -19,57 +42,104 @@ import Joi from 'joi'
  * Reverse engineers selections from main/additional areas when coming back from check-answers
  */
 class ParentAreasController {
-  async get(request, h) {
+  /**
+   * Get workflow configuration for responsibility-parentType combination
+   * @private
+   */
+  _getWorkflowConfig(responsibility, parentType) {
+    return WORKFLOW_CONFIG[`${responsibility}-${parentType}`] || null
+  }
+
+  /**
+   * Get route based on admin context
+   * @private
+   */
+  _getRoute(isAdmin, routeKey, params = {}) {
+    const base = isAdmin ? ROUTES.ADMIN.ACCOUNTS : ROUTES.GENERAL.ACCOUNTS
+    let route = base[routeKey]
+
+    // Replace route parameters
+    Object.entries(params).forEach(([key, value]) => {
+      route = route.replace(`{${key}}`, value)
+    })
+
+    return route
+  }
+
+  /**
+   * Extract and validate request context
+   * @private
+   */
+  _extractRequestContext(request) {
     const isAdmin = request.path.startsWith('/admin')
     const sessionKey = getSessionKey(isAdmin)
     const sessionData = request.yar.get(sessionKey) || {}
     const { responsibility, areas = [] } = sessionData
     const parentType = this.getParentType(request.params.type)
 
-    // Validate responsibility and parent type combination
-    if (!this.isValidCombination(responsibility, parentType)) {
-      return h.redirect(
-        isAdmin
-          ? ROUTES.ADMIN.ACCOUNTS.DETAILS
-          : ROUTES.GENERAL.ACCOUNTS.DETAILS
-      )
+    return {
+      isAdmin,
+      sessionKey,
+      sessionData,
+      responsibility,
+      areas,
+      parentType
     }
+  }
 
-    // Get all areas of the parent type
+  /**
+   * Get parent areas data and selected IDs
+   * @private
+   */
+  async _getParentAreasData(request, context) {
     const areasData = await request.getAreas()
     const parentAreas = getAreasByType(
       areasData,
-      AREAS_RESPONSIBILITIES_MAP[parentType.toUpperCase()]
+      AREAS_RESPONSIBILITIES_MAP[context.parentType.toUpperCase()]
     )
 
-    // Get selected parent areas from session or reverse engineer from main/additional areas
-    const tempKey = `${parentType.toLowerCase()}Areas`
-    let selectedParentIds = sessionData[tempKey] || []
+    const tempKey = `${context.parentType.toLowerCase()}Areas`
+    let selectedParentIds = context.sessionData[tempKey] || []
 
-    // If no parent areas in session, reverse engineer from main/additional areas
     if (selectedParentIds.length === 0) {
       selectedParentIds = this.reverseEngineerParentAreas(
         areasData,
-        areas,
-        parentType,
-        responsibility
+        context.areas,
+        context.parentType,
+        context.responsibility
       )
     }
 
+    return { areasData, parentAreas, selectedParentIds }
+  }
+  async get(request, h) {
+    const context = this._extractRequestContext(request)
+
+    // Validate responsibility and parent type combination
+    if (!this.isValidCombination(context.responsibility, context.parentType)) {
+      return h.redirect(this._getRoute(context.isAdmin, 'DETAILS'))
+    }
+
+    // Get parent areas data
+    const { areasData, parentAreas, selectedParentIds } =
+      await this._getParentAreasData(request, context)
+
     // Build grouped parent areas for RMA selecting PSO
-    const groupedParentAreas = this.buildGroupedParentAreas(
-      areasData,
-      sessionData,
-      responsibility,
-      parentType
-    )
+    const groupedParentAreas =
+      context.parentType === RESPONSIBILITY_MAP.PSO
+        ? buildGroupedAreas(
+            areasData,
+            context.sessionData,
+            RESPONSIBILITY_MAP.PSO
+          )
+        : null
 
     return h.view(
       ACCOUNT_VIEWS.PARENT_AREAS,
       this.buildViewData(request, {
-        isAdmin,
-        responsibility,
-        parentType,
+        isAdmin: context.isAdmin,
+        responsibility: context.responsibility,
+        parentType: context.parentType,
         parentAreas,
         selectedAreas: selectedParentIds,
         groupedParentAreas
@@ -84,6 +154,7 @@ class ParentAreasController {
     const { responsibility } = sessionData
     const parentType = this.getParentType(request.params.type)
     const { parentAreas: selectedAreas = [] } = request.payload
+    const editModeContext = getEditModeContext(request)
 
     // Validate at least one parent area selected
     const schema = Joi.object({
@@ -101,12 +172,11 @@ class ParentAreasController {
         areasData,
         AREAS_RESPONSIBILITIES_MAP[parentType.toUpperCase()]
       )
-      const groupedParentAreas = this.buildGroupedParentAreas(
-        areasData,
-        sessionData,
-        responsibility,
-        parentType
-      )
+
+      const groupedParentAreas =
+        parentType === RESPONSIBILITY_MAP.PSO
+          ? buildGroupedAreas(areasData, sessionData, RESPONSIBILITY_MAP.PSO)
+          : null
 
       return h.view(
         ACCOUNT_VIEWS.PARENT_AREAS,
@@ -115,7 +185,7 @@ class ParentAreasController {
           responsibility,
           parentType,
           parentAreas,
-          selectedAreas: [],
+          selectedAreas: normalizedAreas,
           groupedParentAreas,
           hasError: true
         })
@@ -130,7 +200,9 @@ class ParentAreasController {
     })
 
     // Redirect to next step based on responsibility
-    return h.redirect(this.getNextRoute(isAdmin, responsibility, parentType))
+    return h.redirect(
+      this.getNextRoute(isAdmin, responsibility, parentType, editModeContext)
+    )
   }
 
   /**
@@ -198,9 +270,9 @@ class ParentAreasController {
     )
   }
 
-  getNextRoute(isAdmin, responsibility, parentType) {
+  getNextRoute(isAdmin, responsibility, parentType, editModeContext) {
     const routeKey = this.getNextRouteKey(responsibility, parentType)
-    return this.buildRoute(isAdmin, routeKey)
+    return this.buildRoute(isAdmin, routeKey, editModeContext)
   }
 
   getNextRouteKey(responsibility, parentType) {
@@ -231,7 +303,13 @@ class ParentAreasController {
     return 'DETAILS'
   }
 
-  buildRoute(isAdmin, routeKey) {
+  buildRoute(isAdmin, routeKey, editModeContext) {
+    const { isEditMode, encodedId, baseRoutes } = editModeContext
+    if (isEditMode) {
+      return baseRoutes[routeKey]
+        .replace('{encodedId}', encodedId)
+        .replace('{type}', RESPONSIBILITY_MAP.PSO.toLowerCase())
+    }
     return isAdmin
       ? ROUTES.ADMIN.ACCOUNTS[routeKey]
       : ROUTES.GENERAL.ACCOUNTS[routeKey]
@@ -265,41 +343,6 @@ class ParentAreasController {
       : ROUTES.GENERAL.ACCOUNTS.DETAILS
   }
 
-  /**
-   * Build grouped parent areas for hierarchical display
-   * RMA selecting PSO: grouped by EA parent
-   */
-  buildGroupedParentAreas(
-    masterAreas,
-    sessionData,
-    responsibility,
-    parentType
-  ) {
-    // Only RMA selecting PSO needs grouping
-    if (
-      responsibility !== RESPONSIBILITY_MAP.RMA ||
-      parentType !== RESPONSIBILITY_MAP.PSO
-    ) {
-      return null
-    }
-
-    const selectedEaAreas = sessionData.eaAreas || []
-    if (selectedEaAreas.length === 0) {
-      return null
-    }
-
-    const eaAreas = getAreasByType(masterAreas, AREAS_RESPONSIBILITIES_MAP.EA)
-    const psoAreas = getAreasByType(masterAreas, AREAS_RESPONSIBILITIES_MAP.PSO)
-
-    return eaAreas
-      .filter((ea) => selectedEaAreas.includes(ea.id))
-      .map((ea) => ({
-        parent: ea,
-        children: psoAreas.filter((pso) => pso.parent_id === ea.id)
-      }))
-      .filter((group) => group.children.length > 0)
-  }
-
   buildViewData(request, context) {
     const {
       isAdmin,
@@ -315,7 +358,7 @@ class ParentAreasController {
     const responsibilityLower = responsibility.toLowerCase()
     const translationBase = this.getTranslationBase(responsibility, parentType)
 
-    return {
+    const viewData = {
       pageTitle: request.t(`${translationBase}.title`),
       isAdmin,
       responsibility: responsibilityLower,
@@ -325,13 +368,27 @@ class ParentAreasController {
       groupedParentAreas,
       hasError,
       backLink: this.getBackLink(isAdmin, responsibility, parentType),
-      submitRoute: isAdmin
-        ? `${ROUTES.ADMIN.ACCOUNTS.PARENT_AREAS}/${parentType.toLowerCase()}`
-        : `${ROUTES.GENERAL.ACCOUNTS.PARENT_AREAS}/${parentType.toLowerCase()}`,
+      submitRoute: this.getSubmitRoute(isAdmin, parentType),
       localeKey,
       translationBase,
       ERROR_CODES: VIEW_ERROR_CODES
     }
+
+    const editRouteMap = {
+      ea: ROUTES.ADMIN.ACCOUNTS.EDIT.PARENT_AREAS_EA,
+      pso: ROUTES.ADMIN.ACCOUNTS.EDIT.PARENT_AREAS_PSO
+    }
+
+    return addEditModeContext(request, viewData, {
+      editRoute: editRouteMap[parentType.toLowerCase()]
+    })
+  }
+
+  getSubmitRoute(isAdmin, parentType) {
+    const typeParam = parentType.toLowerCase()
+    return isAdmin
+      ? `${ROUTES.ADMIN.ACCOUNTS.PARENT_AREAS}/${typeParam}`
+      : `${ROUTES.GENERAL.ACCOUNTS.PARENT_AREAS}/${typeParam}`
   }
 
   getTranslationBase(responsibility, parentType) {

@@ -129,9 +129,6 @@ async function checkProjectNameDuplicate(request, h, values) {
  * Save project name to session and redirect to next step
  */
 function handlePostSuccess(request, h, values) {
-  const session = getAuthSession(request)
-  const userSession = session?.user
-
   const sessionData = request.yar.get('projectProposal') ?? {}
   sessionData.projectName = values
   request.yar.set('projectProposal', sessionData)
@@ -141,20 +138,7 @@ function handlePostSuccess(request, h, values) {
     'Project name validated and stored in session'
   )
 
-  if (userSession?.admin || (userSession?.areas?.length ?? 0) > 1) {
-    return h.redirect(ROUTES.PROJECT_PROPOSAL.RMA_SELECTION)
-  }
-
-  if (userSession?.areas?.length === 1) {
-    sessionData.rmaSelection = userSession?.areas[0]?.areaId
-    request.yar.set('projectProposal', sessionData)
-
-    request.server.logger.info(
-      { rmaSelection: userSession?.areas[0]?.areaId },
-      'RMA selection validated and stored in session'
-    )
-  }
-
+  // Redirect to next step (project-type)
   return h.redirect(ROUTES.PROJECT_PROPOSAL.PROJECT_TYPE)
 }
 

@@ -289,6 +289,15 @@ export const config = convict({
       default: 2000,
       env: 'BACKEND_API_HEALTH_CHECK_INTERVAL'
     }
+  },
+  security: {
+    idSecret: {
+      doc: 'Secret key for encoding/decoding record IDs in URLs (must be at least 32 characters)',
+      format: String,
+      default: 'change-this-to-a-secure-random-secret-key-at-least-32-chars',
+      env: 'ID_SECRET',
+      sensitive: true
+    }
   }
 })
 

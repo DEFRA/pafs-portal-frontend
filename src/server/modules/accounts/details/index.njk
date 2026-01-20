@@ -11,9 +11,12 @@
   {% set localeKey = 'add_user.admin_details' %}
 {% endif %}
 {% set validationContext = 'add_user' if isAdmin else 'request_account' %}
+{% set isEditMode = isEditMode | default(false) %}
+{% set headingSuffix = 'edit_heading' if isEditMode else 'heading' %}
+{% set introSuffix = 'edit_intro' if isEditMode else 'intro' %}
 
 {% block beforeContent %}
-  {% if backLink %}
+  {% if not isEditMode and backLink %}
     <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
   {% endif %}
 {% endblock %}
@@ -108,9 +111,9 @@
       }) }}
     {% endif %}
     
-    <h1 class="govuk-heading-xl">{{ t('accounts.' + localeKey + '.heading') }}</h1>
+    <h1 class="govuk-heading-xl">{{ t('accounts.' + localeKey + '.' + headingSuffix) }}</h1>
 
-    <p class="govuk-body">{{ t('accounts.' + localeKey + '.intro') }}</p>
+    <p class="govuk-body">{{ t('accounts.' + localeKey + '.' + introSuffix) }}</p>
 
     <form method="post" action="{{ submitRoute }}" novalidate>
       {# First name field error #}
@@ -278,7 +281,7 @@
           name: "responsibility",
           fieldset: {
             legend: {
-              text: t('accounts.label.responsibility_legend')
+              text:  t('accounts.label.' + responsibilityLegendKey)
             }
           },
           items: [
@@ -371,9 +374,14 @@
         </details>
       {% endif %}
 
-      {{ govukButton({
-        text: t('common.buttons.continue')
-      }) }}
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: t('common.buttons.continue')
+        }) }}
+        {% if isEditMode and cancelRoute %}
+        <a class="govuk-link" href="{{ cancelRoute }}">{{ t('common.cancel_link') }}</a>
+        {% endif %}
+      </div>
     </form>
 
     {% if not isAdmin %}

@@ -21,7 +21,7 @@ describe('getAuthSession', () => {
     expect(getAuthSession({ yar: { get: null } })).toBeNull()
   })
 
-  test('propagates error when yar.get throws', () => {
+  test('throws when yar.get throws', () => {
     const req = {
       yar: {
         get: () => {

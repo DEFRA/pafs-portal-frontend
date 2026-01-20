@@ -1,9 +1,9 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { startController } from './controller.js'
 
-vi.mock('../helpers.js')
+vi.mock('../helpers/session-helpers.js')
 
-const { getSessionKey } = await import('../helpers.js')
+const { getSessionKey } = await import('../helpers/session-helpers.js')
 
 describe('StartController', () => {
   let mockRequest

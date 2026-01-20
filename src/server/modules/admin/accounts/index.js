@@ -23,10 +23,13 @@ import {
 } from '../../accounts/additional-areas/controller.js'
 import {
   checkAnswersController,
-  checkAnswersPostController
+  checkAnswersPostController,
+  viewAccountController
 } from '../../accounts/check-answers/controller.js'
+import { fetchAccountForAdmin } from '../../accounts/helpers/fetch-account-for-admin.js'
 import { confirmationController } from '../../accounts/confirmation/controller.js'
-import { requireJourneyStarted } from '../../accounts/helpers.js'
+import { requireJourneyStarted } from '../../accounts/helpers/session-helpers.js'
+import { initializeEditSessionPreHandler } from '../../accounts/helpers/edit-session-helper.js'
 
 /**
  * Admin user management routes
@@ -42,6 +45,16 @@ function createAuthOptions() {
 function createAuthWithJourneyOptions() {
   return {
     pre: [{ method: requireAdmin }, { method: requireJourneyStarted(true) }]
+  }
+}
+
+function createAuthWithEditOptions() {
+  return {
+    pre: [
+      { method: requireAdmin },
+      { method: fetchAccountForAdmin, assign: 'accountData' },
+      { method: initializeEditSessionPreHandler }
+    ]
   }
 }
 
@@ -170,6 +183,125 @@ function getConfirmationRoutes() {
   ]
 }
 
+function getViewAccountRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.USER_VIEW,
+      options: {
+        pre: [
+          { method: requireAdmin },
+          { method: fetchAccountForAdmin, assign: 'accountData' }
+        ]
+      },
+      ...viewAccountController
+    }
+  ]
+}
+
+// Edit routes - reuse existing controllers with edit mode
+function getEditIsAdminRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.IS_ADMIN,
+      options: createAuthWithEditOptions(),
+      ...isAdminController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.IS_ADMIN,
+      options: createAuthWithEditOptions(),
+      ...isAdminPostController
+    }
+  ]
+}
+
+function getEditDetailsRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.DETAILS,
+      options: createAuthWithEditOptions(),
+      ...detailsController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.DETAILS,
+      options: createAuthWithEditOptions(),
+      ...detailsPostController
+    }
+  ]
+}
+
+function getEditParentAreasRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.PARENT_AREAS,
+      options: createAuthWithEditOptions(),
+      ...parentAreasController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.PARENT_AREAS,
+      options: createAuthWithEditOptions(),
+      ...parentAreasPostController
+    }
+  ]
+}
+
+function getEditMainAreaRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.MAIN_AREA,
+      options: createAuthWithEditOptions(),
+      ...mainAreaController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.MAIN_AREA,
+      options: createAuthWithEditOptions(),
+      ...mainAreaPostController
+    }
+  ]
+}
+
+function getEditAdditionalAreasRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.ADDITIONAL_AREAS,
+      options: createAuthWithEditOptions(),
+      ...additionalAreasController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.ADDITIONAL_AREAS,
+      options: createAuthWithEditOptions(),
+      ...additionalAreasPostController
+    }
+  ]
+}
+
+function getEditCheckAnswersRoutes() {
+  return [
+    {
+      method: 'GET',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.CHECK_ANSWERS,
+      options: createAuthWithEditOptions(),
+      ...checkAnswersController
+    },
+    {
+      method: 'POST',
+      path: ROUTES.ADMIN.ACCOUNTS.EDIT.CHECK_ANSWERS,
+      options: createAuthWithEditOptions(),
+      ...checkAnswersPostController
+    }
+  ]
+}
+
 export const accounts = {
   plugin: {
     name: 'Admin User Management',
@@ -182,7 +314,15 @@ export const accounts = {
         ...getMainAreaRoutes(),
         ...getAdditionalAreasRoutes(),
         ...getCheckAnswersRoutes(),
-        ...getConfirmationRoutes()
+        ...getConfirmationRoutes(),
+        ...getViewAccountRoutes(),
+        // Edit routes
+        ...getEditIsAdminRoutes(),
+        ...getEditDetailsRoutes(),
+        ...getEditParentAreasRoutes(),
+        ...getEditMainAreaRoutes(),
+        ...getEditAdditionalAreasRoutes(),
+        ...getEditCheckAnswersRoutes()
       ]
 
       server.route(routes)

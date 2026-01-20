@@ -1,0 +1,27 @@
+{#
+  Delete User Confirmation Page
+  Displays confirmation page before deleting a user account
+#}
+
+{% extends "layouts/page.njk" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-xl">{{ t('accounts.delete_user.title', { userName: userName }) }}</h1>
+
+      <p class="govuk-body">{{ t('accounts.delete_user.warning') }}</p>
+
+      <form method="post" action="">
+        <input type="hidden" name="confirm" value="yes">
+        <div class="govuk-button-group">
+          <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">
+            {{ t('accounts.delete_user.confirm_button') }}
+          </button>
+          <a class="govuk-link" href="{{ backLink }}">{{ t('common.cancel_link') }}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -5,7 +5,12 @@ import {
   VIEW_ERROR_CODES
 } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { getSessionKey, buildGroupedAreas } from '../helpers.js'
+import { getSessionKey, buildGroupedAreas } from '../helpers/session-helpers.js'
+import { addEditModeContext } from '../helpers/view-data-helper.js'
+import {
+  hasAreasChanged,
+  detectChanges
+} from '../helpers/edit-session-helper.js'
 
 /**
  * Generic Additional Areas Controller
@@ -62,48 +67,80 @@ class AdditionalAreasController {
     )
   }
 
-  async post(request, h) {
-    const isAdmin = request.path.startsWith('/admin')
-    const sessionKey = getSessionKey(isAdmin)
-    const sessionData = request.yar.get(sessionKey) || {}
+  /**
+   * Validate session and redirect if invalid
+   * @private
+   */
+  _validateSession(_request, h, isAdmin, sessionData) {
     const { responsibility, areas = [] } = sessionData
     const mainArea = areas.find((a) => a.primary)?.areaId
 
     if (!responsibility || !mainArea) {
+      const redirectRoute = isAdmin
+        ? ROUTES.ADMIN.ACCOUNTS.MAIN_AREA
+        : ROUTES.GENERAL.ACCOUNTS.MAIN_AREA
+      return { valid: false, redirect: h.redirect(redirectRoute) }
+    }
+
+    return { valid: true, mainArea }
+  }
+
+  /**
+   * Handle edit mode navigation
+   * @private
+   */
+  _handleEditModeNavigation(h, sessionData, updatedSessionData) {
+    const areasChanged = hasAreasChanged(updatedSessionData)
+    const { hasChanges } = detectChanges(updatedSessionData)
+
+    if (areasChanged || hasChanges) {
       return h.redirect(
-        isAdmin
-          ? ROUTES.ADMIN.ACCOUNTS.MAIN_AREA
-          : ROUTES.GENERAL.ACCOUNTS.MAIN_AREA
+        ROUTES.ADMIN.ACCOUNTS.EDIT.CHECK_ANSWERS.replace(
+          '{encodedId}',
+          sessionData.encodedId
+        )
       )
     }
 
-    // Get additional areas from payload (can be empty array)
-    let { additionalAreas } = request.payload || {}
+    return h.redirect(
+      ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', sessionData.encodedId)
+    )
+  }
 
-    // Normalize to array
-    if (!additionalAreas) {
-      additionalAreas = []
+  async post(request, h) {
+    const isAdmin = request.path.startsWith('/admin')
+    const sessionKey = getSessionKey(isAdmin)
+    const sessionData = request.yar.get(sessionKey) || {}
+
+    // Validate session
+    const validation = this._validateSession(request, h, isAdmin, sessionData)
+    if (!validation.valid) {
+      return validation.redirect
     }
 
-    if (!Array.isArray(additionalAreas)) {
-      additionalAreas = [additionalAreas]
-    }
+    // Normalize additional areas input
+    const additionalAreas = [request.payload?.additionalAreas || []].flat()
 
     // Build areas array with primary flag
     const updatedAreas = [
-      { areaId: mainArea, primary: true },
+      { areaId: validation.mainArea, primary: true },
       ...additionalAreas.map((areaId) => ({ areaId, primary: false }))
     ]
 
     // Store updated areas in session
-    request.yar.set(sessionKey, { ...sessionData, areas: updatedAreas })
+    const updatedSessionData = { ...sessionData, areas: updatedAreas }
+    request.yar.set(sessionKey, updatedSessionData)
 
-    // Redirect to check answers
-    return h.redirect(
-      isAdmin
-        ? ROUTES.ADMIN.ACCOUNTS.CHECK_ANSWERS
-        : ROUTES.GENERAL.ACCOUNTS.CHECK_ANSWERS
-    )
+    // Handle navigation based on edit mode
+    if (isAdmin && sessionData.editMode) {
+      return this._handleEditModeNavigation(h, sessionData, updatedSessionData)
+    }
+
+    // Regular flow - redirect to check answers
+    const redirectRoute = isAdmin
+      ? ROUTES.ADMIN.ACCOUNTS.CHECK_ANSWERS
+      : ROUTES.GENERAL.ACCOUNTS.CHECK_ANSWERS
+    return h.redirect(redirectRoute)
   }
 
   buildViewData(
@@ -117,7 +154,7 @@ class AdditionalAreasController {
     const localeKey = isAdmin ? 'add_user' : 'request_account'
     const responsibilityLower = responsibility.toLowerCase()
 
-    return {
+    const viewData = {
       pageTitle: request.t(
         `accounts.areas.${responsibilityLower}.additional.title`
       ),
@@ -135,6 +172,10 @@ class AdditionalAreasController {
       localeKey,
       ERROR_CODES: VIEW_ERROR_CODES
     }
+
+    return addEditModeContext(request, viewData, {
+      editRoute: ROUTES.ADMIN.ACCOUNTS.EDIT.ADDITIONAL_AREAS
+    })
   }
 }
 
