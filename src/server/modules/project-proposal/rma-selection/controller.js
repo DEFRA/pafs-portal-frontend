@@ -89,6 +89,10 @@ async function handleGet(request, h) {
   const sessionData = request.yar.get('projectProposal') ?? {}
   const values = sessionData?.rmaSelection ?? {}
 
+  if (!sessionData.projectName) {
+    return h.redirect(ROUTES.PROJECT_PROPOSAL.START_PROPOSAL)
+  }
+
   return h.view(
     PROPOSAL_VIEWS.RMA_SELECTION,
     buildViewModel(request, values, undefined, undefined, rmaAreas)
