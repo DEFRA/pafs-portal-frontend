@@ -53,7 +53,6 @@ export const router = {
         'intervention-type',
         'primary-intervention-type',
         'first-financial-year',
-        'first-financial-year-manual',
         'last-financial-year',
         'last-financial-year-manual'
       ])

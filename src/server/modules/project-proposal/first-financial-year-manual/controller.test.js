@@ -1,6 +1,13 @@
 import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest'
 import { statusCodes } from '../../../common/constants/status-codes.js'
-import { firstFinancialYearManualController } from './controller.js'
+import {
+  createFirstFinancialYearController,
+  VIEW_TYPES
+} from '../first-financial-year/controller.js'
+
+const firstFinancialYearManualController = createFirstFinancialYearController(
+  VIEW_TYPES.MANUAL
+)
 
 describe('#firstFinancialYearManualController', () => {
   let mockRequest
@@ -46,9 +53,7 @@ describe('#firstFinancialYearManualController', () => {
       await firstFinancialYearManualController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'modules/project-proposal/first-financial-year-manual/index'
-        ),
+        'modules/project-proposal/first-financial-year/manual',
         expect.objectContaining({
           backLink: '/project-proposal/first-financial-year'
         })

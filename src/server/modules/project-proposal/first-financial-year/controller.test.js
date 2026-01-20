@@ -1,6 +1,10 @@
 import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest'
 import { statusCodes } from '../../../common/constants/status-codes.js'
-import { firstFinancialYearController } from './controller.js'
+import { createFirstFinancialYearController, VIEW_TYPES } from './controller.js'
+
+const firstFinancialYearController = createFirstFinancialYearController(
+  VIEW_TYPES.RADIO
+)
 
 describe('#firstFinancialYearController', () => {
   let mockRequest
