@@ -31,7 +31,6 @@ describe('proposal-submission-helper', () => {
       }
 
       rfccHelper.getRfccCodeFromArea.mockReturnValue('AN')
-      rfccHelper.getAreaNameById.mockReturnValue('RMA Area')
 
       const result = await getAreaDetailsForProposal(
         mockRequest,
@@ -40,7 +39,7 @@ describe('proposal-submission-helper', () => {
 
       expect(result).toEqual({
         rfccCode: 'AN',
-        rmaName: 'RMA Area',
+        rmaName: '1',
         rmaSelection: '1'
       })
       expect(mockRequest.getAreas).toHaveBeenCalled()

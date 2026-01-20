@@ -1,6 +1,6 @@
 import { statusCodes } from '../../../common/constants/status-codes.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { getRfccCodeFromArea, getAreaNameById } from './rfcc-helper.js'
+import { getRfccCodeFromArea } from './rfcc-helper.js'
 import { createProjectProposal } from '../../../common/services/project-proposal/project-proposal-service.js'
 
 /**
@@ -45,10 +45,10 @@ function buildViewModel(values, errors, errorSummary) {
 }
 
 /**
- * Get area details (RFCC code and RMA name) from cache
+ * Get area details (RFCC code and area code) from cache
  * @param {Object} request - Hapi request
  * @param {Object} sessionData - Session data containing rmaSelection
- * @returns {Promise<Object>} Area details with rfccCode, rmaName, rmaSelection
+ * @returns {Promise<Object>} Area details with rfccCode, rmaName (area code), rmaSelection
  */
 export async function getAreaDetailsForProposal(request, sessionData) {
   const areasData = await request.getAreas()
@@ -56,7 +56,7 @@ export async function getAreaDetailsForProposal(request, sessionData) {
 
   return {
     rfccCode: getRfccCodeFromArea(rmaSelection, areasData),
-    rmaName: getAreaNameById(rmaSelection, areasData),
+    rmaName: rmaSelection,
     rmaSelection
   }
 }
@@ -65,7 +65,7 @@ export async function getAreaDetailsForProposal(request, sessionData) {
  * Build proposal data for backend API submission
  * @param {Object} sessionData - Session data
  * @param {Object} values - Form values with lastFinancialYear
- * @param {string} rmaName - RMA name
+ * @param {string} rmaName - Area code (sent as rmaName to match backend field)
  * @param {string} rfccCode - RFCC code
  * @returns {Object} Proposal data ready for API
  */
