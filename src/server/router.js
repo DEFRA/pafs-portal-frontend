@@ -52,7 +52,11 @@ export const router = {
       // Project proposal routes
       await loadModules(server, join(dirName, 'modules/project-proposal'), [
         'start-proposal',
-        'project-name'
+        'project-name',
+        'rma-selection',
+        'project-type',
+        'intervention-type',
+        'primary-intervention-type'
       ])
 
       // Static assets

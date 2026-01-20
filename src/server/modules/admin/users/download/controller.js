@@ -222,8 +222,12 @@ class DownloadUsersController {
 
   formatStatus(status) {
     if (!status) return ''
-    if (status === ACCOUNT_STATUS.ACTIVE || status === ACCOUNT_STATUS.APPROVED)
-      {return 'Active'}
+    if (
+      status === ACCOUNT_STATUS.ACTIVE ||
+      status === ACCOUNT_STATUS.APPROVED
+    ) {
+      return 'Active'
+    }
     if (status === ACCOUNT_STATUS.PENDING) return 'Pending'
     return status.charAt(0).toUpperCase() + status.slice(1)
   }
