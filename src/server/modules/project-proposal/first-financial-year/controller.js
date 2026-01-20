@@ -198,8 +198,9 @@ function createFirstFinancialYearController(viewType) {
 
   return {
     async handler(request, h) {
+      const sessionData = request.yar.get('projectProposal') ?? {}
+
       if (request.method === 'post') {
-        const sessionData = request.yar.get('projectProposal') ?? {}
         const { values, errors, errorSummary, isValid } = validateFn(request)
 
         if (!isValid) {
@@ -222,12 +223,11 @@ function createFirstFinancialYearController(viewType) {
       }
 
       // GET request
-      const sessionData = request.yar.get('projectProposal') ?? {}
-      const values = sessionData.firstFinancialYear ?? {}
+      const storedValues = sessionData.firstFinancialYear ?? {}
 
       return h.view(
         viewFile,
-        buildViewModel(request, viewType, sessionData, values)
+        buildViewModel(request, viewType, sessionData, storedValues)
       )
     }
   }

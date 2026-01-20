@@ -6,6 +6,9 @@ import { createLastFinancialYearController, VIEW_TYPES } from './controller.js'
 const lastFinancialYearController = createLastFinancialYearController(
   VIEW_TYPES.RADIO
 )
+const lastFinancialYearManualController = createLastFinancialYearController(
+  VIEW_TYPES.MANUAL
+)
 
 vi.mock('../../../common/services/project-proposal/project-proposal-service.js')
 
@@ -341,6 +344,119 @@ describe('#lastFinancialYearController', () => {
           status: 500
         }),
         'Failed to create project proposal'
+      )
+    })
+  })
+
+  describe('Manual entry', () => {
+    test('renders manual view with hint and back link', async () => {
+      await lastFinancialYearManualController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/last-financial-year/manual',
+        expect.objectContaining({
+          backLink: '/project-proposal/last-financial-year'
+        })
+      )
+    })
+
+    test('shows error when input is empty', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { lastFinancialYear: '' }
+      mockRequest.yar.get.mockReturnValue({
+        firstFinancialYear: { firstFinancialYear: '2032' }
+      })
+
+      const result = await lastFinancialYearManualController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.badRequest)
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/last-financial-year/manual',
+        expect.objectContaining({
+          errorSummary: expect.arrayContaining([
+            expect.objectContaining({ href: '#last-financial-year' })
+          ])
+        })
+      )
+    })
+
+    test('shows error when format invalid', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { lastFinancialYear: '20AB' }
+      mockRequest.yar.get.mockReturnValue({
+        firstFinancialYear: { firstFinancialYear: '2032' }
+      })
+
+      const result = await lastFinancialYearManualController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.badRequest)
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/last-financial-year/manual',
+        expect.objectContaining({
+          errorSummary: expect.arrayContaining([
+            expect.objectContaining({ href: '#last-financial-year' })
+          ])
+        })
+      )
+    })
+
+    test('shows error when before first year', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { lastFinancialYear: '2030' }
+      mockRequest.yar.get.mockReturnValue({
+        firstFinancialYear: { firstFinancialYear: '2032' }
+      })
+
+      const result = await lastFinancialYearManualController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.badRequest)
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        'project-proposal.last_financial_year_manual.errors.before_first_year'
+      )
+    })
+
+    test('persists manual year and submits proposal', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { lastFinancialYear: '2035' }
+      mockRequest.yar.get.mockImplementation((key) => {
+        if (key === 'projectProposal') {
+          return {
+            projectName: { projectName: 'Test Project' },
+            projectType: { projectType: 'DEF' },
+            interventionTypes: { interventionTypes: ['TYPE_1'] },
+            primaryInterventionType: { primaryInterventionType: 'MAIN' },
+            firstFinancialYear: { firstFinancialYear: '2032' },
+            rmaSelection: { rmaSelection: '1' }
+          }
+        }
+        if (key === 'auth') {
+          return { accessToken: 'test-token-123' }
+        }
+        return {}
+      })
+
+      const result = await lastFinancialYearManualController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'projectProposal',
+        expect.objectContaining({
+          lastFinancialYear: { lastFinancialYear: '2035' }
+        })
+      )
+      expect(result.redirect).toBe(
+        '/project-proposal/project-overview/ANC501E-000A-001A'
       )
     })
   })

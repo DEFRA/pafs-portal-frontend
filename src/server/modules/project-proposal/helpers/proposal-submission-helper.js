@@ -96,7 +96,7 @@ export function buildProposalDataForSubmission(
  * @returns {string} Project overview URL with hyphens instead of slashes (e.g., 'abcd-efgh-ijklm')
  */
 export function buildProjectOverviewUrlForProposal(referenceNumber) {
-  const formattedReferenceNumber = referenceNumber.replace(/\//g, '-')
+  const formattedReferenceNumber = referenceNumber.replaceAll('/', '-')
   return ROUTES.PROJECT_PROPOSAL.PROJECT_OVERVIEW.replace(
     '{referenceNumber}',
     formattedReferenceNumber

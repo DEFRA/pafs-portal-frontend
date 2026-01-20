@@ -279,11 +279,11 @@ function createLastFinancialYearController(viewType) {
         return handlePostSuccess(request, h, values, viewType)
       }
 
-      const values = sessionData.lastFinancialYear ?? {}
+      const storedValues = sessionData.lastFinancialYear ?? {}
 
       return h.view(
         view,
-        buildViewModel(request, viewType, sessionData, values)
+        buildViewModel(request, viewType, sessionData, storedValues)
       )
     }
   }

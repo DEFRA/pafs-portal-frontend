@@ -5,6 +5,9 @@ import { createFirstFinancialYearController, VIEW_TYPES } from './controller.js'
 const firstFinancialYearController = createFirstFinancialYearController(
   VIEW_TYPES.RADIO
 )
+const firstFinancialYearManualController = createFirstFinancialYearController(
+  VIEW_TYPES.MANUAL
+)
 
 describe('#firstFinancialYearController', () => {
   let mockRequest
@@ -161,6 +164,77 @@ describe('#firstFinancialYearController', () => {
         'projectProposal',
         expect.objectContaining({
           firstFinancialYear: { firstFinancialYear: '2028' }
+        })
+      )
+      expect(result.redirect).toBe('/project-proposal/last-financial-year')
+    })
+  })
+
+  describe('Manual entry', () => {
+    test('renders manual view with back link', async () => {
+      await firstFinancialYearManualController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/first-financial-year/manual',
+        expect.objectContaining({
+          backLink: '/project-proposal/first-financial-year'
+        })
+      )
+    })
+
+    test('shows error when input is empty', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { firstFinancialYear: '' }
+
+      const result = await firstFinancialYearManualController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.badRequest)
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/first-financial-year/manual',
+        expect.objectContaining({
+          errorSummary: expect.arrayContaining([
+            expect.objectContaining({ href: '#first-financial-year' })
+          ])
+        })
+      )
+    })
+
+    test('shows error when input is not 4 digits', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { firstFinancialYear: '20A4' }
+
+      const result = await firstFinancialYearManualController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result.statusCode).toBe(statusCodes.badRequest)
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/first-financial-year/manual',
+        expect.objectContaining({
+          errorSummary: expect.arrayContaining([
+            expect.objectContaining({ href: '#first-financial-year' })
+          ])
+        })
+      )
+    })
+
+    test('saves manual entry and redirects', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = { firstFinancialYear: '2030' }
+
+      const result = await firstFinancialYearManualController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'projectProposal',
+        expect.objectContaining({
+          firstFinancialYear: { firstFinancialYear: '2030' }
         })
       )
       expect(result.redirect).toBe('/project-proposal/last-financial-year')
