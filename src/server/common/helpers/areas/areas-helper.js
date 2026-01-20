@@ -192,3 +192,150 @@ export function getParentAreas(areasByType, areaId, targetType) {
 
   return parents
 }
+
+/**
+ * Get area details for display (main area and additional areas)
+ * @param {Object} areasByType - The areas data structure
+ * @param {Array} userAreas - Array of user area objects with areaId and primary fields
+ * @returns {Object} Object with mainArea and additionalAreas
+ */
+export function getAreaDetails(areasByType, userAreas) {
+  if (!userAreas || userAreas.length === 0) {
+    return {
+      mainArea: null,
+      additionalAreas: []
+    }
+  }
+
+  const mainAreaObj = userAreas.find((a) => a.primary)
+  const mainAreaDetails = mainAreaObj
+    ? findAreaById(areasByType, mainAreaObj.areaId)
+    : null
+
+  const additionalAreasObjs = userAreas
+    .filter((a) => !a.primary)
+    .map((a) => findAreaById(areasByType, a.areaId))
+    .filter(Boolean)
+
+  return {
+    mainArea: mainAreaDetails,
+    additionalAreas: additionalAreasObjs
+  }
+}
+
+/**
+ * Determine user responsibility from their primary area type
+ * @param {Object} account - Account object with areas array
+ * @param {Object} areasByType - The areas data structure
+ * @param {Object} responsibilityMap - Map of responsibility constants (EA, PSO, RMA)
+ * @param {Object} areasResponsibilitiesMap - Map of area type constants (EA Area, PSO Area, RMA)
+ * @returns {string|null} Responsibility type or null
+ */
+export function determineResponsibilityFromAreas(
+  account,
+  areasByType,
+  responsibilityMap,
+  areasResponsibilitiesMap
+) {
+  if (account.admin || !account.areas || account.areas.length === 0) {
+    return null
+  }
+
+  const primaryArea = account.areas.find((a) => a.primary)
+  if (!primaryArea) {
+    return null
+  }
+
+  // Look up the area in the cached areas data to get the area_type
+  const areaDetails = findAreaById(areasByType, primaryArea.id)
+  if (!areaDetails || !areaDetails.area_type) {
+    return null
+  }
+
+  // Map area_type to responsibility using AREAS_RESPONSIBILITIES_MAP
+  // area_type values: "EA Area", "PSO Area", "RMA"
+  const areaTypeToResponsibility = {
+    [areasResponsibilitiesMap.EA]: responsibilityMap.EA,
+    [areasResponsibilitiesMap.PSO]: responsibilityMap.PSO,
+    [areasResponsibilitiesMap.RMA]: responsibilityMap.RMA
+  }
+
+  return areaTypeToResponsibility[areaDetails.area_type] || null
+}
+
+/**
+ * Get parent areas display for user based on their responsibility
+ * @param {Object} areasByType - The areas data structure
+ * @param {string} responsibility - User's responsibility (EA, PSO, RMA)
+ * @param {Array} userAreas - Array of user area objects with areaId and primary fields
+ * @param {Object} responsibilityMap - Map of responsibility constants
+ * @param {Object} areasResponsibilitiesMap - Map of area type constants
+ * @returns {Object|null} Object with eaAreas and psoAreas strings, or null
+ */
+export function getParentAreasDisplay(
+  areasByType,
+  responsibility,
+  userAreas,
+  responsibilityMap,
+  areasResponsibilitiesMap
+) {
+  if (!responsibility || !userAreas || userAreas.length === 0) {
+    return null
+  }
+
+  // Get unique parent areas based on responsibility
+  const parentAreasSet = new Set()
+
+  userAreas.forEach((areaObj) => {
+    const area = findAreaById(areasByType, areaObj.areaId)
+    if (!area) {
+      return
+    }
+
+    // For PSO users, get EA parents
+    if (responsibility === responsibilityMap.PSO) {
+      const eaParents = getParentAreas(
+        areasByType,
+        area.id,
+        areasResponsibilitiesMap.EA
+      )
+      eaParents.forEach((parent) =>
+        parentAreasSet.add(JSON.stringify({ type: 'EA', area: parent }))
+      )
+    } else if (responsibility === responsibilityMap.RMA) {
+      // For RMA users, get both EA and PSO parents
+      const eaParents = getParentAreas(
+        areasByType,
+        area.id,
+        areasResponsibilitiesMap.EA
+      )
+      eaParents.forEach((parent) =>
+        parentAreasSet.add(JSON.stringify({ type: 'EA', area: parent }))
+      )
+
+      const psoParents = getParentAreas(
+        areasByType,
+        area.id,
+        areasResponsibilitiesMap.PSO
+      )
+      psoParents.forEach((parent) =>
+        parentAreasSet.add(JSON.stringify({ type: 'PSO', area: parent }))
+      )
+    }
+    // EA users or other responsibilities don't need parent areas
+  })
+
+  // Convert back to objects and group by type
+  const parentAreas = Array.from(parentAreasSet).map((str) => JSON.parse(str))
+  const eaAreas = parentAreas
+    .filter((p) => p.type === 'EA')
+    .map((p) => p.area.name)
+  const psoAreas = parentAreas
+    .filter((p) => p.type === 'PSO')
+    .map((p) => p.area.name)
+
+  return {
+    eaAreas: eaAreas.length > 0 ? eaAreas.join(', ') : null,
+    psoAreas: psoAreas.length > 0 ? psoAreas.join(', ') : null
+  }
+}

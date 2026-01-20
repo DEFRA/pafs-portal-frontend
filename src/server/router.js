@@ -31,6 +31,11 @@ export const router = {
         'users',
         'users/pending',
         'users/active',
+        'users/download',
+        'users/approve',
+        'users/delete',
+        'users/resend-invitation',
+        'users/reactivate',
         'journey-selection',
         'accounts'
       ])
@@ -47,8 +52,7 @@ export const router = {
       // Project proposal routes
       await loadModules(server, join(dirName, 'modules/project-proposal'), [
         'start-proposal',
-        'project-name',
-        'rma-selection'
+        'project-name'
       ])
 
       // Static assets

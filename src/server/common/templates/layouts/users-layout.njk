@@ -44,14 +44,31 @@
     {% if successNotification %}
       {% set notificationHtml %}
         <h3 class="govuk-notification-banner__heading">
-          {{ t('accounts.manage_users.notifications.user_added_success_heading') }}
+          {{ successNotification.title or t('accounts.manage_users.notifications.user_added_success_heading') }}
         </h3>
-        <p class="govuk-body">{{ successNotification.name }} {{ t('accounts.manage_users.notifications.user_added_success_body') }}</p>
+        <p class="govuk-body">{{ successNotification.message or (successNotification.name + ' ' + t('accounts.manage_users.notifications.user_added_success_body')) }}</p>
       {% endset %}
 
       {{ govukNotificationBanner({
         html: notificationHtml,
         type: "success"
+      }) }}
+    {% endif %}
+
+    {# Error notification banner #}
+    {% if errorNotification %}
+      {% set errorHtml %}
+        {% if errorNotification.title %}
+          <h3 class="govuk-notification-banner__heading">
+            {{ errorNotification.title }}
+          </h3>
+        {% endif %}
+        <p class="govuk-body">{{ errorNotification.message }}</p>
+      {% endset %}
+
+      {{ govukNotificationBanner({
+        html: errorHtml,
+        titleText: t('common.important')
       }) }}
     {% endif %}
 
@@ -94,17 +111,26 @@
       }) }}
       <span id="search-hint" class="govuk-visually-hidden">{{ t('accounts.manage_users.filters.search_hint') }}</span>
 
-      {{ govukSelect({
-        id: "area-filter",
-        name: "areaId",
-        label: {
-          text: t('accounts.manage_users.filters.area_label'),
-          classes: "govuk-label"
-        },
-        classes: "govuk-!-width-two-thirds",
-        items: areas,
-        value: filters.areaId
-      }) }}
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="area-filter">
+          {{ t('accounts.manage_users.filters.area_label') }}
+        </label>
+        <select class="govuk-select govuk-!-width-two-thirds" id="area-filter" name="areaId">
+          {% for item in areas %}
+            {% if item.options %}
+              {# This is an optgroup #}
+              <optgroup label="{{ item.label }}">
+                {% for option in item.options %}
+                  <option value="{{ option.value }}"{% if option.value == filters.areaId %} selected{% endif %}>{{ option.text }}</option>
+                {% endfor %}
+              </optgroup>
+            {% else %}
+              {# This is a regular option #}
+              <option value="{{ item.value }}"{% if item.value == filters.areaId %} selected{% endif %}>{{ item.text }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
 
       <div class="govuk-button-group">
         {{ govukButton({

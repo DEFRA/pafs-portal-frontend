@@ -23,7 +23,7 @@ import { confirmationController } from '../../accounts/confirmation/controller.j
 import {
   requireJourneyStarted,
   requireNotAuthenticated
-} from '../../accounts/helpers.js'
+} from '../../accounts/helpers/session-helpers.js'
 import { startController } from '../../accounts/start/controller.js'
 
 /**

@@ -25,8 +25,17 @@ function buildRequestContext(request) {
   const cacheService = createAccountsCacheService(request.server)
 
   const userCreatedFlash = request.yar.flash('userCreated')
+  const successFlash = request.yar.flash('success')
+  const errorFlash = request.yar.flash('error')
+
   const successNotification =
-    userCreatedFlash.length > 0 ? userCreatedFlash[0] : null
+    userCreatedFlash.length > 0
+      ? userCreatedFlash[0]
+      : successFlash.length > 0
+        ? successFlash[0]
+        : null
+
+  const errorNotification = errorFlash.length > 0 ? errorFlash[0] : null
 
   const page =
     Number.parseInt(request.query.page, 10) || PAGINATION.DEFAULT_PAGE
@@ -34,7 +43,15 @@ function buildRequestContext(request) {
   const areaId = request.query.areaId || ''
   const filters = { search, areaId }
 
-  return { session, logger, cacheService, successNotification, page, filters }
+  return {
+    session,
+    logger,
+    cacheService,
+    successNotification,
+    errorNotification,
+    page,
+    filters
+  }
 }
 
 async function fetchUsersData({
@@ -70,7 +87,9 @@ function renderEmptyView(params) {
     baseUrl,
     session,
     filters,
-    successNotification
+    areasByType,
+    successNotification,
+    errorNotification
   } = params
 
   return h.view(
@@ -81,8 +100,10 @@ function renderEmptyView(params) {
       filters,
       currentTab: status,
       baseUrl,
+      areasByType,
       error: request.t('accounts.manage_users.errors.fetch_failed'),
-      successNotification
+      successNotification,
+      errorNotification
     })
   )
 }
@@ -100,7 +121,9 @@ function renderUsersView(params) {
     pendingCount,
     activeCount,
     filters,
-    successNotification
+    areasByType,
+    successNotification,
+    errorNotification
   } = params
 
   return h.view(
@@ -115,7 +138,9 @@ function renderUsersView(params) {
       filters,
       currentTab: status,
       baseUrl,
-      successNotification
+      areasByType,
+      successNotification,
+      errorNotification
     })
   )
 }
@@ -132,7 +157,8 @@ function handleSuccessResponse(params) {
     pendingCount,
     activeCount,
     filters,
-    successNotification
+    successNotification,
+    areasByType
   } = params
 
   const { data: users, pagination } = accountsResult.data
@@ -148,7 +174,9 @@ function handleSuccessResponse(params) {
     pendingCount,
     activeCount,
     filters,
-    successNotification
+    areasByType,
+    successNotification,
+    errorNotification: params.errorNotification
   })
 }
 
@@ -166,7 +194,9 @@ function handleErrorResponse(params) {
     baseUrl,
     session,
     filters,
+    areasByType,
     successNotification,
+    errorNotification,
     logger,
     error
   } = params
@@ -188,7 +218,9 @@ function handleErrorResponse(params) {
     baseUrl,
     session,
     filters,
-    successNotification
+    areasByType,
+    successNotification,
+    errorNotification
   })
 }
 
@@ -201,11 +233,15 @@ export function createUsersListController({ status, viewTemplate, baseUrl }) {
         logger,
         cacheService,
         successNotification,
+        errorNotification,
         page,
         filters
       } = context
 
       try {
+        // Fetch areas data from request decorator
+        const areasByType = await request.getAreas()
+
         const [accountsResult, pendingCount, activeCount] =
           await fetchUsersData({
             status,
@@ -224,7 +260,9 @@ export function createUsersListController({ status, viewTemplate, baseUrl }) {
             baseUrl,
             session,
             filters,
+            areasByType,
             successNotification,
+            errorNotification,
             logger,
             errors: accountsResult.errors
           })
@@ -241,7 +279,9 @@ export function createUsersListController({ status, viewTemplate, baseUrl }) {
           pendingCount,
           activeCount,
           filters,
-          successNotification
+          areasByType,
+          successNotification,
+          errorNotification
         })
       } catch (error) {
         return handleErrorResponse({
@@ -252,7 +292,9 @@ export function createUsersListController({ status, viewTemplate, baseUrl }) {
           baseUrl,
           session,
           filters,
+          areasByType: null,
           successNotification,
+          errorNotification,
           logger,
           error
         })

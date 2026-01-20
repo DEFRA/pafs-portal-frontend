@@ -6,12 +6,12 @@ import {
   requireJourneyStarted,
   requireNotAuthenticated,
   buildGroupedAreas
-} from './helpers.js'
+} from './session-helpers.js'
 
-vi.mock('../../common/helpers/auth/session-manager.js')
+vi.mock('../../../common/helpers/auth/session-manager.js')
 
 const { getAuthSession } =
-  await import('../../common/helpers/auth/session-manager.js')
+  await import('../../../common/helpers/auth/session-manager.js')
 
 describe('Account Helpers', () => {
   describe('getAdminSessionKey', () => {

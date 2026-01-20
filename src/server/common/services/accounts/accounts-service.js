@@ -21,17 +21,40 @@ function buildAccountsQueryParams({ status, search, areaId, page, pageSize }) {
   return queryParams
 }
 
-async function getFromCache(cacheService, cacheParams) {
+async function tryGetFromCache(cacheService, cacheParams) {
   if (!cacheService) {
-    return null
+    return { metadata: null, data: null }
   }
-  return cacheService.get(cacheParams)
+
+  const metadata = await cacheService.getListMetadata(cacheParams)
+
+  if (!metadata || !metadata.accountIds) {
+    return { metadata: null, data: null }
+  }
+
+  const cachedAccounts = await cacheService.getAccountsByIds(
+    metadata.accountIds
+  )
+
+  const allAccountsCached = cachedAccounts.every((account) => account !== null)
+  if (!allAccountsCached) {
+    return { metadata: null, data: null }
+  }
+
+  return { metadata, data: cachedAccounts }
 }
 
-async function storeInCache(cacheService, cacheParams, result) {
-  if (cacheService && result.success) {
-    await cacheService.set(cacheParams, result)
+async function storeInCache(cacheService, cacheParams, accounts, pagination) {
+  if (!cacheService || !accounts || accounts.length === 0) {
+    return
   }
+
+  await cacheService.setAccounts(accounts)
+
+  const accountIds = accounts
+    .map((account) => account.id || account.userId)
+    .filter(Boolean)
+  await cacheService.setListMetadata(cacheParams, accountIds, pagination)
 }
 
 export async function getAccounts({
@@ -48,13 +71,19 @@ export async function getAccounts({
     status,
     search: search || '',
     areaId: areaId || '',
-    page
+    page,
+    pageSize: effectivePageSize
   }
 
-  // Try to get from cache first
-  const cached = await getFromCache(cacheService, cacheParams)
-  if (cached) {
-    return cached
+  const { metadata, data } = await tryGetFromCache(cacheService, cacheParams)
+  if (metadata && data) {
+    return {
+      success: true,
+      data: {
+        data,
+        pagination: metadata.pagination
+      }
+    }
   }
 
   const queryParams = buildAccountsQueryParams({
@@ -75,8 +104,23 @@ export async function getAccounts({
     }
   )
 
-  // Cache successful responses
-  await storeInCache(cacheService, cacheParams, result)
+  if (result.success && result.data?.data?.length) {
+    await storeInCache(
+      cacheService,
+      cacheParams,
+      result.data.data,
+      result.data.pagination
+    )
+
+    // Normalize response structure for UI
+    return {
+      success: true,
+      data: {
+        data: result.data.data,
+        pagination: result.data.pagination
+      }
+    }
+  }
 
   return result
 }
@@ -118,11 +162,37 @@ export function getActiveCount(accessToken, cacheService) {
   return getAccountsCount(ACCOUNT_STATUS.ACTIVE, accessToken, cacheService)
 }
 
-export async function validateEmail(email) {
+export async function validateEmail(email, excludeUserId = null) {
+  const payload = excludeUserId ? { email, excludeUserId } : { email }
   return apiRequest('/api/v1/validate-email', {
     method: 'POST',
-    body: JSON.stringify({ email })
+    body: JSON.stringify(payload)
   })
+}
+
+export async function getAccountById(id, accessToken, cacheService) {
+  if (cacheService) {
+    const cached = await cacheService.getAccount(id)
+    if (cached) {
+      return {
+        success: true,
+        data: cached
+      }
+    }
+  }
+
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  const result = await apiRequest(`/api/v1/accounts/${id}`, {
+    method: 'GET',
+    headers
+  })
+
+  if (result.success && result.data && cacheService) {
+    await cacheService.setAccount(id, result.data)
+  }
+
+  return result
 }
 
 export async function upsertAccount(accountData, accessToken = '') {
@@ -134,5 +204,41 @@ export async function upsertAccount(accountData, accessToken = '') {
       }
     }),
     body: JSON.stringify(accountData)
+  })
+}
+
+export async function approveAccount(userId, accessToken) {
+  return apiRequest(`/api/v1/accounts/${userId}/approve`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+}
+
+export async function deleteAccount(userId, accessToken) {
+  return apiRequest(`/api/v1/accounts/${userId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+}
+
+export async function resendInvitation(userId, accessToken) {
+  return apiRequest(`/api/v1/accounts/${userId}/resend-invitation`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+}
+
+export async function reactivateAccount(userId, accessToken) {
+  return apiRequest(`/api/v1/accounts/${userId}/reactivate`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
   })
 }

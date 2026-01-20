@@ -167,7 +167,10 @@ export class BaseCacheService {
       await cache.drop(key)
       logger.debug({ segment: this.segment, key }, 'Dropped cache key')
     } catch (error) {
-      logger.warn({ error, segment: this.segment }, 'Failed to drop cache key')
+      logger.warn(
+        { error, segment: this.segment, key },
+        'Failed to drop cache key'
+      )
     }
   }
 

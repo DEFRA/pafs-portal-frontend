@@ -13,9 +13,13 @@
   "header_navigation_label": "Profile",
   "service_navigation_menu_button_text": "Menu",
   "back_to_sign_in": "Back to sign in",
+  "return_to_sign_in": "Return to sign in",
+  "important": "Important",
   "service_error": "There was a problem with the service. Please try again",
   "optional": "Optional",
   "change": "Change",
+  "yes": "Yes",
+  "no": "No",
   "select_area_option": "Select an area",
   "navigation": {
     "your_proposals": "Your proposals",

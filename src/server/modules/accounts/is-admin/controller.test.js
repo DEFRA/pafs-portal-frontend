@@ -1,9 +1,9 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { isAdminController, isAdminPostController } from './controller.js'
 
-vi.mock('../helpers.js')
+vi.mock('../helpers/session-helpers.js')
 
-const { getSessionKey } = await import('../helpers.js')
+const { getSessionKey } = await import('../helpers/session-helpers.js')
 
 describe('IsAdminController', () => {
   let mockRequest
@@ -11,7 +11,9 @@ describe('IsAdminController', () => {
 
   beforeEach(() => {
     mockRequest = {
+      path: '/admin/accounts/is-admin',
       payload: {},
+      params: {},
       yar: {
         get: vi.fn(),
         set: vi.fn()

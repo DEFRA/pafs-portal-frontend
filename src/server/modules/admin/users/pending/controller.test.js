@@ -56,7 +56,12 @@ describe('Pending Users Controller', () => {
           error: vi.fn(),
           warn: vi.fn()
         }
-      }
+      },
+      getAreas: vi.fn().mockResolvedValue({
+        'EA Area': [],
+        'PSO Area': [],
+        RMA: []
+      })
     }
 
     mockH = {

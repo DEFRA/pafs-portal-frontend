@@ -1,5 +1,6 @@
 {
   "label": {
+    "name": "Name",
     "first_name": "First name",
     "last_name": "Last name",
     "email": "Email address",
@@ -7,6 +8,7 @@
     "organisation": "Organisation",
     "job_title": "Job title",
     "responsibility_legend": "What is your responsibility?",
+    "responsibility_legend_admin": "What is the user's responsibility?",
     "responsibility": {
       "ea": "Environment Agency – Area Programme Team",
       "ea_hint": "Allows you to view all records created within the boundary of your Area.",
@@ -106,146 +108,186 @@
     "admin_question": {
       "title": "Administrator status - Add new user",
       "heading": "Will the user be an administrator?",
+      "edit_title": "Administrator status - Edit user",
+      "edit_heading": "Will the user be an administrator?",
       "yes": "Yes",
       "no": "No"
     },
     "admin_details": {
       "title": "Administrator details - Add new user",
       "heading": "Add new administrator",
-      "intro": "Enter the details of the new administrator."
+      "intro": "Enter the details of the new administrator.",
+      "edit_title": "Administrator details - Edit user",
+      "edit_heading": "Edit administrator details",
+      "edit_intro": "Update the details of the administrator."
     },
     "details": {
       "title": "User details - Add new user",
       "heading": "Add new user",
-      "intro": "Enter the details of the new user account."
+      "intro": "Enter the details of the new user account.",
+      "edit_title": "User details - Edit user",
+      "edit_heading": "Edit user details",
+      "edit_intro": "Update the details of the user account."
     },
     "check_answers": {
       "title": "Check user details - Add new user",
       "heading": "Check user details",
+      "edit_title": "Check user details - Edit user",
+      "edit_heading": "Review changes",
       "personal_details": "User details",
       "change_personal": "Change user details",
       "additional_info": "Additional information",
       "will_be_admin": "Will be an administrator",
       "change_admin_status": "Change admin status",
-      "submit_button": "Confirm and add user"
+      "submit_button": "Confirm and add user",
+      "edit_submit_button": "Confirm and update user"
     }
   },
   "areas": {
     "ea": {
       "main": {
-        "title": "Select main EA area",
-        "heading": "Select your main EA area",
-        "heading_admin": "Select the user's main EA area",
-        "label": "Main EA area",
+        "title": "Select main EA Area",
+        "heading": "Select your main EA Area",
+        "heading_admin": "Select the user's main EA Area",
+        "label": "EA Area",
         "hint": "This will be your primary area",
         "hint_admin": "This will be the user's primary area",
         "validation": {
-          "required": "Select your main EA area",
-          "required_admin": "Select the user's main EA area"
+          "required": "Select your main EA Area",
+          "required_admin": "Select the user's main EA Area"
         }
       },
       "additional": {
-        "title": "Select additional EA areas",
-        "heading": "Select additional EA areas",
-        "intro": "Select any additional EA areas you should have access to (optional).",
-        "intro_admin": "Select any additional EA areas the user should have access to (optional).",
-        "legend": "Additional EA areas"
+        "title": "Select additional EA Areas",
+        "heading": "Select additional EA Areas",
+        "intro": "Select any additional EA Areas you should have access to (optional).",
+        "intro_admin": "Select any additional EA Areas the user should have access to (optional).",
+        "legend": "Additional EA Areas"
       }
     },
     "pso": {
       "ea_areas": {
-        "title": "Select EA areas",
-        "heading": "Select EA areas",
+        "title": "Select EA Areas",
+        "heading": "Select EA Areas",
         "intro": "Select the Environment Agency areas you work with.",
         "intro_admin": "Select the Environment Agency areas the user works with.",
-        "label": "EA areas",
+        "label": "EA Areas",
         "validation": {
-          "required": "Select at least one EA area",
-          "required_admin": "Select at least one EA area for the user"
+          "required": "Select at least one EA Area",
+          "required_admin": "Select at least one EA Area for the user"
         }
       },
       "main": {
-        "title": "Select main PSO area",
-        "heading": "Select your main PSO area",
-        "heading_admin": "Select the user's main PSO area",
-        "intro": "Select the PSO area you primarily work in.",
-        "intro_admin": "Select the PSO area the user primarily works in.",
-        "label": "Main PSO area",
+        "title": "Select main PSO Team",
+        "heading": "Select your main PSO Team",
+        "heading_admin": "Select the user's main PSO Team",
+        "intro": "Select the PSO Team you primarily work in.",
+        "intro_admin": "Select the PSO Team the user primarily works in.",
         "hint": "This will be your primary area",
         "hint_admin": "This will be the user's primary area",
+        "label": "PSO Team",
+        "label_grouped": "{ea_name} - PSO Teams",
         "validation": {
-          "required": "Select your main PSO area",
-          "required_admin": "Select the user's main PSO area"
+          "required": "Select your main PSO Team",
+          "required_admin": "Select the user's main PSO Team"
         }
       },
       "additional": {
-        "title": "Select additional PSO areas",
-        "heading": "Select additional PSO areas",
-        "intro": "Select any additional PSO areas you should have access to (optional).",
-        "intro_admin": "Select any additional PSO areas the user should have access to (optional).",
-        "legend": "Additional PSO areas"
+        "title": "Select additional PSO Teams",
+        "heading": "Select additional PSO Teams",
+        "intro": "Select any additional PSO Teams you should have access to (optional).",
+        "intro_admin": "Select any additional PSO Teams the user should have access to (optional).",
+        "legend": "Additional PSO Teams",
+        "label_grouped": "{ea_name} - PSO Teams"
       }
     },
     "rma": {
       "ea_areas": {
-        "title": "Select EA areas",
-        "heading": "Select EA areas",
+        "title": "Select EA Areas",
+        "heading": "Select EA Areas",
         "intro": "Select the Environment Agency areas you work within.",
         "intro_admin": "Select the Environment Agency areas the user works within.",
-        "label": "EA areas",
+        "label": "EA Areas",
         "validation": {
-          "required": "Select at least one EA area",
-          "required_admin": "Select at least one EA area for the user"
+          "required": "Select at least one EA Area",
+          "required_admin": "Select at least one EA Area for the user"
         }
       },
       "pso_areas": {
-        "title": "Select PSO areas",
-        "heading": "Select PSO areas",
-        "intro": "Select the PSO areas within your selected EA areas.",
-        "intro_admin": "Select the PSO areas within the user's selected EA areas.",
-        "label": "PSO areas",
-        "label_grouped": "{ea_name} - PSO areas",
+        "title": "Select PSO Teams",
+        "heading": "Select PSO Teams",
+        "intro": "Select the PSO Teams within your selected EA Areas.",
+        "intro_admin": "Select the PSO Teams within the user's selected EA Areas.",
+        "label": "PSO Teams",
+        "label_grouped": "{ea_name} - PSO Teams",
         "validation": {
-          "required": "Select at least one PSO area",
-          "required_admin": "Select at least one PSO area for the user"
+          "required": "Select at least one PSO Team",
+          "required_admin": "Select at least one PSO Team for the user"
         }
       },
       "main": {
-        "title": "Select main RMA area",
-        "heading": "Select your main RMA area",
-        "heading_admin": "Select the user's main RMA area",
-        "label": "Main RMA area",
+        "title": "Select main RMA Area",
+        "heading": "Select your main RMA Area",
+        "heading_admin": "Select the user's main RMA Area",
+        "label": "RMA",
         "hint": "This will be your primary area",
         "hint_admin": "This will be the user's primary area",
         "optgroup_label": "{ea_name} - {pso_name}",
         "validation": {
-          "required": "Select your main RMA area",
-          "required_admin": "Select the user's main RMA area"
+          "required": "Select your main RMA Area",
+          "required_admin": "Select the user's main RMA Area"
         }
       },
       "additional": {
-        "title": "Select additional RMA areas",
-        "heading": "Select additional RMA areas",
-        "intro": "Select any additional RMA areas you should have access to (optional).",
-        "intro_admin": "Select any additional RMA areas the user should have access to (optional).",
-        "legend": "Additional RMA areas",
+        "title": "Select additional RMA Areas",
+        "heading": "Select additional RMA Areas",
+        "intro": "Select any additional RMA Areas you should have access to (optional).",
+        "intro_admin": "Select any additional RMA Areas the user should have access to (optional).",
+        "legend": "Additional RMAs",
         "label_grouped": "{ea_name} - {pso_name}"
       }
     }
   },
+  "view_user": {
+    "title": "View user details",
+    "permissions": "Permissions",
+    "is_admin": "Is admin?",
+    "account_information": "Account information",
+    "requested_on": "Requested on",
+    "invitation_sent": "Invitation sent",
+    "invitation_accepted": "Invitation accepted",
+    "approve_user": "Approve user",
+    "delete_user": "Delete user",
+    "resend_invitation": "Resend invitation",
+    "reactivate_account": "Reactivate account",
+    "change_admin_status": "Change admin status",
+    "notifications": {
+      "approved_title": "User approved",
+      "approved_message": "An invitation email has been sent to {{userName}}.",
+      "resend_invitation_title": "Invitation resent",
+      "resend_invitation_message": "A new invitation email has been sent to the user.",
+      "reactivated_title": "Account reactivated",
+      "reactivated_message": "The account has been reactivated for {{userName}}.",
+      "updated_title": "Account updated",
+      "updated_message": "The account has been updated for {{userName}}."
+    },
+    "errors": {
+      "approve_failed": "There was a problem approving the user. Please try again.",
+      "resend_invitation_failed": "There was a problem resending the invitation. Please try again.",
+      "invalid_user_id": "Invalid user ID. Please try again.",
+      "reactivate_failed": "There was a problem reactivating the account. Please try again."
+    }
+  },
   "check_answers": {
     "area_selection": "Area selection",
-    "ea_areas": "EA areas",
-    "pso_areas": "PSO areas",
+    "ea_areas": "EA Areas",
+    "pso_areas": "PSO Teams",
     "not_provided": "Not provided",
     "not_selected": "Not selected",
     "error": {
       "submission_failed": "There was a problem submitting your request. Please try again.",
       "validation_failed": "There was a problem with your request. Please check your details and try again."
     }
-  },
-  "confirmation": {
-    "return_to_sign_in": "Return to sign in"
   },
   "manage_users": {
     "title": "Manage users",
@@ -344,6 +386,20 @@
       "VALIDATION_TELEPHONE_REQUIRED": "Enter the user's telephone number",
       "VALIDATION_RESPONSIBILITY_REQUIRED": "Select the user's area of responsibility",
       "VALIDATION_ADMIN_FLAG_REQUIRED": "Select whether the user will be an administrator"
+    }
+  },
+  "delete_user": {
+    "page_title": "Delete user",
+    "heading": "Delete user",
+    "title": "Are you sure you want to delete {{userName}}?",
+    "warning": "This will permanently remove the user from the system.",
+    "confirm_button": "Yes, delete this user",
+    "notifications": {
+      "deleted_title": "User deleted",
+      "deleted_message": "{{userName}} has been successfully deleted"
+    },
+    "errors": {
+      "delete_failed": "Failed to delete user. Please try again."
     }
   },
   "errors": {

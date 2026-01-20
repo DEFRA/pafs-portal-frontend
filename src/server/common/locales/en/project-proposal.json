@@ -16,13 +16,5 @@
       "already_exists": "The project name already exists. Your project must have a unique name.",
       "validation_error": "An error occurred while validating the project name. Please try again."
     }
-  },
-  "rma_selection": {
-    "heading": "Which risk management authority is leading the proposal?",
-    "label": "RMA Selection",
-    "select_rma_option_text": "Select a Risk Management Authority",
-    "errors": {
-      "required": "Select a lead risk management authority"
-    }
   }
 }

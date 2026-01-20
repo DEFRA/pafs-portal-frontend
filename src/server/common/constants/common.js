@@ -13,7 +13,8 @@ export const AUTH_VIEWS = {
 export const ADMIN_VIEWS = {
   JOURNEY_SELECTION: 'modules/admin/journey-selection/index',
   USERS_PENDING: 'modules/admin/users/pending/index',
-  USERS_ACTIVE: 'modules/admin/users/active/index'
+  USERS_ACTIVE: 'modules/admin/users/active/index',
+  DELETE_USER: 'modules/admin/users/delete/index'
 }
 
 export const ACCOUNT_VIEWS = {
@@ -24,13 +25,13 @@ export const ACCOUNT_VIEWS = {
   MAIN_AREA: 'modules/accounts/main-area/index',
   ADDITIONAL_AREAS: 'modules/accounts/additional-areas/index',
   CHECK_ANSWERS: 'modules/accounts/check-answers/index',
-  CONFIRMATION: 'modules/accounts/confirmation/index'
+  CONFIRMATION: 'modules/accounts/confirmation/index',
+  VIEW_ACCOUNT: 'modules/accounts/view-account/index'
 }
 
 export const PROPOSAL_VIEWS = {
   START: 'modules/project-proposal/start-proposal/index',
-  PROJECT_NAME: 'modules/project-proposal/project-name/index',
-  RMA_SELECTION: 'modules/project-proposal/rma-selection/index'
+  PROJECT_NAME: 'modules/project-proposal/project-name/index'
 }
 
 export const GENERAL_VIEWS = {
@@ -53,6 +54,10 @@ export const PAGINATION = {
   MAX_VISIBLE_PAGES: 5,
   START_THRESHOLD: 4,
   END_OFFSET: 3
+}
+
+export const API_LIMITS = {
+  MAX_ACCOUNTS_PAGE_SIZE: 10000
 }
 
 export const SESSION = {
@@ -82,7 +87,7 @@ export const VALIDATION_PATTERNS = {
   // Names: letters, spaces, hyphens, apostrophes
   NAME: /^[a-zA-Z\s'-]+$/,
 
-  PROJECT_NAME: /^[a-zA-Z0-9_\s-]+$/,
+  PROJECT_NAME: /^[a-zA-Z0-9_-]+$/,
 
   // Job title and organisation: letters, digits, spaces, common punctuation
   // Allows: letters, numbers, spaces, period, comma, ampersand, parentheses, hyphen, apostrophe, forward slash
@@ -123,6 +128,12 @@ export { VIEW_ERROR_CODES } from './validation.js'
 export const AREAS_RESPONSIBILITIES_MAP = {
   EA: 'EA Area',
   PSO: 'PSO Area',
+  RMA: 'RMA'
+}
+
+export const AREAS_LABELS = {
+  EA: 'Area Program Team',
+  PSO: 'PSO Team',
   RMA: 'RMA'
 }
 

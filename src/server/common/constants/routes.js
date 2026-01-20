@@ -45,7 +45,15 @@ export const ROUTES = {
     USERS: '/admin/users',
     USERS_PENDING: '/admin/users/pending',
     USERS_ACTIVE: '/admin/users/active',
-    USER_VIEW: '/admin/users/{id}',
+    USERS_DOWNLOAD: '/admin/users/download',
+    USER_VIEW: '/admin/users/{encodedId}/view',
+    USER_ACTIONS: {
+      APPROVE: '/admin/users/{encodedId}/approve',
+      DELETE: '/admin/users/{encodedId}/delete',
+      RESEND_INVITATION: '/admin/users/{encodedId}/resend-invitation',
+      REACTIVATE: '/admin/users/{encodedId}/reactivate',
+      EDIT_DETAILS: '/admin/users/{encodedId}/edit-details'
+    },
     ACCOUNTS: {
       START: '/admin/user-account',
       IS_ADMIN: '/admin/user-account/is-admin',
@@ -56,7 +64,17 @@ export const ROUTES = {
       MAIN_AREA: '/admin/user-account/main-area',
       ADDITIONAL_AREAS: '/admin/user-account/additional-areas',
       CHECK_ANSWERS: '/admin/user-account/check-answers',
-      CONFIRMATION: '/admin/user-account/confirmation'
+      CONFIRMATION: '/admin/user-account/confirmation',
+      EDIT: {
+        IS_ADMIN: '/admin/user-account/is-admin/{encodedId}/edit',
+        DETAILS: '/admin/user-account/details/{encodedId}/edit',
+        PARENT_AREAS:
+          '/admin/user-account/parent-areas/{type}/{encodedId}/edit',
+        MAIN_AREA: '/admin/user-account/main-area/{encodedId}/edit',
+        ADDITIONAL_AREAS:
+          '/admin/user-account/additional-areas/{encodedId}/edit',
+        CHECK_ANSWERS: '/admin/user-account/check-answers/{encodedId}/edit'
+      }
     },
     PROJECTS: '/admin/projects',
     SUBMISSIONS: '/admin/submissions',
@@ -69,7 +87,6 @@ export const ROUTES = {
   PROJECT_PROPOSAL: {
     START_PROPOSAL: '/project-proposal/start',
     PROJECT_NAME: '/project-proposal/project-name',
-    RMA_SELECTION: '/project-proposal/rma-selection',
     PROJECT_TYPE: '/project-proposal/project-type'
   }
 }

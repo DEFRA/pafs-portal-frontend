@@ -1,6 +1,6 @@
 import { ACCOUNT_VIEWS } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { getSessionKey } from '../helpers.js'
+import { getSessionKey } from '../helpers/session-helpers.js'
 
 class StartController {
   get(request, h) {
