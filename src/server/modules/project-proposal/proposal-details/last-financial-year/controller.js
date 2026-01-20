@@ -28,7 +28,7 @@ const VIEW_TYPES = {
 function buildViewModel(
   request,
   viewType,
-  sessionData,
+  _sessionData,
   values = {},
   errors = {},
   errorSummary = []
