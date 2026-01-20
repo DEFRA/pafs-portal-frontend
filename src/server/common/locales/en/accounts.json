@@ -261,6 +261,8 @@
     "resend_invitation": "Resend invitation",
     "reactivate_account": "Reactivate account",
     "change_admin_status": "Change admin status",
+    "account_status": "Account Status",
+    "suspended": "Suspended",
     "notifications": {
       "approved_title": "User approved",
       "approved_message": "An invitation email has been sent to {{userName}}.",
