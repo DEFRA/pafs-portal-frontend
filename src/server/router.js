@@ -53,8 +53,7 @@ export const router = {
         'intervention-type',
         'primary-intervention-type',
         'first-financial-year',
-        'last-financial-year',
-        'last-financial-year-manual'
+        'last-financial-year'
       ])
 
       // Static assets

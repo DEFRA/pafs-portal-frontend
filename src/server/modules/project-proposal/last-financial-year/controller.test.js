@@ -1,7 +1,11 @@
 import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest'
 import { statusCodes } from '../../../common/constants/status-codes.js'
-import { lastFinancialYearController } from './controller.js'
 import * as projectProposalService from '../../../common/services/project-proposal/project-proposal-service.js'
+import { createLastFinancialYearController, VIEW_TYPES } from './controller.js'
+
+const lastFinancialYearController = createLastFinancialYearController(
+  VIEW_TYPES.RADIO
+)
 
 vi.mock('../../../common/services/project-proposal/project-proposal-service.js')
 

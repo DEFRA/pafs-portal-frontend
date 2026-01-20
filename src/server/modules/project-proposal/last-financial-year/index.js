@@ -1,4 +1,4 @@
-import { lastFinancialYearController } from './controller.js'
+import { createLastFinancialYearController, VIEW_TYPES } from './controller.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
@@ -6,6 +6,9 @@ import {
   requireProjectType,
   requireFirstFinancialYear
 } from '../helpers/proposal-guard.js'
+
+const radioController = createLastFinancialYearController(VIEW_TYPES.RADIO)
+const manualController = createLastFinancialYearController(VIEW_TYPES.MANUAL)
 
 export const lastFinancialYear = {
   plugin: {
@@ -23,7 +26,7 @@ export const lastFinancialYear = {
               requireFirstFinancialYear
             ]
           },
-          ...lastFinancialYearController
+          ...radioController
         },
         {
           method: 'POST',
@@ -36,7 +39,33 @@ export const lastFinancialYear = {
               requireFirstFinancialYear
             ]
           },
-          ...lastFinancialYearController
+          ...radioController
+        },
+        {
+          method: 'GET',
+          path: ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR_MANUAL,
+          options: {
+            pre: [
+              { method: requireAuth },
+              requireProjectName,
+              requireProjectType,
+              requireFirstFinancialYear
+            ]
+          },
+          ...manualController
+        },
+        {
+          method: 'POST',
+          path: ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR_MANUAL,
+          options: {
+            pre: [
+              { method: requireAuth },
+              requireProjectName,
+              requireProjectType,
+              requireFirstFinancialYear
+            ]
+          },
+          ...manualController
         }
       ])
     }

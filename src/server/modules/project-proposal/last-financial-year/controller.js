@@ -19,37 +19,63 @@ import {
 const LAST_FINANCIAL_YEAR_ERROR_HREF = '#last-financial-year'
 const FINANCIAL_YEAR_RANGE = 6
 
-function buildViewModel(request, values = {}, errors = {}, errorSummary = []) {
-  const currentFinancialYearStart = getCurrentFinancialYearStartYear()
-  const financialYearOptions = buildFinancialYearOptions(
-    currentFinancialYearStart,
-    FINANCIAL_YEAR_RANGE
-  )
+// View types for last financial year capture
+const VIEW_TYPES = {
+  RADIO: 'radio',
+  MANUAL: 'manual'
+}
 
+function buildViewModel(
+  request,
+  viewType,
+  sessionData,
+  values = {},
+  errors = {},
+  errorSummary = []
+) {
+  const currentFinancialYearStart = getCurrentFinancialYearStartYear()
   const afterMarchYear = getAfterMarchYear(
     currentFinancialYearStart,
     FINANCIAL_YEAR_RANGE
   )
 
-  return {
-    title: request.t('project-proposal.last_financial_year.heading'),
-    hint: request.t('project-proposal.last_financial_year.hint'),
+  const baseModel = {
     values,
     errors,
     errorSummary,
-    backLink: ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR,
-    financialYearOptions,
-    afterMarchLinkText: request.t(
-      'project-proposal.last_financial_year.after_march_link',
-      {
-        afterMarchYear
-      }
-    ),
-    afterMarchLinkHref: ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR_MANUAL
+    afterMarchYear
+  }
+
+  if (viewType === VIEW_TYPES.RADIO) {
+    const financialYearOptions = buildFinancialYearOptions(
+      currentFinancialYearStart,
+      FINANCIAL_YEAR_RANGE
+    )
+
+    return {
+      ...baseModel,
+      title: request.t('project-proposal.last_financial_year.heading'),
+      hint: request.t('project-proposal.last_financial_year.hint'),
+      backLink: ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR,
+      financialYearOptions,
+      afterMarchLinkText: request.t(
+        'project-proposal.last_financial_year.after_march_link',
+        { afterMarchYear }
+      ),
+      afterMarchLinkHref: ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR_MANUAL
+    }
+  }
+
+  return {
+    ...baseModel,
+    title: request.t('project-proposal.last_financial_year_manual.heading'),
+    label: request.t('project-proposal.last_financial_year_manual.label'),
+    backLink: ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR,
+    hint: request.t('project-proposal.last_financial_year_manual.hint')
   }
 }
 
-function validateLastFinancialYear(request, sessionData) {
+function validateRadioSelection(request, sessionData) {
   const lastFinancialYear = request.payload?.lastFinancialYear
 
   if (!lastFinancialYear) {
@@ -64,11 +90,11 @@ function validateLastFinancialYear(request, sessionData) {
     }
   }
 
-  // Validate that last financial year is not before first financial year
   const firstFinancialYear = sessionData?.firstFinancialYear?.firstFinancialYear
   if (
     firstFinancialYear &&
-    Number.parseInt(lastFinancialYear) < Number.parseInt(firstFinancialYear)
+    Number.parseInt(lastFinancialYear, 10) <
+      Number.parseInt(firstFinancialYear, 10)
   ) {
     const msg = request.t(
       'project-proposal.last_financial_year.errors.before_first_year'
@@ -89,7 +115,60 @@ function validateLastFinancialYear(request, sessionData) {
   }
 }
 
-async function handlePostSuccess(request, h, values) {
+function validateManualEntry(request, sessionData) {
+  const yearRaw = request.payload?.lastFinancialYear
+
+  if (!yearRaw || String(yearRaw).trim() === '') {
+    const msg = request.t(
+      'project-proposal.last_financial_year_manual.errors.required'
+    )
+    return {
+      values: { lastFinancialYear: yearRaw },
+      errors: { lastFinancialYear: msg },
+      errorSummary: [{ text: msg, href: LAST_FINANCIAL_YEAR_ERROR_HREF }],
+      isValid: false
+    }
+  }
+
+  const yearString = String(yearRaw).trim()
+
+  if (!/^\d{4}$/.test(yearString)) {
+    const msg = request.t(
+      'project-proposal.last_financial_year_manual.errors.invalid_format'
+    )
+    return {
+      values: { lastFinancialYear: yearString },
+      errors: { lastFinancialYear: msg },
+      errorSummary: [{ text: msg, href: LAST_FINANCIAL_YEAR_ERROR_HREF }],
+      isValid: false
+    }
+  }
+
+  const firstFinancialYear = sessionData?.firstFinancialYear?.firstFinancialYear
+  if (
+    firstFinancialYear &&
+    Number.parseInt(yearString, 10) < Number.parseInt(firstFinancialYear, 10)
+  ) {
+    const msg = request.t(
+      'project-proposal.last_financial_year_manual.errors.before_first_year'
+    )
+    return {
+      values: { lastFinancialYear: yearString },
+      errors: { lastFinancialYear: msg },
+      errorSummary: [{ text: msg, href: LAST_FINANCIAL_YEAR_ERROR_HREF }],
+      isValid: false
+    }
+  }
+
+  return {
+    values: { lastFinancialYear: yearString },
+    errors: {},
+    errorSummary: [],
+    isValid: true
+  }
+}
+
+async function handlePostSuccess(request, h, values, viewType) {
   const sessionData = request.yar.get('projectProposal') ?? {}
   sessionData.lastFinancialYear = values
   request.yar.set('projectProposal', sessionData)
@@ -107,9 +186,11 @@ async function handlePostSuccess(request, h, values) {
   if (!rfccCode) {
     logAreaDetailsError(request, rmaSelection)
     const msg = request.t(
-      'project-proposal.last_financial_year.errors.api_error'
+      viewType === VIEW_TYPES.RADIO
+        ? 'project-proposal.last_financial_year.errors.api_error'
+        : 'project-proposal.last_financial_year_manual.errors.api_error'
     )
-    return renderError(request, h, values, msg)
+    return renderError(request, h, viewType, sessionData, values, msg)
   }
 
   const proposalData = buildProposalDataForSubmission(
@@ -123,9 +204,11 @@ async function handlePostSuccess(request, h, values) {
   if (!apiResponse.success) {
     logProposalError(request, apiResponse)
     const msg = request.t(
-      'project-proposal.last_financial_year.errors.api_error'
+      viewType === VIEW_TYPES.RADIO
+        ? 'project-proposal.last_financial_year.errors.api_error'
+        : 'project-proposal.last_financial_year_manual.errors.api_error'
     )
-    return renderError(request, h, values, msg)
+    return renderError(request, h, viewType, sessionData, values, msg)
   }
 
   logProposalSuccess(request, apiResponse)
@@ -137,51 +220,73 @@ async function handlePostSuccess(request, h, values) {
   return h.redirect(projectOverviewUrl)
 }
 
-function renderError(request, h, values, message) {
+function renderError(request, h, viewType, sessionData, values, message) {
+  const view =
+    viewType === VIEW_TYPES.RADIO
+      ? PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR
+      : PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR_MANUAL
+
   return h
     .view(
-      PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR,
-      buildViewModel(request, values, { lastFinancialYear: message }, [
-        { text: message, href: LAST_FINANCIAL_YEAR_ERROR_HREF }
-      ])
+      view,
+      buildViewModel(
+        request,
+        viewType,
+        sessionData,
+        values,
+        { lastFinancialYear: message },
+        [{ text: message, href: LAST_FINANCIAL_YEAR_ERROR_HREF }]
+      )
     )
     .code(statusCodes.badRequest)
 }
 
-async function handleGet(request, h) {
-  const sessionData = request.yar.get('projectProposal') ?? {}
-  const values = sessionData.lastFinancialYear ?? {}
+function createLastFinancialYearController(viewType) {
+  const validateFn =
+    viewType === VIEW_TYPES.RADIO ? validateRadioSelection : validateManualEntry
 
-  return h.view(
-    PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR,
-    buildViewModel(request, values)
-  )
-}
+  const view =
+    viewType === VIEW_TYPES.RADIO
+      ? PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR
+      : PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR_MANUAL
 
-async function handlePost(request, h) {
-  const sessionData = request.yar.get('projectProposal') ?? {}
-  const { values, errors, errorSummary, isValid } = validateLastFinancialYear(
-    request,
-    sessionData
-  )
+  return {
+    async handler(request, h) {
+      const sessionData = request.yar.get('projectProposal') ?? {}
 
-  if (!isValid) {
-    return h
-      .view(
-        PROPOSAL_VIEWS.LAST_FINANCIAL_YEAR,
-        buildViewModel(request, values, errors, errorSummary)
+      if (request.method === 'post') {
+        const { values, errors, errorSummary, isValid } = validateFn(
+          request,
+          sessionData
+        )
+
+        if (!isValid) {
+          return h
+            .view(
+              view,
+              buildViewModel(
+                request,
+                viewType,
+                sessionData,
+                values,
+                errors,
+                errorSummary
+              )
+            )
+            .code(statusCodes.badRequest)
+        }
+
+        return handlePostSuccess(request, h, values, viewType)
+      }
+
+      const values = sessionData.lastFinancialYear ?? {}
+
+      return h.view(
+        view,
+        buildViewModel(request, viewType, sessionData, values)
       )
-      .code(statusCodes.badRequest)
-  }
-
-  return handlePostSuccess(request, h, values)
-}
-
-export const lastFinancialYearController = {
-  async handler(request, h) {
-    if (request.method === 'post') {
-      return handlePost(request, h)
     }
-    return handleGet(request, h)
   }
 }
+
+export { createLastFinancialYearController, VIEW_TYPES }
