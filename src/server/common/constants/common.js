@@ -28,19 +28,23 @@ export const ACCOUNT_VIEWS = {
 }
 
 export const PROPOSAL_VIEWS = {
-  START: 'modules/project-proposal/start-proposal/index',
-  PROJECT_NAME: 'modules/project-proposal/project-name/index',
-  RMA_SELECTION: 'modules/project-proposal/rma-selection/index',
-  PROJECT_TYPE: 'modules/project-proposal/project-type/index',
-  INTERVENTION_TYPE: 'modules/project-proposal/intervention-type/index',
+  START: 'modules/project-proposal/proposal-details/start-proposal/index',
+  PROJECT_NAME: 'modules/project-proposal/proposal-details/project-name/index',
+  RMA_SELECTION:
+    'modules/project-proposal/proposal-details/rma-selection/index',
+  PROJECT_TYPE: 'modules/project-proposal/proposal-details/project-type/index',
+  INTERVENTION_TYPE:
+    'modules/project-proposal/proposal-details/intervention-type/index',
   PRIMARY_INTERVENTION_TYPE:
-    'modules/project-proposal/primary-intervention-type/index',
-  FIRST_FINANCIAL_YEAR: 'modules/project-proposal/first-financial-year/index',
+    'modules/project-proposal/proposal-details/primary-intervention-type/index',
+  FIRST_FINANCIAL_YEAR:
+    'modules/project-proposal/proposal-details/first-financial-year/index',
   FIRST_FINANCIAL_YEAR_MANUAL:
-    'modules/project-proposal/first-financial-year/manual',
-  LAST_FINANCIAL_YEAR: 'modules/project-proposal/last-financial-year/index',
+    'modules/project-proposal/proposal-details/first-financial-year/manual',
+  LAST_FINANCIAL_YEAR:
+    'modules/project-proposal/proposal-details/last-financial-year/index',
   LAST_FINANCIAL_YEAR_MANUAL:
-    'modules/project-proposal/last-financial-year/manual'
+    'modules/project-proposal/proposal-details/last-financial-year/manual'
 }
 
 export const GENERAL_VIEWS = {
