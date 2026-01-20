@@ -1,7 +1,7 @@
 import { rmaSelectionController } from './controller.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { requireProjectName } from '../common/proposal-guard.js'
+import { requireProjectName } from '../helpers/proposal-guard.js'
 
 export const rmaSelection = {
   plugin: {

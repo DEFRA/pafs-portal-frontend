@@ -4,7 +4,7 @@ import {
   requireProjectName,
   requireProjectType,
   requireInterventionType
-} from '../common/proposal-guard.js'
+} from '../helpers/proposal-guard.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 
 export const primaryInterventionType = {

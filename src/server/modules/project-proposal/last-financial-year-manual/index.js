@@ -5,7 +5,7 @@ import {
   requireProjectName,
   requireProjectType,
   requireFirstFinancialYear
-} from '../common/proposal-guard.js'
+} from '../helpers/proposal-guard.js'
 
 export const lastFinancialYearManual = {
   plugin: {

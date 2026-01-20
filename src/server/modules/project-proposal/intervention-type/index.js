@@ -3,7 +3,7 @@ import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
 import {
   requireProjectName,
   requireProjectType
-} from '../common/proposal-guard.js'
+} from '../helpers/proposal-guard.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 
 export const interventionType = {

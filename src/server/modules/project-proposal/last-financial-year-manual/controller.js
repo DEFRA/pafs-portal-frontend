@@ -4,7 +4,7 @@ import { ROUTES } from '../../../common/constants/routes.js'
 import {
   getAfterMarchYear,
   getCurrentFinancialYearStartYear
-} from '../common/financial-year.js'
+} from '../helpers/financial-year.js'
 import {
   getAreaDetailsForProposal,
   buildProposalDataForSubmission,
@@ -13,7 +13,7 @@ import {
   logProposalSuccess,
   logAreaDetailsError,
   logProposalError
-} from '../common/proposal-submission-helper.js'
+} from '../helpers/proposal-submission-helper.js'
 
 const LAST_FINANCIAL_YEAR_MANUAL_ERROR_HREF = '#last-financial-year'
 const FINANCIAL_YEAR_RANGE = 6

@@ -4,7 +4,7 @@ import { ROUTES } from '../../../common/constants/routes.js'
 import {
   getAfterMarchYear,
   getCurrentFinancialYearStartYear
-} from '../common/financial-year.js'
+} from '../helpers/financial-year.js'
 
 const FIRST_FINANCIAL_YEAR_MANUAL_ERROR_HREF = '#first-financial-year'
 const FINANCIAL_YEARS_TO_DISPLAY = 6

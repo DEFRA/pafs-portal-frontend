@@ -4,7 +4,7 @@ import { ROUTES } from '../../../common/constants/routes.js'
 import {
   requireProjectName,
   requireProjectType
-} from '../common/proposal-guard.js'
+} from '../helpers/proposal-guard.js'
 
 export const firstFinancialYear = {
   plugin: {
