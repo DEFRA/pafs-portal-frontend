@@ -21,7 +21,7 @@ function extractParentAreaIds(accountAreas, areasData, parentAreaType) {
     const parents = getParentAreas(areasData, area.id, parentAreaType)
     parents.forEach((parent) => parentIds.add(parent.id))
   })
-  return Array.from(parentIds).map((id) => String(id))
+  return Array.from(parentIds).map(String)
 }
 
 /**
@@ -31,17 +31,21 @@ function extractParentAreaIds(accountAreas, areasData, parentAreaType) {
  * @returns {boolean} True if areas have changed
  */
 function detectAreasChange(currentAreas, originalAreas) {
-  if (!currentAreas || !originalAreas) return false
-  if (currentAreas.length !== originalAreas.length) return true
+  if (!currentAreas || !originalAreas) {
+    return false
+  }
+  if (currentAreas.length !== originalAreas.length) {
+    return true
+  }
 
   // Create sorted string representations for comparison
   const current = currentAreas
     .map((a) => `${a.areaId || a.id}:${a.primary}`)
-    .sort()
+    .sort((a, b) => a.localeCompare(b))
     .join('|')
   const original = originalAreas
     .map((a) => `${a.areaId || a.id}:${a.primary}`)
-    .sort()
+    .sort((a, b) => a.localeCompare(b))
     .join('|')
 
   return current !== original
@@ -148,20 +152,11 @@ export function initializeEditSession(request, accountData) {
 }
 
 /**
- * Check if there are any changes in the session data compared to original
- *
- * @param {Object} sessionData - Current session data
- * @returns {Object} Object with hasChanges flag and list of changed fields
+ * Check if basic fields have changed
+ * @private
  */
-export function detectChanges(sessionData) {
-  if (!sessionData?.editMode || !sessionData?.originalData) {
-    return { hasChanges: false, changedFields: [] }
-  }
-
-  const original = sessionData.originalData
+function checkBasicFieldChanges(sessionData, original) {
   const changedFields = []
-
-  // Check basic fields
   if (sessionData.admin !== original.admin) {
     changedFields.push('admin')
   }
@@ -174,26 +169,51 @@ export function detectChanges(sessionData) {
   if (sessionData.email !== original.email) {
     changedFields.push('email')
   }
+  return changedFields
+}
 
-  // Only check these fields if not admin
+/**
+ * Check if non-admin fields have changed
+ * @private
+ */
+function checkNonAdminFieldChanges(sessionData, original) {
+  const changedFields = []
+  if (sessionData.jobTitle !== original.jobTitle) {
+    changedFields.push('jobTitle')
+  }
+  if (sessionData.organisation !== original.organisation) {
+    changedFields.push('organisation')
+  }
+  if (sessionData.telephoneNumber !== original.telephoneNumber) {
+    changedFields.push('telephoneNumber')
+  }
+  if (sessionData.responsibility !== original.responsibility) {
+    changedFields.push('responsibility')
+  }
+  if (detectAreasChange(sessionData.areas, original.areas)) {
+    changedFields.push('areas')
+  }
+  return changedFields
+}
+
+/**
+ * Check if there are any changes in the session data compared to original
+ *
+ * @param {Object} sessionData - Current session data
+ * @returns {Object} Object with hasChanges flag and list of changed fields
+ */
+export function detectChanges(sessionData) {
+  if (!sessionData?.editMode || !sessionData?.originalData) {
+    return { hasChanges: false, changedFields: [] }
+  }
+
+  const original = sessionData.originalData
+  let changedFields = checkBasicFieldChanges(sessionData, original)
+
   if (!sessionData.admin) {
-    if (sessionData.jobTitle !== original.jobTitle) {
-      changedFields.push('jobTitle')
-    }
-    if (sessionData.organisation !== original.organisation) {
-      changedFields.push('organisation')
-    }
-    if (sessionData.telephoneNumber !== original.telephoneNumber) {
-      changedFields.push('telephoneNumber')
-    }
-    if (sessionData.responsibility !== original.responsibility) {
-      changedFields.push('responsibility')
-    }
-
-    // Check areas changes
-    if (detectAreasChange(sessionData.areas, original.areas)) {
-      changedFields.push('areas')
-    }
+    changedFields = changedFields.concat(
+      checkNonAdminFieldChanges(sessionData, original)
+    )
   }
 
   return {

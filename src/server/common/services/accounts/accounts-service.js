@@ -28,7 +28,7 @@ async function tryGetFromCache(cacheService, cacheParams) {
 
   const metadata = await cacheService.getListMetadata(cacheParams)
 
-  if (!metadata || !metadata.accountIds) {
+  if (!metadata?.accountIds) {
     return { metadata: null, data: null }
   }
 

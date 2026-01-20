@@ -28,12 +28,9 @@ function buildRequestContext(request) {
   const successFlash = request.yar.flash('success')
   const errorFlash = request.yar.flash('error')
 
+  const sessionFlashLength = successFlash.length > 0 ? successFlash[0] : null
   const successNotification =
-    userCreatedFlash.length > 0
-      ? userCreatedFlash[0]
-      : successFlash.length > 0
-        ? successFlash[0]
-        : null
+    userCreatedFlash.length > 0 ? userCreatedFlash[0] : sessionFlashLength
 
   const errorNotification = errorFlash.length > 0 ? errorFlash[0] : null
 

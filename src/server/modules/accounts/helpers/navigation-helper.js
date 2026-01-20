@@ -2,6 +2,7 @@ import { RESPONSIBILITY_MAP } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { detectChanges } from './edit-session-helper.js'
 import { getAdminSessionKey } from './session-helpers.js'
+import { ENCODED_ID_PLACEHOLDER } from '../../../common/constants/accounts.js'
 
 /**
  * Navigation helper for account journey
@@ -21,17 +22,17 @@ export function getNextRouteAfterIsAdmin(request, sessionData) {
 
     // If admin flag changed from no to yes, skip to check answers
     if (changes.roleChanged && sessionData.admin === true) {
-      return baseRoutes.CHECK_ANSWERS.replace('{encodedId}', encodedId)
+      return baseRoutes.CHECK_ANSWERS.replace(ENCODED_ID_PLACEHOLDER, encodedId)
     }
 
     // If admin flag changed from yes to no, go to details
     if (changes.roleChanged && sessionData.admin === false) {
-      return baseRoutes.DETAILS.replace('{encodedId}', encodedId)
+      return baseRoutes.DETAILS.replace(ENCODED_ID_PLACEHOLDER, encodedId)
     }
 
     // If no change in admin flag, go directly to view page
     if (!changes.roleChanged) {
-      return ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId)
+      return ROUTES.ADMIN.USER_VIEW.replace(ENCODED_ID_PLACEHOLDER, encodedId)
     }
   }
 
@@ -49,10 +50,10 @@ export function isAdminContext(request) {
  */
 function getAdminDetailsRoute(changes, isEditMode, encodedId, baseRoutes) {
   if (isEditMode && !changes.hasChanges) {
-    return ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId)
+    return ROUTES.ADMIN.USER_VIEW.replace(ENCODED_ID_PLACEHOLDER, encodedId)
   }
   const checkAnswersRoute = isEditMode
-    ? baseRoutes.CHECK_ANSWERS.replace('{encodedId}', encodedId)
+    ? baseRoutes.CHECK_ANSWERS.replace(ENCODED_ID_PLACEHOLDER, encodedId)
     : baseRoutes.CHECK_ANSWERS
   return checkAnswersRoute
 }
@@ -71,10 +72,10 @@ function getGeneralUserDetailsRoute(
 ) {
   if (isEditMode) {
     if (changes.personalDetailsChanged && !changes.responsibilityChanged) {
-      return baseRoutes.CHECK_ANSWERS.replace('{encodedId}', encodedId)
+      return baseRoutes.CHECK_ANSWERS.replace(ENCODED_ID_PLACEHOLDER, encodedId)
     }
     if (!changes.hasChanges) {
-      return ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId)
+      return ROUTES.ADMIN.USER_VIEW.replace(ENCODED_ID_PLACEHOLDER, encodedId)
     }
   }
   return _getParentAreaRoute(request, sessionData, baseRoutes, encodedId)

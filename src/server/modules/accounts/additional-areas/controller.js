@@ -71,7 +71,7 @@ class AdditionalAreasController {
    * Validate session and redirect if invalid
    * @private
    */
-  _validateSession(request, h, isAdmin, sessionData) {
+  _validateSession(_request, h, isAdmin, sessionData) {
     const { responsibility, areas = [] } = sessionData
     const mainArea = areas.find((a) => a.primary)?.areaId
 
@@ -114,10 +114,12 @@ class AdditionalAreasController {
 
     // Validate session
     const validation = this._validateSession(request, h, isAdmin, sessionData)
-    if (!validation.valid) return validation.redirect
+    if (!validation.valid) {
+      return validation.redirect
+    }
 
     // Normalize additional areas input
-    const additionalAreas = [].concat(request.payload?.additionalAreas || [])
+    const additionalAreas = [request.payload?.additionalAreas || []].flat()
 
     // Build areas array with primary flag
     const updatedAreas = [

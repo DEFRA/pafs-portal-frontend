@@ -64,7 +64,9 @@ export function requireNotAuthenticated(request, h) {
  */
 function buildPSOGroupedAreas(masterAreas, sessionData, excludeAreaId) {
   const selectedEaAreas = sessionData.eaAreas || []
-  if (selectedEaAreas.length === 0) return null
+  if (selectedEaAreas.length === 0) {
+    return null
+  }
 
   const eaAreas = getAreasByType(masterAreas, AREAS_RESPONSIBILITIES_MAP.EA)
   const psoAreas = getAreasByType(masterAreas, AREAS_RESPONSIBILITIES_MAP.PSO)
@@ -88,7 +90,9 @@ function buildPSOGroupedAreas(masterAreas, sessionData, excludeAreaId) {
  */
 function buildRMAGroupedAreas(masterAreas, sessionData, excludeAreaId) {
   const selectedPsoAreas = sessionData.psoAreas || []
-  if (selectedPsoAreas.length === 0) return null
+  if (selectedPsoAreas.length === 0) {
+    return null
+  }
 
   const eaAreas = getAreasByType(masterAreas, AREAS_RESPONSIBILITIES_MAP.EA)
   const psoAreas = getAreasByType(masterAreas, AREAS_RESPONSIBILITIES_MAP.PSO)
@@ -119,7 +123,9 @@ export function buildGroupedAreas(
   responsibility,
   excludeAreaId = null
 ) {
-  if (responsibility === RESPONSIBILITY_MAP.EA) return null
+  if (responsibility === RESPONSIBILITY_MAP.EA) {
+    return null
+  }
   if (responsibility === RESPONSIBILITY_MAP.PSO) {
     return buildPSOGroupedAreas(masterAreas, sessionData, excludeAreaId)
   }

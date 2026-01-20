@@ -248,7 +248,7 @@ export function determineResponsibilityFromAreas(
 
   // Look up the area in the cached areas data to get the area_type
   const areaDetails = findAreaById(areasByType, primaryArea.id)
-  if (!areaDetails || !areaDetails.area_type) {
+  if (!areaDetails?.area_type) {
     return null
   }
 
@@ -302,7 +302,8 @@ export function getParentAreasDisplay(
       eaParents.forEach((parent) =>
         parentAreasSet.add(JSON.stringify({ type: 'EA', area: parent }))
       )
-    } else if (responsibility === responsibilityMap.RMA) {
+    }
+    if (responsibility === responsibilityMap.RMA) {
       // For RMA users, get both EA and PSO parents
       const eaParents = getParentAreas(
         areasByType,

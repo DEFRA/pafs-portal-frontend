@@ -12,25 +12,28 @@ import {
 import { ROUTES } from '../../../common/constants/routes.js'
 import { getSessionKey } from '../helpers/session-helpers.js'
 import { upsertAccount } from '../../../common/services/accounts/accounts-service.js'
-import {
-  extractApiValidationErrors,
-  extractApiError
-} from '../../../common/helpers/error-renderer/index.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
-import { ACCOUNT_STATUS } from '../../../common/constants/accounts.js'
-import { createAccountsCacheService } from '../../../common/services/accounts/accounts-cache.js'
 import {
   clearEditSession,
   getEditModeContext
 } from '../helpers/navigation-helper.js'
-
-// Locale key constants to avoid magic strings
-const LOCALE_KEYS = {
-  ADMIN: 'add_user',
-  USER: 'request_account',
-  RESPONSIBILITY_LEGEND_ADMIN: 'responsibility_legend_admin',
-  RESPONSIBILITY_LEGEND: 'responsibility_legend'
-}
+import {
+  CHECK_ANSWERS_LOCALE_KEYS,
+  ENCODED_ID_PLACEHOLDER
+} from '../../../common/constants/accounts.js'
+import {
+  handleApiError,
+  handleSuccess,
+  handleUnexpectedError
+} from './response-handler.js'
+import {
+  buildViewModeProperties,
+  getLocaleKey,
+  getResponsibilityLower,
+  getResponsibilityLabel,
+  getRoutes,
+  getPageTitle
+} from './view-builder.js'
 
 /**
  * Check Answers Controller
@@ -145,21 +148,19 @@ class CheckAnswersController {
 
       // Check if API request was successful
       if (!apiResponse.success) {
-        return this.handleApiError(
+        return handleApiError(this, {
           request,
           h,
           isAdmin,
           sessionData,
           areaDetails,
           parentAreasDisplay,
-          apiResponse,
-          isEditMode,
-          encodedId
-        )
+          apiResponse
+        })
       }
 
       // Store status for confirmation page and redirect
-      return this.handleSuccess(
+      return handleSuccess(this, {
         request,
         h,
         isAdmin,
@@ -168,213 +169,18 @@ class CheckAnswersController {
         apiResponse,
         isEditMode,
         encodedId
-      )
+      })
     } catch (error) {
-      return this.handleUnexpectedError(
+      return handleUnexpectedError(this, {
         request,
         h,
         isAdmin,
         sessionData,
         areaDetails,
         parentAreasDisplay,
-        error,
-        isEditMode,
-        encodedId
-      )
-    }
-  }
-
-  handleApiError(
-    request,
-    h,
-    isAdmin,
-    sessionData,
-    areaDetails,
-    parentAreasDisplay,
-    apiResponse,
-    isEditMode = false,
-    encodedId = null
-  ) {
-    request.server.logger.error({ apiResponse }, 'API returned error response')
-
-    const viewOptions = { isEditMode, encodedId }
-
-    // Check for backend validation errors first
-    if (apiResponse.validationErrors) {
-      return h.view(
-        ACCOUNT_VIEWS.CHECK_ANSWERS,
-        this.buildViewData(
-          request,
-          isAdmin,
-          sessionData,
-          areaDetails,
-          parentAreasDisplay,
-          {
-            ...viewOptions,
-            fieldErrors: extractApiValidationErrors(apiResponse)
-          }
-        )
-      )
-    }
-
-    // Handle general API errors
-    const apiError = extractApiError(apiResponse)
-    return h.view(
-      ACCOUNT_VIEWS.CHECK_ANSWERS,
-      this.buildViewData(
-        request,
-        isAdmin,
-        sessionData,
-        areaDetails,
-        parentAreasDisplay,
-        {
-          ...viewOptions,
-          errorCode: apiError?.errorCode || VIEW_ERROR_CODES.NETWORK_ERROR
-        }
-      )
-    )
-  }
-
-  /**
-   * Invalidate account caches after create/update
-   * @private
-   */
-  async _invalidateAccountCache(request, isEditMode, apiResponse, sessionData) {
-    const cacheService = createAccountsCacheService(request.server)
-
-    if (isEditMode) {
-      const accountId = apiResponse.data?.userId || sessionData.editingUserId
-      if (accountId) {
-        const accountKey = cacheService.generateAccountKey(accountId)
-        await cacheService.dropByKey(accountKey).catch((error) => {
-          request.server.logger.warn(
-            { error, accountId },
-            'Failed to invalidate specific account cache'
-          )
-        })
-      }
-    } else {
-      await cacheService.invalidateAll().catch((error) => {
-        request.server.logger.warn(
-          { error },
-          'Failed to invalidate accounts cache'
-        )
+        error
       })
     }
-  }
-
-  /**
-   * Handle successful account update in edit mode
-   * @private
-   */
-  _handleEditSuccess(request, h, sessionData, encodedId) {
-    const { firstName, lastName } = sessionData
-
-    request.yar.flash('success', {
-      title: request.t('accounts.view_user.notifications.updated_title'),
-      message: request.t('accounts.view_user.notifications.updated_message', {
-        userName: `${firstName} ${lastName}`
-      })
-    })
-
-    clearEditSession(request)
-    return h.redirect(ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId))
-  }
-
-  /**
-   * Handle successful account creation in admin mode
-   * @private
-   */
-  _handleCreateSuccess(request, h, sessionKey, sessionData, apiResponse) {
-    const { firstName, lastName } = sessionData
-
-    request.yar.flash('userCreated', {
-      name: `${firstName} ${lastName}`,
-      userId: apiResponse.data?.userId
-    })
-
-    request.yar.set(sessionKey, undefined)
-    return h.redirect(ROUTES.ADMIN.USERS_ACTIVE)
-  }
-
-  /**
-   * Handle successful account registration for non-admin
-   * @private
-   */
-  _handleUserSuccess(request, h, sessionKey, sessionData, status) {
-    request.yar.set(sessionKey, { ...sessionData, submissionStatus: status })
-    return h.redirect(ROUTES.GENERAL.ACCOUNTS.CONFIRMATION)
-  }
-
-  async handleSuccess(
-    request,
-    h,
-    isAdmin,
-    sessionKey,
-    sessionData,
-    apiResponse,
-    isEditMode = false,
-    encodedId = null
-  ) {
-    const status = apiResponse.data?.status || ACCOUNT_STATUS.PENDING
-
-    // Invalidate caches
-    await this._invalidateAccountCache(
-      request,
-      isEditMode,
-      apiResponse,
-      sessionData
-    )
-
-    // Handle different flows
-    if (isAdmin) {
-      if (isEditMode) {
-        return this._handleEditSuccess(request, h, sessionData, encodedId)
-      }
-      return this._handleCreateSuccess(
-        request,
-        h,
-        sessionKey,
-        sessionData,
-        apiResponse
-      )
-    }
-
-    return this._handleUserSuccess(request, h, sessionKey, sessionData, status)
-  }
-
-  handleUnexpectedError(
-    request,
-    h,
-    isAdmin,
-    sessionData,
-    areaDetails,
-    parentAreasDisplay,
-    error,
-    isEditMode = false,
-    encodedId = null
-  ) {
-    // This handles unexpected errors (network failures, timeouts, etc.)
-    request.server.logger.error(
-      { error },
-      'Unexpected error during account submission'
-    )
-
-    return h.view(
-      ACCOUNT_VIEWS.CHECK_ANSWERS,
-      this.buildViewData(
-        request,
-        isAdmin,
-        sessionData,
-        areaDetails,
-        parentAreasDisplay,
-        {
-          isEditMode,
-          encodedId,
-          errorCode: VIEW_ERROR_CODES.NETWORK_ERROR
-        }
-      )
-    )
   }
 
   buildViewData(
@@ -394,23 +200,21 @@ class CheckAnswersController {
       encodedId = null
     } = options
 
-    const localeKey = this._getLocaleKey(isAdmin)
-    const responsibilityLower = this._getResponsibilityLower(responsibility)
-    const responsibilityLabel = this._getResponsibilityLabel(
+    const localeKey = getLocaleKey(isAdmin)
+    const responsibilityLower = getResponsibilityLower(responsibility)
+    const responsibilityLabel = getResponsibilityLabel(
       request,
       responsibility,
       responsibilityLower
     )
     const responsibilityLegendKey = isAdmin
-      ? LOCALE_KEYS.RESPONSIBILITY_LEGEND_ADMIN
-      : LOCALE_KEYS.RESPONSIBILITY_LEGEND
+      ? CHECK_ANSWERS_LOCALE_KEYS.RESPONSIBILITY_LEGEND_ADMIN
+      : CHECK_ANSWERS_LOCALE_KEYS.RESPONSIBILITY_LEGEND
 
-    const routes = this._getRoutes(isAdmin, isEditMode, encodedId, isViewMode)
-    const viewAccountProps = isViewMode
-      ? this._buildViewModeProperties(options)
-      : {}
+    const routes = getRoutes(isAdmin, isEditMode, encodedId, isViewMode)
+    const viewAccountProps = isViewMode ? buildViewModeProperties(options) : {}
 
-    const pageTitle = this._getPageTitle(
+    const pageTitle = getPageTitle(
       request,
       isViewMode,
       isEditMode,
@@ -449,172 +253,10 @@ class CheckAnswersController {
     }
   }
 
-  /**
-   * Build view mode specific properties
-   * Extracted to reduce cognitive complexity of buildViewData
-   */
-  _buildViewModeProperties(options) {
-    const {
-      accountStatus,
-      accountDisabled,
-      invitationAcceptedAt,
-      createdAt,
-      invitationSentAt,
-      lastSignIn,
-      encodedId
-    } = options
-
-    const statusFlags = this._determineStatusFlags(
-      accountStatus,
-      accountDisabled,
-      invitationAcceptedAt
-    )
-
-    const accountInfo = {
-      createdAt,
-      invitationSentAt,
-      invitationAcceptedAt,
-      lastSignIn
-    }
-
-    return {
-      isViewMode: true,
-      encodedId,
-      ...statusFlags,
-      backLink: statusFlags.isPending
-        ? ROUTES.ADMIN.USERS_PENDING
-        : ROUTES.ADMIN.USERS_ACTIVE,
-      accountInfo,
-      actionRoutes: this._buildActionRoutes(encodedId)
-    }
-  }
-
-  /**
-   * Determine account status flags
-   */
-  _determineStatusFlags(accountStatus, accountDisabled, invitationAcceptedAt) {
-    return {
-      isPending: accountStatus === 'pending',
-      isActive: accountStatus === 'active' || accountStatus === 'approved',
-      isDisabled: accountDisabled,
-      hasAcceptedInvitation: !!invitationAcceptedAt
-    }
-  }
-
-  /**
-   * Build action routes for user management
-   * Uses route constants to avoid magic strings
-   */
-  _buildActionRoutes(encodedId) {
-    return {
-      approve: ROUTES.ADMIN.USER_ACTIONS.APPROVE.replace(
-        '{encodedId}',
-        encodedId
-      ),
-      delete: ROUTES.ADMIN.USER_ACTIONS.DELETE.replace(
-        '{encodedId}',
-        encodedId
-      ),
-      resendInvitation: ROUTES.ADMIN.USER_ACTIONS.RESEND_INVITATION.replace(
-        '{encodedId}',
-        encodedId
-      ),
-      reactivate: ROUTES.ADMIN.USER_ACTIONS.REACTIVATE.replace(
-        '{encodedId}',
-        encodedId
-      ),
-      editDetails: ROUTES.ADMIN.USER_ACTIONS.EDIT_DETAILS.replace(
-        '{encodedId}',
-        encodedId
-      )
-    }
-  }
-
-  _getLocaleKey(isAdmin) {
-    return isAdmin ? LOCALE_KEYS.ADMIN : LOCALE_KEYS.USER
-  }
-
-  _getResponsibilityLower(responsibility) {
-    return responsibility ? responsibility.toLowerCase() : ''
-  }
-
-  _getResponsibilityLabel(request, responsibility, responsibilityLower) {
-    return responsibility
-      ? request.t(`accounts.label.responsibility.${responsibilityLower}`)
-      : ''
-  }
-
-  /**
-   * Get routes for edit mode
-   * @private
-   */
-  _getEditRoutes(encodedId) {
-    const editRoutes = ROUTES.ADMIN.ACCOUNTS.EDIT
-    return {
-      submitRoute: editRoutes.CHECK_ANSWERS.replace('{encodedId}', encodedId),
-      detailsRoute: editRoutes.DETAILS.replace('{encodedId}', encodedId),
-      mainAreaRoute: editRoutes.MAIN_AREA.replace('{encodedId}', encodedId),
-      additionalAreasRoute: editRoutes.ADDITIONAL_AREAS.replace(
-        '{encodedId}',
-        encodedId
-      ),
-      parentAreasEaRoute: editRoutes.PARENT_AREAS.replace(
-        '{type}',
-        'ea'
-      ).replace('{encodedId}', encodedId),
-      parentAreasPsoRoute: editRoutes.PARENT_AREAS.replace(
-        '{type}',
-        'pso'
-      ).replace('{encodedId}', encodedId),
-      isAdminRoute: editRoutes.IS_ADMIN.replace('{encodedId}', encodedId),
-      cancelRoute: ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId)
-    }
-  }
-
-  /**
-   * Get routes for create mode
-   * @private
-   */
-  _getCreateRoutes(isAdmin) {
-    const baseRoutes = isAdmin ? ROUTES.ADMIN.ACCOUNTS : ROUTES.GENERAL.ACCOUNTS
-
-    return {
-      submitRoute: baseRoutes.CHECK_ANSWERS,
-      detailsRoute: baseRoutes.DETAILS,
-      mainAreaRoute: baseRoutes.MAIN_AREA,
-      additionalAreasRoute: baseRoutes.ADDITIONAL_AREAS,
-      parentAreasEaRoute: baseRoutes.PARENT_AREAS_EA,
-      parentAreasPsoRoute: baseRoutes.PARENT_AREAS_PSO,
-      isAdminRoute: isAdmin ? baseRoutes.IS_ADMIN : null
-    }
-  }
-
-  _getRoutes(
-    isAdmin,
-    isEditMode = false,
-    encodedId = null,
-    isViewMode = false
-  ) {
-    if ((isEditMode || isViewMode) && encodedId) {
-      return this._getEditRoutes(encodedId)
-    }
-    return this._getCreateRoutes(isAdmin)
-  }
-
-  _getPageTitle(request, isViewMode, isEditMode, sessionData, localeKey) {
-    if (isViewMode) {
-      return `${request.t('accounts.view_user.title')} - ${sessionData.firstName} ${sessionData.lastName}`
-    }
-    if (isEditMode) {
-      return request.t(`accounts.${localeKey}.check_answers.edit_title`)
-    }
-    return request.t(`accounts.${localeKey}.check_answers.title`)
-  }
-
   _redirectToDetails(h, isAdmin, isEditMode, encodedId) {
     if (isEditMode) {
       return ROUTES.ADMIN.ACCOUNTS.EDIT.DETAILS.replace(
-        '{encodedId}',
+        ENCODED_ID_PLACEHOLDER,
         encodedId
       )
     }
@@ -626,7 +268,7 @@ class CheckAnswersController {
   _redirectToMainArea(h, isAdmin, isEditMode, encodedId) {
     if (isEditMode) {
       return ROUTES.ADMIN.ACCOUNTS.EDIT.MAIN_AREA.replace(
-        '{encodedId}',
+        ENCODED_ID_PLACEHOLDER,
         encodedId
       )
     }

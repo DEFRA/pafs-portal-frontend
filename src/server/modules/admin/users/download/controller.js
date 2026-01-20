@@ -6,6 +6,7 @@ import { decodeUserId } from '../../../../common/helpers/security/encoder.js'
 import { format } from 'date-fns'
 import { ACCOUNT_STATUS } from '../../../../common/constants/accounts.js'
 import { API_LIMITS } from '../../../../common/constants/common.js'
+import { statusCodes } from '../../../../common/constants/status-codes.js'
 
 /**
  * Download Users Controller
@@ -58,7 +59,9 @@ class DownloadUsersController {
         { error },
         'Error generating users Excel export'
       )
-      return h.response({ error: 'Failed to generate Excel export' }).code(500)
+      return h
+        .response({ error: 'Failed to generate Excel export' })
+        .code(statusCodes.internalServerError)
     }
   }
 
@@ -92,11 +95,7 @@ class DownloadUsersController {
     return allUsers
   }
 
-  async generateExcelFile(users) {
-    const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet('Users')
-
-    // Define columns with headers
+  _defineWorksheetColumns(worksheet) {
     worksheet.columns = [
       { header: 'User ID', key: 'userId', width: 15 },
       { header: 'User Email', key: 'email', width: 30 },
@@ -112,68 +111,80 @@ class DownloadUsersController {
       { header: 'Invitation Accepted', key: 'invitationAccepted', width: 25 },
       { header: 'Last Sign In', key: 'lastSignIn', width: 25 }
     ]
+  }
 
-    // Style the header row
+  _styleHeaderRow(worksheet) {
     const headerRow = worksheet.getRow(1)
     headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 }
     headerRow.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FF0B6623' } // Dark green background
+      fgColor: { argb: 'FF0B6623' }
     }
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' }
     headerRow.height = 25
+  }
 
-    // Add data rows
-    users.forEach((user) => {
-      const row = worksheet.addRow({
-        userId: this.formatUserId(user.id || user.userId),
-        email: user.email || '',
-        lastName: user.lastName || '',
-        firstName: user.firstName || '',
-        mainArea: this.getMainArea(user.areas),
-        additionalAreas: this.getAdditionalAreas(user.areas),
-        isAdmin: user.admin ? 'Yes' : 'No',
-        status: this.formatStatus(user.status),
-        disabled: user.disabled ? 'Yes' : 'No',
-        invitationSent: this.formatDateTime(user.invitationSentAt),
-        accountCreation: this.formatDateTime(user.createdAt),
-        invitationAccepted: this.formatDateTime(user.invitationAcceptedAt),
-        lastSignIn: this.formatDateTime(user.lastSignIn)
-      })
-
-      // Apply alternating row colors for better readability
-      const rowNumber = row.number
-      if (rowNumber % 2 === 0) {
-        row.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFF5F5F5' } // Light gray
-        }
+  _applyAlternatingRowColor(row) {
+    if (row.number % 2 === 0) {
+      row.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFF5F5F5' }
       }
+    }
+  }
 
-      // Color code status column
-      const statusCell = row.getCell('status')
-      if (user.status === 'active' || user.status === 'approved') {
-        statusCell.font = { color: { argb: 'FF006400' }, bold: true } // Dark green
-      } else if (user.status === 'pending') {
-        statusCell.font = { color: { argb: 'FFFF8C00' }, bold: true } // Dark orange
-      }
+  _colorCodeStatusCell(row, user) {
+    const statusCell = row.getCell('status')
+    if (user.status === 'active' || user.status === 'approved') {
+      statusCell.font = { color: { argb: 'FF006400' }, bold: true }
+    }
+    if (user.status === 'pending') {
+      statusCell.font = { color: { argb: 'FFFF8C00' }, bold: true }
+    }
+  }
 
-      // Color code disabled column
+  _colorCodeDisabledCell(row, user) {
+    if (user.disabled) {
       const disabledCell = row.getCell('disabled')
-      if (user.disabled) {
-        disabledCell.font = { color: { argb: 'FFDC143C' }, bold: true } // Crimson red
-      }
+      disabledCell.font = { color: { argb: 'FFDC143C' }, bold: true }
+    }
+  }
 
-      // Color code admin column
+  _colorCodeAdminCell(row, user) {
+    if (user.admin) {
       const adminCell = row.getCell('isAdmin')
-      if (user.admin) {
-        adminCell.font = { color: { argb: 'FF4169E1' }, bold: true } // Royal blue
-      }
-    })
+      adminCell.font = { color: { argb: 'FF4169E1' }, bold: true }
+    }
+  }
 
-    // Add borders to all cells
+  _formatUserRowData(user) {
+    return {
+      userId: this.formatUserId(user.id || user.userId),
+      email: user.email || '',
+      lastName: user.lastName || '',
+      firstName: user.firstName || '',
+      mainArea: this.getMainArea(user.areas),
+      additionalAreas: this.getAdditionalAreas(user.areas),
+      isAdmin: user.admin ? 'Yes' : 'No',
+      status: this.formatStatus(user.status),
+      disabled: user.disabled ? 'Yes' : 'No',
+      invitationSent: this.formatDateTime(user.invitationSentAt),
+      accountCreation: this.formatDateTime(user.createdAt),
+      invitationAccepted: this.formatDateTime(user.invitationAcceptedAt),
+      lastSignIn: this.formatDateTime(user.lastSignIn)
+    }
+  }
+
+  _styleUserRow(row, user) {
+    this._applyAlternatingRowColor(row)
+    this._colorCodeStatusCell(row, user)
+    this._colorCodeDisabledCell(row, user)
+    this._colorCodeAdminCell(row, user)
+  }
+
+  _addBordersAndAlignment(worksheet) {
     worksheet.eachRow((row, rowNumber) => {
       row.eachCell((cell) => {
         cell.border = {
@@ -182,23 +193,39 @@ class DownloadUsersController {
           bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
           right: { style: 'thin', color: { argb: 'FFCCCCCC' } }
         }
-        // Align all cells
         if (rowNumber > 1) {
           cell.alignment = { vertical: 'middle', horizontal: 'left' }
         }
       })
     })
+  }
 
-    // Freeze the header row
+  async generateExcelFile(users) {
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Users')
+
+    this._defineWorksheetColumns(worksheet)
+    this._styleHeaderRow(worksheet)
+
+    // Add data rows
+    users.forEach((user) => {
+      const rowData = this._formatUserRowData(user)
+      const row = worksheet.addRow(rowData)
+      this._styleUserRow(row, user)
+    })
+
+    this._addBordersAndAlignment(worksheet)
     worksheet.views = [{ state: 'frozen', ySplit: 1 }]
 
-    // Generate buffer
     const buffer = await workbook.xlsx.writeBuffer()
     return buffer
   }
 
   formatUserId(id) {
-    if (!id) return ''
+    if (!id) {
+      return ''
+    }
+
     // Decode the ID if it's encoded
     try {
       const decoded = decodeUserId(id)
@@ -209,31 +236,41 @@ class DownloadUsersController {
   }
 
   getMainArea(areas) {
-    if (!areas || !Array.isArray(areas) || areas.length === 0) return ''
+    if (!areas || !Array.isArray(areas) || areas.length === 0) {
+      return ''
+    }
     const mainArea = areas.find((area) => area.primary)
     return mainArea?.name || areas[0]?.name || ''
   }
 
   getAdditionalAreas(areas) {
-    if (!areas || !Array.isArray(areas) || areas.length === 0) return ''
+    if (!areas || !Array.isArray(areas) || areas.length === 0) {
+      return ''
+    }
     const additionalAreas = areas.filter((area) => !area.primary)
     return additionalAreas.map((area) => area.name).join(' | ')
   }
 
   formatStatus(status) {
-    if (!status) return ''
+    if (!status) {
+      return ''
+    }
     if (
       status === ACCOUNT_STATUS.ACTIVE ||
       status === ACCOUNT_STATUS.APPROVED
     ) {
       return 'Active'
     }
-    if (status === ACCOUNT_STATUS.PENDING) return 'Pending'
+    if (status === ACCOUNT_STATUS.PENDING) {
+      return 'Pending'
+    }
     return status.charAt(0).toUpperCase() + status.slice(1)
   }
 
   formatDateTime(dateTime) {
-    if (!dateTime) return ''
+    if (!dateTime) {
+      return ''
+    }
     try {
       return format(new Date(dateTime), 'dd/MM/yyyy HH:mm')
     } catch {

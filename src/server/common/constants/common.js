@@ -78,6 +78,7 @@ export const SESSION = {
  */
 export const SIZE = {
   LENGTH_8: 8,
+  LENGTH_12: 12,
   LENGTH_32: 32,
   LENGTH_128: 128,
   LENGTH_254: 254,
@@ -92,7 +93,7 @@ export const VALIDATION_PATTERNS = {
   // Names: letters, spaces, hyphens, apostrophes
   NAME: /^[a-zA-Z\s'-]+$/,
 
-  PROJECT_NAME: /^[a-zA-Z0-9_-]+$/,
+  PROJECT_NAME: /^[a-zA-Z0-9_\s-]+$/,
 
   // Job title and organisation: letters, digits, spaces, common punctuation
   // Allows: letters, numbers, spaces, period, comma, ampersand, parentheses, hyphen, apostrophe, forward slash

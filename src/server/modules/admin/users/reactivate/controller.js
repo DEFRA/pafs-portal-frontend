@@ -1,9 +1,16 @@
 import { reactivateAccount } from '../../../../common/services/accounts/accounts-service.js'
 import { ROUTES } from '../../../../common/constants/routes.js'
-import { createAccountsCacheService } from '../../../../common/services/accounts/accounts-cache.js'
-import { extractApiError } from '../../../../common/helpers/error-renderer/index.js'
 import { getAuthSession } from '../../../../common/helpers/auth/session-manager.js'
 import { decodeUserId } from '../../../../common/helpers/security/encoder.js'
+import { ENCODED_ID_PLACEHOLDER } from '../../../../common/constants/accounts.js'
+import {
+  handleApiError,
+  handleUnexpectedError,
+  invalidateUserCache,
+  setSuccessNotification,
+  logUserAction,
+  logApiResponse
+} from '../helpers/user-action-helper.js'
 
 /**
  * Reactivate User Controller
@@ -17,107 +24,50 @@ class ReactivateUserController {
     try {
       const session = getAuthSession(request)
 
-      request.server.logger.info(
-        { userId, adminId: session?.user?.id },
-        'Admin reactivating user account'
-      )
+      logUserAction(request, 'Admin reactivating user account', userId, session)
 
-      // Call backend API to reactivate account
       const response = await reactivateAccount(userId, session.accessToken)
 
       if (!response.success) {
-        return this.handleError(
+        return handleApiError(
           request,
           h,
           encodedId,
           userId,
           response,
-          'Failed to reactivate account'
+          'Failed to reactivate account',
+          'accounts.view_user.errors.reactivate_failed'
         )
       }
 
-      request.server.logger.info(
-        { userId, reactivatedUserId: response.data?.account?.id },
-        'Account reactivated successfully'
-      )
+      logApiResponse(request, 'Account reactivated successfully', userId, {
+        reactivatedUserId: response.data?.account?.id
+      })
 
-      // Invalidate accounts cache to refresh counts and lists
-      await this.invalidateCache(request, userId)
+      await invalidateUserCache(request, userId, 'reactivation')
 
-      // Set success notification with user name
       const userName =
         `${response.data?.account?.firstName || ''} ${response.data?.account?.lastName || ''}`.trim() ||
         'User'
-      request.yar.flash('success', {
-        title: request.t('accounts.view_user.notifications.reactivated_title'),
-        message: request.t(
-          'accounts.view_user.notifications.reactivated_message',
-          { userName }
-        )
-      })
+      setSuccessNotification(
+        request,
+        'accounts.view_user.notifications.reactivated_title',
+        'accounts.view_user.notifications.reactivated_message',
+        { userName }
+      )
 
-      // Redirect back to view account page
       return h.redirect(
-        ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId)
+        ROUTES.ADMIN.USER_VIEW.replace(ENCODED_ID_PLACEHOLDER, encodedId)
       )
     } catch (error) {
-      return this.handleUnexpectedError(request, h, encodedId, userId, error)
-    }
-  }
-
-  handleError(request, h, encodedId, userId, response, logMessage) {
-    const errorMessage = extractApiError(response)
-    request.server.logger.error({ userId, errors: response.errors }, logMessage)
-
-    request.yar.flash('error', {
-      message:
-        errorMessage || request.t('accounts.view_user.errors.reactivate_failed')
-    })
-    return h.redirect(ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId))
-  }
-
-  handleUnexpectedError(request, h, encodedId, userId, error) {
-    request.server.logger.error(
-      { error, userId },
-      'Unexpected error reactivating account'
-    )
-
-    request.yar.flash('error', {
-      message: request.t('accounts.view_user.errors.reactivate_failed')
-    })
-    return h.redirect(ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId))
-  }
-
-  async invalidateCache(request, userId) {
-    const cacheService = createAccountsCacheService(request.server)
-
-    try {
-      const accountKey = cacheService.generateAccountKey(userId)
-
-      request.server.logger.info(
-        { userId, accountKey, segment: 'accounts' },
-        'Dropping individual account cache'
-      )
-
-      // Invalidate the specific account cache to get fresh status
-      await cacheService.dropByKey(accountKey)
-
-      request.server.logger.info(
-        { userId },
-        'Dropping common list and count caches'
-      )
-
-      // Invalidate common list and count caches
-      await cacheService.invalidateAll()
-
-      request.server.logger.info(
-        { userId },
-        'Successfully invalidated account cache after reactivation'
-      )
-    } catch (error) {
-      request.server.logger.warn(
-        { error, userId },
-        'Failed to invalidate accounts cache'
+      return handleUnexpectedError(
+        request,
+        h,
+        encodedId,
+        userId,
+        error,
+        'Unexpected error reactivating account',
+        'accounts.view_user.errors.reactivate_failed'
       )
     }
   }

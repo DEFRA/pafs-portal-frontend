@@ -1,9 +1,16 @@
 import { resendInvitation } from '../../../../common/services/accounts/accounts-service.js'
 import { ROUTES } from '../../../../common/constants/routes.js'
-import { createAccountsCacheService } from '../../../../common/services/accounts/accounts-cache.js'
-import { extractApiError } from '../../../../common/helpers/error-renderer/index.js'
 import { getAuthSession } from '../../../../common/helpers/auth/session-manager.js'
 import { decodeUserId } from '../../../../common/helpers/security/encoder.js'
+import { ENCODED_ID_PLACEHOLDER } from '../../../../common/constants/accounts.js'
+import {
+  handleApiError,
+  handleUnexpectedError,
+  invalidateUserCache,
+  setSuccessNotification,
+  logUserAction,
+  logApiResponse
+} from '../helpers/user-action-helper.js'
 
 /**
  * Resend Invitation Controller
@@ -17,98 +24,51 @@ class ResendInvitationController {
     try {
       const session = getAuthSession(request)
 
-      request.server.logger.info(
-        { userId, adminId: session?.user?.id },
-        'Admin resending invitation to user'
+      logUserAction(
+        request,
+        'Admin resending invitation to user',
+        userId,
+        session
       )
 
-      // Call backend API to resend invitation
       const response = await resendInvitation(userId, session.accessToken)
 
       if (!response.success) {
-        return this.handleError(
+        return handleApiError(
           request,
           h,
           encodedId,
           userId,
           response,
-          'Failed to resend invitation'
+          'Failed to resend invitation',
+          'accounts.view_user.errors.resend_invitation_failed'
         )
       }
 
-      request.server.logger.info(
-        { userId, resentUserId: response.data?.userId },
-        'Invitation resent successfully'
-      )
-
-      // Invalidate accounts cache to refresh data
-      await this.invalidateCache(request, userId)
-
-      // Set success notification
-      request.yar.flash('success', {
-        title: request.t(
-          'accounts.view_user.notifications.resend_invitation_title'
-        ),
-        message: request.t(
-          'accounts.view_user.notifications.resend_invitation_message'
-        )
+      logApiResponse(request, 'Invitation resent successfully', userId, {
+        resentUserId: response.data?.userId
       })
 
-      // Redirect back to view account page
+      await invalidateUserCache(request, userId, 'resending invitation')
+
+      setSuccessNotification(
+        request,
+        'accounts.view_user.notifications.resend_invitation_title',
+        'accounts.view_user.notifications.resend_invitation_message'
+      )
+
       return h.redirect(
-        ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId)
+        ROUTES.ADMIN.USER_VIEW.replace(ENCODED_ID_PLACEHOLDER, encodedId)
       )
     } catch (error) {
-      return this.handleUnexpectedError(request, h, encodedId, userId, error)
-    }
-  }
-
-  handleError(request, h, encodedId, userId, response, logMessage) {
-    const errorMessage = extractApiError(response)
-    request.server.logger.error({ userId, errors: response.errors }, logMessage)
-
-    request.yar.flash('error', {
-      message:
-        errorMessage ||
-        request.t('accounts.view_user.errors.resend_invitation_failed')
-    })
-    return h.redirect(ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId))
-  }
-
-  handleUnexpectedError(request, h, encodedId, userId, error) {
-    request.server.logger.error(
-      { error, userId },
-      'Unexpected error resending invitation'
-    )
-
-    request.yar.flash('error', {
-      message: request.t('accounts.view_user.errors.resend_invitation_failed')
-    })
-    return h.redirect(ROUTES.ADMIN.USER_VIEW.replace('{encodedId}', encodedId))
-  }
-
-  async invalidateCache(request, userId) {
-    const cacheService = createAccountsCacheService(request.server)
-
-    try {
-      const accountKey = cacheService.generateAccountKey(userId)
-
-      request.server.logger.info(
-        { userId, accountKey, segment: 'accounts' },
-        'Dropping individual account cache'
-      )
-
-      // Invalidate the specific account cache to get fresh data
-      await cacheService.dropByKey(accountKey)
-
-      request.server.logger.info(
-        { userId },
-        'Successfully invalidated account cache after resending invitation'
-      )
-    } catch (error) {
-      request.server.logger.warn(
-        { error, userId },
-        'Failed to invalidate accounts cache'
+      return handleUnexpectedError(
+        request,
+        h,
+        encodedId,
+        userId,
+        error,
+        'Unexpected error resending invitation',
+        'accounts.view_user.errors.resend_invitation_failed'
       )
     }
   }

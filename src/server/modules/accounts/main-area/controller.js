@@ -79,7 +79,9 @@ class MainAreaController {
       { mainArea },
       { abortEarly: false }
     )
-    if (!error) return null
+    if (!error) {
+      return null
+    }
 
     const masterAreas = await request.getAreas()
     const availableAreas = getAreasByType(
@@ -163,7 +165,9 @@ class MainAreaController {
       mainArea,
       sessionData
     )
-    if (errorView) return errorView
+    if (errorView) {
+      return errorView
+    }
 
     // Store main area with primary flag, preserve valid additional areas
     const areasData = await request.getAreas()

@@ -34,7 +34,9 @@ class DetailsController {
    */
   _validatePayload(request, h, isAdmin, admin, payload) {
     const { error } = detailsSchema.validate(payload, { abortEarly: false })
-    if (!error) return null
+    if (!error) {
+      return null
+    }
 
     return h.view(
       ACCOUNT_VIEWS.DETAILS,
@@ -103,7 +105,9 @@ class DetailsController {
       admin,
       payload
     )
-    if (validationError) return validationError
+    if (validationError) {
+      return validationError
+    }
 
     const { value } = detailsSchema.validate(payload, { abortEarly: false })
 
@@ -118,7 +122,9 @@ class DetailsController {
         value.email,
         userId
       )
-      if (emailError) return emailError
+      if (emailError) {
+        return emailError
+      }
 
       request.yar.set(sessionKey, { ...sessionData, ...value })
 

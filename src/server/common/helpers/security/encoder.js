@@ -1,11 +1,12 @@
 import crypto from 'node:crypto'
 import { config } from '../../../../config/config.js'
+import { SIZE } from '../../constants/common.js'
 
 function getSecret() {
   const secret = config.get('security.idSecret')
 
-  if (!secret || secret.length < 32) {
-    throw new Error(
+  if (!secret || secret.length < SIZE.LENGTH_32) {
+    throw new TypeError(
       'ID_SECRET must be configured and at least 32 characters long'
     )
   }
@@ -15,19 +16,19 @@ function getSecret() {
 
 export function encodeUserId(id) {
   if (id === null || id === undefined || id === '') {
-    throw new Error('ID cannot be null, undefined, or empty')
+    throw new TypeError('ID cannot be null, undefined, or empty')
   }
 
   const idString = String(id)
 
   // Validate ID is numeric and positive (greater than 0)
   if (!/^\d+$/.test(idString)) {
-    throw new Error('ID must be a positive integer')
+    throw new TypeError('ID must be a positive integer')
   }
 
   // Reject zero as invalid ID
   if (Number(idString) === 0) {
-    throw new Error('ID must be a positive integer')
+    throw new TypeError('ID must be a positive integer')
   }
 
   // Encode ID to base64url
@@ -39,7 +40,7 @@ export function encodeUserId(id) {
     .createHmac('sha256', secret)
     .update(idString)
     .digest('base64url')
-    .substring(0, 12) // Use first 12 characters for brevity
+    .substring(0, SIZE.LENGTH_12) // Use first 12 characters for brevity
 
   return `${payload}.${signature}`
 }
@@ -49,36 +50,36 @@ export function decodeUserId(token) {
     return null
   }
 
+  const parts = token.split('.')
+
+  if (parts.length !== 2) {
+    return null
+  }
+
+  const [payload, signature] = parts
+
+  if (!payload || !signature) {
+    return null
+  }
+
+  // Decode the payload
+  const idString = Buffer.from(payload, 'base64url').toString('utf8')
+
+  // Validate decoded ID is numeric
+  if (!/^\d+$/.test(idString)) {
+    return null
+  }
+
+  // Verify signature
+  const secret = getSecret()
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(idString)
+    .digest('base64url')
+    .substring(0, SIZE.LENGTH_12)
+
+  // Use timing-safe comparison to prevent timing attacks
   try {
-    const parts = token.split('.')
-
-    if (parts.length !== 2) {
-      return null
-    }
-
-    const [payload, signature] = parts
-
-    if (!payload || !signature) {
-      return null
-    }
-
-    // Decode the payload
-    const idString = Buffer.from(payload, 'base64url').toString('utf8')
-
-    // Validate decoded ID is numeric
-    if (!/^\d+$/.test(idString)) {
-      return null
-    }
-
-    // Verify signature
-    const secret = getSecret()
-    const expectedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(idString)
-      .digest('base64url')
-      .substring(0, 12)
-
-    // Use timing-safe comparison to prevent timing attacks
     if (
       !crypto.timingSafeEqual(
         Buffer.from(signature),
@@ -87,19 +88,19 @@ export function decodeUserId(token) {
     ) {
       return null
     }
-
-    const id = Number(idString)
-
-    // Validate the number is safe and positive
-    if (!Number.isSafeInteger(id) || id <= 0) {
-      return null
-    }
-
-    return id
-  } catch (error) {
-    // Any error in decoding returns null (invalid token)
+  } catch {
+    // Return null if signatures are different lengths or comparison fails
     return null
   }
+
+  const id = Number(idString)
+
+  // Validate the number is safe and positive
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return null
+  }
+
+  return id
 }
 
 export function isValidToken(token) {
@@ -108,7 +109,7 @@ export function isValidToken(token) {
 
 export function encodeUserIds(ids) {
   if (!Array.isArray(ids)) {
-    throw new Error('Input must be an array')
+    throw new TypeError('Input must be an array')
   }
 
   return ids.map((id) => encodeUserId(id))
@@ -116,7 +117,7 @@ export function encodeUserIds(ids) {
 
 export function decodeUserIds(tokens) {
   if (!Array.isArray(tokens)) {
-    throw new Error('Input must be an array')
+    throw new TypeError('Input must be an array')
   }
 
   return tokens.map((token) => decodeUserId(token)).filter((id) => id !== null)
