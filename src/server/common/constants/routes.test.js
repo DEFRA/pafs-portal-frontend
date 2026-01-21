@@ -90,6 +90,18 @@ describe('Routes Constants', () => {
         '/project-proposal/start'
       )
     })
+
+    test('PROJECT_NAME route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.PROJECT_NAME).toBe(
+        '/project-proposal/project-name'
+      )
+    })
+
+    test('RMA_SELECTION route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.RMA_SELECTION).toBe(
+        '/project-proposal/rma-selection'
+      )
+    })
   })
 
   describe('Route structure', () => {
