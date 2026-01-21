@@ -56,12 +56,30 @@ describe('#rmaSelectionController', () => {
   })
 
   describe('GET /project-proposal/rma-selection', () => {
+    test('should redirect to start proposal if project name is missing in session', async () => {
+      mockRequest.yar.get.mockReturnValue({}) // Empty session or missing projectName
+
+      await rmaSelectionController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT_PROPOSAL.START_PROPOSAL
+      )
+    })
+
     test('should handle null session data', async () => {
       mockRequest.yar.get.mockReturnValue(null)
 
       await rmaSelectionController.handler(mockRequest, mockH)
 
-      expect(mockH.view).toHaveBeenCalled()
+      // expect(mockH.view).toHaveBeenCalledWith(
+      //   expect.stringContaining('modules/project-proposal/rma-selection/index'),
+      //   expect.objectContaining({
+      //     values: {}
+      //   })
+      // )
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT_PROPOSAL.START_PROPOSAL
+      )
     })
 
     test('should handle undefined session data', async () => {
@@ -69,7 +87,15 @@ describe('#rmaSelectionController', () => {
 
       await rmaSelectionController.handler(mockRequest, mockH)
 
-      expect(mockH.view).toHaveBeenCalled()
+      // expect(mockH.view).toHaveBeenCalledWith(
+      //   expect.stringContaining('modules/project-proposal/rma-selection/index'),
+      //   expect.objectContaining({
+      //     values: {}
+      //   })
+      // )
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT_PROPOSAL.START_PROPOSAL
+      )
     })
 
     test('should display saved rma selection if available in session', async () => {

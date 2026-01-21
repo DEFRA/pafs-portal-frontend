@@ -3,13 +3,13 @@ import { detailsController, detailsPostController } from './controller.js'
 
 vi.mock('../../../common/services/accounts/accounts-service.js')
 vi.mock('../schema.js')
-vi.mock('../helpers.js')
+vi.mock('../helpers/session-helpers.js')
 vi.mock('../../../common/helpers/error-renderer/index.js')
 
 const { validateEmail } =
   await import('../../../common/services/accounts/accounts-service.js')
 const { detailsSchema } = await import('../schema.js')
-const { getSessionKey } = await import('../helpers.js')
+const { getSessionKey } = await import('../helpers/session-helpers.js')
 const { extractApiValidationErrors, extractApiError, extractJoiErrors } =
   await import('../../../common/helpers/error-renderer/index.js')
 
@@ -160,7 +160,7 @@ describe('DetailsController', () => {
 
       await detailsPostController.handler(mockRequest, mockH)
 
-      expect(validateEmail).toHaveBeenCalledWith('john@example.com')
+      expect(validateEmail).toHaveBeenCalledWith('john@example.com', null)
     })
 
     test('handles backend validation errors', async () => {

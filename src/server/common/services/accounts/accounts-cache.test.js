@@ -11,21 +11,33 @@ vi.mock('../../../../config/config.js', () => ({
     get: vi.fn((key) => {
       if (key === 'session.cache.ttl') return 1800000
       if (key === 'session.cache.engine') return 'redis'
+      if (key === 'pagination.defaultPageSize') return 25
       return null
     })
   }
 }))
 
-vi.mock('../../helpers/logging/logger.js', () => ({
-  createLogger: vi.fn(() => ({
+vi.mock('../../helpers/logging/logger.js', () => {
+  // Need to define the logger instance inside the factory
+  const logger = {
     debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn()
-  }))
+  }
+  return {
+    createLogger: () => logger
+  }
+})
+
+vi.mock('../../helpers/pagination/index.js', () => ({
+  getDefaultPageSize: vi.fn(() => 25)
 }))
 
 const { config } = await import('../../../../config/config.js')
+const { createLogger } = await import('../../helpers/logging/logger.js')
+// Get the logger instance that will be used by base-cache-service
+const baseLogger = createLogger()
 
 describe('AccountsCacheService', () => {
   let mockServer
@@ -33,6 +45,8 @@ describe('AccountsCacheService', () => {
   let cacheService
 
   beforeEach(() => {
+    vi.clearAllMocks()
+
     mockCache = {
       get: vi.fn(),
       set: vi.fn(),
@@ -40,10 +54,14 @@ describe('AccountsCacheService', () => {
     }
 
     mockServer = {
-      cache: vi.fn(() => mockCache)
+      cache: vi.fn(() => mockCache),
+      logger: {
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn()
+      }
     }
-
-    vi.clearAllMocks()
   })
 
   describe('when caching is enabled (Redis)', () => {
@@ -60,32 +78,74 @@ describe('AccountsCacheService', () => {
       expect(cacheService.isCacheEnabled()).toBe(true)
     })
 
-    describe('generateKey', () => {
-      test('generates key from parameters', () => {
-        const key = cacheService.generateKey({
-          status: 'pending',
-          search: 'john',
-          areaId: '5',
-          page: 2
-        })
-
-        expect(key).toBe('pending:john:5:2')
-      })
-
-      test('handles missing optional parameters', () => {
-        const key = cacheService.generateKey({
-          status: 'active'
-        })
-
-        expect(key).toBe('active:::1')
-      })
-    })
-
     describe('generateAccountKey', () => {
       test('generates key for single account', () => {
         const key = cacheService.generateAccountKey(123)
 
         expect(key).toBe('account:123')
+      })
+    })
+
+    describe('generateListKey', () => {
+      test('generates key for list metadata', () => {
+        const params = {
+          status: 'pending',
+          search: 'test',
+          areaId: '1',
+          page: 2,
+          pageSize: 50
+        }
+        const key = cacheService.generateListKey(params)
+
+        expect(key).toBe('list:pending:test:1:2:50')
+      })
+
+      test('handles default values', () => {
+        const params = { status: 'active' }
+        const key = cacheService.generateListKey(params)
+
+        // Default page size comes from config (25)
+        expect(key).toBe('list:active:::1:25')
+      })
+    })
+
+    describe('invalidateAll', () => {
+      test('drops common cache keys for all statuses', async () => {
+        await cacheService.invalidateAll()
+
+        // Should drop list cache for pending and active (first page with default page size)
+        expect(mockCache.drop).toHaveBeenCalledWith('list:pending:::1:25')
+        expect(mockCache.drop).toHaveBeenCalledWith('list:active:::1:25')
+
+        // Should drop count cache for pending and active
+        expect(mockCache.drop).toHaveBeenCalledWith('count:pending')
+        expect(mockCache.drop).toHaveBeenCalledWith('count:active')
+
+        // Should be called 4 times total
+        expect(mockCache.drop).toHaveBeenCalledTimes(4)
+      })
+
+      test('does nothing when cache is disabled', async () => {
+        config.get.mockReturnValue('memory')
+        const disabledService = new AccountsCacheService(mockServer)
+
+        await disabledService.invalidateAll()
+
+        expect(mockCache.drop).not.toHaveBeenCalled()
+      })
+
+      test('logs error and continues on cache drop failure', async () => {
+        mockCache.drop.mockRejectedValue(new Error('Cache error'))
+
+        await cacheService.invalidateAll()
+
+        expect(baseLogger.warn).toHaveBeenCalledWith(
+          expect.objectContaining({
+            error: expect.any(Error),
+            segment: 'accounts'
+          }),
+          'Failed to drop cache key'
+        )
       })
     })
 
@@ -153,33 +213,6 @@ describe('AccountsCacheService', () => {
       })
     })
 
-    describe('invalidateByStatus', () => {
-      test('drops all cache (not just specified status)', async () => {
-        await cacheService.invalidateByStatus('pending')
-
-        expect(mockCache.drop).toHaveBeenCalledWith('*')
-      })
-    })
-
-    describe('addToList', () => {
-      test('invalidates all cache when adding account to list', async () => {
-        const account = { id: 1, status: 'pending' }
-
-        await cacheService.addToList(account, { status: 'pending' })
-
-        expect(mockCache.drop).toHaveBeenCalledWith('*')
-      })
-    })
-
-    describe('removeFromList', () => {
-      test('invalidates all cache and drops account key', async () => {
-        await cacheService.removeFromList(1, 'pending')
-
-        expect(mockCache.drop).toHaveBeenCalledWith('*')
-        expect(mockCache.drop).toHaveBeenCalledWith('account:1')
-      })
-    })
-
     describe('getAccount', () => {
       test('returns cached account on hit', async () => {
         const account = { id: 1, firstName: 'John' }
@@ -206,36 +239,173 @@ describe('AccountsCacheService', () => {
       })
     })
 
-    describe('invalidateAccount', () => {
-      test('invalidates account and all list caches', async () => {
-        await cacheService.invalidateAccount(1)
+    describe('setListMetadata', () => {
+      test('caches list metadata with timestamp', async () => {
+        const params = { status: 'pending', page: 1, pageSize: 25 }
+        const accountIds = [1, 2, 3]
+        const pagination = { total: 3, page: 1, pageSize: 25 }
 
-        expect(mockCache.drop).toHaveBeenCalledWith('account:1')
+        await cacheService.setListMetadata(params, accountIds, pagination)
+
+        expect(mockCache.set).toHaveBeenCalledWith(
+          'list:pending:::1:25',
+          expect.objectContaining({
+            accountIds,
+            pagination,
+            timestamp: expect.any(Number)
+          }),
+          DEFAULT_TTL
+        )
+      })
+
+      test('does nothing when cache disabled', async () => {
+        config.get.mockReturnValue('memory')
+        const disabledService = new AccountsCacheService(mockServer)
+
+        await disabledService.setListMetadata({}, [], {})
+
+        expect(mockCache.set).not.toHaveBeenCalled()
       })
     })
 
-    describe('updateAccount', () => {
-      test('updates account and invalidates all cache', async () => {
-        const account = { id: 1, status: 'active' }
+    describe('getListMetadata', () => {
+      test('returns cached list metadata', async () => {
+        const params = { status: 'pending', page: 1, pageSize: 25 }
+        const metadata = {
+          accountIds: [1, 2],
+          pagination: {},
+          timestamp: Date.now()
+        }
+        mockCache.get.mockResolvedValue(metadata)
 
-        await cacheService.updateAccount(1, account)
+        const result = await cacheService.getListMetadata(params)
+
+        expect(result).toEqual(metadata)
+        expect(mockCache.get).toHaveBeenCalledWith('list:pending:::1:25')
+      })
+
+      test('returns null when not cached', async () => {
+        const params = { status: 'active', page: 2, pageSize: 50 }
+        mockCache.get.mockResolvedValue(null)
+
+        const result = await cacheService.getListMetadata(params)
+
+        expect(result).toBeNull()
+      })
+    })
+
+    describe('getAccountsByIds', () => {
+      test('returns array of cached accounts', async () => {
+        const account1 = { id: 1, firstName: 'John' }
+        const account2 = { id: 2, firstName: 'Jane' }
+        mockCache.get
+          .mockResolvedValueOnce(account1)
+          .mockResolvedValueOnce(account2)
+
+        const result = await cacheService.getAccountsByIds([1, 2])
+
+        expect(result).toEqual([account1, account2])
+        expect(mockCache.get).toHaveBeenCalledWith('account:1')
+        expect(mockCache.get).toHaveBeenCalledWith('account:2')
+      })
+
+      test('returns null for cache misses', async () => {
+        mockCache.get
+          .mockResolvedValueOnce({ id: 1 })
+          .mockResolvedValueOnce(null)
+
+        const result = await cacheService.getAccountsByIds([1, 2])
+
+        expect(result).toEqual([{ id: 1 }, null])
+      })
+
+      test('returns empty array when cache disabled', async () => {
+        config.get.mockReturnValue('memory')
+        const disabledService = new AccountsCacheService(mockServer)
+
+        const result = await disabledService.getAccountsByIds([1, 2, 3])
+
+        expect(result).toEqual([])
+      })
+
+      test('returns empty array when ids is empty', async () => {
+        const result = await cacheService.getAccountsByIds([])
+
+        expect(result).toEqual([])
+      })
+
+      test('returns empty array when ids is null', async () => {
+        const result = await cacheService.getAccountsByIds(null)
+
+        expect(result).toEqual([])
+      })
+    })
+
+    describe('setAccounts', () => {
+      test('caches multiple accounts', async () => {
+        const accounts = [
+          { id: 1, firstName: 'John' },
+          { id: 2, firstName: 'Jane' }
+        ]
+
+        await cacheService.setAccounts(accounts)
 
         expect(mockCache.set).toHaveBeenCalledWith(
           'account:1',
-          account,
+          accounts[0],
           DEFAULT_TTL
         )
-        expect(mockCache.drop).toHaveBeenCalledWith('*')
+        expect(mockCache.set).toHaveBeenCalledWith(
+          'account:2',
+          accounts[1],
+          DEFAULT_TTL
+        )
       })
 
-      test('invalidates all cache twice when status changes', async () => {
-        const account = { id: 1, status: 'active' }
+      test('handles accounts with userId field', async () => {
+        const accounts = [{ userId: 123, firstName: 'John' }]
 
-        await cacheService.updateAccount(1, account, 'pending')
+        await cacheService.setAccounts(accounts)
 
-        // Called twice because both new and old status trigger invalidateAll
-        expect(mockCache.drop).toHaveBeenCalledWith('*')
-        expect(mockCache.drop).toHaveBeenCalledTimes(2)
+        expect(mockCache.set).toHaveBeenCalledWith(
+          'account:123',
+          accounts[0],
+          DEFAULT_TTL
+        )
+      })
+
+      test('skips accounts without id or userId', async () => {
+        const accounts = [{ firstName: 'John' }, { id: 2, firstName: 'Jane' }]
+
+        await cacheService.setAccounts(accounts)
+
+        expect(mockCache.set).toHaveBeenCalledTimes(1)
+        expect(mockCache.set).toHaveBeenCalledWith(
+          'account:2',
+          accounts[1],
+          DEFAULT_TTL
+        )
+      })
+
+      test('does nothing when cache disabled', async () => {
+        config.get.mockReturnValue('memory')
+        const disabledService = new AccountsCacheService(mockServer)
+
+        await disabledService.setAccounts([{ id: 1 }])
+
+        expect(mockCache.set).not.toHaveBeenCalled()
+      })
+
+      test('does nothing when accounts is empty', async () => {
+        await cacheService.setAccounts([])
+
+        expect(mockCache.set).not.toHaveBeenCalled()
+      })
+
+      test('does nothing when accounts is null', async () => {
+        await cacheService.setAccounts(null)
+
+        expect(mockCache.set).not.toHaveBeenCalled()
       })
     })
   })
@@ -259,12 +429,6 @@ describe('AccountsCacheService', () => {
 
     test('setByKey does nothing', async () => {
       await cacheService.setByKey('pending:::1', { data: [] })
-
-      expect(mockServer.cache).not.toHaveBeenCalled()
-    })
-
-    test('invalidateByStatus does nothing', async () => {
-      await cacheService.invalidateByStatus('pending')
 
       expect(mockServer.cache).not.toHaveBeenCalled()
     })

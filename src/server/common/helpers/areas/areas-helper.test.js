@@ -13,7 +13,10 @@ import {
   buildAreaHierarchy,
   getAreaPath,
   hasChildren,
-  getParentAreas
+  getParentAreas,
+  getAreaDetails,
+  getParentAreasDisplay,
+  determineResponsibilityFromAreas
 } from './areas-helper.js'
 
 describe('AreasHelper', () => {
@@ -627,6 +630,358 @@ describe('AreasHelper', () => {
       expect(hierarchy[0].children[0].children[0].name).toBe(
         'Bristol City Council'
       )
+    })
+  })
+
+  describe('getAreaDetails', () => {
+    test('returns main area and additional areas', () => {
+      const userAreas = [
+        { areaId: '1', primary: true },
+        { areaId: '3', primary: false },
+        { areaId: '4', primary: false }
+      ]
+
+      const result = getAreaDetails(mockAreas, userAreas)
+
+      expect(result.mainArea).toBeDefined()
+      expect(result.mainArea.id).toBe('1')
+      expect(result.mainArea.name).toBe('Wessex')
+      expect(result.additionalAreas).toHaveLength(2)
+      expect(result.additionalAreas[0].id).toBe('3')
+      expect(result.additionalAreas[1].id).toBe('4')
+    })
+
+    test('returns null main area when no primary area', () => {
+      const userAreas = [
+        { areaId: '3', primary: false },
+        { areaId: '4', primary: false }
+      ]
+
+      const result = getAreaDetails(mockAreas, userAreas)
+
+      expect(result.mainArea).toBeNull()
+      expect(result.additionalAreas).toHaveLength(2)
+    })
+
+    test('filters out null areas for non-existent IDs', () => {
+      const userAreas = [
+        { areaId: '1', primary: true },
+        { areaId: 'nonexistent', primary: false },
+        { areaId: '3', primary: false }
+      ]
+
+      const result = getAreaDetails(mockAreas, userAreas)
+
+      expect(result.mainArea.id).toBe('1')
+      expect(result.additionalAreas).toHaveLength(1)
+      expect(result.additionalAreas[0].id).toBe('3')
+    })
+
+    test('returns empty result when no user areas', () => {
+      const result = getAreaDetails(mockAreas, [])
+
+      expect(result.mainArea).toBeNull()
+      expect(result.additionalAreas).toEqual([])
+    })
+
+    test('handles null user areas', () => {
+      const result = getAreaDetails(mockAreas, null)
+
+      expect(result.mainArea).toBeNull()
+      expect(result.additionalAreas).toEqual([])
+    })
+
+    test('handles undefined user areas', () => {
+      const result = getAreaDetails(mockAreas, undefined)
+
+      expect(result.mainArea).toBeNull()
+      expect(result.additionalAreas).toEqual([])
+    })
+  })
+
+  describe('getParentAreasDisplay', () => {
+    const RESPONSIBILITY_MAP = { EA: 'EA', PSO: 'PSO', RMA: 'RMA' }
+    const AREAS_RESPONSIBILITIES_MAP = { EA: 'EA', PSO: 'PSO', RMA: 'RMA' }
+
+    test('returns null when no responsibility', () => {
+      const userAreas = [{ areaId: '3', primary: true }]
+
+      const result = getParentAreasDisplay(
+        mockAreas,
+        null,
+        userAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBeNull()
+    })
+
+    test('returns null when no user areas', () => {
+      const result = getParentAreasDisplay(
+        mockAreas,
+        'PSO',
+        [],
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBeNull()
+    })
+
+    test('returns EA parent areas for PSO users', () => {
+      const userAreas = [{ areaId: '3', primary: true }]
+
+      const result = getParentAreasDisplay(
+        mockAreas,
+        'PSO',
+        userAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBeDefined()
+      expect(result.eaAreas).toBe('Wessex')
+      expect(result.psoAreas).toBeNull()
+    })
+
+    test('returns EA and PSO parent areas for RMA users', () => {
+      const userAreas = [{ areaId: '6', primary: true }]
+
+      const result = getParentAreasDisplay(
+        mockAreas,
+        'RMA',
+        userAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBeDefined()
+      expect(result.eaAreas).toBe('Wessex')
+      expect(result.psoAreas).toBe('PSO West of England')
+    })
+
+    test('returns null for EA users (no parent areas needed)', () => {
+      const userAreas = [{ areaId: '1', primary: true }]
+
+      const result = getParentAreasDisplay(
+        mockAreas,
+        'EA',
+        userAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result.eaAreas).toBeNull()
+      expect(result.psoAreas).toBeNull()
+    })
+
+    test('handles multiple areas with unique parents', () => {
+      const userAreas = [
+        { areaId: '3', primary: true },
+        { areaId: '4', primary: false }
+      ]
+
+      const result = getParentAreasDisplay(
+        mockAreas,
+        'PSO',
+        userAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result.eaAreas).toBe('Wessex')
+    })
+
+    test('handles missing area in lookup gracefully', () => {
+      const userAreas = [
+        { areaId: '3', primary: true },
+        { areaId: 'nonexistent', primary: false }
+      ]
+
+      const result = getParentAreasDisplay(
+        mockAreas,
+        'PSO',
+        userAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result.eaAreas).toBe('Wessex')
+    })
+
+    test('joins multiple parent areas with comma', () => {
+      const userAreas = [
+        { areaId: '6', primary: true },
+        { areaId: '8', primary: false }
+      ]
+
+      const result = getParentAreasDisplay(
+        mockAreas,
+        'RMA',
+        userAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result.eaAreas).toBe('Wessex')
+      expect(result.psoAreas).toContain('PSO West of England')
+      expect(result.psoAreas).toContain('PSO Dorset')
+    })
+  })
+
+  describe('determineResponsibilityFromAreas', () => {
+    const RESPONSIBILITY_MAP = { EA: 'EA', PSO: 'PSO', RMA: 'RMA' }
+    const AREAS_RESPONSIBILITIES_MAP = { EA: 'EA', PSO: 'PSO', RMA: 'RMA' }
+
+    test('returns null for admin users', () => {
+      const account = {
+        admin: true,
+        areas: [{ id: '1', primary: true }]
+      }
+
+      const result = determineResponsibilityFromAreas(
+        account,
+        mockAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBeNull()
+    })
+
+    test('returns null when no areas', () => {
+      const account = {
+        admin: false,
+        areas: []
+      }
+
+      const result = determineResponsibilityFromAreas(
+        account,
+        mockAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBeNull()
+    })
+
+    test('returns null when areas is null', () => {
+      const account = {
+        admin: false,
+        areas: null
+      }
+
+      const result = determineResponsibilityFromAreas(
+        account,
+        mockAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBeNull()
+    })
+
+    test('returns null when no primary area', () => {
+      const account = {
+        admin: false,
+        areas: [
+          { id: '3', primary: false },
+          { id: '4', primary: false }
+        ]
+      }
+
+      const result = determineResponsibilityFromAreas(
+        account,
+        mockAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBeNull()
+    })
+
+    test('returns EA for EA area type', () => {
+      const account = {
+        admin: false,
+        areas: [{ id: '1', primary: true }]
+      }
+
+      const result = determineResponsibilityFromAreas(
+        account,
+        mockAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBe('EA')
+    })
+
+    test('returns PSO for PSO area type', () => {
+      const account = {
+        admin: false,
+        areas: [{ id: '3', primary: true }]
+      }
+
+      const result = determineResponsibilityFromAreas(
+        account,
+        mockAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBe('PSO')
+    })
+
+    test('returns RMA for RMA area type', () => {
+      const account = {
+        admin: false,
+        areas: [{ id: '6', primary: true }]
+      }
+
+      const result = determineResponsibilityFromAreas(
+        account,
+        mockAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBe('RMA')
+    })
+
+    test('returns null when area not found in cache', () => {
+      const account = {
+        admin: false,
+        areas: [{ id: 'nonexistent', primary: true }]
+      }
+
+      const result = determineResponsibilityFromAreas(
+        account,
+        mockAreas,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBeNull()
+    })
+
+    test('returns null when area has no area_type', () => {
+      const areasWithoutType = {
+        EA: [{ id: '1', name: 'Test', parent_id: null }]
+      }
+      const account = {
+        admin: false,
+        areas: [{ id: '1', primary: true }]
+      }
+
+      const result = determineResponsibilityFromAreas(
+        account,
+        areasWithoutType,
+        RESPONSIBILITY_MAP,
+        AREAS_RESPONSIBILITIES_MAP
+      )
+
+      expect(result).toBeNull()
     })
   })
 })

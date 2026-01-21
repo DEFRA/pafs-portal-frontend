@@ -5,7 +5,9 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block beforeContent %}
+  {% if not isEditMode %}
   <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
+  {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -24,7 +26,7 @@
         name: "admin",
         fieldset: {
           legend: {
-            text: t('accounts.add_user.admin_question.heading'),
+            text: t('accounts.add_user.admin_question.' + ('edit_heading' if isEditMode else 'heading')),
             isPageHeading: true,
             classes: "govuk-fieldset__legend--l"
           }
@@ -44,9 +46,14 @@
         errorMessage: errors.admin if errors and errors.admin
       }) }}
 
-      {{ govukButton({
-        text: t('common.buttons.continue')
-      }) }}
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: t('common.buttons.continue')
+        }) }}
+        {% if isEditMode and cancelRoute %}
+        <a class="govuk-link" href="{{ cancelRoute }}">{{ t('common.cancel_link') }}</a>
+        {% endif %}
+      </div>
     </form>
   </div>
 </div>

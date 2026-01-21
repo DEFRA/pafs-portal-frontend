@@ -3,7 +3,7 @@ import {
   VIEW_ERROR_CODES
 } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { getSessionKey } from '../helpers.js'
+import { getSessionKey } from '../helpers/session-helpers.js'
 
 /**
  * Confirmation Controller

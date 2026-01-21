@@ -104,6 +104,31 @@ describe('#buildRedisClient', () => {
 
       expect(Cluster).toHaveBeenCalled()
     })
+
+    test('Should configure dnsLookup callback for cluster', () => {
+      Cluster.mockClear()
+
+      const clusterConfig = {
+        host: '127.0.0.1',
+        keyPrefix: 'test:',
+        useSingleInstanceCache: false,
+        username: '',
+        password: ''
+      }
+
+      buildRedisClient(clusterConfig)
+
+      const clusterCall = Cluster.mock.calls[0]
+      const dnsLookup = clusterCall[1].dnsLookup
+
+      expect(dnsLookup).toBeDefined()
+
+      // Test the dnsLookup callback
+      const mockCallback = vi.fn()
+      dnsLookup('test-address', mockCallback)
+
+      expect(mockCallback).toHaveBeenCalledWith(null, 'test-address')
+    })
   })
 
   describe('Event handlers', () => {

@@ -3,11 +3,16 @@
  * Shared between pending and active user controllers
  */
 
-import { PAGINATION } from '../../../../common/constants/common.js'
+import {
+  AREAS_LABELS,
+  AREAS_RESPONSIBILITIES_MAP,
+  PAGINATION
+} from '../../../../common/constants/common.js'
 import {
   buildGovukPagination,
   getDefaultPageSize
 } from '../../../../common/helpers/pagination/index.js'
+import { encodeUserId } from '../../../../common/helpers/security/encoder.js'
 
 /**
  * Get primary area name from user areas array
@@ -33,14 +38,17 @@ export function getPrimaryAreaName(areas) {
 export function formatUserForDisplay(user) {
   const isAdmin = user.admin || false
   return {
-    id: user.id,
+    id: encodeUserId(user.id),
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
     isAdmin,
     primaryArea: isAdmin ? '-' : getPrimaryAreaName(user.areas),
     createdAt: user.createdAt,
-    lastSignIn: user.lastSignIn || null
+    lastSignIn: user.lastSignIn || null,
+    status: user.status,
+    invitationSentAt: user.invitationSentAt,
+    invitationAcceptedAt: user.invitationAcceptedAt
   }
 }
 
@@ -56,13 +64,58 @@ export function formatUsersForDisplay(users) {
 
 /**
  * Get area filter options
- * Currently returns only 'All areas' - will be expanded later
+ * Returns 'All areas' option plus grouped areas (EA, PSO, RMA)
  *
  * @param {Function} t - Translation function
- * @returns {Array} Area options for dropdown
+ * @param {Object} areasByType - Areas data structure from cache
+ * @returns {Array} Area options for dropdown with grouping
  */
-export function getAreaFilterOptions(t) {
-  return [{ value: '', text: t('accounts.manage_users.filters.all_areas') }]
+export function getAreaFilterOptions(t, areasByType) {
+  const options = [
+    { value: '', text: t('accounts.manage_users.filters.all_areas') }
+  ]
+
+  if (!areasByType) {
+    return options
+  }
+
+  // Add EA areas as a group
+  const eaAreas = areasByType[AREAS_RESPONSIBILITIES_MAP.EA] || []
+  if (eaAreas.length > 0) {
+    options.push({
+      label: AREAS_LABELS.EA,
+      options: eaAreas.map((area) => ({
+        value: area.id,
+        text: area.name
+      }))
+    })
+  }
+
+  // Add PSO areas as a group
+  const psoAreas = areasByType[AREAS_RESPONSIBILITIES_MAP.PSO] || []
+  if (psoAreas.length > 0) {
+    options.push({
+      label: AREAS_LABELS.PSO,
+      options: psoAreas.map((area) => ({
+        value: area.id,
+        text: area.name
+      }))
+    })
+  }
+
+  // Add RMA areas as a group
+  const rmaAreas = areasByType[AREAS_RESPONSIBILITIES_MAP.RMA] || []
+  if (rmaAreas.length > 0) {
+    options.push({
+      label: AREAS_LABELS.RMA,
+      options: rmaAreas.map((area) => ({
+        value: area.id,
+        text: area.name
+      }))
+    })
+  }
+
+  return options
 }
 
 /**
@@ -78,8 +131,10 @@ export function getAreaFilterOptions(t) {
  * @param {Object} params.filters - Current filter values
  * @param {string} params.currentTab - Current tab ('pending' or 'active')
  * @param {string} params.baseUrl - Base URL for form and pagination
+ * @param {Object} [params.areasByType] - Areas data structure from cache
  * @param {string} [params.error] - Error message if any
  * @param {Object} [params.successNotification] - Success notification data
+ * @param {Object} [params.errorNotification] - Error notification data
  * @returns {Object} View model
  */
 export function buildUsersViewModel({
@@ -92,8 +147,10 @@ export function buildUsersViewModel({
   filters,
   currentTab,
   baseUrl,
+  areasByType,
   error,
-  successNotification
+  successNotification,
+  errorNotification
 }) {
   const currentPage =
     pagination.page || pagination.currentPage || PAGINATION.DEFAULT_PAGE
@@ -116,7 +173,7 @@ export function buildUsersViewModel({
     pendingCount,
     activeCount,
     filters,
-    areas: getAreaFilterOptions(request.t),
+    areas: getAreaFilterOptions(request.t, areasByType),
     currentTab,
     baseUrl,
     tabUrls: {
@@ -124,7 +181,8 @@ export function buildUsersViewModel({
       active: '/admin/users/active'
     },
     ...(error && { error }),
-    ...(successNotification && { successNotification })
+    ...(successNotification && { successNotification }),
+    ...(errorNotification && { errorNotification })
   }
 }
 
@@ -137,8 +195,10 @@ export function buildUsersViewModel({
  * @param {Object} params.filters - Current filter values
  * @param {string} params.currentTab - Current tab
  * @param {string} params.baseUrl - Base URL
+ * @param {Object} [params.areasByType] - Areas data structure from cache
  * @param {string} params.error - Error message
  * @param {Object} [params.successNotification] - Success notification data
+ * @param {Object} [params.errorNotification] - Error notification data
  * @returns {Object} Empty view model
  */
 export function getEmptyUsersViewModel({
@@ -147,8 +207,10 @@ export function getEmptyUsersViewModel({
   filters,
   currentTab,
   baseUrl,
+  areasByType,
   error,
-  successNotification
+  successNotification,
+  errorNotification
 }) {
   return buildUsersViewModel({
     request,
@@ -165,7 +227,9 @@ export function getEmptyUsersViewModel({
     filters,
     currentTab,
     baseUrl,
+    areasByType,
     error,
-    successNotification
+    successNotification,
+    errorNotification
   })
 }

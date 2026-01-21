@@ -31,6 +31,11 @@ export const router = {
         'users',
         'users/pending',
         'users/active',
+        'users/download',
+        'users/approve',
+        'users/delete',
+        'users/resend-invitation',
+        'users/reactivate',
         'journey-selection',
         'accounts'
       ])

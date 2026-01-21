@@ -53,7 +53,7 @@ describe('Auth Middleware', () => {
 
       await requireAuth(mockRequest, mockH)
 
-      expect(clearAuthSession).toHaveBeenCalled()
+      expect(clearAuthSession).toHaveBeenCalledWith(mockRequest)
       expect(mockRequest.yar.flash).toHaveBeenCalledWith(
         'authError',
         'session-timeout'
@@ -61,17 +61,22 @@ describe('Auth Middleware', () => {
       expect(mockH.redirect).toHaveBeenCalledWith('/login')
     })
 
-    test('refreshes token if needed', async () => {
-      const session = { user: { id: 1 }, accessToken: 'valid-token' }
-      getAuthSession.mockReturnValue(session)
+    test('refreshes token if needed before validation', async () => {
+      const session = { user: { id: 1 }, accessToken: 'old-token' }
+      const refreshedSession = { user: { id: 1 }, accessToken: 'new-token' }
+
+      getAuthSession
+        .mockReturnValueOnce(session)
+        .mockReturnValueOnce(refreshedSession)
       isSessionExpired.mockReturnValue(false)
-      validateSession.mockResolvedValue({ success: true })
       shouldRefreshToken.mockReturnValue(true)
       refreshAuthSession.mockResolvedValue({ success: true })
+      validateSession.mockResolvedValue({ success: true })
 
       const result = await requireAuth(mockRequest, mockH)
 
       expect(refreshAuthSession).toHaveBeenCalled()
+      expect(validateSession).toHaveBeenCalledWith('new-token')
       expect(updateActivity).toHaveBeenCalled()
       expect(result).toBe(mockH.continue)
     })
@@ -79,10 +84,9 @@ describe('Auth Middleware', () => {
     test('redirects if refresh fails', async () => {
       getAuthSession.mockReturnValue({
         user: { id: 1 },
-        accessToken: 'valid-token'
+        accessToken: 'old-token'
       })
       isSessionExpired.mockReturnValue(false)
-      validateSession.mockResolvedValue({ success: true })
       shouldRefreshToken.mockReturnValue(true)
       refreshAuthSession.mockResolvedValue({
         success: false,
@@ -91,6 +95,7 @@ describe('Auth Middleware', () => {
 
       await requireAuth(mockRequest, mockH)
 
+      expect(clearAuthSession).toHaveBeenCalledWith(mockRequest)
       expect(mockRequest.yar.flash).toHaveBeenCalledWith(
         'authError',
         'session-timeout'
@@ -98,13 +103,12 @@ describe('Auth Middleware', () => {
       expect(mockH.redirect).toHaveBeenCalledWith('/login')
     })
 
-    test('handles concurrent session', async () => {
+    test('handles concurrent session during refresh', async () => {
       getAuthSession.mockReturnValue({
         user: { id: 1 },
-        accessToken: 'valid-token'
+        accessToken: 'old-token'
       })
       isSessionExpired.mockReturnValue(false)
-      validateSession.mockResolvedValue({ success: true })
       shouldRefreshToken.mockReturnValue(true)
       refreshAuthSession.mockResolvedValue({
         success: false,
@@ -113,6 +117,7 @@ describe('Auth Middleware', () => {
 
       await requireAuth(mockRequest, mockH)
 
+      expect(clearAuthSession).toHaveBeenCalledWith(mockRequest)
       expect(mockRequest.yar.flash).toHaveBeenCalledWith(
         'authError',
         'session-mismatch'
@@ -142,6 +147,7 @@ describe('Auth Middleware', () => {
         accessToken: 'invalid-token'
       })
       isSessionExpired.mockReturnValue(false)
+      shouldRefreshToken.mockReturnValue(false)
       validateSession.mockResolvedValue({
         success: false,
         errors: [{ errorCode: 'AUTH_SESSION_MISMATCH' }]
@@ -149,7 +155,7 @@ describe('Auth Middleware', () => {
 
       await requireAuth(mockRequest, mockH)
 
-      expect(clearAuthSession).toHaveBeenCalled()
+      expect(clearAuthSession).toHaveBeenCalledWith(mockRequest)
       expect(mockRequest.yar.flash).toHaveBeenCalledWith(
         'authError',
         'session-mismatch'
@@ -163,6 +169,74 @@ describe('Auth Middleware', () => {
         accessToken: 'invalid-token'
       })
       isSessionExpired.mockReturnValue(false)
+      shouldRefreshToken.mockReturnValue(false)
+      validateSession.mockResolvedValue({
+        success: false,
+        errors: [{ errorCode: 'AUTH_TOKEN_EXPIRED' }]
+      })
+      refreshAuthSession.mockResolvedValue({ success: false })
+
+      await requireAuth(mockRequest, mockH)
+
+      expect(clearAuthSession).toHaveBeenCalledWith(mockRequest)
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith(
+        'authError',
+        'session-timeout'
+      )
+      expect(mockH.redirect).toHaveBeenCalledWith('/login')
+    })
+
+    test('tries to refresh when validation fails but session not expired', async () => {
+      const session = {
+        user: { id: 1 },
+        accessToken: 'expired-token',
+        lastActivity: Date.now() - 10 * 60 * 1000 // 10 minutes ago
+      }
+
+      getAuthSession.mockReturnValue(session)
+      isSessionExpired.mockReturnValue(false)
+      shouldRefreshToken.mockReturnValue(false)
+      validateSession.mockResolvedValue({
+        success: false,
+        errors: [{ errorCode: 'AUTH_TOKEN_EXPIRED' }]
+      })
+      refreshAuthSession.mockResolvedValue({ success: true })
+
+      const result = await requireAuth(mockRequest, mockH)
+
+      expect(refreshAuthSession).toHaveBeenCalled()
+      expect(updateActivity).toHaveBeenCalled()
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('redirects when refreshed session is null after token refresh', async () => {
+      const session = { user: { id: 1 }, accessToken: 'old-token' }
+
+      getAuthSession.mockReturnValueOnce(session).mockReturnValueOnce(null)
+      isSessionExpired.mockReturnValue(false)
+      shouldRefreshToken.mockReturnValue(true)
+      refreshAuthSession.mockResolvedValue({ success: true })
+
+      await requireAuth(mockRequest, mockH)
+
+      expect(clearAuthSession).toHaveBeenCalledWith(mockRequest)
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith(
+        'authError',
+        'session-timeout'
+      )
+      expect(mockH.redirect).toHaveBeenCalledWith('/login')
+    })
+
+    test('redirects when validation fails after successful token refresh', async () => {
+      const session = { user: { id: 1 }, accessToken: 'old-token' }
+      const refreshedSession = { user: { id: 1 }, accessToken: 'new-token' }
+
+      getAuthSession
+        .mockReturnValueOnce(session)
+        .mockReturnValueOnce(refreshedSession)
+      isSessionExpired.mockReturnValue(false)
+      shouldRefreshToken.mockReturnValue(true)
+      refreshAuthSession.mockResolvedValue({ success: true })
       validateSession.mockResolvedValue({
         success: false,
         errors: [{ errorCode: 'AUTH_TOKEN_EXPIRED' }]
@@ -170,7 +244,32 @@ describe('Auth Middleware', () => {
 
       await requireAuth(mockRequest, mockH)
 
-      expect(clearAuthSession).toHaveBeenCalled()
+      expect(validateSession).toHaveBeenCalledWith('new-token')
+      expect(clearAuthSession).toHaveBeenCalledWith(mockRequest)
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith(
+        'authError',
+        'session-timeout'
+      )
+      expect(mockH.redirect).toHaveBeenCalledWith('/login')
+    })
+
+    test('redirects when session expires during validation failure handling', async () => {
+      const session = {
+        user: { id: 1 },
+        accessToken: 'invalid-token'
+      }
+
+      getAuthSession.mockReturnValue(session)
+      isSessionExpired.mockReturnValueOnce(false).mockReturnValueOnce(true)
+      shouldRefreshToken.mockReturnValue(false)
+      validateSession.mockResolvedValue({
+        success: false,
+        errors: [{ errorCode: 'AUTH_TOKEN_EXPIRED' }]
+      })
+
+      await requireAuth(mockRequest, mockH)
+
+      expect(clearAuthSession).toHaveBeenCalledWith(mockRequest)
       expect(mockRequest.yar.flash).toHaveBeenCalledWith(
         'authError',
         'session-timeout'

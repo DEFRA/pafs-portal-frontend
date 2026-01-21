@@ -5,7 +5,7 @@ import {
 } from './controller.js'
 
 vi.mock('../../../common/helpers/areas/areas-helper.js')
-vi.mock('../helpers.js', async (importOriginal) => {
+vi.mock('../helpers/session-helpers.js', async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
@@ -15,7 +15,8 @@ vi.mock('../helpers.js', async (importOriginal) => {
 
 const { getAreasByType } =
   await import('../../../common/helpers/areas/areas-helper.js')
-const { getSessionKey, buildGroupedAreas } = await import('../helpers.js')
+const { getSessionKey, buildGroupedAreas } =
+  await import('../helpers/session-helpers.js')
 const { AdditionalAreasController } = await import('./controller.js')
 
 describe('AdditionalAreasController', () => {
@@ -631,6 +632,69 @@ describe('AdditionalAreasController', () => {
         expect.objectContaining({
           areas: [expect.objectContaining({ areaId: '1', primary: true })]
         })
+      )
+    })
+  })
+
+  describe('Edit mode navigation', () => {
+    test('redirects to edit check-answers when areas changed in edit mode', async () => {
+      mockRequest.path = '/admin/accounts/additional-areas'
+      mockRequest.yar.get.mockReturnValue({
+        responsibility: 'EA',
+        areas: [{ areaId: '1', primary: true }],
+        editMode: true,
+        encodedId: 'test123',
+        originalData: {
+          responsibility: 'EA',
+          areas: [{ areaId: '1', primary: true }]
+        }
+      })
+      mockRequest.payload = { additionalAreas: ['2', '3'] }
+
+      await additionalAreasPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/admin/user-account/check-answers/test123/edit'
+      )
+    })
+
+    test('redirects to user view when no changes in edit mode', async () => {
+      mockRequest.path = '/admin/accounts/additional-areas'
+      mockRequest.yar.get.mockReturnValue({
+        responsibility: 'EA',
+        areas: [
+          { areaId: '1', primary: true },
+          { areaId: '2', primary: false }
+        ],
+        editMode: true,
+        encodedId: 'test123',
+        originalData: {
+          responsibility: 'EA',
+          areas: [
+            { areaId: '1', primary: true },
+            { areaId: '2', primary: false }
+          ]
+        }
+      })
+      mockRequest.payload = { additionalAreas: ['2'] }
+
+      await additionalAreasPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith('/admin/users/test123/view')
+    })
+
+    test('redirects to regular check answers when not in edit mode', async () => {
+      mockRequest.path = '/admin/accounts/additional-areas'
+      mockRequest.yar.get.mockReturnValue({
+        responsibility: 'EA',
+        areas: [{ areaId: '1', primary: true }]
+      })
+      mockRequest.payload = { additionalAreas: ['2'] }
+
+      await additionalAreasPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/admin/user-account/check-answers'
       )
     })
   })

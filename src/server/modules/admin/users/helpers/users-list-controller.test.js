@@ -70,7 +70,15 @@ describe('createUsersListController', () => {
           error: vi.fn(),
           warn: vi.fn()
         }
-      }
+      },
+      getAreas: vi.fn().mockResolvedValue({
+        'EA Area': [{ id: '1', name: 'Anglian' }],
+        'PSO Area': [{ id: '2', name: 'Lincolnshire and Northamptonshire' }],
+        RMA: [
+          { id: '3', name: 'Cumbria' },
+          { id: '4', name: 'Lancashire' }
+        ]
+      })
     }
 
     mockH = {
@@ -333,12 +341,14 @@ describe('createUsersListController', () => {
         expect.objectContaining({
           users: expect.arrayContaining([
             expect.objectContaining({
-              id: 1,
+              id: expect.any(String), // ID is now encoded
               firstName: 'John',
               lastName: 'Smith',
               email: 'john.smith@example.com',
               primaryArea: 'Thames',
-              isAdmin: false
+              isAdmin: false,
+              createdAt: expect.any(String),
+              lastSignIn: expect.any(String)
             })
           ])
         })
@@ -426,7 +436,24 @@ describe('createUsersListController', () => {
         'admin/users/pending/index',
         expect.objectContaining({
           areas: [
-            { value: '', text: 'accounts.manage_users.filters.all_areas' }
+            { value: '', text: 'accounts.manage_users.filters.all_areas' },
+            {
+              label: 'Area Program Team',
+              options: [{ value: '1', text: 'Anglian' }]
+            },
+            {
+              label: 'PSO Team',
+              options: [
+                { value: '2', text: 'Lincolnshire and Northamptonshire' }
+              ]
+            },
+            {
+              label: 'RMA',
+              options: [
+                { value: '3', text: 'Cumbria' },
+                { value: '4', text: 'Lancashire' }
+              ]
+            }
           ]
         })
       )

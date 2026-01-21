@@ -4,7 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block beforeContent %}
-  {% if backLink %}
+  {% if not isEditMode and backLink %}
     <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
   {% endif %}
 {% endblock %}
@@ -86,9 +86,14 @@
         {% endif %}
       {% endif %}
 
-      {{ govukButton({
-        text: t('common.buttons.continue')
-      }) }}
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: t('common.buttons.continue')
+        }) }}
+        {% if isEditMode and cancelRoute %}
+        <a class="govuk-link" href="{{ cancelRoute }}">{{ t('common.cancel_link') }}</a>
+        {% endif %}
+      </div>
     </form>
   </div>
 </div>

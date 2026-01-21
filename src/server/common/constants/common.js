@@ -13,7 +13,8 @@ export const AUTH_VIEWS = {
 export const ADMIN_VIEWS = {
   JOURNEY_SELECTION: 'modules/admin/journey-selection/index',
   USERS_PENDING: 'modules/admin/users/pending/index',
-  USERS_ACTIVE: 'modules/admin/users/active/index'
+  USERS_ACTIVE: 'modules/admin/users/active/index',
+  DELETE_USER: 'modules/admin/users/delete/index'
 }
 
 export const ACCOUNT_VIEWS = {
@@ -24,7 +25,8 @@ export const ACCOUNT_VIEWS = {
   MAIN_AREA: 'modules/accounts/main-area/index',
   ADDITIONAL_AREAS: 'modules/accounts/additional-areas/index',
   CHECK_ANSWERS: 'modules/accounts/check-answers/index',
-  CONFIRMATION: 'modules/accounts/confirmation/index'
+  CONFIRMATION: 'modules/accounts/confirmation/index',
+  VIEW_ACCOUNT: 'modules/accounts/view-account/index'
 }
 
 export const PROPOSAL_VIEWS = {
@@ -69,6 +71,10 @@ export const PAGINATION = {
   END_OFFSET: 3
 }
 
+export const API_LIMITS = {
+  MAX_ACCOUNTS_PAGE_SIZE: 10000
+}
+
 export const SESSION = {
   REFRESH_BUFFER_MS: 300000, // Refresh 5 minutes before expiry
   INACTIVE_TIMEOUT_MS: 3600000, // 1 hour (60 minutes)
@@ -82,6 +88,7 @@ export const SESSION = {
  */
 export const SIZE = {
   LENGTH_8: 8,
+  LENGTH_12: 12,
   LENGTH_32: 32,
   LENGTH_128: 128,
   LENGTH_254: 254,
@@ -137,6 +144,12 @@ export { VIEW_ERROR_CODES } from './validation.js'
 export const AREAS_RESPONSIBILITIES_MAP = {
   EA: 'EA Area',
   PSO: 'PSO Area',
+  RMA: 'RMA'
+}
+
+export const AREAS_LABELS = {
+  EA: 'Area Program Team',
+  PSO: 'PSO Team',
   RMA: 'RMA'
 }
 

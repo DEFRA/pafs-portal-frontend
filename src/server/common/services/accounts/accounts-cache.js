@@ -1,9 +1,10 @@
 import { BaseCacheService } from '../../helpers/cache/base-cache-service.js'
 import { CACHE_SEGMENTS } from '../../constants/common.js'
+import { getDefaultPageSize } from '../../helpers/pagination/index.js'
 
 /**
  * Accounts cache service
- * Provides caching layer for account data to reduce API calls
+ * Manages caching for both individual accounts and list metadata in a single segment
  */
 export class AccountsCacheService extends BaseCacheService {
   /**
@@ -14,22 +15,29 @@ export class AccountsCacheService extends BaseCacheService {
   }
 
   /**
-   * Generate cache key for accounts query
-   * @param {Object} params - Query parameters
-   * @returns {string} Cache key
-   */
-  generateKey(params) {
-    const { status, search = '', areaId = '', page = 1 } = params
-    return `${status}:${search}:${areaId}:${page}`
-  }
-
-  /**
    * Generate cache key for a single account
    * @param {number|string} id - Account ID
    * @returns {string} Cache key
    */
   generateAccountKey(id) {
     return `account:${id}`
+  }
+
+  /**
+   * Generate cache key for list metadata
+   * @param {Object} params - Query parameters
+   * @returns {string} Cache key
+   */
+  generateListKey(params) {
+    const defaultPageSize = getDefaultPageSize()
+    const {
+      status,
+      search = '',
+      areaId = '',
+      page = 1,
+      pageSize = defaultPageSize
+    } = params
+    return `list:${status}:${search}:${areaId}:${page}:${pageSize}`
   }
 
   /**
@@ -56,78 +64,127 @@ export class AccountsCacheService extends BaseCacheService {
   }
 
   /**
-   * Invalidate a single account cache
+   * Get multiple accounts by IDs from cache
+   * Returns accounts that are cached, null for missing ones
    *
-   * @param {number|string} id - Account ID
-   * @returns {Promise<void>}
+   * @param {Array<number|string>} ids - Array of account IDs
+   * @returns {Promise<Array<Object|null>>} Array of accounts (null for cache misses)
    */
-  async invalidateAccount(id) {
-    const key = this.generateAccountKey(id)
-    await this.dropByKey(key)
-    // Also invalidate list caches as the account may appear in lists
-    await this.invalidateAll()
+  async getAccountsByIds(ids) {
+    if (!this.enabled || !ids || ids.length === 0) {
+      return []
+    }
+
+    const promises = ids.map((id) => this.getAccount(id))
+    return Promise.all(promises)
   }
 
   /**
-   * Invalidate cache for a specific status
-   * Call this when accounts of a specific status have changed
+   * Cache multiple accounts at once
    *
-   * @param {string} status - Account status ('pending' or 'active')
+   * @param {Array<Object>} accounts - Array of account objects (must have id/userId field)
    * @returns {Promise<void>}
    */
-  async invalidateByStatus(_status) {
+  async setAccounts(accounts) {
+    if (!this.enabled || !accounts || accounts.length === 0) {
+      return
+    }
+
+    const promises = accounts.map((account) => {
+      const id = account.id || account.userId
+      return id ? this.setAccount(id, account) : Promise.resolve()
+    })
+
+    await Promise.all(promises)
+  }
+
+  /**
+   * Cache list metadata with account IDs
+   * @param {Object} params - Query parameters
+   * @param {Array<number>} accountIds - Array of account IDs
+   * @param {Object} pagination - Pagination metadata
+   * @returns {Promise<void>}
+   */
+  async setListMetadata(params, accountIds, pagination) {
     if (!this.enabled) {
       return
     }
 
-    await this.invalidateAll()
+    const metadata = {
+      accountIds,
+      pagination,
+      timestamp: Date.now()
+    }
+
+    const key = this.generateListKey(params)
+    await this.setByKey(key, metadata)
+
+    this.server.logger.debug(
+      { segment: this.segment, key, accountCount: accountIds.length },
+      'Cached list metadata'
+    )
   }
 
   /**
-   * Add account to existing cached list (if cached)
-   * This is a best-effort operation - if cache miss, no action taken
-   *
-   * @param {Object} account - Account data to add
-   * @param {Object} listParams - List query parameters
-   * @returns {Promise<void>}
+   * Get list metadata from cache
+   * @param {Object} params - Query parameters
+   * @returns {Promise<Object|null>} List metadata or null
    */
-  async addToList(account, _listParams) {
-    // For list operations, it's safer to invalidate the cache
-    // Adding to list would require complex pagination recalculation
-    await this.invalidateByStatus(account.status)
+  async getListMetadata(params) {
+    const key = this.generateListKey(params)
+    const metadata = await this.getByKey(key)
+
+    if (metadata) {
+      this.server.logger.debug(
+        {
+          segment: this.segment,
+          key,
+          accountCount: metadata.accountIds?.length
+        },
+        'List metadata cache hit'
+      )
+    } else {
+      this.server.logger.debug(
+        { segment: this.segment, key },
+        'List metadata cache miss'
+      )
+    }
+
+    return metadata
   }
 
   /**
-   * Remove account from existing cached list
-   *
-   * @param {number|string} accountId - Account ID to remove
-   * @param {string} status - Account status
+   * Invalidate all accounts cache
+   * Drops all known cache key patterns for accounts, lists, and counts
    * @returns {Promise<void>}
    */
-  async removeFromList(accountId, status) {
-    // For list operations, it's safer to invalidate the cache
-    await this.invalidateByStatus(status)
-    await this.dropByKey(this.generateAccountKey(accountId))
-  }
+  async invalidateAll() {
+    if (!this.enabled) {
+      return
+    }
 
-  /**
-   * Update account in cache
-   * Invalidates both the single account and affected lists
-   *
-   * @param {number|string} id - Account ID
-   * @param {Object} account - Updated account data
-   * @param {string} [previousStatus] - Previous status if changed
-   * @returns {Promise<void>}
-   */
-  async updateAccount(id, account, previousStatus) {
-    await this.setAccount(id, account)
+    try {
+      const defaultPageSize = getDefaultPageSize()
+      // Drop common list patterns for both statuses
+      const statusList = ['pending', 'active']
+      const listPromises = statusList.flatMap((status) => [
+        // First page with default page size (most common)
+        this.dropByKey(`list:${status}:::1:${defaultPageSize}`),
+        // Count keys
+        this.dropByKey(`count:${status}`)
+      ])
 
-    // Invalidate list caches
-    await this.invalidateByStatus(account.status)
+      await Promise.all(listPromises)
 
-    // If status changed, invalidate the previous status list too
-    if (previousStatus && previousStatus !== account.status) {
-      await this.invalidateByStatus(previousStatus)
+      this.server.logger.info(
+        { segment: this.segment },
+        'Invalidated common accounts cache keys (lists and counts)'
+      )
+    } catch (error) {
+      this.server.logger.warn(
+        { error, segment: this.segment },
+        'Failed to invalidate accounts cache'
+      )
     }
   }
 }

@@ -1,18 +1,32 @@
 import { ACCOUNT_VIEWS } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { getSessionKey } from '../helpers.js'
+import { getSessionKey } from '../helpers/session-helpers.js'
+import { addEditModeContext } from '../helpers/view-data-helper.js'
+import { getNextRouteAfterIsAdmin } from '../helpers/navigation-helper.js'
 
 class IsAdminController {
   get(request, h) {
     const sessionKey = getSessionKey(true)
     const sessionData = request.yar.get(sessionKey) || {}
+    const encodedId = request.params?.encodedId
+    const isEditMode = !!encodedId
 
-    return h.view(ACCOUNT_VIEWS.IS_ADMIN, {
-      pageTitle: request.t('accounts.add_user.admin_question.title'),
+    let viewData = {
+      pageTitle: request.t(
+        isEditMode
+          ? 'accounts.add_user.admin_question.edit_title'
+          : 'accounts.add_user.admin_question.title'
+      ),
       admin: sessionData.admin,
       backLink: ROUTES.ADMIN.ACCOUNTS.START,
       submitRoute: ROUTES.ADMIN.ACCOUNTS.IS_ADMIN
+    }
+
+    viewData = addEditModeContext(request, viewData, {
+      editRoute: ROUTES.ADMIN.ACCOUNTS.EDIT.IS_ADMIN
     })
+
+    return h.view(ACCOUNT_VIEWS.IS_ADMIN, viewData)
   }
 
   post(request, h) {
@@ -48,7 +62,8 @@ class IsAdminController {
     sessionData.admin = admin === 'true' || admin === true
     request.yar.set(sessionKey, sessionData)
 
-    return h.redirect(ROUTES.ADMIN.ACCOUNTS.DETAILS)
+    const nextRoute = getNextRouteAfterIsAdmin(request, sessionData)
+    return h.redirect(nextRoute)
   }
 }
 

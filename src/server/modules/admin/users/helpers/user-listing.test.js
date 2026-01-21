@@ -9,6 +9,10 @@ import {
 } from './user-listing.js'
 import { buildGovukPagination } from '../../../../common/helpers/pagination/index.js'
 
+vi.mock('../../../../common/helpers/security/encoder.js', () => ({
+  encodeUserId: vi.fn((id) => `encoded_${id}`)
+}))
+
 describe('User Helpers', () => {
   describe('getPrimaryAreaName', () => {
     test('returns null for empty areas', () => {
@@ -55,7 +59,7 @@ describe('User Helpers', () => {
   })
 
   describe('formatUserForDisplay', () => {
-    test('formats user with all fields', () => {
+    test('formats user with all fields and encodes ID', () => {
       const user = {
         id: 1,
         firstName: 'John',
@@ -70,7 +74,7 @@ describe('User Helpers', () => {
       const result = formatUserForDisplay(user)
 
       expect(result).toEqual({
-        id: 1,
+        id: 'encoded_1',
         firstName: 'John',
         lastName: 'Smith',
         email: 'john@example.com',
@@ -81,7 +85,7 @@ describe('User Helpers', () => {
       })
     })
 
-    test('formats non-admin user with primary area', () => {
+    test('formats non-admin user with primary area and encodes ID', () => {
       const user = {
         id: 2,
         firstName: 'Jane',
@@ -95,11 +99,12 @@ describe('User Helpers', () => {
 
       const result = formatUserForDisplay(user)
 
+      expect(result.id).toBe('encoded_2')
       expect(result.isAdmin).toBe(false)
       expect(result.primaryArea).toBe('Liverpool')
     })
 
-    test('handles non-admin user without areas', () => {
+    test('handles non-admin user without areas and encodes ID', () => {
       const user = {
         id: 2,
         firstName: 'Jane',
@@ -111,12 +116,13 @@ describe('User Helpers', () => {
 
       const result = formatUserForDisplay(user)
 
+      expect(result.id).toBe('encoded_2')
       expect(result.isAdmin).toBe(false)
       expect(result.primaryArea).toBeNull()
       expect(result.lastSignIn).toBeNull()
     })
 
-    test('handles user with lastSignIn null', () => {
+    test('handles user with lastSignIn null and encodes ID', () => {
       const user = {
         id: 3,
         firstName: 'Test',
@@ -129,12 +135,13 @@ describe('User Helpers', () => {
 
       const result = formatUserForDisplay(user)
 
+      expect(result.id).toBe('encoded_3')
       expect(result.lastSignIn).toBeNull()
     })
   })
 
   describe('formatUsersForDisplay', () => {
-    test('formats array of users', () => {
+    test('formats array of users with encoded IDs', () => {
       const users = [
         {
           id: 1,
@@ -159,9 +166,9 @@ describe('User Helpers', () => {
       const result = formatUsersForDisplay(users)
 
       expect(result).toHaveLength(2)
-      expect(result[0].id).toBe(1)
+      expect(result[0].id).toBe('encoded_1')
       expect(result[0].isAdmin).toBe(true)
-      expect(result[1].id).toBe(2)
+      expect(result[1].id).toBe('encoded_2')
       expect(result[1].isAdmin).toBe(false)
     })
 
@@ -171,20 +178,128 @@ describe('User Helpers', () => {
   })
 
   describe('getAreaFilterOptions', () => {
-    test('returns all areas option', () => {
-      const mockT = vi.fn((key) => {
-        if (key === 'accounts.manage_users.filters.all_areas') {
-          return 'All areas'
-        }
-        return key
-      })
+    const mockT = vi.fn((key) => {
+      if (key === 'accounts.manage_users.filters.all_areas') {
+        return 'All areas'
+      }
+      return key
+    })
 
+    test('returns all areas option when no areasByType provided', () => {
       const result = getAreaFilterOptions(mockT)
 
       expect(result).toEqual([{ value: '', text: 'All areas' }])
       expect(mockT).toHaveBeenCalledWith(
         'accounts.manage_users.filters.all_areas'
       )
+    })
+
+    test('returns all areas option when areasByType is null', () => {
+      const result = getAreaFilterOptions(mockT, null)
+
+      expect(result).toEqual([{ value: '', text: 'All areas' }])
+    })
+
+    test('returns grouped areas with EA, PSO, and RMA', () => {
+      const mockAreasByType = {
+        'EA Area': [
+          { id: '1', name: 'Anglian' },
+          { id: '2', name: 'Midlands' }
+        ],
+        'PSO Area': [
+          { id: '3', name: 'Lincolnshire and Northamptonshire' },
+          { id: '4', name: 'Staffordshire' }
+        ],
+        RMA: [
+          { id: '5', name: 'Cumbria' },
+          { id: '6', name: 'Lancashire' },
+          { id: '7', name: 'Greater Manchester' }
+        ]
+      }
+
+      const result = getAreaFilterOptions(mockT, mockAreasByType)
+
+      expect(result).toEqual([
+        { value: '', text: 'All areas' },
+        {
+          label: 'Area Program Team',
+          options: [
+            { value: '1', text: 'Anglian' },
+            { value: '2', text: 'Midlands' }
+          ]
+        },
+        {
+          label: 'PSO Team',
+          options: [
+            { value: '3', text: 'Lincolnshire and Northamptonshire' },
+            { value: '4', text: 'Staffordshire' }
+          ]
+        },
+        {
+          label: 'RMA',
+          options: [
+            { value: '5', text: 'Cumbria' },
+            { value: '6', text: 'Lancashire' },
+            { value: '7', text: 'Greater Manchester' }
+          ]
+        }
+      ])
+    })
+
+    test('returns only RMA group when only RMA areas exist', () => {
+      const mockAreasByType = {
+        RMA: [
+          { id: '1', name: 'Cumbria' },
+          { id: '2', name: 'Lancashire' }
+        ]
+      }
+
+      const result = getAreaFilterOptions(mockT, mockAreasByType)
+
+      expect(result).toEqual([
+        { value: '', text: 'All areas' },
+        {
+          label: 'RMA',
+          options: [
+            { value: '1', text: 'Cumbria' },
+            { value: '2', text: 'Lancashire' }
+          ]
+        }
+      ])
+    })
+
+    test('returns only all areas when all area arrays are empty', () => {
+      const mockAreasByType = {
+        'EA Area': [],
+        'PSO Area': [],
+        RMA: []
+      }
+
+      const result = getAreaFilterOptions(mockT, mockAreasByType)
+
+      expect(result).toEqual([{ value: '', text: 'All areas' }])
+    })
+
+    test('returns only groups that have areas', () => {
+      const mockAreasByType = {
+        'EA Area': [{ id: '1', name: 'Anglian' }],
+        'PSO Area': [],
+        RMA: [{ id: '2', name: 'Cumbria' }]
+      }
+
+      const result = getAreaFilterOptions(mockT, mockAreasByType)
+
+      expect(result).toEqual([
+        { value: '', text: 'All areas' },
+        {
+          label: 'Area Program Team',
+          options: [{ value: '1', text: 'Anglian' }]
+        },
+        {
+          label: 'RMA',
+          options: [{ value: '2', text: 'Cumbria' }]
+        }
+      ])
     })
   })
 
