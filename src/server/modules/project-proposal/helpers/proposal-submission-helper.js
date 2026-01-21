@@ -153,3 +153,14 @@ export function logProposalError(request, apiResponse) {
     'Failed to create project proposal'
   )
 }
+
+/**
+ * Clear proposal session data after successful submission
+ * @param {Object} request - Hapi request
+ */
+export function clearProposalSession(request) {
+  request.yar.set('projectProposal', {})
+  request.server.logger.info(
+    'Proposal session data cleared after successful submission'
+  )
+}

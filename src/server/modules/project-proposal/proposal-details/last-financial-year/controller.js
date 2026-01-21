@@ -13,7 +13,8 @@ import {
   submitProposalToBackend,
   logProposalSuccess,
   logAreaDetailsError,
-  logProposalError
+  logProposalError,
+  clearProposalSession
 } from '../../helpers/proposal-submission-helper.js'
 
 const LAST_FINANCIAL_YEAR_ERROR_HREF = '#last-financial-year'
@@ -212,7 +213,7 @@ async function handlePostSuccess(request, h, values, viewType) {
   }
 
   logProposalSuccess(request, apiResponse)
-  request.yar.set('projectProposal', {})
+  clearProposalSession(request)
 
   const projectOverviewUrl = buildProjectOverviewUrlForProposal(
     apiResponse.data?.data?.reference_number

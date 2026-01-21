@@ -7,7 +7,8 @@ import {
   logProposalSuccess,
   logAreaDetailsError,
   logProposalError,
-  renderProposalError
+  renderProposalError,
+  clearProposalSession
 } from './proposal-submission-helper.js'
 import * as rfccHelper from './rfcc-helper.js'
 import * as projectProposalService from '../../../common/services/project-proposal/project-proposal-service.js'
@@ -270,6 +271,28 @@ describe('proposal-submission-helper', () => {
       })
       expect(mockCodeFn).toHaveBeenCalledWith(statusCodes.badRequest)
       expect(result.statusCode).toBe(statusCodes.badRequest)
+    })
+  })
+
+  describe('clearProposalSession', () => {
+    test('clears proposal session data and logs', () => {
+      const mockRequest = {
+        yar: {
+          set: vi.fn()
+        },
+        server: {
+          logger: {
+            info: vi.fn()
+          }
+        }
+      }
+
+      clearProposalSession(mockRequest)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith('projectProposal', {})
+      expect(mockRequest.server.logger.info).toHaveBeenCalledWith(
+        'Proposal session data cleared after successful submission'
+      )
     })
   })
 })
