@@ -88,30 +88,7 @@ class StaticPageController {
     // The page has its own success notification
     const response = h.redirect(`${request.path}?saved=true`)
 
-    const currentPolicyVersion = config.get(COOKIE_POLICY_VERSION_KEY)
-
-    response.state(
-      COOKIE_POLICY_NAME,
-      JSON.stringify({
-        analytics: consentValue,
-        policyVersion: currentPolicyVersion
-      }),
-      {
-        path: '/',
-        ttl: config.get(COOKIE_TTL_CONFIG_KEY),
-        isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
-        isHttpOnly: true,
-        isSameSite: 'Lax'
-      }
-    )
-
-    response.state(COOKIE_PREFS_SET_NAME, 'true', {
-      path: '/',
-      ttl: config.get(COOKIE_TTL_CONFIG_KEY),
-      isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
-      isHttpOnly: true,
-      isSameSite: 'Lax'
-    })
+    this._setCookiePolicy(response, consentValue)
 
     return response
   }
@@ -142,13 +119,15 @@ class StaticPageController {
     return response
   }
 
-  /**
-   * Helper to set cookie consent
-   */
-  _setCookieConsent(h, consentValue, redirectPath) {
-    const response = h.redirect(redirectPath)
-
+  _setCookiePolicy(response, consentValue) {
     const currentPolicyVersion = config.get(COOKIE_POLICY_VERSION_KEY)
+    const cookieOptions = {
+      path: '/',
+      ttl: config.get(COOKIE_TTL_CONFIG_KEY),
+      isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
+      isHttpOnly: true,
+      isSameSite: 'Lax'
+    }
 
     response.state(
       COOKIE_POLICY_NAME,
@@ -156,22 +135,19 @@ class StaticPageController {
         analytics: consentValue,
         policyVersion: currentPolicyVersion
       }),
-      {
-        path: '/',
-        ttl: config.get(COOKIE_TTL_CONFIG_KEY),
-        isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
-        isHttpOnly: true,
-        isSameSite: 'Lax'
-      }
+      cookieOptions
     )
 
-    response.state(COOKIE_PREFS_SET_NAME, 'true', {
-      path: '/',
-      ttl: config.get(COOKIE_TTL_CONFIG_KEY),
-      isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
-      isHttpOnly: true,
-      isSameSite: 'Lax'
-    })
+    response.state(COOKIE_PREFS_SET_NAME, 'true', cookieOptions)
+  }
+
+  /**
+   * Helper to set cookie consent
+   */
+  _setCookieConsent(h, consentValue, redirectPath) {
+    const response = h.redirect(redirectPath)
+
+    this._setCookiePolicy(response, consentValue)
 
     // Set a session cookie to show confirmation message
     response.state('show_cookie_confirmation', 'true', {
