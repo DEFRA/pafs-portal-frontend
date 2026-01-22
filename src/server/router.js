@@ -56,7 +56,8 @@ export const router = {
         'rma-selection',
         'project-type',
         'intervention-type',
-        'primary-intervention-type'
+        'primary-intervention-type',
+        'proposal-overview'
       ])
 
       // Static assets

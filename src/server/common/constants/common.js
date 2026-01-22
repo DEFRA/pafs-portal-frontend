@@ -36,7 +36,8 @@ export const PROPOSAL_VIEWS = {
   PROJECT_TYPE: 'modules/project-proposal/project-type/index',
   INTERVENTION_TYPE: 'modules/project-proposal/intervention-type/index',
   PRIMARY_INTERVENTION_TYPE:
-    'modules/project-proposal/primary-intervention-type/index'
+    'modules/project-proposal/primary-intervention-type/index',
+  PROPOSAL_OVERVIEW: 'modules/project-proposal/proposal-overview/index'
 }
 
 export const GENERAL_VIEWS = {

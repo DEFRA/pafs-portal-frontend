@@ -58,5 +58,59 @@
       "required": "Select which intervention will provide the most benefit",
       "invalid": "Select a primary intervention type from your previous choices"
     }
+  },
+  "proposal_overview": {
+    "title": "Proposal Overview",
+    "heading": "Proposal Overview",
+    "common": {
+      "npn": "National Proposal Number",
+      "last_updated": "Last updated",
+      "status": "Status",
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "archive": "Archive",
+      "delete": "Delete",
+      "not_submitted": "Not yet submitted",
+      "not_provided": "Not provided"
+    },
+    "proposal_details_summary_card": {
+      "title": "Proposal details",
+      "project_name": "Project name",
+      "rma": "Risk management authority",
+      "project_type": "Project type",
+      "intervention_types": "Intervention types",
+      "primary_benefit_intervention": "Primary benefit intervention",
+      "financial_year_start": "Financial year (start spending)",
+      "financial_year_end": "Financial year (stop spending)"
+    },
+    "location_summary_card": {
+      "title": "Location",
+      "not_added": "No location added yet"
+    },
+    "important_dates_summary_card": {
+      "title": "Important dates",
+      "not_added": "No important dates added yet"
+    },
+    "funding_summary_card": {
+      "title": "Funding sources and spending",
+      "not_added": "No funding sources and spending added yet"
+    },
+    "risks_and_properties_summary_card": {
+      "title": "Risks and properties benefitting",
+      "not_added": "No risks and properties benefitting data added yet"
+    },
+    "approach_summary_card": {
+      "title": "Approach",
+      "not_added": "No approach added yet"
+    },
+    "environmental_summary_card": {
+      "title": "Environmental benefits",
+      "not_added": "No environmental benefits data added yet"
+    },
+    "urgency_summary_card": {
+      "title": "Urgency",
+      "not_added": "No urgency data added yet"
+    },
+    "submission_info": "By submitting this proposal you confirm all the information provided is accurate and complete"
   }
 }

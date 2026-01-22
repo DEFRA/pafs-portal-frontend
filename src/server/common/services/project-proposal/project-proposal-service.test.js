@@ -1,5 +1,8 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
-import { checkProjectNameExists } from './project-proposal-service.js'
+import {
+  checkProjectNameExists,
+  getProjectProposalOverview
+} from './project-proposal-service.js'
 import { apiRequest } from '../../helpers/api-client/index.js'
 
 // Mock the api-client module
@@ -150,6 +153,67 @@ describe('project-proposal-service', () => {
       const callArgs = apiRequest.mock.calls[0][1]
       expect(typeof callArgs.body).toBe('string')
       expect(JSON.parse(callArgs.body)).toEqual({ name: 'Test_Project' })
+    })
+  })
+
+  describe('getProjectProposalOverview', () => {
+    test('Should call apiRequest with correct endpoint and method', async () => {
+      apiRequest.mockResolvedValue({ data: {} })
+
+      await getProjectProposalOverview('REF123', 'mock-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project-proposal/proposal-overview/REF123',
+        expect.objectContaining({
+          method: 'GET'
+        })
+      )
+    })
+
+    test('Should include Authorization header when accessToken is provided', async () => {
+      apiRequest.mockResolvedValue({ data: {} })
+
+      await getProjectProposalOverview('REF123', 'test-token-123')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project-proposal/proposal-overview/REF123',
+        expect.objectContaining({
+          headers: {
+            Authorization: 'Bearer test-token-123'
+          }
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is not provided', async () => {
+      apiRequest.mockResolvedValue({ data: {} })
+
+      await getProjectProposalOverview('REF123')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project-proposal/proposal-overview/REF123',
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should return API response', async () => {
+      const mockResponse = { data: { id: '123', referenceNumber: 'REF123' } }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await getProjectProposalOverview('REF123', 'token')
+
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('Should handle API errors', async () => {
+      const mockError = new Error('API Error')
+      apiRequest.mockRejectedValue(mockError)
+
+      await expect(
+        getProjectProposalOverview('REF123', 'token')
+      ).rejects.toThrow('API Error')
     })
   })
 })

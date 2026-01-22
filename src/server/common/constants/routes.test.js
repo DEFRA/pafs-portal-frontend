@@ -102,6 +102,12 @@ describe('Routes Constants', () => {
         '/project-proposal/rma-selection'
       )
     })
+
+    test('PROPOSAL_OVERVIEW route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.PROPOSAL_OVERVIEW).toBe(
+        '/project-proposal/proposal-overview/{referenceNumber}'
+      )
+    })
   })
 
   describe('Route structure', () => {
@@ -134,6 +140,9 @@ describe('Routes Constants', () => {
 
     test('all project proposal routes are defined', () => {
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('START_PROPOSAL')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('PROJECT_NAME')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('RMA_SELECTION')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('PROPOSAL_OVERVIEW')
     })
   })
 })
