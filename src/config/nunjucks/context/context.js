@@ -42,10 +42,9 @@ export function context(request) {
     navigation,
     user: session?.user,
     request,
-    cookies: {
-      ...(request.state || {}),
-      needsReacceptance
-    },
+    cookies: request.state
+      ? { ...request.state, needsReacceptance }
+      : { needsReacceptance },
     t: (key, params) => translate(key, 'en', params),
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
