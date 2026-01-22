@@ -12,6 +12,7 @@ const COOKIE_POLICY_NAME = 'cookies_policy'
 const COOKIE_PREFS_SET_NAME = 'cookies_preferences_set'
 const COOKIE_TTL_CONFIG_KEY = 'cookie.preferences.ttl'
 const COOKIE_SECURE_CONFIG_KEY = 'session.cookie.secure'
+const COOKIE_POLICY_VERSION_KEY = 'cookie.policy.version'
 
 class StaticPageController {
   getPageKey(path) {
@@ -87,9 +88,14 @@ class StaticPageController {
     // The page has its own success notification
     const response = h.redirect(`${request.path}?saved=true`)
 
+    const currentPolicyVersion = config.get(COOKIE_POLICY_VERSION_KEY)
+
     response.state(
       COOKIE_POLICY_NAME,
-      JSON.stringify({ analytics: consentValue }),
+      JSON.stringify({
+        analytics: consentValue,
+        policyVersion: currentPolicyVersion
+      }),
       {
         path: '/',
         ttl: config.get(COOKIE_TTL_CONFIG_KEY),
@@ -142,9 +148,14 @@ class StaticPageController {
   _setCookieConsent(h, consentValue, redirectPath) {
     const response = h.redirect(redirectPath)
 
+    const currentPolicyVersion = config.get(COOKIE_POLICY_VERSION_KEY)
+
     response.state(
       COOKIE_POLICY_NAME,
-      JSON.stringify({ analytics: consentValue }),
+      JSON.stringify({
+        analytics: consentValue,
+        policyVersion: currentPolicyVersion
+      }),
       {
         path: '/',
         ttl: config.get(COOKIE_TTL_CONFIG_KEY),

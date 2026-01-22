@@ -6,6 +6,7 @@ import { buildNavigation } from './build-navigation.js'
 import { getAuthSession } from './session-helper.js'
 import { createLogger } from '../../../server/common/helpers/logging/logger.js'
 import { translate } from '../../../server/common/helpers/i18n/index.js'
+import { needsCookiePolicyReacceptance } from '../../../server/common/helpers/cookie-policy/cookie-policy-helper.js'
 
 const logger = createLogger()
 const assetPath = config.get('assetPath')
@@ -30,6 +31,9 @@ export function context(request) {
 
   navigation = buildNavigation(request)
 
+  // Check if cookie policy needs re-acceptance
+  const needsReacceptance = needsCookiePolicyReacceptance(request)
+
   return {
     assetPath: `${assetPath}/assets`,
     serviceName: config.get('serviceName'),
@@ -38,7 +42,10 @@ export function context(request) {
     navigation,
     user: session?.user,
     request,
-    cookies: request.state || {},
+    cookies: {
+      ...(request.state || {}),
+      needsReacceptance
+    },
     t: (key, params) => translate(key, 'en', params),
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]
