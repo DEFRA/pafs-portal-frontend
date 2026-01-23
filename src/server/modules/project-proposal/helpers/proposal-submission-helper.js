@@ -78,9 +78,9 @@ export function buildProposalDataForSubmission(
   return {
     name: sessionData.projectName?.projectName,
     projectType: sessionData.projectType?.projectType,
-    projectIntervesionTypes:
+    projectInterventionTypes:
       sessionData.interventionTypes?.interventionTypes || [],
-    mainIntervensionType:
+    mainInterventionType:
       sessionData.primaryInterventionType?.primaryInterventionType || null,
     projectStartFinancialYear:
       sessionData.firstFinancialYear?.firstFinancialYear,

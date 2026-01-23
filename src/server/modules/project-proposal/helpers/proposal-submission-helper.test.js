@@ -73,8 +73,8 @@ describe('proposal-submission-helper', () => {
       expect(result).toEqual({
         name: 'Test Project',
         projectType: 'DEF',
-        projectIntervesionTypes: ['TYPE_1', 'TYPE_2'],
-        mainIntervensionType: 'TYPE_1',
+        projectInterventionTypes: ['TYPE_1', 'TYPE_2'],
+        mainInterventionType: 'TYPE_1',
         projectStartFinancialYear: '2025',
         projectEndFinancialYear: '2030',
         rmaName: 'RMA Area',
@@ -96,8 +96,8 @@ describe('proposal-submission-helper', () => {
         'AN'
       )
 
-      expect(result.projectIntervesionTypes).toEqual([])
-      expect(result.mainIntervensionType).toBeNull()
+      expect(result.projectInterventionTypes).toEqual([])
+      expect(result.mainInterventionType).toBeNull()
     })
   })
 
