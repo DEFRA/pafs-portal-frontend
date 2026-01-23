@@ -1,6 +1,5 @@
 import { statusCodes } from '../../../common/constants/status-codes.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { getRfccCodeFromArea } from './rfcc-helper.js'
 import { createProjectProposal } from '../../../common/services/project-proposal/project-proposal-service.js'
 
 /**
@@ -45,17 +44,14 @@ function buildViewModel(values, errors, errorSummary) {
 }
 
 /**
- * Get area details (RFCC code and area code) from cache
- * @param {Object} request - Hapi request
+ * Get area code from session
  * @param {Object} sessionData - Session data containing rmaSelection
- * @returns {Promise<Object>} Area details with rfccCode, rmaName (area code), rmaSelection
+ * @returns {Object} Area details with rmaName (area code) and rmaSelection
  */
-export async function getAreaDetailsForProposal(request, sessionData) {
-  const areasData = await request.getAreas()
+export function getAreaDetailsForProposal(sessionData) {
   const rmaSelection = sessionData.rmaSelection?.rmaSelection
 
   return {
-    rfccCode: getRfccCodeFromArea(rmaSelection, areasData),
     rmaName: rmaSelection,
     rmaSelection
   }
@@ -66,15 +62,9 @@ export async function getAreaDetailsForProposal(request, sessionData) {
  * @param {Object} sessionData - Session data
  * @param {Object} values - Form values with lastFinancialYear
  * @param {string} rmaName - Area code (sent as rmaName to match backend field)
- * @param {string} rfccCode - RFCC code
  * @returns {Object} Proposal data ready for API
  */
-export function buildProposalDataForSubmission(
-  sessionData,
-  values,
-  rmaName,
-  rfccCode
-) {
+export function buildProposalDataForSubmission(sessionData, values, rmaName) {
   return {
     name: sessionData.projectName?.projectName,
     projectType: sessionData.projectType?.projectType,
@@ -85,8 +75,7 @@ export function buildProposalDataForSubmission(
     projectStartFinancialYear:
       sessionData.firstFinancialYear?.firstFinancialYear,
     projectEndFinancialYear: values.lastFinancialYear,
-    rmaName,
-    rfccCode
+    rmaName
   }
 }
 

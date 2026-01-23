@@ -179,12 +179,9 @@ async function handlePostSuccess(request, h, values, viewType) {
     'Last financial year selected and stored in session'
   )
 
-  const { rfccCode, rmaName, rmaSelection } = await getAreaDetailsForProposal(
-    request,
-    sessionData
-  )
+  const { rmaName, rmaSelection } = getAreaDetailsForProposal(sessionData)
 
-  if (!rfccCode) {
+  if (!rmaName) {
     logAreaDetailsError(request, rmaSelection)
     const msg = request.t(
       viewType === VIEW_TYPES.RADIO
@@ -197,8 +194,7 @@ async function handlePostSuccess(request, h, values, viewType) {
   const proposalData = buildProposalDataForSubmission(
     sessionData,
     values,
-    rmaName,
-    rfccCode
+    rmaName
   )
   const apiResponse = await submitProposalToBackend(request, proposalData)
 

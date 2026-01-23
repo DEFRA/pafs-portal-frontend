@@ -10,44 +10,24 @@ import {
   renderProposalError,
   clearProposalSession
 } from './proposal-submission-helper.js'
-import * as rfccHelper from './rfcc-helper.js'
 import * as projectProposalService from '../../../common/services/project-proposal/project-proposal-service.js'
 import { statusCodes } from '../../../common/constants/status-codes.js'
 
-vi.mock('./rfcc-helper.js')
 vi.mock('../../../common/services/project-proposal/project-proposal-service.js')
 
 describe('proposal-submission-helper', () => {
   describe('getAreaDetailsForProposal', () => {
-    test('retrieves area details from cache', async () => {
-      const mockRequest = {
-        getAreas: vi.fn(async () => ({
-          PSO: [{ id: '2', name: 'PSO Area', sub_type: 'AN' }],
-          RMA: [{ id: '1', name: 'RMA Area' }]
-        }))
-      }
-
+    test('retrieves area code from session', () => {
       const mockSessionData = {
         rmaSelection: { rmaSelection: '1' }
       }
 
-      rfccHelper.getRfccCodeFromArea.mockReturnValue('AN')
-
-      const result = await getAreaDetailsForProposal(
-        mockRequest,
-        mockSessionData
-      )
+      const result = getAreaDetailsForProposal(mockSessionData)
 
       expect(result).toEqual({
-        rfccCode: 'AN',
         rmaName: '1',
         rmaSelection: '1'
       })
-      expect(mockRequest.getAreas).toHaveBeenCalled()
-      expect(rfccHelper.getRfccCodeFromArea).toHaveBeenCalledWith(
-        '1',
-        expect.any(Object)
-      )
     })
   })
 
@@ -66,8 +46,7 @@ describe('proposal-submission-helper', () => {
       const result = buildProposalDataForSubmission(
         sessionData,
         values,
-        'RMA Area',
-        'AN'
+        'RMA Area'
       )
 
       expect(result).toEqual({
@@ -77,8 +56,7 @@ describe('proposal-submission-helper', () => {
         mainInterventionType: 'TYPE_1',
         projectStartFinancialYear: '2025',
         projectEndFinancialYear: '2030',
-        rmaName: 'RMA Area',
-        rfccCode: 'AN'
+        rmaName: 'RMA Area'
       })
     })
 
@@ -92,8 +70,7 @@ describe('proposal-submission-helper', () => {
       const result = buildProposalDataForSubmission(
         sessionData,
         { lastFinancialYear: '2030' },
-        'RMA',
-        'AN'
+        'RMA'
       )
 
       expect(result.projectInterventionTypes).toEqual([])
