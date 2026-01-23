@@ -1,8 +1,10 @@
 {% set cookiePolicy = cookies.cookies_policy | jsonParse %}
 {% set prefsSet = cookies.cookies_preferences_set %}
 {% set showConfirmation = cookies.show_cookie_confirmation %}
+{% set needsReacceptance = cookies.needsReacceptance %}
+{% set policyUpdated = prefsSet and needsReacceptance %}
 
-{% if showConfirmation or (not prefsSet) %}
+{% if showConfirmation or (not prefsSet) or policyUpdated %}
 <div class="govuk-cookie-banner" role="region" aria-label="{{ t('static-pages:cookie_banner.heading') }}">
   <div class="govuk-cookie-banner__message govuk-width-container">
     
@@ -31,7 +33,7 @@
       </div>
     
     {# Show initial consent banner if preferences not set #}
-    {% elif not prefsSet %}
+    {% elif not prefsSet or policyUpdated %}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
           <h2 class="govuk-cookie-banner__heading govuk-heading-m">{{ t('static-pages:cookie_banner.heading') }}</h2>

@@ -396,7 +396,10 @@ describe('Nunjucks context builder', () => {
       }
       const result = contextModule.context(mockReq)
 
-      expect(result.cookies).toEqual(mockState)
+      expect(result.cookies).toEqual({
+        ...mockState,
+        needsReacceptance: expect.any(Boolean)
+      })
     })
 
     test('includes empty cookies object when state is undefined', async () => {
@@ -415,7 +418,9 @@ describe('Nunjucks context builder', () => {
       }
       const result = contextModule.context(mockReq)
 
-      expect(result.cookies).toEqual({})
+      expect(result.cookies).toEqual({
+        needsReacceptance: expect.any(Boolean)
+      })
     })
 
     test('includes cookies in context along with other properties', async () => {

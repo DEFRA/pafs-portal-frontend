@@ -162,6 +162,14 @@ export const config = convict({
     }
   },
   cookie: {
+    policy: {
+      version: {
+        doc: 'Cookie policy version number. Increment this when policy is updated to re-prompt users.',
+        format: Number,
+        default: 1,
+        env: 'COOKIE_POLICY_VERSION'
+      }
+    },
     preferences: {
       ttl: {
         doc: 'Cookie preferences TTL in milliseconds (default: 1 year)',
