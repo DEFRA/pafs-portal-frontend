@@ -96,10 +96,10 @@ export function buildListingPagination(pagination, baseUrl, filters) {
  * @returns {Object} View model
  */
 export function buildListingViewModel({
-  request,
+  _request,
   session,
   pageTitle,
-  items,
+  _items,
   pagination,
   baseUrl,
   filters,

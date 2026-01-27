@@ -171,7 +171,9 @@ class OrganisationManageController {
     const typeConfig = this.getTypeConfig(orgType)
 
     const redirectResponse = this._validateTypeConfig(typeConfig, h)
-    if (redirectResponse) return redirectResponse
+    if (redirectResponse) {
+      return redirectResponse
+    }
 
     const isEditMode = !!encodedId
     const formData = request.yar.get(
@@ -207,7 +209,9 @@ class OrganisationManageController {
     const typeConfig = this.getTypeConfig(orgType)
 
     const redirectResponse = this._validateTypeConfig(typeConfig, h)
-    if (redirectResponse) return redirectResponse
+    if (redirectResponse) {
+      return redirectResponse
+    }
 
     const isEditMode = !!encodedId
     let organisationId = null
@@ -350,14 +354,17 @@ class OrganisationManageController {
    * @private
    */
   _addFieldToPayload(apiPayload, field, value) {
-    if (!value) return
+    if (!value) {
+      return
+    }
 
     if (field === 'identifier' || field === 'subType') {
       const trimmedValue = value.trim()
       if (trimmedValue) {
         apiPayload[field] = trimmedValue
       }
-    } else if (field === 'parentId') {
+    }
+    if (field === 'parentId') {
       apiPayload[field] = String(value)
     }
   }

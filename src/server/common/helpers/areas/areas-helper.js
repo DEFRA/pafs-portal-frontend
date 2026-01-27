@@ -9,7 +9,7 @@
  * - RMA (Risk Management Authority) Areas (children of PSO)
  */
 
-import { AREAS_RESPONSIBILITIES_MAP } from '../../constants/common.js'
+import { AREAS_RESPONSIBILITIES_MAP } from '../../constants/common'
 
 export function flattenAreas(areasByType) {
   if (!areasByType || typeof areasByType !== 'object') {

@@ -20,7 +20,9 @@ export function dateToISOString(dateObj) {
   }
 
   const { day, month, year } = dateObj
-  if (!day || !month || !year) return null
+  if (!day || !month || !year) {
+    return null
+  }
 
   const paddedDay = String(day).padStart(2, '0')
   const paddedMonth = String(month).padStart(2, '0')
@@ -227,7 +229,7 @@ export async function fetchOrganisationForAdmin(request, h) {
  * @returns {boolean} True if types match
  */
 export function verifyOrganisationType(organisation, expectedType) {
-  return organisation && organisation.areaType === expectedType
+  return organisation?.areaType === expectedType
 }
 
 /**

@@ -10,11 +10,9 @@ export function extractJoiErrors(err) {
   for (const detail of err.details) {
     // For nested objects like endDate.month, use the parent field (endDate)
     const field = detail.context?.label || detail.path?.[0]
-    if (field) {
-      // Only set if not already set (first error wins)
-      if (!errors[field]) {
-        errors[field] = detail.message
-      }
+    // Only set if not already set (first error wins)
+    if (field && !errors[field]) {
+      errors[field] = detail.message
     }
   }
   return errors
