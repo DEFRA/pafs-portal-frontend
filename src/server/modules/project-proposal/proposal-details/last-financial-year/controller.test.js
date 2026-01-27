@@ -79,7 +79,8 @@ describe('#lastFinancialYearController', () => {
         success: true,
         data: {
           id: '1',
-          reference_number: 'ANC501E/000A/001A'
+          referenceNumber: 'ANC501E/000A/001A',
+          name: 'Test Project'
         }
       }
     })
@@ -234,11 +235,18 @@ describe('#lastFinancialYearController', () => {
         '/project-proposal/project-overview/ANC501E-000A-001A'
       )
       expect(projectProposalService.createProjectProposal).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: 'Test Project',
-          projectType: 'DEF',
-          projectEndFinancialYear: '2035'
-        }),
+        {
+          level: 'INITIAL_SAVE',
+          payload: {
+            name: 'Test Project',
+            rmaId: '1',
+            projectType: 'DEF',
+            projectInterventionTypes: ['TYPE_1'],
+            mainInterventionType: 'MAIN',
+            financialStartYear: 2032,
+            financialEndYear: 2035
+          }
+        },
         'test-token-123'
       )
     })

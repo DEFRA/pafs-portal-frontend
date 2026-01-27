@@ -17,7 +17,7 @@ vi.mock('../../../common/services/project-proposal/project-proposal-service.js')
 
 describe('proposal-submission-helper', () => {
   describe('getAreaDetailsForProposal', () => {
-    test('retrieves area code from session', () => {
+    test('retrieves area id from session', () => {
       const mockSessionData = {
         rmaSelection: { rmaSelection: '1' }
       }
@@ -25,7 +25,7 @@ describe('proposal-submission-helper', () => {
       const result = getAreaDetailsForProposal(mockSessionData)
 
       expect(result).toEqual({
-        rmaName: '1',
+        rmaId: 1,
         rmaSelection: '1'
       })
     })
@@ -36,27 +36,26 @@ describe('proposal-submission-helper', () => {
       const sessionData = {
         projectName: { projectName: 'Test Project' },
         projectType: { projectType: 'DEF' },
-        interventionTypes: { interventionTypes: ['TYPE_1', 'TYPE_2'] },
-        primaryInterventionType: { primaryInterventionType: 'TYPE_1' },
+        interventionTypes: { interventionTypes: ['type_1', 'type_2'] },
+        primaryInterventionType: { primaryInterventionType: 'type_1' },
         firstFinancialYear: { firstFinancialYear: '2025' }
       }
 
       const values = { lastFinancialYear: '2030' }
 
-      const result = buildProposalDataForSubmission(
-        sessionData,
-        values,
-        'RMA Area'
-      )
+      const result = buildProposalDataForSubmission(sessionData, values, 10)
 
       expect(result).toEqual({
-        name: 'Test Project',
-        projectType: 'DEF',
-        projectInterventionTypes: ['TYPE_1', 'TYPE_2'],
-        mainInterventionType: 'TYPE_1',
-        projectStartFinancialYear: '2025',
-        projectEndFinancialYear: '2030',
-        rmaName: 'RMA Area'
+        level: 'INITIAL_SAVE',
+        payload: {
+          name: 'Test Project',
+          rmaId: '10',
+          projectType: 'DEF',
+          projectInterventionTypes: ['TYPE_1', 'TYPE_2'],
+          mainInterventionType: 'TYPE_1',
+          financialStartYear: 2025,
+          financialEndYear: 2030
+        }
       })
     })
 
@@ -69,12 +68,16 @@ describe('proposal-submission-helper', () => {
 
       const result = buildProposalDataForSubmission(
         sessionData,
-        { lastFinancialYear: '2030' },
-        'RMA'
+        {
+          lastFinancialYear: '2030'
+        },
+        5
       )
 
-      expect(result.projectInterventionTypes).toEqual([])
-      expect(result.mainInterventionType).toBeNull()
+      expect(result.payload.projectInterventionTypes).toEqual([])
+      expect(result.payload.mainInterventionType).toBeNull()
+      expect(result.payload.financialStartYear).toBe(2025)
+      expect(result.payload.financialEndYear).toBe(2030)
     })
   })
 
@@ -114,8 +117,8 @@ describe('proposal-submission-helper', () => {
       }
 
       const proposalData = {
-        name: 'Test Project',
-        projectType: 'DEF'
+        level: 'INITIAL_SAVE',
+        payload: { name: 'Test Project', projectType: 'DEF' }
       }
 
       projectProposalService.createProjectProposal.mockResolvedValue({
@@ -146,7 +149,7 @@ describe('proposal-submission-helper', () => {
       const apiResponse = {
         data: {
           data: {
-            reference_number: 'ANC501E/000A/001A',
+            referenceNumber: 'ANC501E/000A/001A',
             id: '123'
           }
         }

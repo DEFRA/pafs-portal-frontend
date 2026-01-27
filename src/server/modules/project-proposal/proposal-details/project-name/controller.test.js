@@ -513,7 +513,7 @@ describe('#projectNameController', () => {
         'projectProposal',
         expect.objectContaining({
           projectName: { projectName: 'Test_Project' },
-          rmaSelection: '1'
+          rmaSelection: { rmaSelection: '1' }
         })
       )
     })

@@ -44,15 +44,16 @@ function buildViewModel(values, errors, errorSummary) {
 }
 
 /**
- * Get area code from session
+ * Get area id from session
  * @param {Object} sessionData - Session data containing rmaSelection
- * @returns {Object} Area details with rmaName (area code) and rmaSelection
+ * @returns {Object} Area details with numeric rmaId and raw selection
  */
 export function getAreaDetailsForProposal(sessionData) {
   const rmaSelection = sessionData.rmaSelection?.rmaSelection
+  const rmaId = rmaSelection ? Number(rmaSelection) : undefined
 
   return {
-    rmaName: rmaSelection,
+    rmaId,
     rmaSelection
   }
 }
@@ -61,21 +62,36 @@ export function getAreaDetailsForProposal(sessionData) {
  * Build proposal data for backend API submission
  * @param {Object} sessionData - Session data
  * @param {Object} values - Form values with lastFinancialYear
- * @param {string} rmaName - Area code (sent as rmaName to match backend field)
- * @returns {Object} Proposal data ready for API
+ * @param {number} rmaId - Area id of selected RMA
+ * @returns {Object} Proposal data ready for API upsert
  */
-export function buildProposalDataForSubmission(sessionData, values, rmaName) {
+export function buildProposalDataForSubmission(sessionData, values, rmaId) {
+  // Normalize intervention types to uppercase
+  const interventionTypes = (
+    sessionData.interventionTypes?.interventionTypes || []
+  ).map((type) => String(type).toUpperCase())
+
+  // Convert financial years to numbers
+  const financialStartYear = Number.parseInt(
+    sessionData.firstFinancialYear?.firstFinancialYear,
+    10
+  )
+  const financialEndYear = Number.parseInt(values.lastFinancialYear, 10)
+
   return {
-    name: sessionData.projectName?.projectName,
-    projectType: sessionData.projectType?.projectType,
-    projectInterventionTypes:
-      sessionData.interventionTypes?.interventionTypes || [],
-    mainInterventionType:
-      sessionData.primaryInterventionType?.primaryInterventionType || null,
-    projectStartFinancialYear:
-      sessionData.firstFinancialYear?.firstFinancialYear,
-    projectEndFinancialYear: values.lastFinancialYear,
-    rmaName
+    level: 'INITIAL_SAVE',
+    payload: {
+      name: sessionData.projectName?.projectName,
+      rmaId: String(rmaId),
+      projectType: sessionData.projectType?.projectType,
+      projectInterventionTypes: interventionTypes,
+      mainInterventionType:
+        String(
+          sessionData.primaryInterventionType?.primaryInterventionType || ''
+        ).toUpperCase() || null,
+      financialStartYear,
+      financialEndYear
+    }
   }
 }
 
@@ -112,7 +128,7 @@ export async function submitProposalToBackend(request, proposalData) {
 export function logProposalSuccess(request, apiResponse) {
   request.server.logger.info(
     {
-      referenceNumber: apiResponse.data?.data?.reference_number,
+      referenceNumber: apiResponse.data?.data?.referenceNumber,
       projectId: apiResponse.data?.data?.id
     },
     'Project proposal created successfully'

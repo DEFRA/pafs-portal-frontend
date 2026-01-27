@@ -45,7 +45,7 @@
     "options": {
       "nfm": "Natural Flood Management",
       "pfr": "Property Flood Resilience",
-      "sds": "Sustainable Drainage Systems",
+      "suds": "Sustainable Drainage Systems",
       "other": "Other"
     },
     "errors": {

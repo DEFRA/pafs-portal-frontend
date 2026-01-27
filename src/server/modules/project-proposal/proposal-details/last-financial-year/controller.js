@@ -179,9 +179,9 @@ async function handlePostSuccess(request, h, values, viewType) {
     'Last financial year selected and stored in session'
   )
 
-  const { rmaName, rmaSelection } = getAreaDetailsForProposal(sessionData)
+  const { rmaId, rmaSelection } = getAreaDetailsForProposal(sessionData)
 
-  if (!rmaName) {
+  if (!rmaId) {
     logAreaDetailsError(request, rmaSelection)
     const msg = request.t(
       viewType === VIEW_TYPES.RADIO
@@ -194,7 +194,7 @@ async function handlePostSuccess(request, h, values, viewType) {
   const proposalData = buildProposalDataForSubmission(
     sessionData,
     values,
-    rmaName
+    rmaId
   )
   const apiResponse = await submitProposalToBackend(request, proposalData)
 
@@ -212,7 +212,7 @@ async function handlePostSuccess(request, h, values, viewType) {
   clearProposalSession(request)
 
   const projectOverviewUrl = buildProjectOverviewUrlForProposal(
-    apiResponse.data?.data?.reference_number
+    apiResponse.data?.data?.referenceNumber
   )
   return h.redirect(projectOverviewUrl)
 }

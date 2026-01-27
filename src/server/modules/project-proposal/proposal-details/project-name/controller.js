@@ -93,8 +93,12 @@ async function checkProjectNameDuplicate(request, h, values) {
       values.projectName,
       accessToken
     )
+    const duplicateDetected =
+      response?.data?.exists ||
+      response?.validationErrors?.errorCode === 'PROJECT_NAME_DUPLICATE' ||
+      (!response?.success && response?.status === statusCodes.badRequest)
 
-    if (response.data?.exists) {
+    if (duplicateDetected) {
       return buildErrorResponse(
         h,
         request,
@@ -146,7 +150,9 @@ function handlePostSuccess(request, h, values) {
   }
 
   if (userSession?.areas?.length === 1) {
-    sessionData.rmaSelection = userSession?.areas[0]?.areaId
+    sessionData.rmaSelection = {
+      rmaSelection: userSession?.areas[0]?.areaId
+    }
     request.yar.set('projectProposal', sessionData)
 
     request.server.logger.info(

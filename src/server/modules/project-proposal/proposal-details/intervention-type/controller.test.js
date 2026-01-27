@@ -271,7 +271,7 @@ describe('#interventionTypeController', () => {
 
     test('Should redirect to primary page when exactly 2 options selected', async () => {
       mockRequest.method = 'post'
-      mockRequest.payload = { interventionTypes: ['nfm', 'sds'] }
+      mockRequest.payload = { interventionTypes: ['nfm', 'suds'] }
       mockRequest.yar.get.mockReturnValue({})
 
       const result = await interventionTypeController.handler(
@@ -287,7 +287,7 @@ describe('#interventionTypeController', () => {
     test('Should redirect to primary page when 3+ options selected', async () => {
       mockRequest.method = 'post'
       mockRequest.payload = {
-        interventionTypes: ['nfm', 'pfr', 'sds', 'other']
+        interventionTypes: ['nfm', 'pfr', 'suds', 'other']
       }
       mockRequest.yar.get.mockReturnValue({})
 
