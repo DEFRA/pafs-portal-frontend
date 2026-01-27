@@ -7,7 +7,10 @@ import { ADMIN_VIEWS } from '../../../../common/constants/common.js'
 import { ROUTES } from '../../../../common/constants/routes.js'
 import { createAreasService } from '../../../../common/services/areas/areas-service.js'
 import { getDefaultPageSize } from '../../../../common/helpers/pagination/index.js'
-import { ORGANISATION_OPTIONS } from '../../../../common/constants/organisations.js'
+import {
+  ORGANISATION_OPTIONS,
+  ORGANISATION_SESSION_KEYS
+} from '../../../../common/constants/organisations.js'
 import {
   buildListingRequestContext,
   buildListingViewModel,
@@ -37,7 +40,7 @@ function formatOrganisationForDisplay(org) {
  * @returns {Array} Formatted organisations
  */
 function formatOrganisationsForDisplay(organisations) {
-  return organisations.map(formatOrganisationForDisplay)
+  return organisations.map((org) => formatOrganisationForDisplay(org))
 }
 
 /**
@@ -65,6 +68,7 @@ export const organisationsListingController = {
 
     try {
       const areasService = createAreasService(request.server)
+      request.yar.clear(ORGANISATION_SESSION_KEYS.ORGANISATION_DATA)
 
       // Fetch organisations list with pagination
       const result = await areasService.getAreasByList({

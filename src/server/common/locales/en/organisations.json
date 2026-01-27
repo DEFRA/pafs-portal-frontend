@@ -4,7 +4,7 @@
     "heading": "Manage Organisations",
     "filters": {
       "aria_label": "Filter organisations",
-      "search_label": "Enter an organisation name",
+      "search_label": "Search by organisation name",
       "search_hint": "Search by organisation name",
       "type_label": "Select an organisation type",
       "filter_button": "Filter",

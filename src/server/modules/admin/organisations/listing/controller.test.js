@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { organisationsListingController } from './controller.js'
+import { ORGANISATION_SESSION_KEYS } from '../../../../common/constants/organisations.js'
 
 vi.mock('../../../../common/helpers/auth/session-manager.js')
 vi.mock('../../../../common/services/areas/areas-service.js')
@@ -35,7 +36,8 @@ describe('organisationsListingController', () => {
       },
       query: {},
       yar: {
-        flash: vi.fn(() => [])
+        flash: vi.fn(() => []),
+        clear: vi.fn()
       },
       t: vi.fn((key) => key)
     }
@@ -91,6 +93,9 @@ describe('organisationsListingController', () => {
       pageSize: 20,
       accessToken: 'test-token'
     })
+    expect(mockRequest.yar.clear).toHaveBeenCalledWith(
+      ORGANISATION_SESSION_KEYS.ORGANISATION_DATA
+    )
 
     expect(result.context.organisations).toHaveLength(2)
     expect(result.context.organisations[0].name).toBe('Thames')
