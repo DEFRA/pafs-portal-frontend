@@ -9,6 +9,8 @@
  * - RMA (Risk Management Authority) Areas (children of PSO)
  */
 
+import { AREAS_RESPONSIBILITIES_MAP } from '../../constants/common.js'
+
 export function flattenAreas(areasByType) {
   if (!areasByType || typeof areasByType !== 'object') {
     return []
@@ -339,4 +341,76 @@ export function getParentAreasDisplay(
     eaAreas: eaAreas.length > 0 ? eaAreas.join(', ') : null,
     psoAreas: psoAreas.length > 0 ? psoAreas.join(', ') : null
   }
+}
+
+/**
+ * Build dropdown options from areas of a specific type
+ * @param {Object} areasData - Areas grouped by type
+ * @param {string} type - Area type to filter by
+ * @param {string} textColumn - Area object property to use for display text
+ * @param {string} idColumn - Area object property to use for value
+ * @param {string} emptyText - Text for empty/default option
+ * @returns {Array} Array of dropdown items with {value, text} format
+ */
+export function buildAreaDropdownByType({
+  areasData,
+  type,
+  textColumn = 'name',
+  idColumn = 'id',
+  emptyText = 'Select an option'
+}) {
+  const areas = getAreasByType(areasData, type)
+
+  const items = [{ value: '', text: emptyText }]
+
+  if (areas && areas.length > 0) {
+    areas.forEach((area) => {
+      items.push({
+        value: area[idColumn].toString(),
+        text: area[textColumn]
+      })
+    })
+  }
+
+  return items
+}
+
+/**
+ * Build dropdown options from unique RFCC codes (sub_type) in PSO areas
+ * @param {Object} areasData - Areas grouped by type
+ * @param {string} emptyText - Text for empty/default option
+ * @returns {Array} Array of dropdown items with {value, text} format
+ */
+export function buildRfccCodeDropdown({
+  areasData,
+  emptyText = 'Select a RFCC code'
+}) {
+  const psoAreas = getAreasByType(areasData, AREAS_RESPONSIBILITIES_MAP.PSO)
+
+  const items = [{ value: '', text: emptyText }]
+
+  if (psoAreas && psoAreas.length > 0) {
+    // Extract unique sub_type values
+    const uniqueRfccCodes = new Set()
+
+    psoAreas.forEach((area) => {
+      if (area.sub_type && area.sub_type.trim() !== '') {
+        uniqueRfccCodes.add(area.sub_type.trim())
+      }
+    })
+
+    // Convert to sorted array and build dropdown items
+    const sortedCodes = Array.from(uniqueRfccCodes).sort((a, b) =>
+      a.localeCompare(b)
+    )
+
+    sortedCodes.forEach((code) => {
+      items.push({
+        value: code,
+        text: code
+      })
+    })
+  }
+
+  return items
 }

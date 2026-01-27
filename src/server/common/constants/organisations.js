@@ -1,0 +1,53 @@
+import { AREAS_RESPONSIBILITIES_MAP } from './common.js'
+
+/**
+ * Organisation type options for add/edit forms
+ * Used in the type selection dropdown
+ */
+export const ORGANISATION_TYPE_OPTIONS = [
+  {
+    value: AREAS_RESPONSIBILITIES_MAP.AUTHORITY,
+    text: AREAS_RESPONSIBILITIES_MAP.AUTHORITY
+  },
+  {
+    value: AREAS_RESPONSIBILITIES_MAP.PSO,
+    text: AREAS_RESPONSIBILITIES_MAP.PSO.replaceAll(' Area', '')
+  },
+  {
+    value: AREAS_RESPONSIBILITIES_MAP.RMA,
+    text: AREAS_RESPONSIBILITIES_MAP.RMA
+  }
+]
+
+/**
+ * Organisation filter options for listing page
+ * Used for the type filter dropdown
+ */
+export const ORGANISATION_OPTIONS = [
+  { value: '', text: 'All organisation types' },
+  ...ORGANISATION_TYPE_OPTIONS
+]
+
+export const AREA_VALIDATION_CODES = {
+  TYPE_REQUIRED: 'VALIDATION_AREA_TYPE_REQUIRED',
+  TYPE_INVALID: 'VALIDATION_AREA_TYPE_INVALID',
+  NAME_REQUIRED: 'VALIDATION_AREA_NAME_REQUIRED',
+  NAME_TOO_SHORT: 'VALIDATION_AREA_NAME_TOO_SHORT',
+  NAME_TOO_LONG: 'VALIDATION_AREA_NAME_TOO_LONG',
+  IDENTIFIER_REQUIRED: 'VALIDATION_AREA_IDENTIFIER_REQUIRED',
+  IDENTIFIER_TOO_LONG: 'VALIDATION_AREA_IDENTIFIER_TOO_LONG',
+  PARENT_ID_REQUIRED: 'VALIDATION_AREA_PARENT_ID_REQUIRED',
+  SUBTYPE_REQUIRED: 'VALIDATION_AREA_SUBTYPE_REQUIRED',
+  DATE_INVALID: 'VALIDATION_AREA_DATE_INVALID'
+}
+
+export const AREA_ERROR_CODES = {
+  ...AREA_VALIDATION_CODES
+}
+
+/**
+ * Session keys for organisation management
+ */
+export const ORGANISATION_SESSION_KEYS = {
+  ORGANISATION_DATA: 'organisationData'
+}

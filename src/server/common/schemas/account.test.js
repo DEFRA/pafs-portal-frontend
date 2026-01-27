@@ -176,6 +176,11 @@ describe('Account Schemas', () => {
       expect(result.error).toBeUndefined()
     })
 
+    test('trims whitespace', () => {
+      const result = firstNameSchema.validate('  John  ')
+      expect(result.value).toBe('John')
+    })
+
     test('rejects empty first name', () => {
       const result = firstNameSchema.validate('')
       expect(result.error).toBeDefined()
@@ -187,6 +192,13 @@ describe('Account Schemas', () => {
       expect(result.error).toBeDefined()
       expect(result.error.message).toContain('FIRST_NAME_INVALID_FORMAT')
     })
+
+    test('rejects first name longer than 255 characters', () => {
+      const longName = 'a'.repeat(256)
+      const result = firstNameSchema.validate(longName)
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('FIRST_NAME_TOO_LONG')
+    })
   })
 
   describe('lastNameSchema', () => {
@@ -195,10 +207,28 @@ describe('Account Schemas', () => {
       expect(result.error).toBeUndefined()
     })
 
+    test('trims whitespace', () => {
+      const result = lastNameSchema.validate('  Smith  ')
+      expect(result.value).toBe('Smith')
+    })
+
     test('rejects empty last name', () => {
       const result = lastNameSchema.validate('')
       expect(result.error).toBeDefined()
       expect(result.error.message).toContain('LAST_NAME_REQUIRED')
+    })
+
+    test('rejects last name with invalid characters', () => {
+      const result = lastNameSchema.validate('Smith123')
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('LAST_NAME_INVALID_FORMAT')
+    })
+
+    test('rejects last name longer than 255 characters', () => {
+      const longName = 'a'.repeat(256)
+      const result = lastNameSchema.validate(longName)
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('LAST_NAME_TOO_LONG')
     })
   })
 
@@ -206,6 +236,11 @@ describe('Account Schemas', () => {
     test('validates valid job title', () => {
       const result = jobTitleSchema.validate('Senior Engineer')
       expect(result.error).toBeUndefined()
+    })
+
+    test('trims whitespace', () => {
+      const result = jobTitleSchema.validate('  Manager  ')
+      expect(result.value).toBe('Manager')
     })
 
     test('allows null job title', () => {
@@ -217,6 +252,19 @@ describe('Account Schemas', () => {
       const result = jobTitleSchema.validate('')
       expect(result.error).toBeUndefined()
     })
+
+    test('rejects job title with invalid characters', () => {
+      const result = jobTitleSchema.validate('Manager<script>')
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('JOB_TITLE_INVALID_FORMAT')
+    })
+
+    test('rejects job title longer than 255 characters', () => {
+      const longTitle = 'a'.repeat(256)
+      const result = jobTitleSchema.validate(longTitle)
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('JOB_TITLE_TOO_LONG')
+    })
   })
 
   describe('organisationSchema', () => {
@@ -225,9 +273,27 @@ describe('Account Schemas', () => {
       expect(result.error).toBeUndefined()
     })
 
+    test('trims whitespace', () => {
+      const result = organisationSchema.validate('  ACME Corp  ')
+      expect(result.value).toBe('ACME Corp')
+    })
+
     test('allows empty organisation', () => {
       const result = organisationSchema.validate('')
       expect(result.error).toBeUndefined()
+    })
+
+    test('rejects organisation with invalid characters', () => {
+      const result = organisationSchema.validate('ACME<script>')
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('ORGANISATION_INVALID_FORMAT')
+    })
+
+    test('rejects organisation longer than 255 characters', () => {
+      const longOrg = 'a'.repeat(256)
+      const result = organisationSchema.validate(longOrg)
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('ORGANISATION_TOO_LONG')
     })
   })
 
@@ -235,6 +301,16 @@ describe('Account Schemas', () => {
     test('validates valid UK telephone number', () => {
       const result = telephoneNumberSchema.validate('01234567890')
       expect(result.error).toBeUndefined()
+    })
+
+    test('validates telephone with spaces and dashes', () => {
+      const result = telephoneNumberSchema.validate('01234 567-890')
+      expect(result.error).toBeUndefined()
+    })
+
+    test('trims whitespace', () => {
+      const result = telephoneNumberSchema.validate('  01234567890  ')
+      expect(result.value).toBe('01234567890')
     })
 
     test('allows null telephone number', () => {
@@ -245,6 +321,19 @@ describe('Account Schemas', () => {
     test('allows empty telephone number', () => {
       const result = telephoneNumberSchema.validate('')
       expect(result.error).toBeUndefined()
+    })
+
+    test('rejects telephone with invalid characters', () => {
+      const result = telephoneNumberSchema.validate('01234abc')
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('TELEPHONE_INVALID_FORMAT')
+    })
+
+    test('rejects telephone longer than 255 characters', () => {
+      const longTel = '0'.repeat(256)
+      const result = telephoneNumberSchema.validate(longTel)
+      expect(result.error).toBeDefined()
+      expect(result.error.message).toContain('TELEPHONE_TOO_LONG')
     })
   })
 
@@ -269,6 +358,13 @@ describe('Account Schemas', () => {
       expect(result.error).toBeDefined()
       expect(result.error.message).toContain('RESPONSIBILITY_INVALID')
     })
+
+    test('rejects empty responsibility', () => {
+      const result = responsibilitySchema.validate('')
+      expect(result.error).toBeDefined()
+      // Empty string triggers RESPONSIBILITY_INVALID (not in valid list)
+      expect(result.error.message).toContain('RESPONSIBILITY_INVALID')
+    })
   })
 
   describe('adminFlagSchema', () => {
@@ -285,6 +381,13 @@ describe('Account Schemas', () => {
     test('defaults to false when undefined', () => {
       const result = adminFlagSchema.validate(undefined)
       expect(result.value).toBe(false)
+    })
+
+    test('converts string to boolean if possible', () => {
+      // Joi boolean schema with default(false) converts truthy values
+      const result = adminFlagSchema.validate('true')
+      // String 'true' is truthy so gets converted to true
+      expect(result.value).toBe(true)
     })
   })
 
@@ -310,6 +413,11 @@ describe('Account Schemas', () => {
       const result = userIdSchema.validate('abc')
       expect(result.error).toBeDefined()
       expect(result.error.message).toContain('USER_ID_INVALID')
+    })
+
+    test('rejects decimal number', () => {
+      const result = userIdSchema.validate(123.45)
+      expect(result.error).toBeDefined()
     })
   })
 })

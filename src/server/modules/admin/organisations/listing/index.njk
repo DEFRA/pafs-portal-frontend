@@ -1,0 +1,174 @@
+{#
+  Organisations Listing Page
+  Displays the list of organisations with filtering
+#}
+
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-xl">{{ t('organisations.listing.heading') }}</h1>
+
+    {# Success notification banner #}
+    {% if successNotification %}
+      {% set notificationHtml %}
+        <h3 class="govuk-notification-banner__heading">
+          {{ successNotification.title or t('organisations.listing.notifications.success_heading') }}
+        </h3>
+        <p class="govuk-body">{{ successNotification.message }}</p>
+      {% endset %}
+
+      {{ govukNotificationBanner({
+        html: notificationHtml,
+        type: "success"
+      }) }}
+    {% endif %}
+
+    {# Error notification banner #}
+    {% if errorNotification %}
+      {% set errorHtml %}
+        {% if errorNotification.title %}
+          <h3 class="govuk-notification-banner__heading">
+            {{ errorNotification.title }}
+          </h3>
+        {% endif %}
+        <p class="govuk-body">{{ errorNotification.message }}</p>
+      {% endset %}
+
+      {{ govukNotificationBanner({
+        html: errorHtml,
+        titleText: t('common.important')
+      }) }}
+    {% endif %}
+
+    {# Filter form #}
+    <form action="{{ baseUrl }}" method="get" class="govuk-!-margin-bottom-6" role="search" aria-label="{{ t('organisations.listing.filters.aria_label') }}" data-testid="organisations-filter-form">
+      {{ govukInput({
+        label: {
+          text: t('organisations.listing.filters.search_label'),
+          classes: "govuk-label"
+        },
+        id: "search",
+        name: "search",
+        value: filters.search,
+        classes: "govuk-!-width-two-thirds",
+        attributes: {
+          "aria-describedby": "search-hint"
+        }
+      }) }}
+      <span id="search-hint" class="govuk-visually-hidden">{{ t('organisations.listing.filters.search_hint') }}</span>
+
+      {{ govukSelect({
+        id: "type",
+        name: "type",
+        label: {
+          text: t('organisations.listing.filters.type_label'),
+          classes: "govuk-label"
+        },
+        classes: "govuk-!-width-two-thirds",
+        items: typeOptions,
+        attributes: {
+          "data-testid": "type-filter"
+        }
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: t('organisations.listing.filters.filter_button'),
+          type: "submit"
+        }) }}
+        <a href="{{ baseUrl }}" class="govuk-link" data-testid="clear-filters">
+          {{ t('organisations.listing.filters.clear_filters') }}
+        </a>
+      </div>
+    </form>
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true">
+
+    {# Organisations table #}
+    {% if error %}
+      <p class="govuk-body govuk-error-message" data-testid="organisations-error">{{ error }}</p>
+    {% elif organisations | length > 0 %}
+      <table class="govuk-table app-table--responsive" data-testid="organisations-table">
+        <caption class="govuk-visually-hidden">{{ t('organisations.listing.table.caption') }}</caption>
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">{{ t('organisations.listing.table.name') }}</th>
+            <th scope="col" class="govuk-table__header">{{ t('organisations.listing.table.type') }}</th>
+            <th scope="col" class="govuk-table__header">
+              <span class="govuk-visually-hidden">{{ t('organisations.listing.table.actions') }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for org in organisations %}
+            <tr class="govuk-table__row" data-testid="organisations-table-row">
+              <td class="govuk-table__cell" data-label="{{ t('organisations.listing.table.name') }}" data-testid="org-name">
+                {{ org.name }}
+              </td>
+              <td class="govuk-table__cell" data-label="{{ t('organisations.listing.table.type') }}" data-testid="org-type">
+                {{ org.type }}
+              </td>
+              <td class="govuk-table__cell" data-label="">
+                {% set typeSlug = (org.type | lower | replace(' area', '')) if org.type else 'unknown' %}
+                <a href="/admin/organisations/{{ typeSlug }}/{{ org.id }}" class="govuk-link" data-testid="org-edit-link">
+                  {{ t('organisations.listing.actions.edit') }}
+                  <span class="govuk-visually-hidden"> {{ org.name }}</span>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="govuk-body" data-testid="organisations-empty">{{ t('organisations.listing.empty') }}</p>
+    {% endif %}
+
+    {# Pagination row with summary and navigation #}
+    {% if pagination.summary or pagination.items or pagination.previous or pagination.next %}
+    <div class="app-pagination-row govuk-!-margin-top-6">
+      {# Pagination summary #}
+      {% if pagination.summary %}
+      <p class="govuk-body app-pagination-row__summary" data-testid="pagination-summary">
+        {{ t('organisations.listing.pagination.showing') }}
+        <strong>{{ pagination.summary.startItem }}</strong>
+        {{ t('organisations.listing.pagination.to') }}
+        <strong>{{ pagination.summary.endItem }}</strong>
+        {{ t('organisations.listing.pagination.of') }}
+        <strong>{{ pagination.summary.totalItems }}</strong>
+        {{ t('organisations.listing.pagination.organisations') }}
+      </p>
+      {% endif %}
+
+      {# GOV.UK Pagination #}
+      {% if pagination.items or pagination.previous or pagination.next %}
+      <div class="app-pagination-row__nav">
+        {{ govukPagination({
+          items: pagination.items,
+          previous: pagination.previous,
+          next: pagination.next,
+          landmarkLabel: t('organisations.listing.pagination.aria_label')
+        }) }}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-6" aria-hidden="true">
+
+    {# Bottom action link #}
+    <div class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+      <a href="/admin/organisations/add" class="govuk-link" data-testid="add-new-organisation">
+        {{ t('organisations.listing.actions.add_new_organisation') }}
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

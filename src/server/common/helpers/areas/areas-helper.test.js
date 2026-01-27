@@ -16,7 +16,9 @@ import {
   getParentAreas,
   getAreaDetails,
   getParentAreasDisplay,
-  determineResponsibilityFromAreas
+  determineResponsibilityFromAreas,
+  buildAreaDropdownByType,
+  buildRfccCodeDropdown
 } from './areas-helper.js'
 
 describe('AreasHelper', () => {
@@ -982,6 +984,271 @@ describe('AreasHelper', () => {
       )
 
       expect(result).toBeNull()
+    })
+  })
+
+  describe('buildAreaDropdownByType', () => {
+    test('builds dropdown with EA areas', () => {
+      const result = buildAreaDropdownByType({
+        areasData: mockAreas,
+        type: 'EA',
+        emptyText: 'Select EA area'
+      })
+
+      expect(result).toHaveLength(3) // 1 empty + 2 EA areas
+      expect(result[0]).toEqual({ value: '', text: 'Select EA area' })
+      expect(result[1]).toEqual({ value: '1', text: 'Wessex' })
+      expect(result[2]).toEqual({ value: '2', text: 'Thames' })
+    })
+
+    test('builds dropdown with PSO areas', () => {
+      const result = buildAreaDropdownByType({
+        areasData: mockAreas,
+        type: 'PSO'
+      })
+
+      expect(result).toHaveLength(4) // 1 empty + 3 PSO areas
+      expect(result[0]).toEqual({ value: '', text: 'Select an option' })
+      expect(result[1]).toEqual({ value: '3', text: 'PSO West of England' })
+      expect(result[2]).toEqual({ value: '4', text: 'PSO Dorset' })
+      expect(result[3]).toEqual({ value: '5', text: 'PSO Greater London' })
+    })
+
+    test('builds dropdown with RMA areas', () => {
+      const result = buildAreaDropdownByType({
+        areasData: mockAreas,
+        type: 'RMA',
+        emptyText: 'Select RMA'
+      })
+
+      expect(result).toHaveLength(5) // 1 empty + 4 RMA areas
+      expect(result[0]).toEqual({ value: '', text: 'Select RMA' })
+      expect(result[1]).toEqual({ value: '6', text: 'Bristol City Council' })
+    })
+
+    test('uses custom text and id columns', () => {
+      const customAreas = {
+        Custom: [
+          { code: 'A1', label: 'Area One', parent_id: null },
+          { code: 'A2', label: 'Area Two', parent_id: null }
+        ]
+      }
+
+      const result = buildAreaDropdownByType({
+        areasData: customAreas,
+        type: 'Custom',
+        textColumn: 'label',
+        idColumn: 'code',
+        emptyText: 'Pick one'
+      })
+
+      expect(result).toHaveLength(3)
+      expect(result[0]).toEqual({ value: '', text: 'Pick one' })
+      expect(result[1]).toEqual({ value: 'A1', text: 'Area One' })
+      expect(result[2]).toEqual({ value: 'A2', text: 'Area Two' })
+    })
+
+    test('returns only empty option when no areas of type exist', () => {
+      const result = buildAreaDropdownByType({
+        areasData: mockAreas,
+        type: 'NONEXISTENT',
+        emptyText: 'No areas'
+      })
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).toEqual({ value: '', text: 'No areas' })
+    })
+
+    test('handles empty areas data', () => {
+      const result = buildAreaDropdownByType({
+        areasData: {},
+        type: 'EA'
+      })
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).toEqual({ value: '', text: 'Select an option' })
+    })
+
+    test('handles null areas data', () => {
+      const result = buildAreaDropdownByType({
+        areasData: null,
+        type: 'EA'
+      })
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).toEqual({ value: '', text: 'Select an option' })
+    })
+
+    test('converts numeric id to string in value', () => {
+      const areasWithNumericIds = {
+        Test: [{ id: 100, name: 'Test Area' }]
+      }
+
+      const result = buildAreaDropdownByType({
+        areasData: areasWithNumericIds,
+        type: 'Test'
+      })
+
+      expect(result[1]).toEqual({ value: '100', text: 'Test Area' })
+    })
+  })
+
+  describe('buildRfccCodeDropdown', () => {
+    const areasWithRfcc = {
+      ...mockAreas,
+      'PSO Area': [
+        {
+          id: '3',
+          name: 'PSO West of England',
+          area_type: 'PSO',
+          parent_id: '1',
+          sub_type: 'RFCC-003'
+        },
+        {
+          id: '4',
+          name: 'PSO Dorset',
+          area_type: 'PSO',
+          parent_id: '1',
+          sub_type: 'RFCC-001'
+        },
+        {
+          id: '5',
+          name: 'PSO Greater London',
+          area_type: 'PSO',
+          parent_id: '2',
+          sub_type: 'RFCC-002'
+        },
+        {
+          id: '11',
+          name: 'PSO Another',
+          area_type: 'PSO',
+          parent_id: '2',
+          sub_type: 'RFCC-001' // duplicate to test uniqueness
+        }
+      ]
+    }
+
+    test('builds dropdown with unique RFCC codes', () => {
+      const result = buildRfccCodeDropdown({
+        areasData: areasWithRfcc
+      })
+
+      expect(result).toHaveLength(4) // 1 empty + 3 unique codes
+      expect(result[0]).toEqual({ value: '', text: 'Select a RFCC code' })
+      expect(result[1]).toEqual({ value: 'RFCC-001', text: 'RFCC-001' })
+      expect(result[2]).toEqual({ value: 'RFCC-002', text: 'RFCC-002' })
+      expect(result[3]).toEqual({ value: 'RFCC-003', text: 'RFCC-003' })
+    })
+
+    test('sorts RFCC codes alphabetically', () => {
+      const result = buildRfccCodeDropdown({
+        areasData: areasWithRfcc
+      })
+
+      // Verify codes are in sorted order
+      expect(result[1].value).toBe('RFCC-001')
+      expect(result[2].value).toBe('RFCC-002')
+      expect(result[3].value).toBe('RFCC-003')
+    })
+
+    test('handles custom empty text', () => {
+      const result = buildRfccCodeDropdown({
+        areasData: areasWithRfcc,
+        emptyText: 'Choose RFCC'
+      })
+
+      expect(result[0]).toEqual({ value: '', text: 'Choose RFCC' })
+    })
+
+    test('returns only empty option when no PSO areas', () => {
+      const areasWithoutPso = {
+        EA: mockAreas.EA,
+        RMA: mockAreas.RMA
+      }
+
+      const result = buildRfccCodeDropdown({
+        areasData: areasWithoutPso
+      })
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).toEqual({ value: '', text: 'Select a RFCC code' })
+    })
+
+    test('returns only empty option when PSO areas have no sub_type', () => {
+      const result = buildRfccCodeDropdown({
+        areasData: mockAreas // Original mockAreas without sub_type
+      })
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).toEqual({ value: '', text: 'Select a RFCC code' })
+    })
+
+    test('filters out empty sub_type values', () => {
+      const areasWithEmptySubType = {
+        'PSO Area': [
+          {
+            id: '3',
+            name: 'PSO West',
+            area_type: 'PSO',
+            sub_type: 'RFCC-001'
+          },
+          { id: '4', name: 'PSO East', area_type: 'PSO', sub_type: '' },
+          { id: '5', name: 'PSO North', area_type: 'PSO', sub_type: '   ' },
+          { id: '6', name: 'PSO South', area_type: 'PSO', sub_type: null }
+        ]
+      }
+
+      const result = buildRfccCodeDropdown({
+        areasData: areasWithEmptySubType
+      })
+
+      expect(result).toHaveLength(2) // 1 empty + 1 valid code
+      expect(result[1]).toEqual({ value: 'RFCC-001', text: 'RFCC-001' })
+    })
+
+    test('trims whitespace from sub_type values', () => {
+      const areasWithWhitespace = {
+        'PSO Area': [
+          {
+            id: '3',
+            name: 'PSO West',
+            area_type: 'PSO',
+            sub_type: '  RFCC-001  '
+          },
+          {
+            id: '4',
+            name: 'PSO East',
+            area_type: 'PSO',
+            sub_type: 'RFCC-002'
+          }
+        ]
+      }
+
+      const result = buildRfccCodeDropdown({
+        areasData: areasWithWhitespace
+      })
+
+      expect(result).toHaveLength(3)
+      expect(result[1]).toEqual({ value: 'RFCC-001', text: 'RFCC-001' })
+      expect(result[2]).toEqual({ value: 'RFCC-002', text: 'RFCC-002' })
+    })
+
+    test('handles empty areasData', () => {
+      const result = buildRfccCodeDropdown({
+        areasData: {}
+      })
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).toEqual({ value: '', text: 'Select a RFCC code' })
+    })
+
+    test('handles null areasData', () => {
+      const result = buildRfccCodeDropdown({
+        areasData: null
+      })
+
+      expect(result).toHaveLength(1)
+      expect(result[0]).toEqual({ value: '', text: 'Select a RFCC code' })
     })
   })
 })

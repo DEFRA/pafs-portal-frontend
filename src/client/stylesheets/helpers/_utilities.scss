@@ -10,3 +10,9 @@
 .app-\!-text-break-all {
   word-break: break-all;
 }
+
+// Vertical alignment utility for flex items
+// Use app-!-align-with-button to vertically center links with buttons in button groups
+.app-\!-align-with-button {
+  align-self: center;
+}

@@ -4,8 +4,6 @@
  * to avoid code duplication
  */
 
-import { PAGINATION } from '../../../../common/constants/common.js'
-import { getAuthSession } from '../../../../common/helpers/auth/session-manager.js'
 import { getDefaultPageSize } from '../../../../common/helpers/pagination/index.js'
 import {
   getAccounts,
@@ -13,43 +11,12 @@ import {
   getActiveCount
 } from '../../../../common/services/accounts/accounts-service.js'
 import { createAccountsCacheService } from '../../../../common/services/accounts/accounts-cache.js'
+import { buildListingRequestContext } from '../../common/listing-helpers.js'
 import {
   formatUsersForDisplay,
   buildUsersViewModel,
   getEmptyUsersViewModel
 } from './user-listing.js'
-
-function buildRequestContext(request) {
-  const session = getAuthSession(request)
-  const logger = request.server.logger
-  const cacheService = createAccountsCacheService(request.server)
-
-  const userCreatedFlash = request.yar.flash('userCreated')
-  const successFlash = request.yar.flash('success')
-  const errorFlash = request.yar.flash('error')
-
-  const sessionFlashLength = successFlash.length > 0 ? successFlash[0] : null
-  const successNotification =
-    userCreatedFlash.length > 0 ? userCreatedFlash[0] : sessionFlashLength
-
-  const errorNotification = errorFlash.length > 0 ? errorFlash[0] : null
-
-  const page =
-    Number.parseInt(request.query.page, 10) || PAGINATION.DEFAULT_PAGE
-  const search = request.query.search || ''
-  const areaId = request.query.areaId || ''
-  const filters = { search, areaId }
-
-  return {
-    session,
-    logger,
-    cacheService,
-    successNotification,
-    errorNotification,
-    page,
-    filters
-  }
-}
 
 async function fetchUsersData({
   status,
@@ -224,16 +191,16 @@ function handleErrorResponse(params) {
 export function createUsersListController({ status, viewTemplate, baseUrl }) {
   return {
     async handler(request, h) {
-      const context = buildRequestContext(request)
       const {
         session,
         logger,
-        cacheService,
         successNotification,
         errorNotification,
         page,
         filters
-      } = context
+      } = buildListingRequestContext(request, ['search', 'areaId'])
+
+      const cacheService = createAccountsCacheService(request.server)
 
       try {
         // Fetch areas data from request decorator

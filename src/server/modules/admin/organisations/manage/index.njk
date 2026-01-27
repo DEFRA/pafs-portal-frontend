@@ -1,0 +1,409 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}
+  {% if backLink %}
+    <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    
+    {# Build error summary list #}
+    {% set errorList = [] %}
+    
+    {% if errors.name %}
+      {% set errorList = (errorList.push({ text: t('organisations.validation.' + errors.name), href: "#name" }), errorList) %}
+    {% endif %}
+
+    {% if step == 'authority' %}
+      {# Authority Code field error #}
+      {% if fieldErrors.identifier == ERROR_CODES.IDENTIFIER_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AUTHORITY_CODE_REQUIRED'), href: "#identifier" }]) %}
+      {% elif fieldErrors.identifier == ERROR_CODES.IDENTIFIER_TOO_LONG %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AUTHORITY_CODE_TOO_LONG'), href: "#identifier" }]) %}
+      {% endif %}
+    {% endif %}
+    
+    {% if step == 'authority' %}
+      {# Authority Type field error #}
+      {% if fieldErrors.name == ERROR_CODES.NAME_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AUTHORITY_TYPE_REQUIRED'), href: "#name" }]) %}
+      {% elif fieldErrors.name == ERROR_CODES.NAME_TOO_SHORT %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AUTHORITY_TYPE_TOO_SHORT'), href: "#name" }]) %}
+      {% elif fieldErrors.name == ERROR_CODES.NAME_TOO_LONG %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AUTHORITY_TYPE_TOO_LONG'), href: "#name" }]) %}
+      {% endif %}
+    {% endif %}
+    {% if step != 'authority' %}
+      {# Name field error #}
+      {% if fieldErrors.name == ERROR_CODES.NAME_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AREA_NAME_REQUIRED'), href: "#name" }]) %}
+      {% elif fieldErrors.name == ERROR_CODES.NAME_TOO_SHORT %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AREA_NAME_TOO_SHORT'), href: "#name" }]) %}
+      {% elif fieldErrors.name == ERROR_CODES.NAME_TOO_LONG %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AREA_NAME_TOO_LONG'), href: "#name" }]) %}
+      {% endif %}
+    {% endif %}
+
+    {% if step == 'rma' %}
+      {# Identifier field error #}
+      {% if fieldErrors.identifier == ERROR_CODES.IDENTIFIER_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AREA_IDENTIFIER_REQUIRED'), href: "#identifier" }]) %}
+      {% elif fieldErrors.identifier == ERROR_CODES.IDENTIFIER_TOO_LONG %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AREA_IDENTIFIER_TOO_LONG'), href: "#identifier" }]) %}
+      {% endif %}
+    {% endif %}
+    
+    {% if step == 'pso' %}
+      {# Parent Id field error #}
+      {% if fieldErrors.parentId == ERROR_CODES.PARENT_ID_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_EA_AREA_REQUIRED'), href: "#parentId" }]) %}
+      {% endif %}
+    {% endif %}
+    
+    {% if step == 'rma' %}
+      {# Parent Id field error #}
+      {% if fieldErrors.parentId == ERROR_CODES.PARENT_ID_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_ASSOCIATED_PSO_REQUIRED'), href: "#parentId" }]) %}
+      {% endif %}
+    {% endif %}
+    
+    {% if step == 'pso' %}
+      {# Sub Type field error #}
+      {% if fieldErrors.subType == ERROR_CODES.SUBTYPE_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_RFCC_CODE_REQUIRED'), href: "#subType" }]) %}
+      {% endif %}
+    {% endif %}
+    
+    {% if step == 'rma' %}
+      {# Sub Type field error #}
+      {% if fieldErrors.subType == ERROR_CODES.SUBTYPE_REQUIRED %}
+        {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AUTHORITY_CODE_OPTION_REQUIRED'), href: "#subType" }]) %}
+      {% endif %}
+    {% endif %}
+
+    {# End Date field error #}
+    {% if fieldErrors.endDate %}
+      {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AREA_DATE_INVALID'), href: "#endDate" }]) %}
+    {% endif %}
+    
+    {% if errors.general %}
+      {% set errorList = (errorList.push({ text: errors.general }), errorList) %}
+    {% endif %}
+
+    {# Display error summary if there are errors #}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
+
+    {# Page heading #}
+    <h1 class="govuk-heading-xl">{{ heading }}</h1>
+
+    <form method="post" novalidate>
+      {% if step == 'authority' %}
+        {# Authority Type field error #}
+        {% set authorityTypeError = false %}
+        {% if fieldErrors.name == ERROR_CODES.NAME_REQUIRED %}
+          {% set authorityTypeError = { text: t('organisations.validation.VALIDATION_AUTHORITY_TYPE_REQUIRED') } %}
+        {% elif fieldErrors.name == ERROR_CODES.NAME_TOO_SHORT %}
+          {% set authorityTypeError = { text: t('organisations.validation.VALIDATION_AUTHORITY_TYPE_TOO_SHORT') } %}
+        {% elif fieldErrors.name == ERROR_CODES.NAME_TOO_LONG %}
+          {% set authorityTypeError = { text: t('organisations.validation.VALIDATION_AUTHORITY_TYPE_TOO_LONG') } %}
+        {% endif %}
+      {% endif %}
+
+      {% if step != 'authority' %}
+        {# Name field error #}
+        {% set nameError = false %}
+        {% if fieldErrors.name == ERROR_CODES.NAME_REQUIRED %}
+          {% set nameError = { text: t('organisations.validation.VALIDATION_AREA_NAME_REQUIRED') } %}
+        {% elif fieldErrors.name == ERROR_CODES.NAME_TOO_SHORT %}
+          {% set nameError = { text: t('organisations.validation.VALIDATION_AREA_NAME_TOO_SHORT') } %}
+        {% elif fieldErrors.name == ERROR_CODES.NAME_TOO_LONG %}
+          {% set nameError = { text: t('organisations.validation.VALIDATION_AREA_NAME_TOO_LONG') } %}
+        {% endif %}
+      {% endif %}
+
+      {% if step == 'authority' %}
+        {# Authority Code field error #}
+        {% set authorityCode = false %}
+        {% if fieldErrors.identifier == ERROR_CODES.IDENTIFIER_REQUIRED %}
+          {% set authorityCode = { text: t('organisations.validation.VALIDATION_AUTHORITY_CODE_REQUIRED') } %}
+        {% elif fieldErrors.identifier == ERROR_CODES.IDENTIFIER_TOO_LONG %}
+          {% set authorityCode = { text: t('organisations.validation.VALIDATION_AUTHORITY_CODE_TOO_LONG') } %}
+        {% endif %}
+      {% endif %}
+
+      {% if step == 'rma' %}
+        {# Identifier field error #}
+        {% set identifierError = false %}
+        {% if fieldErrors.identifier == ERROR_CODES.IDENTIFIER_REQUIRED %}
+          {% set identifierError = { text: t('organisations.validation.VALIDATION_AREA_IDENTIFIER_REQUIRED') } %}
+        {% elif fieldErrors.identifier == ERROR_CODES.IDENTIFIER_TOO_LONG %}
+          {% set identifierError = { text: t('organisations.validation.VALIDATION_AREA_IDENTIFIER_TOO_LONG') } %}
+        {% endif %}
+      {% endif %}
+
+      {% if step == 'pso' %}
+        {# Parent ID field error #}
+        {% set eaAreaError = false %}
+        {% if fieldErrors.parentId == ERROR_CODES.PARENT_ID_REQUIRED %}
+          {% set eaAreaError = { text: t('organisations.validation.VALIDATION_EA_AREA_REQUIRED') } %}
+        {% endif %}
+      {% endif %}
+
+      {% if step == 'rma' %}
+        {# Parent ID field error #}
+        {% set psoAreaError = false %}
+        {% if fieldErrors.parentId == ERROR_CODES.PARENT_ID_REQUIRED %}
+          {% set psoAreaError = { text: t('organisations.validation.VALIDATION_ASSOCIATED_PSO_REQUIRED') } %}
+        {% endif %}
+      {% endif %}
+
+      {% if step == 'pso' %}
+        {# Sub Type field error #}
+        {% set rfccError = false %}
+        {% if fieldErrors.subType == ERROR_CODES.SUBTYPE_REQUIRED %}
+          {% set rfccError = { text: t('organisations.validation.VALIDATION_RFCC_CODE_REQUIRED') } %}
+        {% endif %}
+      {% endif %}
+
+      {% if step == 'rma' %}
+        {# Sub Type field error #}
+        {% set authorityCodeOptionError = false %}
+        {% if fieldErrors.subType == ERROR_CODES.SUBTYPE_REQUIRED %}
+          {% set authorityCodeOptionError = { text: t('organisations.validation.VALIDATION_AUTHORITY_CODE_OPTION_REQUIRED') } %}
+        {% endif %}
+      {% endif %}
+
+      {# End Date field error #}
+      {% set endDateError = false %}
+      {% if fieldErrors.endDate %}
+        {% set endDateError = { text: t('organisations.validation.VALIDATION_AREA_DATE_INVALID') } %}
+      {% endif %}
+
+      {# Authority Form #}
+      {% if step == 'authority' %}
+        {{ govukInput({
+          label: {
+            text: t('organisations.manage.authority.authority_code_label')
+          },
+          id: "identifier",
+          name: "identifier",
+          value: formData.identifier,
+          errorMessage: authorityCode,
+          classes: "govuk-!-width-two-thirds"
+        }) }}
+
+        {{ govukInput({
+          label: {
+            text: t('organisations.manage.authority.authority_type_label')
+          },
+          id: "name",
+          name: "name",
+          value: formData.name,
+          errorMessage: authorityTypeError,
+          classes: "govuk-!-width-two-thirds"
+        }) }}
+
+        {{ govukDateInput({
+          id: "endDate",
+          namePrefix: "endDate",
+          fieldset: {
+            legend: {
+              text: t('organisations.manage.authority.end_date_label')
+            }
+          },
+          hint: {
+            text: t('organisations.manage.authority.end_date_hint')
+          },
+          errorMessage: endDateError,
+          items: [
+            {
+              name: "day",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if fieldErrors.endDate else ""),
+              value: formData.endDate.day
+            },
+            {
+              name: "month",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if fieldErrors.endDate else ""),
+              value: formData.endDate.month
+            },
+            {
+              name: "year",
+              classes: "govuk-input--width-4" + (" govuk-input--error" if fieldErrors.endDate else ""),
+              value: formData.endDate.year
+            }
+          ]
+        }) }}
+
+      {# PSO Form #}
+      {% elif step == 'pso' %}
+        {{ govukInput({
+          label: {
+            text: t('organisations.manage.pso.name_label')
+          },
+          id: "name",
+          name: "name",
+          value: formData.name,
+          errorMessage: nameError,
+          classes: "govuk-!-width-two-thirds"
+        }) }}
+
+        {{ govukSelect({
+          id: "parentId",
+          name: "parentId",
+          label: {
+            text: t('organisations.manage.pso.ea_area_label')
+          },
+          classes: "govuk-!-width-two-thirds",
+          items: eaAreaOptions,
+          errorMessage: eaAreaError,
+          value: formData.parentId
+        }) }}
+
+        {{ govukSelect({
+          id: "subType",
+          name: "subType",
+          label: {
+            text: t('organisations.manage.pso.rfcc_code_label')
+          },
+          classes: "govuk-!-width-two-thirds",
+          items: rfccOptions,
+          errorMessage: rfccError,
+          value: formData.subType
+        }) }}
+
+        {{ govukDateInput({
+          id: "endDate",
+          namePrefix: "endDate",
+          fieldset: {
+            legend: {
+              text: t('organisations.manage.pso.end_date_label')
+            }
+          },
+          hint: {
+            text: t('organisations.manage.pso.end_date_hint')
+          },
+          errorMessage: endDateError,
+          items: [
+            {
+              name: "day",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if fieldErrors.endDate else ""),
+              value: formData.endDate.day
+            },
+            {
+              name: "month",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if fieldErrors.endDate else ""),
+              value: formData.endDate.month
+            },
+            {
+              name: "year",
+              classes: "govuk-input--width-4" + (" govuk-input--error" if fieldErrors.endDate else ""),
+              value: formData.endDate.year
+            }
+          ]
+        }) }}
+
+      {# RMA Form #}
+      {% elif step == 'rma' %}
+        {{ govukInput({
+          label: {
+            text: t('organisations.manage.rma.name_label')
+          },
+          id: "name",
+          name: "name",
+          value: formData.name,
+          errorMessage: nameError,
+          classes: "govuk-!-width-two-thirds"
+        }) }}
+
+        {{ govukInput({
+          label: {
+            text: t('organisations.manage.rma.identifier_label')
+          },
+          id: "identifier",
+          name: "identifier",
+          value: formData.identifier,
+          errorMessage: identifierError,
+          classes: "govuk-!-width-two-thirds"
+        }) }}
+
+        {{ govukSelect({
+          id: "parentId",
+          name: "parentId",
+          label: {
+            text: t('organisations.manage.rma.pso_label')
+          },
+          classes: "govuk-!-width-two-thirds",
+          items: psoOptions,
+          errorMessage: psoAreaError,
+          value: formData.parentId
+        }) }}
+
+        {{ govukSelect({
+          id: "subType",
+          name: "subType",
+          label: {
+            text: t('organisations.manage.rma.authority_code_label')
+          },
+          classes: "govuk-!-width-two-thirds",
+          items: authorityOptions,
+          errorMessage: authorityCodeOptionError,
+          value: formData.subType
+        }) }}
+
+        {{ govukDateInput({
+          id: "endDate",
+          namePrefix: "endDate",
+          fieldset: {
+            legend: {
+              text: t('organisations.manage.rma.end_date_label')
+            }
+          },
+          hint: {
+            text: t('organisations.manage.rma.end_date_hint')
+          },
+          errorMessage: endDateError,
+          items: [
+            {
+              name: "day",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if fieldErrors.endDate else ""),
+              value: formData.endDate.day
+            },
+            {
+              name: "month",
+              classes: "govuk-input--width-2" + (" govuk-input--error" if fieldErrors.endDate else ""),
+              value: formData.endDate.month
+            },
+            {
+              name: "year",
+              classes: "govuk-input--width-4" + (" govuk-input--error" if fieldErrors.endDate else ""),
+              value: formData.endDate.year
+            }
+          ]
+        }) }}
+      {% endif %}
+
+      {# Button Group #}
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: t('common.buttons.save_changes')
+        }) }}
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
