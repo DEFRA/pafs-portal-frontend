@@ -44,7 +44,7 @@ function validateProjectType(request) {
 
 function handlePostSuccess(request, h, values) {
   const sessionData = request.yar.get('projectProposal') ?? {}
-  sessionData.projectType = values
+  sessionData.projectType = values.projectType
   request.yar.set('projectProposal', sessionData)
 
   request.server.logger.info(
@@ -81,7 +81,7 @@ async function handlePost(request, h) {
 
 async function handleGet(request, h) {
   const sessionData = request.yar.get('projectProposal') ?? {}
-  const values = sessionData.projectType ?? {}
+  const values = { projectType: sessionData.projectType ?? '' }
 
   return h.view(
     PROPOSAL_VIEWS.PROJECT_TYPE,

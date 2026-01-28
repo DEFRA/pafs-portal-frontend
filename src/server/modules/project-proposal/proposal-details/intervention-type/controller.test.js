@@ -46,7 +46,7 @@ describe('#interventionTypeController', () => {
           'modules/project-proposal/proposal-details/intervention-type/index'
         ),
         expect.objectContaining({
-          values: {}
+          values: { interventionTypes: [] }
         })
       )
     })
@@ -54,7 +54,7 @@ describe('#interventionTypeController', () => {
     test('Should display saved intervention selections if available in session', async () => {
       mockRequest.method = 'get'
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: { interventionTypes: ['nfm', 'sds'] }
+        interventionTypes: ['nfm', 'sds']
       })
 
       await interventionTypeController.handler(mockRequest, mockH)
@@ -72,7 +72,7 @@ describe('#interventionTypeController', () => {
     test('Should include projectType in view model when available in session', async () => {
       mockRequest.method = 'get'
       mockRequest.yar.get.mockReturnValue({
-        projectType: { projectType: 'DEF' }
+        projectType: 'DEF'
       })
 
       await interventionTypeController.handler(mockRequest, mockH)
@@ -129,7 +129,7 @@ describe('#interventionTypeController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          interventionTypes: { interventionTypes: ['nfm'] }
+          interventionTypes: ['nfm']
         })
       )
       expect(result.redirect).toBe('/project-proposal/first-financial-year')
@@ -148,7 +148,7 @@ describe('#interventionTypeController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          interventionTypes: { interventionTypes: ['nfm', 'sds'] }
+          interventionTypes: ['nfm', 'sds']
         })
       )
       expect(result.redirect).toBe(
@@ -204,7 +204,7 @@ describe('#interventionTypeController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          interventionTypes: { interventionTypes: ['sds'] }
+          interventionTypes: ['sds']
         })
       )
     })
@@ -219,7 +219,7 @@ describe('#interventionTypeController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          interventionTypes: { interventionTypes: ['nfm', 'pfr', 'sds'] }
+          interventionTypes: ['nfm', 'pfr', 'sds']
         })
       )
     })
@@ -228,7 +228,7 @@ describe('#interventionTypeController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { interventionTypes: [] }
       mockRequest.yar.get.mockReturnValue({
-        projectType: { projectType: 'REF' }
+        projectType: 'REF'
       })
 
       await interventionTypeController.handler(mockRequest, mockH)

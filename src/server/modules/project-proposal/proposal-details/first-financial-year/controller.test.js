@@ -73,8 +73,8 @@ describe('#firstFinancialYearController', () => {
 
     test('shows saved selection if present in session', async () => {
       mockRequest.yar.get.mockReturnValue({
-        projectType: { projectType: 'DEF' },
-        firstFinancialYear: { firstFinancialYear: '2027' }
+        projectType: 'DEF',
+        firstFinancialYear: '2027'
       })
 
       await firstFinancialYearController.handler(mockRequest, mockH)
@@ -91,8 +91,8 @@ describe('#firstFinancialYearController', () => {
 
     test('sets back link to primary intervention when multiple interventions selected', async () => {
       mockRequest.yar.get.mockReturnValue({
-        projectType: { projectType: 'DEF' },
-        interventionTypes: { interventionTypes: ['TYPE_A', 'TYPE_B'] }
+        projectType: 'DEF',
+        interventionTypes: ['TYPE_A', 'TYPE_B']
       })
 
       await firstFinancialYearController.handler(mockRequest, mockH)
@@ -105,8 +105,8 @@ describe('#firstFinancialYearController', () => {
 
     test('sets back link to intervention type when project type is DEF', async () => {
       mockRequest.yar.get.mockReturnValue({
-        projectType: { projectType: 'DEF' },
-        interventionTypes: { interventionTypes: ['TYPE_A'] }
+        projectType: 'DEF',
+        interventionTypes: ['TYPE_A']
       })
 
       await firstFinancialYearController.handler(mockRequest, mockH)
@@ -117,7 +117,7 @@ describe('#firstFinancialYearController', () => {
 
     test('sets back link to project type when no interventions and project type not in DEF/REP/REF', async () => {
       mockRequest.yar.get.mockReturnValue({
-        projectType: { projectType: 'OTHER' }
+        projectType: 'OTHER'
       })
 
       await firstFinancialYearController.handler(mockRequest, mockH)
@@ -152,7 +152,7 @@ describe('#firstFinancialYearController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { firstFinancialYear: '2028' }
       mockRequest.yar.get.mockReturnValue({
-        projectType: { projectType: 'DEF' }
+        projectType: 'DEF'
       })
 
       const result = await firstFinancialYearController.handler(
@@ -163,7 +163,7 @@ describe('#firstFinancialYearController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          firstFinancialYear: { firstFinancialYear: '2028' }
+          firstFinancialYear: '2028'
         })
       )
       expect(result.redirect).toBe('/project-proposal/last-financial-year')
@@ -234,7 +234,7 @@ describe('#firstFinancialYearController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          firstFinancialYear: { firstFinancialYear: '2030' }
+          firstFinancialYear: '2030'
         })
       )
       expect(result.redirect).toBe('/project-proposal/last-financial-year')

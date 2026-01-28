@@ -87,7 +87,7 @@ function validateRmaSelection(request) {
 async function handleGet(request, h) {
   const rmaAreas = await rmaDropDownOptions(request)
   const sessionData = request.yar.get('projectProposal') ?? {}
-  const values = sessionData?.rmaSelection ?? {}
+  const values = { rmaSelection: sessionData.rmaSelection ?? '' }
 
   if (!sessionData.projectName) {
     return h.redirect(ROUTES.PROJECT_PROPOSAL.START_PROPOSAL)
@@ -104,7 +104,7 @@ async function handleGet(request, h) {
  */
 function handlePostSuccess(request, h, values) {
   const sessionData = request.yar.get('projectProposal') ?? {}
-  sessionData.rmaSelection = values
+  sessionData.rmaSelection = values.rmaSelection
   request.yar.set('projectProposal', sessionData)
 
   request.server.logger.info(

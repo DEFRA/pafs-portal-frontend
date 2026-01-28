@@ -7,7 +7,7 @@ import { ROUTES } from '../../../common/constants/routes.js'
 export const requireProjectName = {
   method: (request, h) => {
     const sessionData = request.yar.get('projectProposal') ?? {}
-    const projectName = sessionData.projectName?.projectName
+    const projectName = sessionData.projectName
 
     if (!projectName) {
       return h.redirect(ROUTES.PROJECT_PROPOSAL.PROJECT_NAME).takeover()
@@ -25,8 +25,8 @@ export const requireProjectName = {
 export const requireProjectType = {
   method: (request, h) => {
     const sessionData = request.yar.get('projectProposal') ?? {}
-    const projectName = sessionData.projectName?.projectName
-    const projectType = sessionData.projectType?.projectType
+    const projectName = sessionData.projectName
+    const projectType = sessionData.projectType
 
     if (!projectName) {
       return h.redirect(ROUTES.PROJECT_PROPOSAL.PROJECT_NAME).takeover()
@@ -48,9 +48,9 @@ export const requireProjectType = {
 export const requireInterventionType = {
   method: (request, h) => {
     const sessionData = request.yar.get('projectProposal') ?? {}
-    const projectName = sessionData.projectName?.projectName
-    const projectType = sessionData.projectType?.projectType
-    const interventionTypes = sessionData.interventionTypes?.interventionTypes
+    const projectName = sessionData.projectName
+    const projectType = sessionData.projectType
+    const interventionTypes = sessionData.interventionTypes
 
     if (!projectName) {
       return h.redirect(ROUTES.PROJECT_PROPOSAL.PROJECT_NAME).takeover()
@@ -80,8 +80,7 @@ export const requireInterventionType = {
 export const requireFirstFinancialYear = {
   method: (request, h) => {
     const sessionData = request.yar.get('projectProposal') ?? {}
-    const firstFinancialYear =
-      sessionData.firstFinancialYear?.firstFinancialYear
+    const firstFinancialYear = sessionData.firstFinancialYear
 
     if (!firstFinancialYear) {
       return h.redirect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR).takeover()

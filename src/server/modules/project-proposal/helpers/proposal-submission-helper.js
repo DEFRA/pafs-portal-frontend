@@ -49,7 +49,7 @@ function buildViewModel(values, errors, errorSummary) {
  * @returns {Object} Area details with numeric rmaId and raw selection
  */
 export function getAreaDetailsForProposal(sessionData) {
-  const rmaSelection = sessionData.rmaSelection?.rmaSelection
+  const rmaSelection = sessionData.rmaSelection
   const rmaId = rmaSelection ? Number(rmaSelection) : undefined
 
   return {
@@ -67,17 +67,14 @@ export function getAreaDetailsForProposal(sessionData) {
  */
 export function buildProposalDataForSubmission(sessionData, values, rmaId) {
   // Convert financial years to numbers
-  const financialStartYear = Number.parseInt(
-    sessionData.firstFinancialYear?.firstFinancialYear,
-    10
-  )
+  const financialStartYear = Number.parseInt(sessionData.firstFinancialYear, 10)
   const financialEndYear = Number.parseInt(values.lastFinancialYear, 10)
 
-  const projectType = sessionData.projectType?.projectType
+  const projectType = sessionData.projectType
 
   // Base payload without intervention types
   const payload = {
-    name: sessionData.projectName?.projectName,
+    name: sessionData.projectName,
     rmaId: String(rmaId),
     projectType,
     financialStartYear,
@@ -87,15 +84,13 @@ export function buildProposalDataForSubmission(sessionData, values, rmaId) {
   // Only include intervention types for DEF, REP, and REF project types
   if (projectType === 'DEF' || projectType === 'REP' || projectType === 'REF') {
     // Normalize intervention types to uppercase
-    const interventionTypes = (
-      sessionData.interventionTypes?.interventionTypes || []
-    ).map((type) => String(type).toUpperCase())
+    const interventionTypes = (sessionData.interventionTypes || []).map(
+      (type) => String(type).toUpperCase()
+    )
 
     payload.projectInterventionTypes = interventionTypes
     payload.mainInterventionType =
-      String(
-        sessionData.primaryInterventionType?.primaryInterventionType || ''
-      ).toUpperCase() || null
+      String(sessionData.primaryInterventionType || '').toUpperCase() || null
   }
 
   return {

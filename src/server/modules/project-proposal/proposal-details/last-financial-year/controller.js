@@ -91,7 +91,7 @@ function validateRadioSelection(request, sessionData) {
     }
   }
 
-  const firstFinancialYear = sessionData?.firstFinancialYear?.firstFinancialYear
+  const firstFinancialYear = sessionData?.firstFinancialYear
   if (
     firstFinancialYear &&
     Number.parseInt(lastFinancialYear, 10) <
@@ -145,7 +145,7 @@ function validateManualEntry(request, sessionData) {
     }
   }
 
-  const firstFinancialYear = sessionData?.firstFinancialYear?.firstFinancialYear
+  const firstFinancialYear = sessionData?.firstFinancialYear
   if (
     firstFinancialYear &&
     Number.parseInt(yearString, 10) < Number.parseInt(firstFinancialYear, 10)
@@ -171,7 +171,7 @@ function validateManualEntry(request, sessionData) {
 
 async function handlePostSuccess(request, h, values, viewType) {
   const sessionData = request.yar.get('projectProposal') ?? {}
-  sessionData.lastFinancialYear = values
+  sessionData.lastFinancialYear = values.lastFinancialYear
   request.yar.set('projectProposal', sessionData)
 
   request.server.logger.info(
@@ -276,7 +276,9 @@ function createLastFinancialYearController(viewType) {
         return handlePostSuccess(request, h, values, viewType)
       }
 
-      const storedValues = sessionData.lastFinancialYear ?? {}
+      const storedValues = {
+        lastFinancialYear: sessionData.lastFinancialYear ?? ''
+      }
 
       return h.view(
         view,

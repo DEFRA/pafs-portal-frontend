@@ -17,8 +17,8 @@ const VIEW_TYPES = {
 }
 
 function getBackLink(sessionData) {
-  const projectType = sessionData?.projectType?.projectType
-  const selected = sessionData?.interventionTypes?.interventionTypes
+  const projectType = sessionData?.projectType
+  const selected = sessionData?.interventionTypes
 
   let interventions = []
   if (Array.isArray(selected)) {
@@ -172,7 +172,7 @@ function validateManualEntry(request) {
 
 function handlePostSuccess(request, h, values) {
   const sessionData = request.yar.get('projectProposal') ?? {}
-  sessionData.firstFinancialYear = values
+  sessionData.firstFinancialYear = values.firstFinancialYear
   request.yar.set('projectProposal', sessionData)
 
   request.server.logger.info(
@@ -223,7 +223,9 @@ function createFirstFinancialYearController(viewType) {
       }
 
       // GET request
-      const storedValues = sessionData.firstFinancialYear ?? {}
+      const storedValues = {
+        firstFinancialYear: sessionData.firstFinancialYear ?? ''
+      }
 
       return h.view(
         viewFile,

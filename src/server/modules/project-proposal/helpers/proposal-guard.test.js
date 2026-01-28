@@ -32,7 +32,7 @@ describe('Project Proposal Guards', () => {
   describe('#requireProjectName', () => {
     test('Should allow access when project name exists in session', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' }
+        projectName: 'Test_Project'
       })
 
       const result = requireProjectName.method(mockRequest, mockH)
@@ -73,7 +73,7 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect when projectName object exists but projectName value is empty', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: '' }
+        projectName: ''
       })
 
       requireProjectName.method(mockRequest, mockH)
@@ -85,7 +85,7 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect when projectName object exists but projectName value is null', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: null }
+        projectName: null
       })
 
       requireProjectName.method(mockRequest, mockH)
@@ -99,8 +99,8 @@ describe('Project Proposal Guards', () => {
   describe('#requireProjectType', () => {
     test('Should allow access when both project name and type exist', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: 'DEF' }
+        projectName: 'Test_Project',
+        projectType: 'DEF'
       })
 
       const result = requireProjectType.method(mockRequest, mockH)
@@ -111,7 +111,7 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect to project-name when projectName is missing', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectType: { projectType: 'DEF' }
+        projectType: 'DEF'
       })
 
       requireProjectType.method(mockRequest, mockH)
@@ -123,7 +123,7 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect to project-type when projectName exists but projectType is missing', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' }
+        projectName: 'Test_Project'
       })
 
       requireProjectType.method(mockRequest, mockH)
@@ -155,8 +155,8 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect when projectType value is empty string', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: '' }
+        projectName: 'Test_Project',
+        projectType: ''
       })
 
       requireProjectType.method(mockRequest, mockH)
@@ -170,9 +170,9 @@ describe('Project Proposal Guards', () => {
   describe('#requireInterventionType', () => {
     test('Should allow access when all prerequisites are met for DEF project', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: 'DEF' },
-        interventionTypes: { interventionTypes: ['nfm', 'sds'] }
+        projectName: 'Test_Project',
+        projectType: 'DEF',
+        interventionTypes: ['nfm', 'sds']
       })
 
       const result = requireInterventionType.method(mockRequest, mockH)
@@ -183,9 +183,9 @@ describe('Project Proposal Guards', () => {
 
     test('Should allow access when all prerequisites are met for REP project', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: 'REP' },
-        interventionTypes: { interventionTypes: ['pfr'] }
+        projectName: 'Test_Project',
+        projectType: 'REP',
+        interventionTypes: ['pfr']
       })
 
       const result = requireInterventionType.method(mockRequest, mockH)
@@ -196,9 +196,9 @@ describe('Project Proposal Guards', () => {
 
     test('Should allow access when all prerequisites are met for REF project', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: 'REF' },
-        interventionTypes: { interventionTypes: ['other'] }
+        projectName: 'Test_Project',
+        projectType: 'REF',
+        interventionTypes: ['other']
       })
 
       const result = requireInterventionType.method(mockRequest, mockH)
@@ -209,8 +209,8 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect to project-name when projectName is missing', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectType: { projectType: 'DEF' },
-        interventionTypes: { interventionTypes: ['nfm'] }
+        projectType: 'DEF',
+        interventionTypes: ['nfm']
       })
 
       requireInterventionType.method(mockRequest, mockH)
@@ -222,8 +222,8 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect to project-type when projectType is missing', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        interventionTypes: { interventionTypes: ['nfm'] }
+        projectName: 'Test_Project',
+        interventionTypes: ['nfm']
       })
 
       requireInterventionType.method(mockRequest, mockH)
@@ -235,9 +235,9 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect to project-type when projectType is not DEF, REP, or REF', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: 'HCR' },
-        interventionTypes: { interventionTypes: ['nfm'] }
+        projectName: 'Test_Project',
+        projectType: 'HCR',
+        interventionTypes: ['nfm']
       })
 
       requireInterventionType.method(mockRequest, mockH)
@@ -249,9 +249,9 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect to project-type for STR project type', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: 'STR' },
-        interventionTypes: { interventionTypes: ['nfm'] }
+        projectName: 'Test_Project',
+        projectType: 'STR',
+        interventionTypes: ['nfm']
       })
 
       requireInterventionType.method(mockRequest, mockH)
@@ -263,8 +263,8 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect to intervention-type when interventionTypes is missing', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: 'DEF' }
+        projectName: 'Test_Project',
+        projectType: 'DEF'
       })
 
       requireInterventionType.method(mockRequest, mockH)
@@ -276,9 +276,9 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect to intervention-type when interventionTypes is empty array', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: 'DEF' },
-        interventionTypes: { interventionTypes: [] }
+        projectName: 'Test_Project',
+        projectType: 'DEF',
+        interventionTypes: []
       })
 
       requireInterventionType.method(mockRequest, mockH)
@@ -290,9 +290,9 @@ describe('Project Proposal Guards', () => {
 
     test('Should redirect to intervention-type when interventionTypes is null', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: 'DEF' },
-        interventionTypes: { interventionTypes: null }
+        projectName: 'Test_Project',
+        projectType: 'DEF',
+        interventionTypes: null
       })
 
       requireInterventionType.method(mockRequest, mockH)
@@ -325,8 +325,8 @@ describe('Project Proposal Guards', () => {
 
     test('Should check project type validity before checking intervention types', () => {
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project' },
-        projectType: { projectType: 'STU' }
+        projectName: 'Test_Project',
+        projectType: 'STU'
         // interventionTypes intentionally missing
       })
 
@@ -342,7 +342,7 @@ describe('Project Proposal Guards', () => {
   describe('#requireFirstFinancialYear', () => {
     test('Should allow access when first financial year exists in session', () => {
       mockRequest.yar.get.mockReturnValue({
-        firstFinancialYear: { firstFinancialYear: '2024-2025' }
+        firstFinancialYear: '2024-2025'
       })
 
       const result = requireFirstFinancialYear.method(mockRequest, mockH)

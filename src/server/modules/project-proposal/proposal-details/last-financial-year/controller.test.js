@@ -118,7 +118,7 @@ describe('#lastFinancialYearController', () => {
 
     test('displays saved value from session', async () => {
       mockRequest.yar.get.mockReturnValue({
-        lastFinancialYear: { lastFinancialYear: '2035' }
+        lastFinancialYear: '2035'
       })
 
       await lastFinancialYearController.handler(mockRequest, mockH)
@@ -153,7 +153,7 @@ describe('#lastFinancialYearController', () => {
       mockRequest.yar.get.mockImplementation((key) => {
         if (key === 'projectProposal') {
           return {
-            firstFinancialYear: { firstFinancialYear: '2032' }
+            firstFinancialYear: '2032'
           }
         }
         return {}
@@ -181,7 +181,7 @@ describe('#lastFinancialYearController', () => {
       mockRequest.yar.get.mockImplementation((key) => {
         if (key === 'projectProposal') {
           return {
-            firstFinancialYear: { firstFinancialYear: '2032' }
+            firstFinancialYear: '2032'
           }
         }
         return {}
@@ -204,12 +204,12 @@ describe('#lastFinancialYearController', () => {
       mockRequest.yar.get.mockImplementation((key) => {
         if (key === 'projectProposal') {
           return {
-            projectName: { projectName: 'Test Project' },
-            projectType: { projectType: 'DEF' },
-            interventionTypes: { interventionTypes: ['TYPE_1'] },
-            primaryInterventionType: { primaryInterventionType: 'MAIN' },
-            firstFinancialYear: { firstFinancialYear: '2032' },
-            rmaSelection: { rmaSelection: '1' }
+            projectName: 'Test Project',
+            projectType: 'DEF',
+            interventionTypes: ['TYPE_1'],
+            primaryInterventionType: 'MAIN',
+            firstFinancialYear: '2032',
+            rmaSelection: '1'
           }
         }
         if (key === 'auth') {
@@ -226,7 +226,7 @@ describe('#lastFinancialYearController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          lastFinancialYear: { lastFinancialYear: '2035' }
+          lastFinancialYear: '2035'
         })
       )
       // Session should be cleared after successful submission
@@ -257,12 +257,12 @@ describe('#lastFinancialYearController', () => {
       mockRequest.yar.get.mockImplementation((key) => {
         if (key === 'projectProposal') {
           return {
-            projectName: { projectName: 'Test Project' },
-            projectType: { projectType: 'DEF' },
-            interventionTypes: { interventionTypes: [] },
-            primaryInterventionType: { primaryInterventionType: null },
-            firstFinancialYear: { firstFinancialYear: '2032' },
-            rmaSelection: { rmaSelection: '1' }
+            projectName: 'Test Project',
+            projectType: 'DEF',
+            interventionTypes: [],
+            primaryInterventionType: null,
+            firstFinancialYear: '2032',
+            rmaSelection: '1'
           }
         }
         if (key === 'auth') {
@@ -288,12 +288,12 @@ describe('#lastFinancialYearController', () => {
       mockRequest.yar.get.mockImplementation((key) => {
         if (key === 'projectProposal') {
           return {
-            projectName: { projectName: 'Test Project' },
-            projectType: { projectType: 'DEF' },
-            interventionTypes: { interventionTypes: [] },
-            primaryInterventionType: { primaryInterventionType: null },
-            firstFinancialYear: { firstFinancialYear: '2032' },
-            rmaSelection: { rmaSelection: '1' }
+            projectName: 'Test Project',
+            projectType: 'DEF',
+            interventionTypes: [],
+            primaryInterventionType: null,
+            firstFinancialYear: '2032',
+            rmaSelection: '1'
           }
         }
         if (key === 'auth') {
@@ -314,12 +314,12 @@ describe('#lastFinancialYearController', () => {
       mockRequest.yar.get.mockImplementation((key) => {
         if (key === 'projectProposal') {
           return {
-            projectName: { projectName: 'Test Project' },
-            projectType: { projectType: 'DEF' },
-            interventionTypes: { interventionTypes: [] },
-            primaryInterventionType: { primaryInterventionType: null },
-            firstFinancialYear: { firstFinancialYear: '2032' },
-            rmaSelection: { rmaSelection: '1' }
+            projectName: 'Test Project',
+            projectType: 'DEF',
+            interventionTypes: [],
+            primaryInterventionType: null,
+            firstFinancialYear: '2032',
+            rmaSelection: '1'
           }
         }
         if (key === 'auth') {
@@ -374,7 +374,7 @@ describe('#lastFinancialYearController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { lastFinancialYear: '' }
       mockRequest.yar.get.mockReturnValue({
-        firstFinancialYear: { firstFinancialYear: '2032' }
+        firstFinancialYear: '2032'
       })
 
       const result = await lastFinancialYearManualController.handler(
@@ -397,7 +397,7 @@ describe('#lastFinancialYearController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { lastFinancialYear: '20AB' }
       mockRequest.yar.get.mockReturnValue({
-        firstFinancialYear: { firstFinancialYear: '2032' }
+        firstFinancialYear: '2032'
       })
 
       const result = await lastFinancialYearManualController.handler(
@@ -420,7 +420,7 @@ describe('#lastFinancialYearController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { lastFinancialYear: '2030' }
       mockRequest.yar.get.mockReturnValue({
-        firstFinancialYear: { firstFinancialYear: '2032' }
+        firstFinancialYear: '2032'
       })
 
       const result = await lastFinancialYearManualController.handler(
@@ -440,12 +440,12 @@ describe('#lastFinancialYearController', () => {
       mockRequest.yar.get.mockImplementation((key) => {
         if (key === 'projectProposal') {
           return {
-            projectName: { projectName: 'Test Project' },
-            projectType: { projectType: 'DEF' },
-            interventionTypes: { interventionTypes: ['TYPE_1'] },
-            primaryInterventionType: { primaryInterventionType: 'MAIN' },
-            firstFinancialYear: { firstFinancialYear: '2032' },
-            rmaSelection: { rmaSelection: '1' }
+            projectName: 'Test Project',
+            projectType: 'DEF',
+            interventionTypes: ['TYPE_1'],
+            primaryInterventionType: 'MAIN',
+            firstFinancialYear: '2032',
+            rmaSelection: '1'
           }
         }
         if (key === 'auth') {
@@ -462,7 +462,7 @@ describe('#lastFinancialYearController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          lastFinancialYear: { lastFinancialYear: '2035' }
+          lastFinancialYear: '2035'
         })
       )
       expect(result.redirect).toBe(

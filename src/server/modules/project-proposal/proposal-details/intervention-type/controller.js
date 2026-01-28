@@ -56,7 +56,7 @@ function validateInterventionTypes(request) {
 
 function handlePostSuccess(request, h, values, selectedInterventions) {
   const sessionData = request.yar.get('projectProposal') ?? {}
-  sessionData.interventionTypes = values
+  sessionData.interventionTypes = values.interventionTypes
   request.yar.set('projectProposal', sessionData)
 
   request.server.logger.info(
@@ -74,8 +74,7 @@ function handlePostSuccess(request, h, values, selectedInterventions) {
 async function handlePost(request, h) {
   const { values, errors, errorSummary, isValid } =
     validateInterventionTypes(request)
-  const projectType =
-    request.yar.get('projectProposal')?.projectType?.projectType
+  const projectType = request.yar.get('projectProposal')?.projectType
   const selectedInterventions = values.interventionTypes || []
 
   if (!isValid) {
@@ -92,8 +91,8 @@ async function handlePost(request, h) {
 
 async function handleGet(request, h) {
   const sessionData = request.yar.get('projectProposal') ?? {}
-  const values = sessionData.interventionTypes ?? {}
-  const projectType = sessionData.projectType?.projectType
+  const values = { interventionTypes: sessionData.interventionTypes ?? [] }
+  const projectType = sessionData.projectType
 
   return h.view(
     PROPOSAL_VIEWS.INTERVENTION_TYPE,

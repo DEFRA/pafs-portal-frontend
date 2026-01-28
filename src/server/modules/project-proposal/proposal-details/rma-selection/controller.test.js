@@ -99,10 +99,9 @@ describe('#rmaSelectionController', () => {
     })
 
     test('should display saved rma selection if available in session', async () => {
-      const savedValues = { rmaSelection: 'saved-id' }
       mockRequest.yar.get.mockReturnValue({
         projectName: 'Test Project',
-        rmaSelection: savedValues
+        rmaSelection: 'saved-id'
       })
       getAuthSession.mockReturnValue({ user: { admin: false, areas: [] } })
 
@@ -110,7 +109,7 @@ describe('#rmaSelectionController', () => {
 
       expect(mockH.view).toHaveBeenCalledWith(
         PROPOSAL_VIEWS.RMA_SELECTION,
-        expect.objectContaining({ values: savedValues })
+        expect.objectContaining({ values: { rmaSelection: 'saved-id' } })
       )
     })
 
@@ -122,7 +121,7 @@ describe('#rmaSelectionController', () => {
 
       expect(mockH.view).toHaveBeenCalledWith(
         PROPOSAL_VIEWS.RMA_SELECTION,
-        expect.objectContaining({ values: {} })
+        expect.objectContaining({ values: { rmaSelection: '' } })
       )
     })
 
@@ -192,7 +191,7 @@ describe('#rmaSelectionController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          rmaSelection: { rmaSelection: 'some-id' }
+          rmaSelection: 'some-id'
         })
       )
     })
@@ -206,7 +205,7 @@ describe('#rmaSelectionController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          rmaSelection: { rmaSelection: 'some-id' }
+          rmaSelection: 'some-id'
         })
       )
     })
@@ -248,7 +247,7 @@ describe('#rmaSelectionController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          rmaSelection: { rmaSelection: 'some-id' }
+          rmaSelection: 'some-id'
         })
       )
       expect(mockH.redirect).toHaveBeenCalledWith(

@@ -137,7 +137,7 @@ function handlePostSuccess(request, h, values) {
   const userSession = session?.user
 
   const sessionData = request.yar.get('projectProposal') ?? {}
-  sessionData.projectName = values
+  sessionData.projectName = values.projectName
   request.yar.set('projectProposal', sessionData)
 
   request.server.logger.info(
@@ -150,14 +150,12 @@ function handlePostSuccess(request, h, values) {
   }
 
   if (userSession?.areas?.length === 1) {
-    sessionData.rmaSelection = {
-      rmaSelection: userSession?.areas[0]?.areaId
-    }
+    sessionData.rmaSelection = userSession?.areas[0]?.areaId
     request.yar.set('projectProposal', sessionData)
 
     request.server.logger.info(
       { rmaSelection: userSession?.areas[0]?.areaId },
-      'RMA selection validated and stored in session'
+      'RMA selection auto-set for single-area user, skipping RMA selection page'
     )
   }
 
@@ -195,7 +193,7 @@ async function handlePost(request, h) {
 
 async function handleGet(request, h) {
   const sessionData = request.yar.get('projectProposal') ?? {}
-  const values = sessionData.projectName ?? {}
+  const values = { projectName: sessionData.projectName ?? '' }
 
   return h.view(
     PROPOSAL_VIEWS.PROJECT_NAME,

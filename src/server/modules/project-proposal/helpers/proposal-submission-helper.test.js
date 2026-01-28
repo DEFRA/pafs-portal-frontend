@@ -19,7 +19,7 @@ describe('proposal-submission-helper', () => {
   describe('getAreaDetailsForProposal', () => {
     test('retrieves area id from session', () => {
       const mockSessionData = {
-        rmaSelection: { rmaSelection: '1' }
+        rmaSelection: '1'
       }
 
       const result = getAreaDetailsForProposal(mockSessionData)
@@ -34,11 +34,11 @@ describe('proposal-submission-helper', () => {
   describe('buildProposalDataForSubmission', () => {
     test('builds proposal data object from session and values for DEF project type', () => {
       const sessionData = {
-        projectName: { projectName: 'Test Project' },
-        projectType: { projectType: 'DEF' },
-        interventionTypes: { interventionTypes: ['type_1', 'type_2'] },
-        primaryInterventionType: { primaryInterventionType: 'type_1' },
-        firstFinancialYear: { firstFinancialYear: '2025' }
+        projectName: 'Test Project',
+        projectType: 'DEF',
+        interventionTypes: ['type_1', 'type_2'],
+        primaryInterventionType: 'type_1',
+        firstFinancialYear: '2025'
       }
 
       const values = { lastFinancialYear: '2030' }
@@ -61,11 +61,11 @@ describe('proposal-submission-helper', () => {
 
     test('excludes intervention types for non-DEF/REP/REF project types', () => {
       const sessionData = {
-        projectName: { projectName: 'Test' },
-        projectType: { projectType: 'STR' },
-        interventionTypes: { interventionTypes: ['type_1'] },
-        primaryInterventionType: { primaryInterventionType: 'type_1' },
-        firstFinancialYear: { firstFinancialYear: '2025' }
+        projectName: 'Test',
+        projectType: 'STR',
+        interventionTypes: ['type_1'],
+        primaryInterventionType: 'type_1',
+        firstFinancialYear: '2025'
       }
 
       const result = buildProposalDataForSubmission(
@@ -90,9 +90,9 @@ describe('proposal-submission-helper', () => {
 
     test('handles missing intervention types for DEF project type', () => {
       const sessionData = {
-        projectName: { projectName: 'Test' },
-        projectType: { projectType: 'DEF' },
-        firstFinancialYear: { firstFinancialYear: '2025' }
+        projectName: 'Test',
+        projectType: 'DEF',
+        firstFinancialYear: '2025'
       }
 
       const result = buildProposalDataForSubmission(

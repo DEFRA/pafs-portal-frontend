@@ -45,7 +45,7 @@ describe('#projectTypeController', () => {
           'modules/project-proposal/proposal-details/project-type/index'
         ),
         expect.objectContaining({
-          values: {}
+          values: { projectType: '' }
         })
       )
     })
@@ -53,7 +53,7 @@ describe('#projectTypeController', () => {
     test('Should display saved selection if available in session', async () => {
       mockRequest.method = 'get'
       mockRequest.yar.get.mockReturnValue({
-        projectType: { projectType: 'nfm' }
+        projectType: 'nfm'
       })
 
       await projectTypeController.handler(mockRequest, mockH)
@@ -108,7 +108,7 @@ describe('#projectTypeController', () => {
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
-        expect.objectContaining({ projectType: { projectType: 'nfm' } })
+        expect.objectContaining({ projectType: 'nfm' })
       )
       expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })

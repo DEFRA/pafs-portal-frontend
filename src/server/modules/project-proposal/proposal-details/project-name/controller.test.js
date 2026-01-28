@@ -64,7 +64,7 @@ describe('#projectNameController', () => {
           'modules/project-proposal/proposal-details/project-name/index'
         ),
         expect.objectContaining({
-          values: {}
+          values: { projectName: '' }
         })
       )
     })
@@ -80,7 +80,7 @@ describe('#projectNameController', () => {
           'modules/project-proposal/proposal-details/project-name/index'
         ),
         expect.objectContaining({
-          values: {}
+          values: { projectName: '' }
         })
       )
     })
@@ -88,7 +88,7 @@ describe('#projectNameController', () => {
     test('Should display saved project name if available in session', async () => {
       mockRequest.method = 'get'
       mockRequest.yar.get.mockReturnValue({
-        projectName: { projectName: 'Test_Project_Name' }
+        projectName: 'Test_Project_Name'
       })
 
       await projectNameController.handler(mockRequest, mockH)
@@ -114,7 +114,7 @@ describe('#projectNameController', () => {
           'modules/project-proposal/proposal-details/project-name/index'
         ),
         expect.objectContaining({
-          values: {}
+          values: { projectName: '' }
         })
       )
     })
@@ -130,7 +130,7 @@ describe('#projectNameController', () => {
           'modules/project-proposal/proposal-details/project-name/index'
         ),
         expect.objectContaining({
-          values: {}
+          values: { projectName: '' }
         })
       )
     })
@@ -205,7 +205,7 @@ describe('#projectNameController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          projectName: { projectName: 'Test_Project' }
+          projectName: 'Test_Project'
         })
       )
     })
@@ -429,7 +429,7 @@ describe('#projectNameController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          projectName: { projectName: 'Test_Project' }
+          projectName: 'Test_Project'
         })
       )
       expect(mockH.redirect).toHaveBeenCalled()
@@ -448,7 +448,7 @@ describe('#projectNameController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          projectName: { projectName: 'Test_Project' }
+          projectName: 'Test_Project'
         })
       )
       expect(mockH.redirect).toHaveBeenCalled()
@@ -512,8 +512,8 @@ describe('#projectNameController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          projectName: { projectName: 'Test_Project' },
-          rmaSelection: { rmaSelection: '1' }
+          projectName: 'Test_Project',
+          rmaSelection: '1'
         })
       )
     })

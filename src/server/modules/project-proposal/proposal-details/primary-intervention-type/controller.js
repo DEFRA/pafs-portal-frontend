@@ -22,7 +22,7 @@ function buildViewModel(
 
 function getSelectedInterventions(request) {
   const sessionData = request.yar.get('projectProposal') ?? {}
-  const interventions = sessionData.interventionTypes?.interventionTypes || []
+  const interventions = sessionData.interventionTypes || []
   return Array.isArray(interventions) ? interventions : [interventions]
 }
 
@@ -69,7 +69,7 @@ function validatePrimaryIntervention(request, selectedInterventions) {
 
 function handlePostSuccess(request, h, values) {
   const sessionData = request.yar.get('projectProposal') ?? {}
-  sessionData.primaryInterventionType = values
+  sessionData.primaryInterventionType = values.primaryInterventionType
   request.yar.set('projectProposal', sessionData)
 
   request.server.logger.info(
@@ -88,8 +88,10 @@ async function handleGet(request, h) {
     return h.redirect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR)
   }
 
-  const values =
-    request.yar.get('projectProposal')?.primaryInterventionType ?? {}
+  const sessionData = request.yar.get('projectProposal') ?? {}
+  const values = {
+    primaryInterventionType: sessionData.primaryInterventionType ?? ''
+  }
 
   return h.view(
     PROPOSAL_VIEWS.PRIMARY_INTERVENTION_TYPE,
