@@ -32,7 +32,7 @@ describe('proposal-submission-helper', () => {
   })
 
   describe('buildProposalDataForSubmission', () => {
-    test('builds proposal data object from session and values', () => {
+    test('builds proposal data object from session and values for DEF project type', () => {
       const sessionData = {
         projectName: { projectName: 'Test Project' },
         projectType: { projectType: 'DEF' },
@@ -59,7 +59,36 @@ describe('proposal-submission-helper', () => {
       })
     })
 
-    test('handles missing intervention types', () => {
+    test('excludes intervention types for non-DEF/REP/REF project types', () => {
+      const sessionData = {
+        projectName: { projectName: 'Test' },
+        projectType: { projectType: 'STR' },
+        interventionTypes: { interventionTypes: ['type_1'] },
+        primaryInterventionType: { primaryInterventionType: 'type_1' },
+        firstFinancialYear: { firstFinancialYear: '2025' }
+      }
+
+      const result = buildProposalDataForSubmission(
+        sessionData,
+        { lastFinancialYear: '2030' },
+        5
+      )
+
+      expect(result).toEqual({
+        level: 'INITIAL_SAVE',
+        payload: {
+          name: 'Test',
+          rmaId: '5',
+          projectType: 'STR',
+          financialStartYear: 2025,
+          financialEndYear: 2030
+        }
+      })
+      expect(result.payload.projectInterventionTypes).toBeUndefined()
+      expect(result.payload.mainInterventionType).toBeUndefined()
+    })
+
+    test('handles missing intervention types for DEF project type', () => {
       const sessionData = {
         projectName: { projectName: 'Test' },
         projectType: { projectType: 'DEF' },

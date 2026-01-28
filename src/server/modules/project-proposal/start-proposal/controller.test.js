@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { projectProposalStartController } from './controller.js'
 
-vi.mock('../../common/helpers/auth/session-manager.js')
+vi.mock('../../../common/helpers/auth/session-manager.js')
 
 describe('#projectProposalStartController', () => {
   let mockRequest
@@ -23,7 +23,7 @@ describe('#projectProposalStartController', () => {
     await projectProposalStartController.handler(mockRequest, mockH)
 
     expect(mockH.view).toHaveBeenCalledWith(
-      'modules/project-proposal/proposal-details/start-proposal/index',
+      'modules/project-proposal/start-proposal/index',
       {
         pageTitle: 'project-proposal.start_proposal.title',
         heading: 'project-proposal.start_proposal.heading'

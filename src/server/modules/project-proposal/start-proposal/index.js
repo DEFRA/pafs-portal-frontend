@@ -1,6 +1,6 @@
 import { projectProposalStartController } from './controller.js'
-import { requireAuth } from '../../../../common/helpers/auth/auth-middleware.js'
-import { ROUTES } from '../../../../common/constants/routes.js'
+import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
+import { ROUTES } from '../../../common/constants/routes.js'
 
 /**
  * Sets up the routes used in the home page.

@@ -66,11 +66,6 @@ export function getAreaDetailsForProposal(sessionData) {
  * @returns {Object} Proposal data ready for API upsert
  */
 export function buildProposalDataForSubmission(sessionData, values, rmaId) {
-  // Normalize intervention types to uppercase
-  const interventionTypes = (
-    sessionData.interventionTypes?.interventionTypes || []
-  ).map((type) => String(type).toUpperCase())
-
   // Convert financial years to numbers
   const financialStartYear = Number.parseInt(
     sessionData.firstFinancialYear?.firstFinancialYear,
@@ -78,20 +73,34 @@ export function buildProposalDataForSubmission(sessionData, values, rmaId) {
   )
   const financialEndYear = Number.parseInt(values.lastFinancialYear, 10)
 
+  const projectType = sessionData.projectType?.projectType
+
+  // Base payload without intervention types
+  const payload = {
+    name: sessionData.projectName?.projectName,
+    rmaId: String(rmaId),
+    projectType,
+    financialStartYear,
+    financialEndYear
+  }
+
+  // Only include intervention types for DEF, REP, and REF project types
+  if (projectType === 'DEF' || projectType === 'REP' || projectType === 'REF') {
+    // Normalize intervention types to uppercase
+    const interventionTypes = (
+      sessionData.interventionTypes?.interventionTypes || []
+    ).map((type) => String(type).toUpperCase())
+
+    payload.projectInterventionTypes = interventionTypes
+    payload.mainInterventionType =
+      String(
+        sessionData.primaryInterventionType?.primaryInterventionType || ''
+      ).toUpperCase() || null
+  }
+
   return {
     level: 'INITIAL_SAVE',
-    payload: {
-      name: sessionData.projectName?.projectName,
-      rmaId: String(rmaId),
-      projectType: sessionData.projectType?.projectType,
-      projectInterventionTypes: interventionTypes,
-      mainInterventionType:
-        String(
-          sessionData.primaryInterventionType?.primaryInterventionType || ''
-        ).toUpperCase() || null,
-      financialStartYear,
-      financialEndYear
-    }
+    payload
   }
 }
 

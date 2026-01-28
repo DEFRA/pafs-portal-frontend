@@ -30,7 +30,7 @@ export const ACCOUNT_VIEWS = {
 }
 
 export const PROPOSAL_VIEWS = {
-  START: 'modules/project-proposal/proposal-details/start-proposal/index',
+  START: 'modules/project-proposal/start-proposal/index',
   PROJECT_NAME: 'modules/project-proposal/proposal-details/project-name/index',
   RMA_SELECTION:
     'modules/project-proposal/proposal-details/rma-selection/index',

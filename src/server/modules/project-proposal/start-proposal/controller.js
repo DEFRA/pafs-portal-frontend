@@ -1,4 +1,4 @@
-import { PROPOSAL_VIEWS } from '../../../../common/constants/common.js'
+import { PROPOSAL_VIEWS } from '../../../common/constants/common.js'
 
 class ProjectProposalStartController {
   get(request, h) {
