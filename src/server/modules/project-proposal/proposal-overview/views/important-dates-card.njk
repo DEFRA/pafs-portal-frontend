@@ -1,0 +1,70 @@
+{% macro importantDatesSummaryCard(values, t) %}
+
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Important dates</h2>
+    <ul class="govuk-summary-card__actions">
+      <li class="govuk-summary-card__action">
+        <a class="govuk-link" href="/proposal/create-proposal/important-dates/obc-start?from=overview">
+          {% if data['important-dates-added'] %}Change{% else %}Add{% endif %}<span class="govuk-visually-hidden"> important dates</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="govuk-summary-card__content">
+    {% if data['important-dates-added'] %}
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Outline business case start date</dt>
+          <dd class="govuk-summary-list__value">
+            {{ importantDates.obcStart or 'Not Provided' }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Outline business case completion date</dt>
+          <dd class="govuk-summary-list__value">
+            {{ importantDates.obcCompletion or 'Not Provided' }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Contract awarded</dt>
+          <dd class="govuk-summary-list__value">
+            {{ importantDates.contractAwarded or 'Not Provided' }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Start construction</dt>
+          <dd class="govuk-summary-list__value">
+            {{ importantDates.startConstruction or 'Not Provided' }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Ready for service</dt>
+          <dd class="govuk-summary-list__value">
+            {{ importantDates.readyForService or 'Not Provided' }}
+          </dd>
+        </div>
+        {% if data['could-start-earlier'] %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Could start earlier with Grant in Aid</dt>
+            <dd class="govuk-summary-list__value">
+              {% if data['could-start-earlier'] == 'yes' %}Yes{% else %}No{% endif %}
+            </dd>
+          </div>
+          {% if data['could-start-earlier'] == 'yes' and importantDates.earliestWithGia %}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Earliest start date with Grant in Aid</dt>
+              <dd class="govuk-summary-list__value">
+                {{ importantDates.earliestWithGia }}
+              </dd>
+            </div>
+          {% endif %}
+        {% endif %}
+      </dl>
+    {% else %}
+      <p class="govuk-body">No important dates added yet</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endmacro %}

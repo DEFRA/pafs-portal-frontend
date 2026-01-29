@@ -70,8 +70,8 @@ describe('Proposal Overview Controller', () => {
       expect(convertYearToFinancialYearLabel).toHaveBeenCalledWith(2024)
 
       expect(request.yar.set).toHaveBeenCalledWith('projectProposal', {
-        id: '123',
         referenceNumber: 'REF123',
+        editModeReferenceNumber: 'REF123',
         projectName: 'Test Project',
         rmaSelection: 'Test Area',
         projectType: 'DEF',

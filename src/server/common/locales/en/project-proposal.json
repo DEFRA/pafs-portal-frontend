@@ -45,7 +45,7 @@
     "options": {
       "nfm": "Natural Flood Management",
       "pfr": "Property Flood Resilience",
-      "sds": "Sustainable Drainage Systems",
+      "suds": "Sustainable Drainage Systems",
       "other": "Other"
     },
     "errors": {
@@ -111,6 +111,6 @@
       "title": "Urgency",
       "not_added": "No urgency data added yet"
     },
-    "submission_info": "By submitting this proposal you confirm all the information provided is accurate and complete"
+    "submission_info": "By submitting this proposal you confirm all the information provided is accurate and complete."
   }
 }

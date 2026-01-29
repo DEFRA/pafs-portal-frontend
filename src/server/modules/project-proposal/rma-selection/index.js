@@ -16,8 +16,24 @@ export const rmaSelection = {
           ...rmaSelectionController
         },
         {
+          method: 'GET',
+          path: ROUTES.PROJECT_PROPOSAL.EDIT.RMA_SELECTION,
+          options: {
+            pre: [{ method: requireAuth }]
+          },
+          ...rmaSelectionController
+        },
+        {
           method: 'POST',
           path: ROUTES.PROJECT_PROPOSAL.RMA_SELECTION,
+          options: {
+            pre: [{ method: requireAuth }]
+          },
+          ...rmaSelectionController
+        },
+        {
+          method: 'POST',
+          path: ROUTES.PROJECT_PROPOSAL.EDIT.RMA_SELECTION,
           options: {
             pre: [{ method: requireAuth }]
           },

@@ -1,0 +1,23 @@
+{% macro approachSummaryCard(values, t) %}
+
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Approach</h2>
+    <ul class="govuk-summary-card__actions">
+      <li class="govuk-summary-card__action">
+        <a class="govuk-link" href="/proposal/create-proposal/approach">
+          {% if data['approach'] %}Change{% else %}Add{% endif %}<span class="govuk-visually-hidden"> approach</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="govuk-summary-card__content">
+    {% if data['approach'] %}
+      <p class="govuk-body">{{ data['approach'] }}</p>
+    {% else %}
+      <p class="govuk-body">No approach added yet</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endmacro %}

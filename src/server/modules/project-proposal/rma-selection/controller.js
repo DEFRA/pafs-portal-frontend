@@ -6,6 +6,7 @@ import {
 } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
+import { getBacklink } from '../common/backlink-helper.js'
 
 const RMA_SELECTION_ERROR_HREF = '#rma-selection'
 
@@ -16,12 +17,17 @@ function buildViewModel(
   errorSummary = [],
   viewData = {}
 ) {
+  const backlink = getBacklink(request, {
+    defaultUrl: ROUTES.PROJECT_PROPOSAL.PROJECT_NAME
+  })
+
   return {
     title: request.t('project-proposal.rma_selection.heading'),
     values,
     errors,
     errorSummary,
-    viewData
+    viewData,
+    backlink
   }
 }
 
