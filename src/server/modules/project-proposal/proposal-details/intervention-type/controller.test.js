@@ -54,7 +54,7 @@ describe('#interventionTypeController', () => {
     test('Should display saved intervention selections if available in session', async () => {
       mockRequest.method = 'get'
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       await interventionTypeController.handler(mockRequest, mockH)
@@ -64,7 +64,7 @@ describe('#interventionTypeController', () => {
           'modules/project-proposal/proposal-details/intervention-type/index'
         ),
         expect.objectContaining({
-          values: { interventionTypes: ['nfm', 'sds'] }
+          values: { interventionTypes: ['nfm', 'suds'] }
         })
       )
     })
@@ -137,7 +137,7 @@ describe('#interventionTypeController', () => {
 
     test('Should save multiple intervention types and redirect to primary-intervention-type', async () => {
       mockRequest.method = 'post'
-      mockRequest.payload = { interventionTypes: ['nfm', 'sds'] }
+      mockRequest.payload = { interventionTypes: ['nfm', 'suds'] }
       mockRequest.yar.get.mockReturnValue({})
 
       const result = await interventionTypeController.handler(
@@ -148,7 +148,7 @@ describe('#interventionTypeController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          interventionTypes: ['nfm', 'sds']
+          interventionTypes: ['nfm', 'suds']
         })
       )
       expect(result.redirect).toBe(
@@ -196,7 +196,7 @@ describe('#interventionTypeController', () => {
 
     test('Should convert single intervention type string to array', async () => {
       mockRequest.method = 'post'
-      mockRequest.payload = { interventionTypes: 'sds' }
+      mockRequest.payload = { interventionTypes: 'suds' }
       mockRequest.yar.get.mockReturnValue({})
 
       await interventionTypeController.handler(mockRequest, mockH)
@@ -204,14 +204,14 @@ describe('#interventionTypeController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          interventionTypes: ['sds']
+          interventionTypes: ['suds']
         })
       )
     })
 
     test('Should preserve multiple selections as array', async () => {
       mockRequest.method = 'post'
-      mockRequest.payload = { interventionTypes: ['nfm', 'pfr', 'sds'] }
+      mockRequest.payload = { interventionTypes: ['nfm', 'pfr', 'suds'] }
       mockRequest.yar.get.mockReturnValue({})
 
       await interventionTypeController.handler(mockRequest, mockH)
@@ -219,7 +219,7 @@ describe('#interventionTypeController', () => {
       expect(mockRequest.yar.set).toHaveBeenCalledWith(
         'projectProposal',
         expect.objectContaining({
-          interventionTypes: ['nfm', 'pfr', 'sds']
+          interventionTypes: ['nfm', 'pfr', 'suds']
         })
       )
     })

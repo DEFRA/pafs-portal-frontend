@@ -125,6 +125,32 @@ describe('#firstFinancialYearController', () => {
       const [, context] = mockH.view.mock.calls[0]
       expect(context.backLink).toBe('/project-proposal/project-type')
     })
+
+    test('redirects to manual page when session value is outside radio range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectType: 'DEF',
+        firstFinancialYear: '2032' // Outside 2025-2030 range
+      })
+
+      await firstFinancialYearController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/project-proposal/first-financial-year-manual'
+      )
+      expect(mockH.view).not.toHaveBeenCalled()
+    })
+
+    test('shows radio page when session value is within radio range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectType: 'DEF',
+        firstFinancialYear: '2027' // Within 2025-2030 range
+      })
+
+      await firstFinancialYearController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).not.toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalled()
+    })
   })
 
   describe('POST', () => {
@@ -146,6 +172,28 @@ describe('#firstFinancialYearController', () => {
           ])
         })
       )
+    })
+
+    test('uses session value when no radio selected but session has manual entry', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = {} // No radio selection
+      mockRequest.yar.get.mockReturnValue({
+        projectType: 'DEF',
+        firstFinancialYear: '2031' // From previous manual entry
+      })
+
+      const result = await firstFinancialYearController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'projectProposal',
+        expect.objectContaining({
+          firstFinancialYear: '2031'
+        })
+      )
+      expect(result.redirect).toBe('/project-proposal/last-financial-year')
     })
 
     test('saves selection to session and redirects', async () => {
@@ -171,13 +219,86 @@ describe('#firstFinancialYearController', () => {
   })
 
   describe('Manual entry', () => {
-    test('renders manual view with back link', async () => {
+    test('renders manual view with back link to radio page when no session value', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectType: 'DEF',
+        interventionTypes: ['TYPE_A']
+        // No firstFinancialYear
+      })
+
       await firstFinancialYearManualController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
         'modules/project-proposal/proposal-details/first-financial-year/manual',
         expect.objectContaining({
           backLink: '/project-proposal/first-financial-year'
+        })
+      )
+    })
+
+    test('renders manual view with back link to radio page when session value is within range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectType: 'DEF',
+        interventionTypes: ['TYPE_A'],
+        firstFinancialYear: '2027' // Within 2025-2030 range
+      })
+
+      await firstFinancialYearManualController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/proposal-details/first-financial-year/manual',
+        expect.objectContaining({
+          backLink: '/project-proposal/first-financial-year'
+        })
+      )
+    })
+
+    test('renders manual view with dynamic back link to project type when value outside range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectType: 'HCR', // Not DEF/REP/REF
+        firstFinancialYear: '2035' // Outside range
+      })
+
+      await firstFinancialYearManualController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/proposal-details/first-financial-year/manual',
+        expect.objectContaining({
+          backLink: '/project-proposal/project-type'
+        })
+      )
+    })
+
+    test('renders manual view with dynamic back link to intervention type for DEF project outside range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectType: 'DEF',
+        interventionTypes: ['TYPE_A'],
+        firstFinancialYear: '2035' // Outside range
+      })
+
+      await firstFinancialYearManualController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/proposal-details/first-financial-year/manual',
+        expect.objectContaining({
+          backLink: '/project-proposal/intervention-type'
+        })
+      )
+    })
+
+    test('renders manual view with dynamic back link to primary intervention when multiple types and outside range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        projectType: 'DEF',
+        interventionTypes: ['TYPE_A', 'TYPE_B'],
+        firstFinancialYear: '2035' // Outside range
+      })
+
+      await firstFinancialYearManualController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/proposal-details/first-financial-year/manual',
+        expect.objectContaining({
+          backLink: '/project-proposal/primary-intervention-type'
         })
       )
     })

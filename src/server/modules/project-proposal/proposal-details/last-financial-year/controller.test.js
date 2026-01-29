@@ -116,9 +116,9 @@ describe('#lastFinancialYearController', () => {
       )
     })
 
-    test('displays saved value from session', async () => {
+    test('displays saved value from session when within radio range', async () => {
       mockRequest.yar.get.mockReturnValue({
-        lastFinancialYear: '2035'
+        lastFinancialYear: '2028' // Within 2025-2030 range
       })
 
       await lastFinancialYearController.handler(mockRequest, mockH)
@@ -126,7 +126,7 @@ describe('#lastFinancialYearController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({
-          values: { lastFinancialYear: '2035' }
+          values: { lastFinancialYear: '2028' }
         })
       )
     })
@@ -143,6 +143,30 @@ describe('#lastFinancialYearController', () => {
           afterMarchLinkHref: '/project-proposal/last-financial-year-manual'
         })
       )
+    })
+
+    test('redirects to manual page when session value is outside radio range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        lastFinancialYear: '2035' // Outside 2025-2030 range
+      })
+
+      await lastFinancialYearController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/project-proposal/last-financial-year-manual'
+      )
+      expect(mockH.view).not.toHaveBeenCalled()
+    })
+
+    test('shows radio page when session value is within radio range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        lastFinancialYear: '2028' // Within 2025-2030 range
+      })
+
+      await lastFinancialYearController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).not.toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalled()
     })
   })
 
@@ -172,6 +196,43 @@ describe('#lastFinancialYearController', () => {
             expect.objectContaining({ href: '#last-financial-year' })
           ])
         })
+      )
+    })
+
+    test('uses session value when no radio selected but session has manual entry', async () => {
+      mockRequest.method = 'post'
+      mockRequest.payload = {} // No radio selection
+      mockRequest.yar.get.mockImplementation((key) => {
+        if (key === 'projectProposal') {
+          return {
+            projectName: 'Test Project',
+            projectType: 'DEF',
+            interventionTypes: ['TYPE_1'],
+            primaryInterventionType: 'MAIN',
+            firstFinancialYear: '2032',
+            lastFinancialYear: '2035', // From previous manual entry
+            rmaSelection: '1'
+          }
+        }
+        if (key === 'auth') {
+          return { accessToken: 'test-token-123' }
+        }
+        return {}
+      })
+
+      const result = await lastFinancialYearController.handler(
+        mockRequest,
+        mockH
+      )
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'projectProposal',
+        expect.objectContaining({
+          lastFinancialYear: '2035'
+        })
+      )
+      expect(result.redirect).toBe(
+        '/project-proposal/project-overview/ANC501E-000A-001A'
       )
     })
 
@@ -359,13 +420,66 @@ describe('#lastFinancialYearController', () => {
   })
 
   describe('Manual entry', () => {
-    test('renders manual view with hint and back link', async () => {
+    test('renders manual view with back link to last year radio when no session value', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        firstFinancialYear: '2027'
+        // No lastFinancialYear
+      })
+
       await lastFinancialYearManualController.handler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
         'modules/project-proposal/proposal-details/last-financial-year/manual',
         expect.objectContaining({
           backLink: '/project-proposal/last-financial-year'
+        })
+      )
+    })
+
+    test('renders manual view with back link to radio page when last year is within range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        firstFinancialYear: '2027', // Within range
+        lastFinancialYear: '2029' // Within range
+      })
+
+      await lastFinancialYearManualController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/proposal-details/last-financial-year/manual',
+        expect.objectContaining({
+          backLink: '/project-proposal/last-financial-year'
+        })
+      )
+    })
+
+    test('renders manual view with back link to first financial year radio when last year outside range but first year in range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        firstFinancialYear: '2027', // Within 2025-2030 range
+        lastFinancialYear: '2035' // Outside range
+      })
+
+      await lastFinancialYearManualController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/proposal-details/last-financial-year/manual',
+        expect.objectContaining({
+          backLink: '/project-proposal/first-financial-year'
+        })
+      )
+    })
+
+    test('renders manual view with back link to first financial year manual when both years outside range', async () => {
+      mockRequest.yar.get.mockReturnValue({
+        firstFinancialYear: '2035', // Outside 2025-2030 range
+        lastFinancialYear: '2038' // Outside range
+      })
+
+      await lastFinancialYearManualController.handler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/project-proposal/proposal-details/last-financial-year/manual',
+        expect.objectContaining({
+          backLink: '/project-proposal/first-financial-year-manual'
         })
       )
     })

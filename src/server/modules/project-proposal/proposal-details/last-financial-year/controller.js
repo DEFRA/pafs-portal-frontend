@@ -29,7 +29,7 @@ const VIEW_TYPES = {
 function buildViewModel(
   request,
   viewType,
-  _sessionData,
+  sessionData,
   values = {},
   errors = {},
   errorSummary = []
@@ -67,17 +67,42 @@ function buildViewModel(
     }
   }
 
+  // Manual entry view - determine back link based on last financial year value
+  // Default to last year radio page (user came from there)
+  // If last year is outside range, check first year to determine correct back link
+  let backLink = ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR
+  const storedLastYear = sessionData?.lastFinancialYear
+  const firstFinancialYear = sessionData?.firstFinancialYear
+
+  if (storedLastYear) {
+    const financialYearOptions = buildFinancialYearOptions(
+      currentFinancialYearStart,
+      FINANCIAL_YEAR_RANGE
+    )
+    const availableYears = financialYearOptions.map((opt) => opt.value)
+
+    // If last year is outside range, determine back link based on first year
+    if (!availableYears.includes(storedLastYear)) {
+      if (firstFinancialYear && !availableYears.includes(firstFinancialYear)) {
+        backLink = ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR_MANUAL
+      } else {
+        backLink = ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR
+      }
+    }
+  }
+
   return {
     ...baseModel,
     title: request.t('project-proposal.last_financial_year_manual.heading'),
     label: request.t('project-proposal.last_financial_year_manual.label'),
-    backLink: ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR,
+    backLink,
     hint: request.t('project-proposal.last_financial_year_manual.hint')
   }
 }
 
 function validateRadioSelection(request, sessionData) {
-  const lastFinancialYear = request.payload?.lastFinancialYear
+  const lastFinancialYear =
+    request.payload?.lastFinancialYear || sessionData?.lastFinancialYear
 
   if (!lastFinancialYear) {
     const msg = request.t(
@@ -278,6 +303,20 @@ function createLastFinancialYearController(viewType) {
 
       const storedValues = {
         lastFinancialYear: sessionData.lastFinancialYear ?? ''
+      }
+
+      // If radio view and session has value outside radio range, redirect to manual
+      if (viewType === VIEW_TYPES.RADIO && storedValues.lastFinancialYear) {
+        const currentFinancialYearStart = getCurrentFinancialYearStartYear()
+        const financialYearOptions = buildFinancialYearOptions(
+          currentFinancialYearStart,
+          FINANCIAL_YEAR_RANGE
+        )
+        const availableYears = financialYearOptions.map((opt) => opt.value)
+
+        if (!availableYears.includes(storedValues.lastFinancialYear)) {
+          return h.redirect(ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR_MANUAL)
+        }
       }
 
       return h.view(

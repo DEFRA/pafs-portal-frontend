@@ -172,7 +172,7 @@ describe('Project Proposal Guards', () => {
       mockRequest.yar.get.mockReturnValue({
         projectName: 'Test_Project',
         projectType: 'DEF',
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       const result = requireInterventionType.method(mockRequest, mockH)

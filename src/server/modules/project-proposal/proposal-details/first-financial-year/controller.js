@@ -91,11 +91,29 @@ function buildViewModel(
   }
 
   // Manual entry view
+  // Determine back link:
+  // - If no session value or value is within radio range -> go back to radio page
+  // - If value exists and is outside radio range -> go to previous step in flow
+  let manualBackLink = ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR
+  const storedYear = sessionData?.firstFinancialYear
+
+  if (storedYear) {
+    const financialYearOptions = buildFinancialYearOptions(
+      currentFinancialYearStart,
+      FINANCIAL_YEARS_TO_DISPLAY
+    )
+    const availableYears = financialYearOptions.map((opt) => opt.value)
+
+    if (!availableYears.includes(storedYear)) {
+      manualBackLink = getBackLink(sessionData)
+    }
+  }
+
   return {
     ...baseModel,
     title: request.t('project-proposal.first_financial_year_manual.heading'),
     label: request.t('project-proposal.first_financial_year_manual.label'),
-    backLink: ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR,
+    backLink: manualBackLink,
     hint: request.t('project-proposal.first_financial_year_manual.hint')
   }
 }
@@ -103,10 +121,12 @@ function buildViewModel(
 /**
  * Validate first financial year from dropdown selection
  * @param {Object} request - Hapi request object
+ * @param {Object} sessionData - Current session data
  * @returns {Object} Validation result
  */
-function validateRadioSelection(request) {
-  const firstFinancialYear = request.payload?.firstFinancialYear
+function validateRadioSelection(request, sessionData) {
+  const firstFinancialYear =
+    request.payload?.firstFinancialYear || sessionData?.firstFinancialYear
 
   if (!firstFinancialYear) {
     const msg = request.t(
@@ -201,7 +221,10 @@ function createFirstFinancialYearController(viewType) {
       const sessionData = request.yar.get('projectProposal') ?? {}
 
       if (request.method === 'post') {
-        const { values, errors, errorSummary, isValid } = validateFn(request)
+        const { values, errors, errorSummary, isValid } =
+          viewType === VIEW_TYPES.RADIO
+            ? validateFn(request, sessionData)
+            : validateFn(request)
 
         if (!isValid) {
           return h
@@ -225,6 +248,20 @@ function createFirstFinancialYearController(viewType) {
       // GET request
       const storedValues = {
         firstFinancialYear: sessionData.firstFinancialYear ?? ''
+      }
+
+      // If radio view and session has value outside radio range, redirect to manual
+      if (viewType === VIEW_TYPES.RADIO && storedValues.firstFinancialYear) {
+        const currentFinancialYearStart = getCurrentFinancialYearStartYear()
+        const financialYearOptions = buildFinancialYearOptions(
+          currentFinancialYearStart,
+          FINANCIAL_YEARS_TO_DISPLAY
+        )
+        const availableYears = financialYearOptions.map((opt) => opt.value)
+
+        if (!availableYears.includes(storedValues.firstFinancialYear)) {
+          return h.redirect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR_MANUAL)
+        }
       }
 
       return h.view(

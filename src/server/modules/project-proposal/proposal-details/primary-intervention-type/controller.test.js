@@ -66,7 +66,7 @@ describe('#primaryInterventionTypeController', () => {
     test('Should render page when two interventions selected', async () => {
       mockRequest.method = 'get'
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       await primaryInterventionTypeController.handler(mockRequest, mockH)
@@ -76,7 +76,7 @@ describe('#primaryInterventionTypeController', () => {
           'modules/project-proposal/proposal-details/primary-intervention-type/index'
         ),
         expect.objectContaining({
-          selectedInterventions: ['nfm', 'sds']
+          selectedInterventions: ['nfm', 'suds']
         })
       )
     })
@@ -84,7 +84,7 @@ describe('#primaryInterventionTypeController', () => {
     test('Should render page when multiple interventions selected', async () => {
       mockRequest.method = 'get'
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'pfr', 'sds']
+        interventionTypes: ['nfm', 'pfr', 'suds']
       })
 
       await primaryInterventionTypeController.handler(mockRequest, mockH)
@@ -92,7 +92,7 @@ describe('#primaryInterventionTypeController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({
-          selectedInterventions: ['nfm', 'pfr', 'sds']
+          selectedInterventions: ['nfm', 'pfr', 'suds']
         })
       )
     })
@@ -100,7 +100,7 @@ describe('#primaryInterventionTypeController', () => {
     test('Should display saved primary selection if available in session', async () => {
       mockRequest.method = 'get'
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds'],
+        interventionTypes: ['nfm', 'suds'],
         primaryInterventionType: 'nfm'
       })
 
@@ -110,7 +110,7 @@ describe('#primaryInterventionTypeController', () => {
         expect.anything(),
         expect.objectContaining({
           values: { primaryInterventionType: 'nfm' },
-          selectedInterventions: ['nfm', 'sds']
+          selectedInterventions: ['nfm', 'suds']
         })
       )
     })
@@ -173,7 +173,7 @@ describe('#primaryInterventionTypeController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { primaryInterventionType: '' }
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       await primaryInterventionTypeController.handler(mockRequest, mockH)
@@ -196,7 +196,7 @@ describe('#primaryInterventionTypeController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { primaryInterventionType: 'pfr' }
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       await primaryInterventionTypeController.handler(mockRequest, mockH)
@@ -216,7 +216,7 @@ describe('#primaryInterventionTypeController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { primaryInterventionType: 'nfm' }
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       const result = await primaryInterventionTypeController.handler(
@@ -237,7 +237,7 @@ describe('#primaryInterventionTypeController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { primaryInterventionType: '' }
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       const result = await primaryInterventionTypeController.handler(
@@ -250,24 +250,24 @@ describe('#primaryInterventionTypeController', () => {
 
     test('Should log info on successful primary intervention selection', async () => {
       mockRequest.method = 'post'
-      mockRequest.payload = { primaryInterventionType: 'sds' }
+      mockRequest.payload = { primaryInterventionType: 'suds' }
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       await primaryInterventionTypeController.handler(mockRequest, mockH)
 
       expect(mockRequest.server.logger.info).toHaveBeenCalledWith(
-        { primaryInterventionType: 'sds' },
+        { primaryInterventionType: 'suds' },
         'Primary intervention type selected and stored in session'
       )
     })
 
     test('Should accept any selected intervention from the list', async () => {
       mockRequest.method = 'post'
-      mockRequest.payload = { primaryInterventionType: 'sds' }
+      mockRequest.payload = { primaryInterventionType: 'suds' }
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       const result = await primaryInterventionTypeController.handler(
@@ -283,7 +283,7 @@ describe('#primaryInterventionTypeController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = undefined
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       await primaryInterventionTypeController.handler(mockRequest, mockH)
@@ -295,7 +295,7 @@ describe('#primaryInterventionTypeController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { primaryInterventionType: 'invalid' }
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'pfr', 'sds']
+        interventionTypes: ['nfm', 'pfr', 'suds']
       })
 
       await primaryInterventionTypeController.handler(mockRequest, mockH)
@@ -303,7 +303,7 @@ describe('#primaryInterventionTypeController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({
-          selectedInterventions: ['nfm', 'pfr', 'sds']
+          selectedInterventions: ['nfm', 'pfr', 'suds']
         })
       )
     })
@@ -312,7 +312,7 @@ describe('#primaryInterventionTypeController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { primaryInterventionType: 'nfm' }
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: 'sds'
+        interventionTypes: 'suds'
       })
 
       const result = await primaryInterventionTypeController.handler(
@@ -320,7 +320,7 @@ describe('#primaryInterventionTypeController', () => {
         mockH
       )
 
-      // When converted to array, 'sds' is the only option, so no primary page
+      // When converted to array, 'suds' is the only option, so no primary page
       expect(result.redirect).toBe('/project-proposal/first-financial-year')
     })
 
@@ -328,7 +328,7 @@ describe('#primaryInterventionTypeController', () => {
       mockRequest.method = 'post'
       mockRequest.payload = { primaryInterventionType: null }
       mockRequest.yar.get.mockReturnValue({
-        interventionTypes: ['nfm', 'sds']
+        interventionTypes: ['nfm', 'suds']
       })
 
       await primaryInterventionTypeController.handler(mockRequest, mockH)
