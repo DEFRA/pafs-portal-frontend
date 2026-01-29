@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { projectProposalStartController } from './controller.js'
 
-vi.mock('../../common/helpers/auth/session-manager.js')
+vi.mock('../../../common/helpers/auth/session-manager.js')
 
 describe('#projectProposalStartController', () => {
   let mockRequest

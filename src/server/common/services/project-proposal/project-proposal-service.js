@@ -15,3 +15,19 @@ export async function checkProjectNameExists(name, accessToken) {
     headers
   })
 }
+
+/**
+ * Upserts a project proposal in the backend
+ * @param {Object} proposalData - The project proposal data including level/payload
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} API response with project data including reference number
+ */
+export async function createProjectProposal(proposalData, accessToken) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest('/api/v1/project/upsert', {
+    method: 'POST',
+    body: JSON.stringify(proposalData),
+    headers
+  })
+}
