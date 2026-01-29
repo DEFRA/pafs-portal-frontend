@@ -79,11 +79,11 @@ function buildViewModel(
       currentFinancialYearStart,
       FINANCIAL_YEAR_RANGE
     )
-    const availableYears = financialYearOptions.map((opt) => opt.value)
+    const availableYears = new Set(financialYearOptions.map((opt) => opt.value))
 
     // If last year is outside range, determine back link based on first year
-    if (!availableYears.includes(storedLastYear)) {
-      if (firstFinancialYear && !availableYears.includes(firstFinancialYear)) {
+    if (!availableYears.has(storedLastYear)) {
+      if (firstFinancialYear && !availableYears.has(firstFinancialYear)) {
         backLink = ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR_MANUAL
       } else {
         backLink = ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR
@@ -312,9 +312,11 @@ function createLastFinancialYearController(viewType) {
           currentFinancialYearStart,
           FINANCIAL_YEAR_RANGE
         )
-        const availableYears = financialYearOptions.map((opt) => opt.value)
+        const availableYears = new Set(
+          financialYearOptions.map((opt) => opt.value)
+        )
 
-        if (!availableYears.includes(storedValues.lastFinancialYear)) {
+        if (!availableYears.has(storedValues.lastFinancialYear)) {
           return h.redirect(ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR_MANUAL)
         }
       }

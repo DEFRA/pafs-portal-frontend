@@ -102,9 +102,9 @@ function buildViewModel(
       currentFinancialYearStart,
       FINANCIAL_YEARS_TO_DISPLAY
     )
-    const availableYears = financialYearOptions.map((opt) => opt.value)
+    const availableYears = new Set(financialYearOptions.map((opt) => opt.value))
 
-    if (!availableYears.includes(storedYear)) {
+    if (!availableYears.has(storedYear)) {
       manualBackLink = getBackLink(sessionData)
     }
   }
@@ -257,9 +257,11 @@ function createFirstFinancialYearController(viewType) {
           currentFinancialYearStart,
           FINANCIAL_YEARS_TO_DISPLAY
         )
-        const availableYears = financialYearOptions.map((opt) => opt.value)
+        const availableYears = new Set(
+          financialYearOptions.map((opt) => opt.value)
+        )
 
-        if (!availableYears.includes(storedValues.firstFinancialYear)) {
+        if (!availableYears.has(storedValues.firstFinancialYear)) {
           return h.redirect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR_MANUAL)
         }
       }
