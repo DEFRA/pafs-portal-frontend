@@ -59,6 +59,45 @@
       "invalid": "Select a primary intervention type from your previous choices"
     }
   },
+  "first_financial_year": {
+    "heading": "In what financial year will the project first require funding?",
+    "after_march_link": "The project starts after March {{afterMarchYear}}",
+    "errors": {
+      "required": "Select the financial year when the project first requires funding"
+    }
+  },
+  "first_financial_year_manual": {
+    "heading": "In what financial year will the project first require funding?",
+    "label": "Financial year starting April",
+    "hint": "For example, 2033",
+    "errors": {
+      "required": "Enter a financial year",
+      "invalid_format": "Enter a financial year in the correct format",
+      "too_early": "Enter a financial year after March {{afterMarchYear}}"
+    }
+  },
+  "last_financial_year": {
+    "heading": "In what financial year will the project stop spending funds?",
+    "hint": "Don't include years which include maintenance costs.",
+    "after_march_link": "The project stops spending funds after March {{afterMarchYear}}",
+    "errors": {
+      "required": "Select the financial year when the project stops spending funds",
+      "before_first_year": "Your last financial date is earlier than the start financial date. Please re-enter your last financial year",
+      "api_error": "There was a problem saving your project. Please try again."
+    }
+  },
+  "last_financial_year_manual": {
+    "heading": "In what financial year will the project stop spending funds?",
+    "label": "Financial year starting April",
+    "hint": "Don't include years which include maintenance costs. For example, 2033",
+    "errors": {
+      "required": "Enter a financial year",
+      "invalid_format": "Enter a financial year in the correct format",
+      "too_early": "Enter a financial year after March {{afterMarchYear}}",
+      "before_first_year": "Your last financial date is earlier than the start financial date. Please re-enter your last financial year",
+      "api_error": "There was a problem saving your project. Please try again."
+    }
+  },
   "proposal_overview": {
     "title": "Proposal Overview",
     "heading": "Proposal Overview",

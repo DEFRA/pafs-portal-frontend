@@ -239,6 +239,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
     config.get.mockImplementation((key) => {
       if (key === 'cookie.preferences.ttl') return 1000
       if (key === 'session.cookie.secure') return true
+      if (key === 'cookie.policy.version') return 1
       return null
     })
 
@@ -262,7 +263,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
 
     expect(stateSpy).toHaveBeenCalledWith(
       'cookies_policy',
-      JSON.stringify({ analytics: 'yes' }),
+      JSON.stringify({ analytics: 'yes', policyVersion: 1 }),
       expect.objectContaining({
         ttl: 1000,
         isSecure: true,
@@ -289,6 +290,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
     config.get.mockImplementation((key) => {
       if (key === 'cookie.preferences.ttl') return 500
       if (key === 'session.cookie.secure') return false
+      if (key === 'cookie.policy.version') return 1
       return null
     })
 
@@ -305,7 +307,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
 
     expect(stateSpy).toHaveBeenCalledWith(
       'cookies_policy',
-      JSON.stringify({ analytics: 'no' }),
+      JSON.stringify({ analytics: 'no', policyVersion: 1 }),
       expect.any(Object)
     )
   })
@@ -320,6 +322,7 @@ describe('StaticPageController - cookie banner accept', () => {
     config.get.mockImplementation((key) => {
       if (key === 'cookie.preferences.ttl') return 31536000
       if (key === 'session.cookie.secure') return true
+      if (key === 'cookie.policy.version') return 1
       return null
     })
 
@@ -343,7 +346,7 @@ describe('StaticPageController - cookie banner accept', () => {
     expect(redirectSpy).toHaveBeenCalledWith('/home')
     expect(stateSpy).toHaveBeenCalledWith(
       'cookies_policy',
-      JSON.stringify({ analytics: 'yes' }),
+      JSON.stringify({ analytics: 'yes', policyVersion: 1 }),
       expect.objectContaining({
         isSecure: true,
         isHttpOnly: true,
@@ -397,6 +400,7 @@ describe('StaticPageController - cookie banner reject', () => {
     config.get.mockImplementation((key) => {
       if (key === 'cookie.preferences.ttl') return 31536000
       if (key === 'session.cookie.secure') return true
+      if (key === 'cookie.policy.version') return 1
       return null
     })
 
@@ -420,7 +424,7 @@ describe('StaticPageController - cookie banner reject', () => {
     expect(redirectSpy).toHaveBeenCalledWith('/home')
     expect(stateSpy).toHaveBeenCalledWith(
       'cookies_policy',
-      JSON.stringify({ analytics: 'no' }),
+      JSON.stringify({ analytics: 'no', policyVersion: 1 }),
       expect.objectContaining({
         isSecure: true,
         isHttpOnly: true,

@@ -91,6 +91,11 @@ export const ROUTES = {
     PROJECT_TYPE: '/project-proposal/project-type',
     INTERVENTION_TYPE: '/project-proposal/intervention-type',
     PRIMARY_INTERVENTION_TYPE: '/project-proposal/primary-intervention-type',
+    FIRST_FINANCIAL_YEAR: '/project-proposal/first-financial-year',
+    FIRST_FINANCIAL_YEAR_MANUAL:
+      '/project-proposal/first-financial-year-manual',
+    LAST_FINANCIAL_YEAR: '/project-proposal/last-financial-year',
+    LAST_FINANCIAL_YEAR_MANUAL: '/project-proposal/last-financial-year-manual',
     PROPOSAL_OVERVIEW: '/project-proposal/proposal-overview/{referenceNumber}',
     EDIT: {
       PROJECT_NAME: '/project-proposal/project-name/{referenceNumber}/edit',
@@ -99,7 +104,15 @@ export const ROUTES = {
       INTERVENTION_TYPE:
         '/project-proposal/intervention-type/{referenceNumber}/edit',
       PRIMARY_INTERVENTION_TYPE:
-        '/project-proposal/primary-intervention-type/{referenceNumber}/edit'
+        '/project-proposal/primary-intervention-type/{referenceNumber}/edit',
+      FIRST_FINANCIAL_YEAR:
+        '/project-proposal/first-financial-year/{referenceNumber}/edit',
+      FIRST_FINANCIAL_YEAR_MANUAL:
+        '/project-proposal/first-financial-year-manual/{referenceNumber}/edit',
+      LAST_FINANCIAL_YEAR:
+        '/project-proposal/last-financial-year/{referenceNumber}/edit',
+      LAST_FINANCIAL_YEAR_MANUAL:
+        '/project-proposal/last-financial-year-manual/{referenceNumber}/edit'
     }
   }
 }

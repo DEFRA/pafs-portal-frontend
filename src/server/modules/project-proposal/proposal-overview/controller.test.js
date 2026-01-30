@@ -2,13 +2,15 @@ import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { proposalOverviewController } from './controller.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { getProjectProposalOverview } from '../../../common/services/project-proposal/project-proposal-service.js'
-import { convertYearToFinancialYearLabel } from '../common/financial-year-helper.js'
+import { getAreaNameById } from '../../../common/helpers/areas/areas-helper.js'
+import { buildFinancialYearLabel } from '../helpers/financial-year.js'
 import { PROPOSAL_VIEWS } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 
 vi.mock('../../../common/helpers/auth/session-manager.js')
 vi.mock('../../../common/services/project-proposal/project-proposal-service.js')
-vi.mock('../common/financial-year-helper.js')
+vi.mock('../../../common/helpers/areas/areas-helper.js')
+vi.mock('../helpers/financial-year.js')
 
 describe('Proposal Overview Controller', () => {
   let request
@@ -24,6 +26,9 @@ describe('Proposal Overview Controller', () => {
         get: vi.fn()
       },
       t: vi.fn((key) => key),
+      getAreas: vi
+        .fn()
+        .mockResolvedValue([{ id: 'area-1', name: 'Test Area' }]),
       server: {
         logger: {
           info: vi.fn()
@@ -39,15 +44,15 @@ describe('Proposal Overview Controller', () => {
 
   describe('GET handler', () => {
     test('should render proposal overview page with correct data', async () => {
-      const mockSession = { accessToken: 'mock-token' }
-      getAuthSession.mockReturnValue(mockSession)
+      const mockAreasData = [{ id: 'area-1', name: 'Test Area' }]
+      request.getAreas.mockResolvedValue(mockAreasData)
 
       const mockProposalData = {
         data: {
           id: '123',
           referenceNumber: 'REF123',
           projectName: 'Test Project',
-          rmaArea: 'Test Area',
+          rmaArea: 'area-1',
           projectType: 'DEF',
           interventionTypes: ['Type1'],
           mainInterventionType: 'Type1',
@@ -56,8 +61,10 @@ describe('Proposal Overview Controller', () => {
           lastUpdated: '2023-01-01'
         }
       }
+      getAuthSession.mockReturnValue({ accessToken: 'mock-token' })
       getProjectProposalOverview.mockResolvedValue(mockProposalData)
-      convertYearToFinancialYearLabel.mockImplementation((year) => `FY ${year}`)
+      getAreaNameById.mockReturnValue('Test Area')
+      buildFinancialYearLabel.mockImplementation((year) => `FY ${year}`)
 
       await proposalOverviewController.handler(request, h)
 
@@ -66,8 +73,14 @@ describe('Proposal Overview Controller', () => {
         'REF123',
         'mock-token'
       )
-      expect(convertYearToFinancialYearLabel).toHaveBeenCalledWith(2023)
-      expect(convertYearToFinancialYearLabel).toHaveBeenCalledWith(2024)
+      expect(request.getAreas).toHaveBeenCalled()
+      expect(getAreaNameById).toHaveBeenCalledWith(mockAreasData, 'area-1')
+      expect(getProjectProposalOverview).toHaveBeenCalledWith(
+        'REF123',
+        'mock-token'
+      )
+      expect(buildFinancialYearLabel).toHaveBeenCalledWith(2023)
+      expect(buildFinancialYearLabel).toHaveBeenCalledWith(2024)
 
       expect(request.yar.set).toHaveBeenCalledWith('projectProposal', {
         referenceNumber: 'REF123',

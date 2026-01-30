@@ -1,9 +1,10 @@
 // import { statusCodes } from '../../../common/constants/status-codes.js'
+import { getAreaNameById } from '../../../common/helpers/areas/areas-helper.js'
 import { PROPOSAL_VIEWS } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { getProjectProposalOverview } from '../../../common/services/project-proposal/project-proposal-service.js'
-import { convertYearToFinancialYearLabel } from '../common/financial-year-helper.js'
+import { buildFinancialYearLabel } from '../helpers/financial-year.js'
 
 function buildViewModel(request, values = {}, errors = {}, errorSummary = []) {
   return {
@@ -27,19 +28,20 @@ async function handleGet(request, h) {
     accessToken
   )
   const data = proposalData.data
+  const areasData = await request.getAreas()
 
   const values = {
     referenceNumber: data.referenceNumber,
     editModeReferenceNumber: data.referenceNumber.replace(/\//g, '-'),
     projectName: data.projectName,
-    rmaSelection: data.rmaArea,
+    rmaSelection: getAreaNameById(areasData, data.rmaArea),
     projectType: data.projectType,
     interventionTypes: data.interventionTypes,
     primaryInterventionType: data.mainInterventionType,
     firstFinancialYear: data.startYear,
-    financialStartYearLabel: convertYearToFinancialYearLabel(data.startYear),
+    financialStartYearLabel: buildFinancialYearLabel(data.startYear),
     lastFinancialYear: data.endYear,
-    financialEndYearLabel: convertYearToFinancialYearLabel(data.endYear),
+    financialEndYearLabel: buildFinancialYearLabel(data.endYear),
     lastUpdated: data.lastUpdated
   }
 

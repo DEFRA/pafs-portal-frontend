@@ -74,10 +74,10 @@
               <ul class="govuk-list govuk-list--bullet">
                 {% for type in values.interventionTypes %}
                   <li>
-                    {% if type == 'nfm' %}{{ t('project-proposal.intervention_type.options.nfm') }}
-                    {% elif type == 'suds' %}{{ t('project-proposal.intervention_type.options.suds') }}
-                    {% elif type == 'pfr' %}{{ t('project-proposal.intervention_type.options.pfr') }}
-                    {% elif type == 'other' %}{{ t('project-proposal.intervention_type.options.other') }}
+                    {% if type == 'NFM' %}{{ t('project-proposal.intervention_type.options.nfm') }}
+                    {% elif type == 'SUDS' %}{{ t('project-proposal.intervention_type.options.suds') }}
+                    {% elif type == 'PFR' %}{{ t('project-proposal.intervention_type.options.pfr') }}
+                    {% elif type == 'OTHER' %}{{ t('project-proposal.intervention_type.options.other') }}
                     {% else %}{{ type }}
                     {% endif %}
                   </li>
@@ -97,10 +97,10 @@
                 {{ t('project-proposal.proposal_overview.proposal_details_summary_card.primary_benefit_intervention') }}
               </dt>
               <dd class="govuk-summary-list__value">
-                {% if primaryInterventionType == 'nfm' %}{{ t('project-proposal.intervention_type.options.nfm') }}
-                {% elif primaryInterventionType == 'suds' %}{{ t('project-proposal.intervention_type.options.suds') }}
-                {% elif primaryInterventionType == 'pfr' %}{{ t('project-proposal.intervention_type.options.pfr') }}
-                {% elif primaryInterventionType == 'other' %}{{ t('project-proposal.intervention_type.options.other') }}
+                {% if primaryInterventionType == 'NFM' %}{{ t('project-proposal.intervention_type.options.nfm') }}
+                {% elif primaryInterventionType == 'SUDS' %}{{ t('project-proposal.intervention_type.options.suds') }}
+                {% elif primaryInterventionType == 'PFR' %}{{ t('project-proposal.intervention_type.options.pfr') }}
+                {% elif primaryInterventionType == 'OTHER' %}{{ t('project-proposal.intervention_type.options.other') }}
                 {% else %}{{ primaryInterventionType }}
                 {% endif %}
               </dd>
