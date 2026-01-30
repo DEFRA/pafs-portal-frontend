@@ -232,7 +232,7 @@ describe('#lastFinancialYearController', () => {
         })
       )
       expect(result.redirect).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
     })
 
@@ -293,7 +293,7 @@ describe('#lastFinancialYearController', () => {
       // Session should be cleared after successful submission
       expect(mockRequest.yar.set).toHaveBeenCalledWith('projectProposal', {})
       expect(result.redirect).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
       expect(projectProposalService.createProjectProposal).toHaveBeenCalledWith(
         {
@@ -338,7 +338,7 @@ describe('#lastFinancialYearController', () => {
       )
 
       expect(result.redirect).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
       expect(projectProposalService.createProjectProposal).toHaveBeenCalled()
     })
@@ -580,7 +580,7 @@ describe('#lastFinancialYearController', () => {
         })
       )
       expect(result.redirect).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
     })
   })

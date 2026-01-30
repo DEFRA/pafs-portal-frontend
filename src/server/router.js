@@ -58,6 +58,8 @@ export const router = {
         'proposal-details/project-type',
         'proposal-details/intervention-type',
         'proposal-details/primary-intervention-type',
+        'proposal-details/first-financial-year',
+        'proposal-details/last-financial-year',
         'proposal-overview'
       ])
 

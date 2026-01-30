@@ -106,7 +106,7 @@ export function buildProposalDataForSubmission(sessionData, values, rmaId) {
  */
 export function buildProjectOverviewUrlForProposal(referenceNumber) {
   const formattedReferenceNumber = referenceNumber.replaceAll('/', '-')
-  return ROUTES.PROJECT_PROPOSAL.PROJECT_OVERVIEW.replace(
+  return ROUTES.PROJECT_PROPOSAL.PROPOSAL_OVERVIEW.replace(
     '{referenceNumber}',
     formattedReferenceNumber
   )

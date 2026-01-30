@@ -1,7 +1,7 @@
 import { statusCodes } from '../../../../common/constants/status-codes.js'
 import { PROPOSAL_VIEWS } from '../../../../common/constants/common.js'
 import { ROUTES } from '../../../../common/constants/routes.js'
-import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
+import { getAuthSession } from '../../../../common/helpers/auth/session-manager.js'
 import { getBacklink } from '../../helpers/backlink-helper.js'
 
 const PROJECT_TYPE_ERROR_HREF = '#project-type'

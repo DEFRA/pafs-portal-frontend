@@ -1,9 +1,8 @@
-// import { statusCodes } from '../../../common/constants/status-codes.js'
 import { PROPOSAL_VIEWS } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { getProjectProposalOverview } from '../../../common/services/project-proposal/project-proposal-service.js'
-import { convertYearToFinancialYearLabel } from '../common/financial-year-helper.js'
+import { convertYearToFinancialYearLabel } from '../helpers/financial-year-helper.js'
 
 function buildViewModel(request, values = {}, errors = {}, errorSummary = []) {
   return {
@@ -30,7 +29,7 @@ async function handleGet(request, h) {
 
   const values = {
     referenceNumber: data.referenceNumber,
-    editModeReferenceNumber: data.referenceNumber.replace(/\//g, '-'),
+    editModeReferenceNumber: data.referenceNumber.replaceAll('/', '-'),
     projectName: data.projectName,
     rmaSelection: data.rmaArea,
     projectType: data.projectType,
@@ -59,7 +58,7 @@ async function handleGet(request, h) {
 /**
  * Submit Project Proposal redirect to next step
  */
-function handlePostSuccess(request, h, values) {
+function handlePostSuccess(_request, h, _values) {
   return h.redirect(ROUTES.PROJECT_PROPOSAL.START_PROPOSAL)
 }
 

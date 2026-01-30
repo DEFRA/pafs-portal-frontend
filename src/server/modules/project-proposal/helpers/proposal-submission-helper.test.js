@@ -117,7 +117,7 @@ describe('proposal-submission-helper', () => {
       const result = buildProjectOverviewUrlForProposal(referenceNumber)
 
       expect(result).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
     })
 
@@ -127,7 +127,7 @@ describe('proposal-submission-helper', () => {
       const result = buildProjectOverviewUrlForProposal(referenceNumber)
 
       expect(result).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
     })
   })
