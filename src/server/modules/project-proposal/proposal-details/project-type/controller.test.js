@@ -1,6 +1,12 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { statusCodes } from '../../../../common/constants/status-codes.js'
 import { projectTypeController } from './controller.js'
+import { getAuthSession } from '../../../../common/helpers/auth/session-manager.js'
+import { getBacklink } from '../../helpers/backlink-helper.js'
+import { ROUTES } from '../../../../common/constants/routes.js'
+
+vi.mock('../../../../common/helpers/auth/session-manager.js')
+vi.mock('../../helpers/backlink-helper.js')
 
 describe('#projectTypeController', () => {
   let mockRequest
@@ -9,10 +15,25 @@ describe('#projectTypeController', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
+    // Mock getAuthSession to return a default user session
+    getAuthSession.mockReturnValue({
+      user: {
+        admin: false,
+        areas: ['area-1']
+      }
+    })
+
+    // Mock getBacklink to return a default backlink
+    getBacklink.mockReturnValue({
+      text: 'Back',
+      href: '/project-proposal/project-name'
+    })
+
     mockRequest = {
       method: 'get',
       t: vi.fn((key) => key),
       payload: {},
+      params: {},
       yar: {
         get: vi.fn(() => ({})),
         set: vi.fn()
@@ -45,7 +66,8 @@ describe('#projectTypeController', () => {
           'modules/project-proposal/proposal-details/project-type/index'
         ),
         expect.objectContaining({
-          values: { projectType: '' }
+          values: { projectType: '' },
+          backlink: { text: 'Back', href: '/project-proposal/project-name' }
         })
       )
     })
@@ -63,9 +85,65 @@ describe('#projectTypeController', () => {
           'modules/project-proposal/proposal-details/project-type/index'
         ),
         expect.objectContaining({
-          values: { projectType: 'nfm' }
+          values: { projectType: 'nfm' },
+          backlink: { text: 'Back', href: '/project-proposal/project-name' }
         })
       )
+    })
+
+    test('Should use RMA selection as backlink for admin users', async () => {
+      getAuthSession.mockReturnValue({
+        user: {
+          admin: true,
+          areas: ['area-1']
+        }
+      })
+
+      await projectTypeController.handler(mockRequest, mockH)
+
+      expect(getBacklink).toHaveBeenCalledWith(mockRequest, {
+        defaultUrl: ROUTES.PROJECT_PROPOSAL.RMA_SELECTION
+      })
+    })
+
+    test('Should use RMA selection as backlink for users with multiple areas', async () => {
+      getAuthSession.mockReturnValue({
+        user: {
+          admin: false,
+          areas: ['area-1', 'area-2']
+        }
+      })
+
+      await projectTypeController.handler(mockRequest, mockH)
+
+      expect(getBacklink).toHaveBeenCalledWith(mockRequest, {
+        defaultUrl: ROUTES.PROJECT_PROPOSAL.RMA_SELECTION
+      })
+    })
+
+    test('Should use project name as backlink for users with single area', async () => {
+      getAuthSession.mockReturnValue({
+        user: {
+          admin: false,
+          areas: ['area-1']
+        }
+      })
+
+      await projectTypeController.handler(mockRequest, mockH)
+
+      expect(getBacklink).toHaveBeenCalledWith(mockRequest, {
+        defaultUrl: ROUTES.PROJECT_PROPOSAL.PROJECT_NAME
+      })
+    })
+
+    test('Should handle missing user session', async () => {
+      getAuthSession.mockReturnValue(null)
+
+      await projectTypeController.handler(mockRequest, mockH)
+
+      expect(getBacklink).toHaveBeenCalledWith(mockRequest, {
+        defaultUrl: ROUTES.PROJECT_PROPOSAL.PROJECT_NAME
+      })
     })
 
     test('Should handle null/undefined session data', async () => {

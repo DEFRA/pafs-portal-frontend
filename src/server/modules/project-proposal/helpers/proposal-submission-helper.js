@@ -1,6 +1,6 @@
 import { statusCodes } from '../../../common/constants/status-codes.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { createProjectProposal } from '../../../common/services/project-proposal/project-proposal-service.js'
+import { upsertProjectProposal } from '../../../common/services/project-proposal/project-proposal-service.js'
 
 /**
  * Render error view for proposal submission
@@ -106,7 +106,7 @@ export function buildProposalDataForSubmission(sessionData, values, rmaId) {
  */
 export function buildProjectOverviewUrlForProposal(referenceNumber) {
   const formattedReferenceNumber = referenceNumber.replaceAll('/', '-')
-  return ROUTES.PROJECT_PROPOSAL.PROJECT_OVERVIEW.replace(
+  return ROUTES.PROJECT_PROPOSAL.PROPOSAL_OVERVIEW.replace(
     '{referenceNumber}',
     formattedReferenceNumber
   )
@@ -121,7 +121,7 @@ export function buildProjectOverviewUrlForProposal(referenceNumber) {
 export async function submitProposalToBackend(request, proposalData) {
   const authSession = request.yar.get('auth')
   const accessToken = authSession?.accessToken
-  return createProjectProposal(proposalData, accessToken)
+  return upsertProjectProposal(proposalData, accessToken)
 }
 
 /**

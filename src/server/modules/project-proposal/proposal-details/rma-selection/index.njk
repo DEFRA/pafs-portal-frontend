@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-  <a href="/project-proposal/project-name" class="govuk-back-link">{{ t('common.back_link') }}</a>
+  <a href={{ backlink.href }} class="govuk-back-link">{{ backlink.text }}</a>
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">

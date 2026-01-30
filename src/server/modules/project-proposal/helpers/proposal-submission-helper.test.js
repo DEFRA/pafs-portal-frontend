@@ -117,7 +117,7 @@ describe('proposal-submission-helper', () => {
       const result = buildProjectOverviewUrlForProposal(referenceNumber)
 
       expect(result).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
     })
 
@@ -127,7 +127,7 @@ describe('proposal-submission-helper', () => {
       const result = buildProjectOverviewUrlForProposal(referenceNumber)
 
       expect(result).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
     })
   })
@@ -150,14 +150,14 @@ describe('proposal-submission-helper', () => {
         payload: { name: 'Test Project', projectType: 'DEF' }
       }
 
-      projectProposalService.createProjectProposal.mockResolvedValue({
+      projectProposalService.upsertProjectProposal.mockResolvedValue({
         success: true,
         data: { id: '1' }
       })
 
       const result = await submitProposalToBackend(mockRequest, proposalData)
 
-      expect(projectProposalService.createProjectProposal).toHaveBeenCalledWith(
+      expect(projectProposalService.upsertProjectProposal).toHaveBeenCalledWith(
         proposalData,
         'test-token-123'
       )

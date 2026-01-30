@@ -52,7 +52,8 @@ export const router = {
 
       // Project proposal routes
       await loadModules(server, join(dirName, 'modules/project-proposal'), [
-        'start-proposal'
+        'start-proposal',
+        'proposal-overview'
       ])
 
       await loadModules(

@@ -73,7 +73,7 @@ describe('#lastFinancialYearController', () => {
       redirect: vi.fn((url) => ({ redirect: url }))
     }
 
-    projectProposalService.createProjectProposal.mockResolvedValue({
+    projectProposalService.upsertProjectProposal.mockResolvedValue({
       success: true,
       data: {
         success: true,
@@ -232,7 +232,7 @@ describe('#lastFinancialYearController', () => {
         })
       )
       expect(result.redirect).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
     })
 
@@ -293,9 +293,9 @@ describe('#lastFinancialYearController', () => {
       // Session should be cleared after successful submission
       expect(mockRequest.yar.set).toHaveBeenCalledWith('projectProposal', {})
       expect(result.redirect).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
-      expect(projectProposalService.createProjectProposal).toHaveBeenCalledWith(
+      expect(projectProposalService.upsertProjectProposal).toHaveBeenCalledWith(
         {
           level: 'INITIAL_SAVE',
           payload: {
@@ -338,9 +338,9 @@ describe('#lastFinancialYearController', () => {
       )
 
       expect(result.redirect).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
-      expect(projectProposalService.createProjectProposal).toHaveBeenCalled()
+      expect(projectProposalService.upsertProjectProposal).toHaveBeenCalled()
     })
 
     test('clears session data after successful submission', async () => {
@@ -389,7 +389,7 @@ describe('#lastFinancialYearController', () => {
         return {}
       })
 
-      projectProposalService.createProjectProposal.mockResolvedValue({
+      projectProposalService.upsertProjectProposal.mockResolvedValue({
         success: false,
         status: 500,
         errors: [{ message: 'Server error' }]
@@ -580,7 +580,7 @@ describe('#lastFinancialYearController', () => {
         })
       )
       expect(result.redirect).toBe(
-        '/project-proposal/project-overview/ANC501E-000A-001A'
+        '/project-proposal/proposal-overview/ANC501E-000A-001A'
       )
     })
   })

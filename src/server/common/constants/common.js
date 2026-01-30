@@ -49,7 +49,8 @@ export const PROPOSAL_VIEWS = {
   LAST_FINANCIAL_YEAR:
     'modules/project-proposal/proposal-details/last-financial-year/index',
   LAST_FINANCIAL_YEAR_MANUAL:
-    'modules/project-proposal/proposal-details/last-financial-year/manual'
+    'modules/project-proposal/proposal-details/last-financial-year/manual',
+  PROPOSAL_OVERVIEW: 'modules/project-proposal/proposal-overview/index'
 }
 
 export const GENERAL_VIEWS = {

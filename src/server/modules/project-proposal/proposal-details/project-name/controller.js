@@ -6,15 +6,21 @@ import {
 import { ROUTES } from '../../../../common/constants/routes.js'
 import { checkProjectNameExists } from '../../../../common/services/project-proposal/project-proposal-service.js'
 import { getAuthSession } from '../../../../common/helpers/auth/session-manager.js'
+import { getBacklink } from '../../helpers/backlink-helper.js'
 
 const PROJECT_NAME_ERROR_HREF = '#project-name'
 
 function buildViewModel(request, values = {}, errors = {}, errorSummary = []) {
+  const backlink = getBacklink(request, {
+    defaultUrl: ROUTES.PROJECT_PROPOSAL.START_PROPOSAL
+  })
+
   return {
     title: request.t('project-proposal.project_name.heading'),
     values,
     errors,
-    errorSummary
+    errorSummary,
+    backlink
   }
 }
 
