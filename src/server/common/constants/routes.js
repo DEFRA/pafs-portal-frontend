@@ -96,6 +96,15 @@ export const ROUTES = {
       '/project-proposal/first-financial-year-manual',
     LAST_FINANCIAL_YEAR: '/project-proposal/last-financial-year',
     LAST_FINANCIAL_YEAR_MANUAL: '/project-proposal/last-financial-year-manual',
-    PROJECT_OVERVIEW: '/project-proposal/project-overview/{referenceNumber}'
+    PROPOSAL_OVERVIEW: '/project-proposal/proposal-overview/{referenceNumber}',
+    EDIT: {
+      PROJECT_NAME: '/project-proposal/project-name/{referenceNumber}/edit',
+      RMA_SELECTION: '/project-proposal/rma-selection/{referenceNumber}/edit',
+      PROJECT_TYPE: '/project-proposal/project-type/{referenceNumber}/edit',
+      INTERVENTION_TYPE:
+        '/project-proposal/intervention-type/{referenceNumber}/edit',
+      PRIMARY_INTERVENTION_TYPE:
+        '/project-proposal/primary-intervention-type/{referenceNumber}/edit'
+    }
   }
 }

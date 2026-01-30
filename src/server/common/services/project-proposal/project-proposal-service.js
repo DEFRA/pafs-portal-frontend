@@ -31,3 +31,15 @@ export async function createProjectProposal(proposalData, accessToken) {
     headers
   })
 }
+
+export async function getProjectProposalOverview(referenceNumber, accessToken) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(
+    `/api/v1/project-proposal/proposal-overview/${referenceNumber}`,
+    {
+      method: 'GET',
+      headers
+    }
+  )
+}

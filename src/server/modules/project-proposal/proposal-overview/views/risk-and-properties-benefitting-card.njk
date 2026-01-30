@@ -1,0 +1,117 @@
+{% macro riskAndPropertiesBenefittingSummaryCard(values, t) %}
+
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Risks and properties benefitting</h2>
+    <ul class="govuk-summary-card__actions">
+      <li class="govuk-summary-card__action">
+        <a class="govuk-link" href="/proposal/create-proposal/risks">
+          {% if data['risks-selected'] %}Change{% else %}Add{% endif %}<span class="govuk-visually-hidden"> risks and properties benefitting</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="govuk-summary-card__content">
+    {% if data['risks-selected'] %}
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            Selected risks
+          </dt>
+          <dd class="govuk-summary-list__value">
+            <ul class="govuk-list govuk-list--bullet">
+              {% if data['fluvial-flooding'] %}<li>Fluvial flooding (river flooding)</li>{% endif %}
+              {% if data['tidal-flooding'] %}<li>Tidal flooding</li>{% endif %}
+              {% if data['groundwater-flooding'] %}<li>Groundwater flooding</li>{% endif %}
+              {% if data['surface-water-flooding'] %}<li>Surface water flooding</li>{% endif %}
+              {% if data['sea-flooding'] %}<li>Sea flooding</li>{% endif %}
+              {% if data['reservoir-flooding'] %}<li>Reservoir flooding</li>{% endif %}
+              {% if data['coastal-erosion'] %}<li>Coastal erosion</li>{% endif %}
+            </ul>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            Main risk
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {% if data['main-risk'] == 'fluvial-flooding' %}Fluvial flooding (river flooding)
+            {% elif data['main-risk'] == 'tidal-flooding' %}Tidal flooding
+            {% elif data['main-risk'] == 'groundwater-flooding' %}Groundwater flooding
+            {% elif data['main-risk'] == 'surface-water-flooding' %}Surface water flooding
+            {% elif data['main-risk'] == 'sea-flooding' %}Sea flooding
+            {% elif data['main-risk'] == 'reservoir-flooding' %}Reservoir flooding
+            {% elif data['main-risk'] == 'coastal-erosion' %}Coastal erosion
+            {% endif %}
+          </dd>
+        </div>
+
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            Properties affected by flooding
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {% if data['no-properties-affected-flooding'] == 'true' %}
+              No properties affected by flooding
+            {% else %}
+              <ul class="govuk-list">
+                {% if data['properties-maintaining-protection'] %}<li>Maintaining flood protection: {{ data['properties-maintaining-protection'] }}</li>{% endif %}
+                {% if data['properties-reducing-risk-50-plus'] %}<li>Reducing flood risk (50% or more): {{ data['properties-reducing-risk-50-plus'] }}</li>{% endif %}
+                {% if data['properties-reducing-risk-less-50'] %}<li>Reducing flood risk (less than 50%): {{ data['properties-reducing-risk-less-50'] }}</li>{% endif %}
+                {% if data['properties-increasing-resilience'] %}<li>Increasing flood resilience: {{ data['properties-increasing-resilience'] }}</li>{% endif %}
+              </ul>
+            {% endif %}
+          </dd>
+        </div>
+
+        {% if data['coastal-erosion'] %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Properties affected by coastal erosion
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {% if data['no-properties-affected-coastal'] == 'true' %}
+                No properties affected by coastal erosion
+              {% else %}
+                <ul class="govuk-list">
+                  {% if data['properties-maintaining-coastal-protection'] %}<li>Maintaining coastal erosion protection: {{ data['properties-maintaining-coastal-protection'] }}</li>{% endif %}
+                  {% if data['properties-reducing-coastal-risk'] %}<li>Reducing coastal erosion risk: {{ data['properties-reducing-coastal-risk'] }}</li>{% endif %}
+                </ul>
+              {% endif %}
+            </dd>
+          </div>
+        {% endif %}
+
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            Current flood risk
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {% if data['current-flood-risk'] == 'high' %}High risk (greater than 3.3%)
+            {% elif data['current-flood-risk'] == 'medium' %}Medium risk (between 1% and 3.3%)
+            {% elif data['current-flood-risk'] == 'low' %}Low risk (between 0.1% and 1%)
+            {% elif data['current-flood-risk'] == 'very-low' %}Very low risk (less than 0.1%)
+            {% else %}Not provided{% endif %}
+          </dd>
+        </div>
+
+        {% if data['coastal-erosion'] %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Current coastal erosion risk
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {% if data['current-coastal-risk'] == 'medium-term' %}Medium term loss (≤ 30 years)
+              {% elif data['current-coastal-risk'] == 'longer-term' %}Longer term loss (> 30 years)
+              {% else %}Not provided{% endif %}
+            </dd>
+          </div>
+        {% endif %}
+      </dl>
+    {% else %}
+      <p class="govuk-body">No risks and properties benefitting data added yet</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endmacro %}

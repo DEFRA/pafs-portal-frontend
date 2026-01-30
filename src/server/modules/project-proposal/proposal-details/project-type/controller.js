@@ -1,15 +1,30 @@
 import { statusCodes } from '../../../../common/constants/status-codes.js'
 import { PROPOSAL_VIEWS } from '../../../../common/constants/common.js'
 import { ROUTES } from '../../../../common/constants/routes.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
+import { getBacklink } from '../../helpers/backlink-helper.js'
 
 const PROJECT_TYPE_ERROR_HREF = '#project-type'
 
 function buildViewModel(request, values = {}, errors = {}, errorSummary = []) {
+  const session = getAuthSession(request)
+  const userSession = session?.user
+  let backlinkURL = ROUTES.PROJECT_PROPOSAL.PROJECT_NAME
+
+  if (userSession?.admin || (userSession?.areas?.length ?? 0) > 1) {
+    backlinkURL = ROUTES.PROJECT_PROPOSAL.RMA_SELECTION
+  }
+
+  const backlink = getBacklink(request, {
+    defaultUrl: backlinkURL
+  })
+
   return {
     title: request.t('project-proposal.project_type.heading'),
     values,
     errors,
-    errorSummary
+    errorSummary,
+    backlink
   }
 }
 

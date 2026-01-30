@@ -102,6 +102,42 @@ describe('Routes Constants', () => {
         '/project-proposal/rma-selection'
       )
     })
+
+    test('PROPOSAL_OVERVIEW route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.PROPOSAL_OVERVIEW).toBe(
+        '/project-proposal/proposal-overview/{referenceNumber}'
+      )
+    })
+
+    test('Edit PROJECT_NAME route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.EDIT.PROJECT_NAME).toBe(
+        '/project-proposal/project-name/{referenceNumber}/edit'
+      )
+    })
+
+    test('Edit RMA_SELECTION route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.EDIT.RMA_SELECTION).toBe(
+        '/project-proposal/rma-selection/{referenceNumber}/edit'
+      )
+    })
+
+    test('Edit PROJECT_TYPE route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.EDIT.PROJECT_TYPE).toBe(
+        '/project-proposal/project-type/{referenceNumber}/edit'
+      )
+    })
+
+    test('Edit INTERVENTION_TYPE route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.EDIT.INTERVENTION_TYPE).toBe(
+        '/project-proposal/intervention-type/{referenceNumber}/edit'
+      )
+    })
+
+    test('Edit PRIMARY_INTERVENTION_TYPE route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.EDIT.PRIMARY_INTERVENTION_TYPE).toBe(
+        '/project-proposal/primary-intervention-type/{referenceNumber}/edit'
+      )
+    })
   })
 
   describe('Route structure', () => {
@@ -140,6 +176,9 @@ describe('Routes Constants', () => {
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty(
         'FIRST_FINANCIAL_YEAR_MANUAL'
       )
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('PROJECT_NAME')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('RMA_SELECTION')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('PROPOSAL_OVERVIEW')
     })
   })
 })

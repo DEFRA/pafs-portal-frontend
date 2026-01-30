@@ -1,0 +1,142 @@
+{% macro fundingSourcesAndSpendingSummaryCard(values, t) %}
+
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Funding sources and spending</h2>
+    <ul class="govuk-summary-card__actions">
+      <li class="govuk-summary-card__action">
+        <a class="govuk-link" href="/proposal/create-proposal/funding-sources">
+          {% if fundingSectionStarted %}Change{% else %}Add{% endif %}<span class="govuk-visually-hidden"> the funding sources and spending details</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="govuk-summary-card__content">
+    {% if fundingSectionStarted %}
+      {% if fundingSummary.selectedSources and (fundingSummary.selectedSources | length) > 0 %}
+        <table class="govuk-table full-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Funding Source</th>
+              <th scope="col" class="govuk-table__header align-right">Total Estimated Spend</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for source in fundingSummary.selectedSources %}
+              {% set sourceTotal = 0 %}
+              {% for year in fundingYears %}
+                {% set value = (data['funding-values'] and data['funding-values'][year] and data['funding-values'][year][source.key]) or 0 %}
+                {% set sourceTotal = sourceTotal + (value | int) %}
+              {% endfor %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">{{ source.label }}</td>
+                <td class="govuk-table__cell align-right">£{{ sourceTotal }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <details class="govuk-details govuk-!-margin-top-4" data-module="govuk-details">
+          <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">View funding sources and spending detail</span>
+          </summary>
+          <div class="govuk-details__text">
+            <div class="scroll-horz">
+              <table class="govuk-table funding_sources_and_spending_detail_table">
+                <thead class="govuk-table__head">
+                  <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header financial-year-column">Financial year</th>
+                    {% for source in fundingSummary.selectedSources %}
+                      <th scope="col" class="govuk-table__header align-right data-column">{{ source.label }}</th>
+                    {% endfor %}
+                    <th scope="col" class="govuk-table__header align-right data-total">Total (£)</th>
+                  </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                  {% for year in fundingYears %}
+                    <tr class="govuk-table__row">
+                      <td class="govuk-table__cell financial_year">April {{ year }} to March {{ year + 1 }}</td>
+                      {% set rowTotal = 0 %}
+                      {% for source in fundingSummary.selectedSources %}
+                        {% set value = (data['funding-values'] and data['funding-values'][year] and data['funding-values'][year][source.key]) or 0 %}
+                        {% set numValue = value | int %}
+                        {% set rowTotal = rowTotal + numValue %}
+                        <td class="govuk-table__cell numeric">{{ numValue }}</td>
+                      {% endfor %}
+                      <td class="govuk-table__cell row-total numeric">{{ rowTotal }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot class="govuk-table__foot">
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">Total (£)</td>
+                    {% set footerGrandTotal = 0 %}
+                    {% for source in fundingSummary.selectedSources %}
+                      {% set columnTotal = 0 %}
+                      {% for year in fundingYears %}
+                        {% set value = (data['funding-values'] and data['funding-values'][year] and data['funding-values'][year][source.key]) or 0 %}
+                        {% set columnTotal = columnTotal + (value | int) %}
+                      {% endfor %}
+                      {% set footerGrandTotal = footerGrandTotal + columnTotal %}
+                      <td class="govuk-table__cell numeric">{{ columnTotal }}</td>
+                    {% endfor %}
+                    <td class="govuk-table__cell numeric grand-total">{{ footerGrandTotal }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            {% set hasContributors = false %}
+            {% if data['public-contributors'] and (data['public-contributors'] | length) > 0 %}
+              {% set hasContributors = true %}
+            {% endif %}
+            {% if data['private-contributors'] and (data['private-contributors'] | length) > 0 %}
+              {% set hasContributors = true %}
+            {% endif %}
+            {% if data['other-ea-contributors'] and (data['other-ea-contributors'] | length) > 0 %}
+              {% set hasContributors = true %}
+            {% endif %}
+
+            {% if hasContributors %}
+              <div id="contributor_detail">
+                <br>
+                {% if data['public-contributors'] and (data['public-contributors'] | length) > 0 %}
+                  <div>
+                    <h3 class="govuk-heading-s">Public sector contributors:</h3>
+                    {% for contributor in data['public-contributors'] %}
+                      <p class="govuk-body">{{ contributor.name }}</p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                {% if data['private-contributors'] and (data['private-contributors'] | length) > 0 %}
+                  <div>
+                    <h3 class="govuk-heading-s">Private sector contributors:</h3>
+                    {% for contributor in data['private-contributors'] %}
+                      <p class="govuk-body">{{ contributor.name }}</p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                {% if data['other-ea-contributors'] and (data['other-ea-contributors'] | length) > 0 %}
+                  <div>
+                    <h3 class="govuk-heading-s">Other Environment Agency contributors:</h3>
+                    {% for contributor in data['other-ea-contributors'] %}
+                      <p class="govuk-body">{{ contributor.name }}</p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </details>
+      {% else %}
+        <p class="govuk-body">No funding sources selected yet</p>
+      {% endif %}
+    {% else %}
+      <p class="govuk-body">No funding sources and spending details added yet</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endmacro %}

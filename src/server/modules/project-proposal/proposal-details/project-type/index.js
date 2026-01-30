@@ -17,10 +17,26 @@ export const projectType = {
           ...projectTypeController
         },
         {
+          method: 'GET',
+          path: ROUTES.PROJECT_PROPOSAL.EDIT.PROJECT_TYPE,
+          options: {
+            pre: [{ method: requireAuth }]
+          },
+          ...projectTypeController
+        },
+        {
           method: 'POST',
           path: ROUTES.PROJECT_PROPOSAL.PROJECT_TYPE,
           options: {
             pre: [{ method: requireAuth }, requireProjectName]
+          },
+          ...projectTypeController
+        },
+        {
+          method: 'POST',
+          path: ROUTES.PROJECT_PROPOSAL.EDIT.PROJECT_TYPE,
+          options: {
+            pre: [{ method: requireAuth }]
           },
           ...projectTypeController
         }

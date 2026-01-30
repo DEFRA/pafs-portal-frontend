@@ -17,9 +17,11 @@
   "important": "Important",
   "service_error": "There was a problem with the service. Please try again",
   "optional": "Optional",
+  "add": "Add",
   "change": "Change",
   "yes": "Yes",
   "no": "No",
+  "back_to_overview": "Back to overview",
   "select_area_option": "Select an area",
   "navigation": {
     "your_proposals": "Your proposals",
@@ -42,7 +44,7 @@
     "continue": "Continue",
     "start_now": "Start now",
     "save_and_continue": "Save and continue",
-    "save_changes": "Save changes"
+    "submit_proposal": "Submit proposal"
   },
   "footer": {
     "contact_html": "Any issues contact the Defra IT Service Desk on <a href=\"tel:08008766458\" class=\"govuk-footer__link\">0800 8766458</a> or email <a href=\"mailto:pafs-support@environment-agency.gov.uk\" class=\"govuk-footer__link\">pafs-support@environment-agency.gov.uk</a>",

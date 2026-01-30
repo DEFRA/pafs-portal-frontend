@@ -16,8 +16,24 @@ export const projectName = {
           ...projectNameController
         },
         {
+          method: 'GET',
+          path: ROUTES.PROJECT_PROPOSAL.EDIT.PROJECT_NAME,
+          options: {
+            pre: [{ method: requireAuth }]
+          },
+          ...projectNameController
+        },
+        {
           method: 'POST',
           path: ROUTES.PROJECT_PROPOSAL.PROJECT_NAME,
+          options: {
+            pre: [{ method: requireAuth }]
+          },
+          ...projectNameController
+        },
+        {
+          method: 'POST',
+          path: ROUTES.PROJECT_PROPOSAL.EDIT.PROJECT_NAME,
           options: {
             pre: [{ method: requireAuth }]
           },
