@@ -61,7 +61,7 @@ async function handleGet(request, h) {
 /**
  * Submit Project Proposal redirect to next step
  */
-function handlePostSuccess(request, h, values) {
+function handlePostSuccess(_request, h, _values) {
   return h.redirect(ROUTES.PROJECT_PROPOSAL.START_PROPOSAL)
 }
 
