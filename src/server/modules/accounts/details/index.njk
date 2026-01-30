@@ -50,7 +50,7 @@
     {% if fieldErrors.email == ERROR_CODES.EMAIL_REQUIRED %}
       {% set errorList = errorList.concat([{ text: t('accounts.validation.' + validationContext + '.VALIDATION_EMAIL_REQUIRED'), href: "#email" }]) %}
     {% elif fieldErrors.email == ERROR_CODES.EMAIL_INVALID_FORMAT %}
-      {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_EMAIL_INVALID_FORMAT'), href: "#email" }]) %}
+      {% set errorList = errorList.concat([{ text: t('accounts.validation.' + validationContext + '.VALIDATION_EMAIL_INVALID_FORMAT'), href: "#email" }]) %}
     {% elif fieldErrors.email == ERROR_CODES.EMAIL_TOO_LONG %}
       {% set errorList = errorList.concat([{ text: t('accounts.validation.common.VALIDATION_EMAIL_TOO_LONG'), href: "#email" }]) %}
     {% elif fieldErrors.email == ERROR_CODES.EMAIL_LOCAL_TOO_LONG %}
@@ -165,7 +165,7 @@
       {% if fieldErrors.email == ERROR_CODES.EMAIL_REQUIRED %}
         {% set emailError = { text: t('accounts.validation.' + validationContext + '.VALIDATION_EMAIL_REQUIRED') } %}
       {% elif fieldErrors.email == ERROR_CODES.EMAIL_INVALID_FORMAT %}
-        {% set emailError = { text: t('accounts.validation.common.VALIDATION_EMAIL_INVALID_FORMAT') } %}
+        {% set emailError = { text: t('accounts.validation.' + validationContext + '.VALIDATION_EMAIL_INVALID_FORMAT') } %}
       {% elif fieldErrors.email == ERROR_CODES.EMAIL_TOO_LONG %}
         {% set emailError = { text: t('accounts.validation.common.VALIDATION_EMAIL_TOO_LONG') } %}
       {% elif fieldErrors.email == ERROR_CODES.EMAIL_LOCAL_TOO_LONG %}

@@ -14,7 +14,10 @@ export const ADMIN_VIEWS = {
   JOURNEY_SELECTION: 'modules/admin/journey-selection/index',
   USERS_PENDING: 'modules/admin/users/pending/index',
   USERS_ACTIVE: 'modules/admin/users/active/index',
-  DELETE_USER: 'modules/admin/users/delete/index'
+  DELETE_USER: 'modules/admin/users/delete/index',
+  ORGANISATIONS: 'modules/admin/organisations/listing/index',
+  ORGANISATION_TYPE: 'modules/admin/organisations/type/index',
+  ORGANISATION_MANAGE: 'modules/admin/organisations/manage/index'
 }
 
 export const ACCOUNT_VIEWS = {
@@ -87,12 +90,18 @@ export const SESSION = {
  * SIZE
  */
 export const SIZE = {
+  LENGTH_1: 1,
   LENGTH_8: 8,
   LENGTH_12: 12,
+  LENGTH_10: 10,
+  LENGTH_31: 31,
   LENGTH_32: 32,
+  LENGTH_100: 100,
   LENGTH_128: 128,
   LENGTH_254: 254,
-  LENGTH_255: 255
+  LENGTH_255: 255,
+  LENGTH_2000: 2000,
+  LENGTH_2100: 2100
 }
 
 /**
@@ -129,6 +138,12 @@ export const CACHE_SEGMENTS = {
   USERS: 'users'
 }
 
+export const AREA_SEGMENT_KEYS = {
+  BY_TYPE: 'areas-by-type',
+  BY_LIST: 'areas-by-list',
+  BY_ID: 'area-'
+}
+
 /**
  * Session Keys for Account Flows
  * Defines session storage keys for different account management contexts
@@ -142,6 +157,7 @@ export const ACCOUNT_SESSION_KEYS = {
 export { VIEW_ERROR_CODES } from './validation.js'
 
 export const AREAS_RESPONSIBILITIES_MAP = {
+  AUTHORITY: 'Authority',
   EA: 'EA Area',
   PSO: 'PSO Area',
   RMA: 'RMA'

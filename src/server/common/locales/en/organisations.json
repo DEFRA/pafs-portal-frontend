@@ -1,0 +1,108 @@
+{
+  "listing": {
+    "title": "Manage Organisations",
+    "heading": "Manage Organisations",
+    "filters": {
+      "aria_label": "Filter organisations",
+      "search_label": "Search by organisation name",
+      "search_hint": "Search by organisation name",
+      "type_label": "Select an organisation type",
+      "filter_button": "Filter",
+      "clear_filters": "Clear filters"
+    },
+    "table": {
+      "caption": "List of organisations",
+      "name": "Organisation Name",
+      "type": "Organisation Type",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "add_new_organisation": "Add a new organisation"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "organisations": "organisations",
+      "aria_label": "Organisations pagination"
+    },
+    "empty": "No organisations found",
+    "errors": {
+      "fetch_failed": "Unable to load organisations. Please try again later."
+    },
+    "notifications": {
+      "success_heading": "Success",
+      "organisation_added": "Organisation has been added successfully",
+      "organisation_updated": "Organisation has been updated successfully"
+    }
+  },
+  "manage": {
+    "select_type": {
+      "title": "Add a new Organisation",
+      "heading": "Add a new Organisation",
+      "label": "Select an organisation type",
+      "select_option": "Select an organisation type"
+    },
+    "authority": {
+      "title_add": "Add an Authority Code",
+      "title_edit": "Edit an Authority Code",
+      "heading_add": "Add an Authority Code",
+      "heading_edit": "Edit an Authority Code",
+      "authority_code_label": "Authority code",
+      "authority_type_label": "Authority type",
+      "end_date_label": "End date",
+      "end_date_hint": "Optional, E.g: 31 03 2024"
+    },
+    "pso": {
+      "title_add": "Add a PSO",
+      "title_edit": "Edit a PSO",
+      "heading_add": "Add a PSO",
+      "heading_edit": "Edit a PSO",
+      "name_label": "Name of PSO",
+      "ea_area_label": "Associated EA Area",
+      "select_ea_option": "Select an associated EA Area",
+      "rfcc_code_label": "RFCC code",
+      "select_rfcc_option": "Select an RFCC code",
+      "end_date_label": "End date",
+      "end_date_hint": "Optional, E.g: 31 03 2024"
+    },
+    "rma": {
+      "title_add": "Add a RMA",
+      "title_edit": "Edit a RMA",
+      "heading_add": "Add a RMA",
+      "heading_edit": "Edit a RMA",
+      "name_label": "Name of organisation",
+      "identifier_label": "Identifier code",
+      "authority_code_label": "Authority code",
+      "select_authority_option": "Select an authority code",
+      "pso_label": "Associated PSO",
+      "select_pso_option": "Select an associated PSO",
+      "end_date_label": "End date",
+      "end_date_hint": "Optional, E.g: 31 03 2024"
+    },
+    "errors": {
+      "general_message": "There is a problem. Please check the form and try again.",
+      "save_failed": "Unable to save organisation. Please try again."
+    }
+  },
+  "validation": {
+    "VALIDATION_AREA_TYPE_REQUIRED": "Select an organisation type",
+    "VALIDATION_AREA_TYPE_INVALID": "Select a valid organisation type",
+    "VALIDATION_AUTHORITY_TYPE_REQUIRED": "Enter an authority type",
+    "VALIDATION_AUTHORITY_TYPE_TOO_SHORT": "Authority type is too short",
+    "VALIDATION_AUTHORITY_TYPE_TOO_LONG": "Authority type must be 255 characters or less",
+    "VALIDATION_AUTHORITY_CODE_REQUIRED": "Enter an authority code",
+    "VALIDATION_AUTHORITY_CODE_TOO_LONG": "Authority code must be 100 characters or less",
+    "VALIDATION_AREA_NAME_REQUIRED": "Enter a name",
+    "VALIDATION_AREA_NAME_TOO_SHORT": "Name is too short",
+    "VALIDATION_AREA_NAME_TOO_LONG": "Name must be 255 characters or less",
+    "VALIDATION_AREA_IDENTIFIER_REQUIRED": "Enter an identifier code",
+    "VALIDATION_AREA_IDENTIFIER_TOO_LONG": "Identifier code must be 100 characters or less",
+    "VALIDATION_EA_AREA_REQUIRED": "Select an associated EA Area",
+    "VALIDATION_RFCC_CODE_REQUIRED": "Select an RFCC code",
+    "VALIDATION_AUTHORITY_CODE_OPTION_REQUIRED": "Select an authority code",
+    "VALIDATION_ASSOCIATED_PSO_REQUIRED": "Select an associated PSO",
+    "VALIDATION_AREA_DATE_INVALID": "Enter a valid end date"
+  }
+}

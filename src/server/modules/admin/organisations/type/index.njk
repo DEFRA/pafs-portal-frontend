@@ -1,0 +1,67 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block beforeContent %}
+  {% if backLink %}
+    <a href="{{ backLink }}" class="govuk-back-link">{{ t('common.back_link') }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {# Build error summary list #}
+    {% set errorList = [] %}
+
+    {# Organisation type #}
+    {% if fieldErrors.areaType == ERROR_CODES.TYPE_REQUIRED %}
+      {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AREA_TYPE_REQUIRED'), href: "#areaType" }]) %}
+    {% elif fieldErrors.areaType == ERROR_CODES.TYPE_INVALID %}
+      {% set errorList = errorList.concat([{ text: t('organisations.validation.VALIDATION_AREA_TYPE_INVALID'), href: "#areaType" }]) %}
+    {% endif %}
+
+    {# Display error summary if there are errors #}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
+
+    {# Page heading #}
+    <h1 class="govuk-heading-xl">{{ heading }}</h1>
+  
+    <form method="post" novalidate>
+
+      {# Area Type field error #}
+      {% set areaTypeError = false %}
+      {% if fieldErrors.areaType == ERROR_CODES.TYPE_REQUIRED %}
+        {% set areaTypeError = { text: t('organisations.validation.VALIDATION_AREA_TYPE_REQUIRED') } %}
+      {% elif fieldErrors.areaType == ERROR_CODES.TYPE_INVALID %}
+        {% set areaTypeError = { text: t('organisations.validation.VALIDATION_AREA_TYPE_INVALID') } %}
+      {% endif %}
+
+      {{ govukSelect({
+        id: "areaType",
+        name: "areaType",
+        label: {
+          text: t('organisations.manage.select_type.label')
+        },
+        classes: "govuk-!-width-two-thirds",
+        items: organisationTypeItems,
+        errorMessage: areaTypeError,
+        value: formData.areaType
+      }) }}
+
+      {{ govukButton({
+        text: t('common.buttons.continue')
+      }) }}
+    </form>
+
+  </div>
+</div>
+{% endblock %}
