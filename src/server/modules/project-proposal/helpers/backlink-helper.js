@@ -1,36 +1,5 @@
 import { ROUTES } from '../../../common/constants/routes.js'
 
-/**
- * Generates backlink configuration for project proposal pages
- *
- * @param {Object} request - Hapi request object
- * @param {Object} options - Configuration options
- * @param {string} options.defaultUrl - URL to use when not in edit mode
- * @param {string} options.defaultText - Text to use when not in edit mode (default: 'Back')
- * @param {boolean} options.alwaysOverview - Always go to overview regardless of edit mode (default: false)
- * @param {boolean} options.ignoreEditMode - Never go to overview even in edit mode (default: false)
- * @returns {Object} Backlink configuration with text and href properties
- *
- * @example
- * // Normal page - goes to overview in edit mode
- * const backlink = getBacklink(request, {
- *   defaultUrl: '/project-proposal/project-type'
- * })
- *
- * @example
- * // Always go to overview
- * const backlink = getBacklink(request, {
- *   defaultUrl: '/somewhere',
- *   alwaysOverview: true
- * })
- *
- * @example
- * // Never go to overview (ignore edit mode)
- * const backlink = getBacklink(request, {
- *   defaultUrl: '/project-proposal/step-1',
- *   ignoreEditMode: true
- * })
- */
 export function getBacklink(request, options = {}) {
   const {
     defaultUrl = '/',
@@ -38,6 +7,8 @@ export function getBacklink(request, options = {}) {
     alwaysOverview = false,
     ignoreEditMode = false
   } = options
+
+  const overviewText = request.t('common.back_to_overview')
 
   // Check if we have a reference number in params (edit mode indicator)
   const referenceNumber = request.params?.referenceNumber
@@ -49,12 +20,12 @@ export function getBacklink(request, options = {}) {
       // If no reference number but alwaysOverview is true, we need one from somewhere
       // This is an edge case - you might want to handle this differently
       return {
-        text: request.t('common.back_to_overview'),
+        text: overviewText,
         href: defaultUrl
       }
     }
     return {
-      text: request.t('common.back_to_overview'),
+      text: overviewText,
       href: ROUTES.PROJECT_PROPOSAL.PROPOSAL_OVERVIEW.replace(
         '{referenceNumber}',
         referenceNumber
@@ -73,7 +44,7 @@ export function getBacklink(request, options = {}) {
   // Pages which go back to overview only in edit mode
   if (isEditMode) {
     return {
-      text: request.t('common.back_to_overview'),
+      text: overviewText,
       href: ROUTES.PROJECT_PROPOSAL.PROPOSAL_OVERVIEW.replace(
         '{referenceNumber}',
         referenceNumber
