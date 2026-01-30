@@ -97,5 +97,37 @@
       "before_first_year": "Your last financial date is earlier than the start financial date. Please re-enter your last financial year",
       "api_error": "There was a problem saving your project. Please try again."
     }
+  },
+  "project_benefit_area": {
+    "heading": "What area is the project likely to benefit?",
+    "introduction": "Upload a shapefile. The shapefile should show the approximate area the project is likely to benefit. Draw as many separate areas as necessary, but make sure they don't overlap.",
+    "hint": "Your shapefile files should be in a single compressed folder or zipfile (.zip) to upload successfully",
+    "footer": {
+      "free_mapping_tool": {
+        "title": "Free mapping tool",
+        "intro": "You can use your own mapping tool or our recommended tool - Magic Map (free to use) - to draw your project's benefit area",
+        "link_text": "Magic Map Application (opens in a new window)",
+        "link": "https://magic.defra.gov.uk/MagicMap.html",
+        "instructions_heading": "Here are simple steps to draw your polygon in Magic Map",
+        "instructions_intro": "Follow these simple steps to create and upload your polygon:",
+        "instructions_steps": [
+          "Click on the Mapping tool link above to open the Magic Map tool.",
+          "Use the search field on the top left-hand corner, to zoom in on your area of benefit. The arrow pointing downwards allows you to choose your preferred method to zoom in (e.g. postcode, grid ref. etc)",
+          "Click on the 'Drawing Tool' icon.",
+          "Click on the Polygon icon.",
+          "Now click to start your first vertices and then select to draw your polygon.",
+          "Double click to complete your shape.",
+          "If you want to start again you can select the rubbish bin icon in the Sketch Styler menu.",
+          "When you are happy with the shape that you have drawn select on the polygon, it should go blue with an orange box around it.",
+          "Now select the Save Graphics menu within the Sketch Styler menu and select Save.",
+          "The Shape file ZIP will download to your machine.",
+          "Go to your computers download folder, to view your file, at this point you can rename it.",
+          "Return to PAFs, then upload and continue."
+        ]
+      },
+      "unable_to_create_shape_file": {
+        "help_text": "If you are unable to upload or create a shapefile, contact your local partnership and strategic overview officer and they will be able to help you."
+      }
+    }
   }
 }
