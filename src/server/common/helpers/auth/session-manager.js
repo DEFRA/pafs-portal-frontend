@@ -14,6 +14,9 @@ export function setAuthSession(request, authData) {
 }
 
 export function getAuthSession(request) {
+  if (!request?.yar) {
+    return null
+  }
   return request.yar.get('auth')
 }
 
