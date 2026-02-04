@@ -1,0 +1,15 @@
+{% extends 'layouts/page.njk' %}
+
+{% block beforeContent %}
+  <a href="{{ backLinkURL }}" class="govuk-back-link">{{ backLinkText }}</a>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-{{ columnWidth if columnWidth else 'two-thirds' }}">
+      {% include 'partials/projects/error-summary.njk' %}
+      {% block body %}{% endblock %}
+    </div>
+  </div>
+
+{% endblock %}

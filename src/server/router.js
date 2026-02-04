@@ -50,17 +50,15 @@ export const router = {
         'static'
       ])
 
-      // Project proposal routes
-      await loadModules(server, join(dirName, 'modules/project-proposal'), [
-        'start-proposal',
-        'proposal-details/project-name',
-        'proposal-details/rma-selection',
-        'proposal-details/project-type',
-        'proposal-details/intervention-type',
-        'proposal-details/primary-intervention-type',
-        'proposal-details/first-financial-year',
-        'proposal-details/last-financial-year',
-        'proposal-overview'
+      // Project routes
+      await loadModules(server, join(dirName, 'modules/projects'), [
+        'overview',
+        'start',
+        'name',
+        'area',
+        'type',
+        'financial-year',
+        'important-dates'
       ])
 
       // Static assets

@@ -1,0 +1,70 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "partials/projects/financial-year-error.njk" import getFinancialYearError %}
+
+{% block body %}
+  <form method="post" novalidate>
+
+    {% if fieldErrors and(fieldErrors[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR] or fieldErrors[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]) %}
+      {% set errorKey = getFinancialYearError(fieldErrors, ERROR_CODES) | trim %}
+      {% set financialYearError = {
+        text: t(localKeyPrefix + '.errors.' + errorKey)
+      } %}
+    {% else %}
+      {% set financialYearError = false %}
+    {% endif %}
+
+    {% if step == projectSteps.FINANCIAL_START_YEAR or step == projectSteps.FINANCIAL_START_YEAR_MANUAL%}
+      <input type="hidden" name="{{PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR}}" value="{{ formData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR] }}">
+    {% elif step == projectSteps.FINANCIAL_END_YEAR or step == projectSteps.FINANCIAL_END_YEAR_MANUAL %}
+      <input type="hidden" name="{{PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR}}" value="{{ formData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR] }}">
+    {% endif %}
+
+    {# Financial Start & End Year Step #}
+    {% if step == projectSteps.FINANCIAL_START_YEAR or step == projectSteps.FINANCIAL_END_YEAR %}
+      {{ govukRadios({
+      id: fieldName,
+      name: fieldName,
+      fieldset: {
+        legend: {
+          text: t(localKeyPrefix + '.heading'),
+          classes: "govuk-fieldset__legend--xl",
+          isPageHeading: true
+        }
+      },
+      value: formData[fieldName],
+      items: yearOptions,
+      classes: "govuk-!-width-full",
+      errorMessage: financialYearError
+    }) }}
+
+      <p class="govuk-body">
+        <a class="govuk-link" href="{{ afterMarchLinkHref }}">{{ afterMarchLinkText }}</a>
+      </p>
+
+      {# Financial Start & End Year Manual Step #}
+    {%- elif step == projectSteps.FINANCIAL_START_YEAR_MANUAL or step == projectSteps.FINANCIAL_END_YEAR_MANUAL -%}
+      <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
+
+      {{ govukInput({
+        id: fieldName,
+        name: fieldName,
+        label: {
+          text: t(localKeyPrefix + '.label')
+        },
+        hint: {
+          text: t(localKeyPrefix + '.hint')
+        },
+        classes: "govuk-!-width-full",
+        value: formData[fieldName],
+        errorMessage: financialYearError
+      }) }}
+    {% endif %}
+
+    {{ govukButton({
+      text: t('common.buttons.save_and_continue')
+    }) }}
+  </form>
+{% endblock %}

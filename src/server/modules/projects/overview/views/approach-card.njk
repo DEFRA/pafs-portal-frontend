@@ -1,0 +1,27 @@
+{% macro approachSummaryCard(values, t) %}
+
+  <div class="govuk-summary-card">
+    <div class="govuk-summary-card__title-wrapper">
+      <h2 class="govuk-summary-card__title">{{ t('projects.overview.approach_summary_card.title') }}</h2>
+      <ul class="govuk-summary-card__actions">
+        <li class="govuk-summary-card__action">
+          <a class="govuk-link" href="/proposal/create-proposal/approach">
+            {% if data['approach'] %}{{ t('common.change') }}
+            {% else %}{{ t('common.add') }}
+            {% endif %}
+            <span class="govuk-visually-hidden">
+              {{ t('projects.overview.approach_summary_card.title') | lower }}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="govuk-summary-card__content">
+      {% if data['approach'] %}
+        <p class="govuk-body">{{ data['approach'] }}</p>
+      {% else %}
+        <p class="govuk-body">{{ t('projects.overview.approach_summary_card.not_added') }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+{% endmacro %}

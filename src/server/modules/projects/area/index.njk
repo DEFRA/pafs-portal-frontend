@@ -1,0 +1,36 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "partials/projects/area-error.njk" import getAreaError %}
+
+{% block body %}
+  <form method="post" novalidate>
+
+    {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.AREA_ID] %}
+      {% set errorKey = getAreaError(fieldErrors, ERROR_CODES) | trim %}
+      {% set areaError = {
+        text: t(localKeyPrefix + '.errors.' + errorKey)
+      } %}
+    {% else %}
+      {% set areaError = false %}
+    {% endif %}
+
+    {{ govukSelect({
+      id: PROJECT_PAYLOAD_FIELDS.AREA_ID,
+      name: PROJECT_PAYLOAD_FIELDS.AREA_ID,
+      label: {
+        text: t(localKeyPrefix + '.heading'),
+        classes: "govuk-label--xl",
+        isPageHeading: true
+      },
+      classes: "govuk-!-width-full",
+      items: areaOptions,
+      errorMessage: areaError,
+      value: formData[PROJECT_PAYLOAD_FIELDS.AREA_ID]
+    }) }}
+
+    {{ govukButton({
+      text: t('common.buttons.save_and_continue')
+    }) }}
+  </form>
+{% endblock %}

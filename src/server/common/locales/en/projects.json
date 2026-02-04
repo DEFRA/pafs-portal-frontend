@@ -1,0 +1,237 @@
+{
+  "common": {
+    "month": "Month",
+    "year": "Year",
+    "date_hint": "For example, 3 2025",
+    "errors": {
+      "not_allowed_to_create": "You are not allowed to create a project",
+      "not_allowed_to_update": "You are not allowed to update this project",
+      "area_is_not_allowed": "The selected risk management authority is not allowed to create projects"
+    }
+  },
+  "overview": {
+    "title": "Proposal Overview",
+    "heading": "Proposal Overview",
+    "common": {
+      "npn": "National Proposal Number",
+      "last_updated": "Last updated",
+      "status": "Status",
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "archive": "Archive",
+      "delete": "Delete",
+      "not_submitted": "Not yet submitted",
+      "not_provided": "Not provided"
+    },
+    "proposal_details_summary_card": {
+      "title": "Proposal details",
+      "project_name": "Project name",
+      "rma": "Risk management authority",
+      "project_type": "Project type",
+      "intervention_types": "Intervention types",
+      "primary_benefit_intervention": "Primary benefit intervention",
+      "financial_year_start": "Financial year (start spending)",
+      "financial_year_end": "Financial year (stop spending)"
+    },
+    "project_benefit_area_summary_card": {
+      "title": "Project benefit area",
+      "not_added": "No shapefile uploaded yet"
+    },
+    "important_dates_summary_card": {
+      "title": "Important dates",
+      "not_added": "No important dates added yet",
+      "outline_business_case_start": "Outline business case start date",
+      "outline_business_case_complete": "Outline business case completion date",
+      "contract_award_date": "Contract awarded",
+      "start_construction_date": "Start construction",
+      "ready_for_service_date": "Ready for service",
+      "could_start_earlier": "Could start earlier with Grant in Aid",
+      "earliest_start_date": "Earliest start date with Grant in Aid"
+    },
+    "funding_summary_card": {
+      "title": "Funding sources and spending",
+      "not_added": "No funding sources and spending added yet"
+    },
+    "risks_and_properties_summary_card": {
+      "title": "Risks and properties benefitting",
+      "not_added": "No risks and properties benefitting data added yet"
+    },
+    "approach_summary_card": {
+      "title": "Approach",
+      "not_added": "No approach added yet"
+    },
+    "environmental_summary_card": {
+      "title": "Environmental benefits",
+      "not_added": "No environmental benefits data added yet"
+    },
+    "urgency_summary_card": {
+      "title": "Urgency",
+      "not_added": "No urgency data added yet"
+    },
+    "submission_info": "By submitting this proposal you confirm all the information provided is accurate and complete."
+  },
+  "start_proposal": {
+    "title": "Start a new proposal",
+    "heading": "Start a new proposal",
+    "intro_paragraph": "Use this service to create a new funding proposal for a flood or coastal erosion risk management project.",
+    "before_you_start_heading": "Before you start",
+    "before_you_start_intro": "Over the next few pages we will ask you for key details about your project so we can create a proposal record for you."
+  },
+  "project_name": {
+    "title": "What is the project's name?",
+    "heading": "What is the project's name?",
+    "label": "Project name",
+    "intro_paragraph": "The project name should be meaningful and understandable and should not include abbreviations. For example, South Chesham River Colne Flood Alleviation Scheme or Clacton-on-Sea Coastal Erosion Project Phase 4.",
+    "errors": {
+      "required": "Enter a project name",
+      "invalid_format": "The project name must only contain letters, spaces, underscores, hyphens and numbers",
+      "already_exists": "The project name already exists. Your project must have a unique name."
+    }
+  },
+  "area_selection": {
+    "title": "Which risk management authority is leading the proposal?",
+    "heading": "Which risk management authority is leading the proposal?",
+    "label": "RMA Selection",
+    "select_rma_option_text": "Select a Risk Management Authority",
+    "errors": {
+      "required": "Select a lead risk management authority"
+    }
+  },
+  "project_type": {
+    "title": "Which project type are you proposing?",
+    "heading": "Which project type are you proposing?",
+    "options": {
+      "def": "Create a new flood and coastal erosion risk management asset, or change an existing approach to risk management in an area already with assets (this could include natural flood management measures, property flood resilience or sustainable drainage systems)",
+      "rep": "Replace an existing flood and coastal erosion risk management asset that is at the end of its life with another asset which sustains the standard of service and the design performance on an equivalent basis (this could include natural flood management measures, property flood resilience or sustainable drainage systems)",
+      "ref": "Substantially renew or replace, one or more asset elements or components in an existing flood and coastal erosion risk management asset (this could include natural flood management measures or sustainable drainage systems)",
+      "hcr": "Protect, compensate or restore habitats and natural functions, to support coastal risk management legal compliance (Habitat Regulations) and wider environmental outcomes",
+      "str": "Produce a strategy for complex flood or coastal erosion risk situations across several interconnected areas",
+      "stu": "Produce a study to support the case that a project is needed to resolve a flood or coastal erosion risk problem - helping to define the scope, purpose, and viability of any future project(s)",
+      "elo": "Implement measures to address impacts arising from existing or historic flood or coastal erosion risk management assets or actions to comply with specified environmental legislation - Sites of Special Scientific Interest (SSSIs) and Water Environment Regulations (WER)"
+    },
+    "errors": {
+      "required": "Select a project type"
+    }
+  },
+  "intervention_type": {
+    "heading": "Which of these interventions feature in your proposed project?",
+    "title": "Which of these interventions feature in your proposed project?",
+    "options": {
+      "nfm": "Natural Flood Management",
+      "pfr": "Property Flood Resilience",
+      "suds": "Sustainable Drainage Systems",
+      "other": "Other"
+    },
+    "errors": {
+      "required": "Select at least one intervention feature"
+    }
+  },
+  "primary_intervention_type": {
+    "heading": "Which of the interventions will provide the most benefit to properties?",
+    "title": "Which of the interventions will provide the most benefit to properties?",
+    "errors": {
+      "required": "Select which intervention will provide the most benefit"
+    }
+  },
+  "financial_year_start": {
+    "heading": "In what financial year will the project first require funding?",
+    "title": "In what financial year will the project first require funding?",
+    "after_march_link": "The project starts after March {{afterMarchYear}}",
+    "errors": {
+      "required": "Select the financial year when the project first requires funding",
+      "after_last_year": "Your first financial year should be less than your last financial year"
+    }
+  },
+  "financial_year_start_manual": {
+    "heading": "In what financial year will the project first require funding?",
+    "title": "In what financial year will the project first require funding?",
+    "label": "Financial year starting April",
+    "hint": "For example, 2033",
+    "errors": {
+      "required": "Enter a financial year",
+      "invalid_format": "Enter a financial year in the correct format",
+      "should_be_in_future": "Enter a financial year that is the current year or later",
+      "invalid_range": "Your first financial year should be less than your last financial year"
+    }
+  },
+  "financial_year_end": {
+    "heading": "In what financial year will the project stop spending funds?",
+    "title": "In what financial year will the project stop spending funds?",
+    "hint": "Don't include years which include maintenance costs.",
+    "after_march_link": "The project stops spending funds after March {{afterMarchYear}}",
+    "errors": {
+      "required": "Select the financial year when the project stops spending funds",
+      "invalid_range": "Your last financial year should be greater than your first financial year"
+    }
+  },
+  "financial_year_end_manual": {
+    "heading": "In what financial year will the project stop spending funds?",
+    "title": "In what financial year will the project stop spending funds?",
+    "label": "Financial year starting April",
+    "hint": "Don't include years which include maintenance costs. For example, 2033",
+    "errors": {
+      "required": "Enter a financial year",
+      "invalid_format": "Enter a financial year in the correct format",
+      "should_be_in_future": "Enter a financial year that is the current year or later",
+      "invalid_range": "Your last financial year should be greater than your first financial year"
+    }
+  },
+  "important_dates": {
+    "start_outline_business_case": {
+      "title": "When do you expect to start the project's outline business case?",
+      "heading": "When do you expect to start the project's outline business case?",
+      "hint": "na",
+      "placeholder": "to start the outline business case"
+    },
+    "complete_outline_business_case": {
+      "title": "When do you expect to complete the project's outline business case?",
+      "heading": "When do you expect to complete the project's outline business case?",
+      "hint": "na",
+      "placeholder": "to complete the outline business case",
+      "previousStagePlaceholder": "to start the outline business case"
+    },
+    "award_main_contract": {
+      "title": "When do you expect to award the project's main contract?",
+      "heading": "When do you expect to award the project's main contract?",
+      "hint": "na",
+      "placeholder": "to award the main contract",
+      "previousStagePlaceholder": "to complete the outline business case"
+    },
+    "expect_to_start_the_work": {
+      "title": "When do you expect to start the work?",
+      "heading": "When do you expect to start the work?",
+      "hint": "This could be construction or creating a strategy.",
+      "placeholder": "to start the work",
+      "previousStagePlaceholder": "to award the main contract"
+    },
+    "start_achieving_its_benefits": {
+      "title": "When do you expect the project to start achieving its benefits?",
+      "heading": "When do you expect the project to start achieving its benefits?",
+      "hint": "This could be when households start to benefit or new habitat is created.",
+      "placeholder": "the project to start achieving its benefits",
+      "previousStagePlaceholder": "to start the work"
+    },
+    "could_start_earlier": {
+      "title": "Could the project start sooner if Grant in Aid funding was made available earlier?",
+      "heading": "Could the project start sooner if Grant in Aid funding was made available earlier?",
+      "hint": "Without impacting deliverability or outcomes"
+    },
+    "earliest_date": {
+      "title": "What is the earliest date the project could start if Grant in Aid funding was made available earlier?",
+      "heading": "What is the earliest date the project could start if Grant in Aid funding was made available earlier?",
+      "hint": "Spend includes any funding source (e.g. local levy, contributions and GiA)."
+    },
+    "validation": {
+      "required": "Enter the date you expect {{placeholder}}",
+      "invalid": "Enter a valid date for when you expect {{placeholder}}",
+      "in_past": "You cannot enter a date in the past for when you expect {{placeholder}}",
+      "financial_year_range": "The date you expect {{placeholder}} must be within the financial year selected for the project {{financialYearStart}} to {{financialYearEnd}}",
+      "before_previous_stage": "You expect {{previousStagePlaceholder}} on {{previousStageDate}}. The date you expect {{placeholder}} must come after this date",
+      "could_start_earlier_required": "Tell us if the project can start earlier",
+      "earliest_date_required": "Tell us the earliest date the project can start",
+      "earliest_date_invalid": "Enter a valid earliest date the project can start",
+      "earliest_date_in_past": "You cannot enter a date in the past for the earliest date the project can start",
+      "earliest_date_after_financial_start": "The earliest date the project can start must be before the financial year start date selected for the project {{financialYearStart}}"
+    }
+  }
+}

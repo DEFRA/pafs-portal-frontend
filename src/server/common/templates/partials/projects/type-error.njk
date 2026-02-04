@@ -1,0 +1,17 @@
+{% macro getTypeError(fieldErrors, ERROR_CODES) %}
+  {%- if fieldErrors and(fieldErrors.projectType or fieldErrors.projectInterventionTypes or fieldErrors.mainInterventionType) -%}
+    {%- if fieldErrors.projectType == ERROR_CODES.PROJECT_TYPE_REQUIRED -%}
+      required
+    {%- elif fieldErrors.projectType == ERROR_CODES.PROJECT_TYPE_INVALID -%}
+      required
+    {%- elif fieldErrors.projectInterventionTypes == ERROR_CODES.PROJECT_INTERVENTION_TYPE_REQUIRED -%}
+      required
+    {%- elif fieldErrors.projectInterventionTypes == ERROR_CODES.PROJECT_INTERVENTION_TYPE_INVALID -%}
+      required
+    {%- elif fieldErrors.mainInterventionType == ERROR_CODES.PROJECT_MAIN_INTERVENTION_TYPE_REQUIRED -%}
+      required
+    {%- elif fieldErrors.mainInterventionType == ERROR_CODES.PROJECT_MAIN_INTERVENTION_TYPE_INVALID -%}
+      required
+    {%- endif -%}
+  {%- endif -%}
+{% endmacro %}

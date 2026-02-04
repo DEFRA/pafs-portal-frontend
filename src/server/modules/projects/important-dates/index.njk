@@ -1,0 +1,148 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "partials/projects/important-dates-error.njk" import getImportantDatesError %}
+
+{% block body %}
+  <form method="post" novalidate>
+    {% if fieldType == 'date' %}
+      {# Date field (month and year only) #}
+      {% if fieldErrors and(fieldErrors[monthField] or fieldErrors[yearField]) %}
+        {% set errorKey = getImportantDatesError(fieldErrors, ERROR_CODES, monthField, yearField) | trim %}
+        {% if errorKey == 'before_previous_stage' %}
+          {% set dateError = {
+            text: t('projects.important_dates.validation.' + errorKey, {
+              placeholder: t(localKeyPrefix + '.placeholder'),
+              previousStagePlaceholder: t(localKeyPrefix + '.previousStagePlaceholder', ''),
+              previousStageDate: previousStageDate or ''
+            })
+          } %}
+        {% elif errorKey == 'financial_year_range' %}
+          {% set dateError = {
+            text: t('projects.important_dates.validation.' + errorKey, {
+              placeholder: t(localKeyPrefix + '.placeholder'),
+              financialYearStart: financialYearStart,
+              financialYearEnd: financialYearEnd
+            })
+          } %}
+        {% elif errorKey == 'earliest_date_after_financial_start' %}
+          {% set dateError = {
+            text: t('projects.important_dates.validation.' + errorKey, {financialYearStart: financialYearStart})
+          } %}
+        {% elif monthField == 'earliestWithGiaMonth' %}
+          {% set dateError = {
+            text: t('projects.important_dates.validation.' + errorKey)
+          } %}
+        {% else %}
+          {% set dateError = {
+            text: t('projects.important_dates.validation.' + errorKey, {
+              placeholder: t(localKeyPrefix + '.placeholder')
+            })
+          } %}
+        {% endif %}
+      {% else %}
+        {% set dateError = false %}
+      {% endif %}
+
+      {% set monthClasses = "govuk-input--width-2" %}
+      {% set yearClasses = "govuk-input--width-4" %}
+
+      {% if dateError %}
+        {% set monthClasses = monthClasses + " govuk-input--error" %}
+        {% set yearClasses = yearClasses + " govuk-input--error" %}
+      {% endif %}
+
+      {# Build hint HTML - combine section hint and date hint #}
+      {% set hintHtml = '' %}
+      {% if sectionHint and sectionHint != 'na' %}
+        {% set hintHtml = sectionHint %}
+      {% endif %}
+      {% if dateHint %}
+        {% if hintHtml %}
+          {% set hintHtml = hintHtml + '<br><br>' + dateHint %}
+        {% else %}
+          {% set hintHtml = dateHint %}
+        {% endif %}
+      {% endif %}
+
+      {{ govukDateInput({
+        id: monthField,
+        namePrefix: "",
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.heading'),
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--xl"
+          }
+        },
+        hint: {
+          html: hintHtml
+        } if hintHtml else false,
+        errorMessage: dateError,
+        items: [
+          {
+            id: monthField,
+            name: monthField,
+            label: t('projects.common.month'),
+            classes: monthClasses,
+            value: formData[monthField],
+            attributes: {
+              maxlength: 2
+            }
+          },
+          {
+            id: yearField,
+            name: yearField,
+            label: t('projects.common.year'),
+            classes: yearClasses,
+            value: formData[yearField],
+            attributes: {
+              maxlength: 4
+            }
+          }
+        ]
+      }) }}
+
+    {% elif fieldType == 'radio' %}
+      {# Radio field for could start earlier #}
+      {% if fieldErrors and fieldErrors[fieldName] %}
+        {% set radioError = {
+          text: t('projects.important_dates.validation.could_start_earlier_required')
+        } %}
+      {% else %}
+        {% set radioError = false %}
+      {% endif %}
+
+      {{ govukRadios({
+        id: fieldName,
+        name: fieldName,
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.heading'),
+            classes: "govuk-fieldset__legend--xl",
+            isPageHeading: true
+          }
+        },
+        items: [
+          {
+            value: "true",
+            text: t('common.yes'),
+            checked: formData[fieldName] == 'true' or formData[fieldName] == true
+          },
+          {
+            value: "false",
+            text: t('common.no'),
+            checked: formData[fieldName] == 'false' or formData[fieldName] == false
+          }
+        ],
+        errorMessage: radioError
+      }) }}
+    {% endif %}
+
+    {{ govukButton({
+      text: t('common.buttons.save_and_continue')
+    }) }}
+  </form>
+{% endblock %}

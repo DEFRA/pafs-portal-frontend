@@ -103,6 +103,48 @@ describe('Routes Constants', () => {
       )
     })
 
+    test('PROJECT_TYPE route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.PROJECT_TYPE).toBe(
+        '/project-proposal/project-type'
+      )
+    })
+
+    test('INTERVENTION_TYPE route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.INTERVENTION_TYPE).toBe(
+        '/project-proposal/intervention-type'
+      )
+    })
+
+    test('PRIMARY_INTERVENTION_TYPE route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.PRIMARY_INTERVENTION_TYPE).toBe(
+        '/project-proposal/primary-intervention-type'
+      )
+    })
+
+    test('FIRST_FINANCIAL_YEAR route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR).toBe(
+        '/project-proposal/first-financial-year'
+      )
+    })
+
+    test('FIRST_FINANCIAL_YEAR_MANUAL route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.FIRST_FINANCIAL_YEAR_MANUAL).toBe(
+        '/project-proposal/first-financial-year-manual'
+      )
+    })
+
+    test('LAST_FINANCIAL_YEAR route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR).toBe(
+        '/project-proposal/last-financial-year'
+      )
+    })
+
+    test('LAST_FINANCIAL_YEAR_MANUAL route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.LAST_FINANCIAL_YEAR_MANUAL).toBe(
+        '/project-proposal/last-financial-year-manual'
+      )
+    })
+
     test('PROPOSAL_OVERVIEW route is defined', () => {
       expect(ROUTES.PROJECT_PROPOSAL.PROPOSAL_OVERVIEW).toBe(
         '/project-proposal/proposal-overview/{referenceNumber}'
@@ -136,6 +178,30 @@ describe('Routes Constants', () => {
     test('Edit PRIMARY_INTERVENTION_TYPE route is defined', () => {
       expect(ROUTES.PROJECT_PROPOSAL.EDIT.PRIMARY_INTERVENTION_TYPE).toBe(
         '/project-proposal/primary-intervention-type/{referenceNumber}/edit'
+      )
+    })
+
+    test('Edit FIRST_FINANCIAL_YEAR route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.EDIT.FIRST_FINANCIAL_YEAR).toBe(
+        '/project-proposal/first-financial-year/{referenceNumber}/edit'
+      )
+    })
+
+    test('Edit FIRST_FINANCIAL_YEAR_MANUAL route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.EDIT.FIRST_FINANCIAL_YEAR_MANUAL).toBe(
+        '/project-proposal/first-financial-year-manual/{referenceNumber}/edit'
+      )
+    })
+
+    test('Edit LAST_FINANCIAL_YEAR route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.EDIT.LAST_FINANCIAL_YEAR).toBe(
+        '/project-proposal/last-financial-year/{referenceNumber}/edit'
+      )
+    })
+
+    test('Edit LAST_FINANCIAL_YEAR_MANUAL route is defined', () => {
+      expect(ROUTES.PROJECT_PROPOSAL.EDIT.LAST_FINANCIAL_YEAR_MANUAL).toBe(
+        '/project-proposal/last-financial-year-manual/{referenceNumber}/edit'
       )
     })
   })
@@ -172,12 +238,21 @@ describe('Routes Constants', () => {
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('START_PROPOSAL')
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('PROJECT_NAME')
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('RMA_SELECTION')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('PROJECT_TYPE')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('INTERVENTION_TYPE')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty(
+        'PRIMARY_INTERVENTION_TYPE'
+      )
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('FIRST_FINANCIAL_YEAR')
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty(
         'FIRST_FINANCIAL_YEAR_MANUAL'
       )
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('PROJECT_NAME')
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('RMA_SELECTION')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('LAST_FINANCIAL_YEAR')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty(
+        'LAST_FINANCIAL_YEAR_MANUAL'
+      )
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('PROPOSAL_OVERVIEW')
     })
   })

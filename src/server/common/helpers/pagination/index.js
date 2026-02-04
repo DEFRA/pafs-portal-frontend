@@ -66,7 +66,7 @@ function buildStartItems(currentPage, totalPages, createItem) {
   const pageNumbers = Array.from({ length: currentPage + 1 }, (_, i) => i + 1)
 
   return [
-    ...pageNumbers.map(createItem),
+    ...pageNumbers.map((page) => createItem(page)),
     { ellipsis: true },
     createItem(totalPages)
   ]
@@ -80,7 +80,11 @@ function buildEndItems(currentPage, totalPages, createItem) {
     (_, i) => startPage + i
   )
 
-  return [createItem(1), { ellipsis: true }, ...pageNumbers.map(createItem)]
+  return [
+    createItem(1),
+    { ellipsis: true },
+    ...pageNumbers.map((page) => createItem(page))
+  ]
 }
 
 function buildMiddleItems(currentPage, totalPages, createItem) {

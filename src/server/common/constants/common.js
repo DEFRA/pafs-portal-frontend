@@ -32,6 +32,16 @@ export const ACCOUNT_VIEWS = {
   VIEW_ACCOUNT: 'modules/accounts/view-account/index'
 }
 
+export const PROJECT_VIEWS = {
+  OVERVIEW: 'modules/projects/overview/index',
+  START: 'modules/projects/start/index',
+  NAME: 'modules/projects/name/index',
+  AREA: 'modules/projects/area/index',
+  TYPE: 'modules/projects/type/index',
+  FINANCIAL_YEAR: 'modules/projects/financial-year/index',
+  IMPORTANT_DATES: 'modules/projects/important-dates/index'
+}
+
 export const PROPOSAL_VIEWS = {
   START: 'modules/project-proposal/start-proposal/index',
   PROJECT_NAME: 'modules/project-proposal/proposal-details/project-name/index',
@@ -92,6 +102,8 @@ export const SESSION = {
  */
 export const SIZE = {
   LENGTH_1: 1,
+  LENGTH_4: 4,
+  LENGTH_6: 6,
   LENGTH_8: 8,
   LENGTH_12: 12,
   LENGTH_10: 10,
@@ -113,7 +125,9 @@ export const VALIDATION_PATTERNS = {
   // Names: letters, spaces, hyphens, apostrophes
   NAME: /^[a-zA-Z\s'-]+$/,
 
-  PROJECT_NAME: /^[a-zA-Z0-9_\s-]+$/,
+  NAME_WITH_ALPHANUMERIC_SPACE_UNDERSCORE_DASH: /^[a-zA-Z0-9_ -]+$/,
+
+  PROJECT_REFERENCE_NUMBER: /^[A-Z]{2}C501E\/\d{3}A\/\d{3}A$/,
 
   // Job title and organisation: letters, digits, spaces, common punctuation
   // Allows: letters, numbers, spaces, period, comma, ampersand, parentheses, hyphen, apostrophe, forward slash

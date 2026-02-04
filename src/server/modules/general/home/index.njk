@@ -1,47 +1,47 @@
 {% extends 'layouts/page.njk' %}
 
 {% block content %}
-{{ appHeading({
+    {{ appHeading({
     text: t('home.heading')
 }) }}
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-body" data-testid="app-page-body">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-body" data-testid="app-page-body">
 
-            <div class="govuk-inset-text">{{t('home.inset_text')}}</div>
+                <div class="govuk-inset-text">{{t('home.inset_text')}}</div>
 
-            <form method="get" action="" class="govuk-!-margin-bottom-6" novalidate="">
-                <div class="govuk-form-group govuk-!-margin-bottom-2">
-                    <label class="govuk-label" for="project-search">
-                        {{t('home.labels.project')}}
-                    </label>
-                    <div class="govuk-grid-row govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-                        <div class="govuk-grid-column-two-thirds">
-                            <input class="govuk-input govuk-!-width-full" id="project-search" name="q" type="text"
+                <form method="get" action="" class="govuk-!-margin-bottom-6" novalidate="">
+                    <div class="govuk-form-group govuk-!-margin-bottom-2">
+                        <label class="govuk-label" for="project-search">
+                            {{t('home.labels.project')}}
+                        </label>
+                        <div class="govuk-grid-row govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                            <div class="govuk-grid-column-two-thirds">
+                                <input class="govuk-input govuk-!-width-full" id="project-search" name="q" type="text"
                                 placeholder="{{t('home.labels.project')}}">
-                        </div>
-                        <div class="govuk-grid-column-one-third">
-                            <button class="govuk-button govuk-!-margin-top-0" data-module="govuk-button" type="submit"
+                            </div>
+                            <div class="govuk-grid-column-one-third">
+                                <button class="govuk-button govuk-!-margin-top-0" data-module="govuk-button" type="submit"
                                 data-govuk-button-init="">
-                                {{t('common.buttons.search')}}
-                            </button>
+                                    {{t('common.buttons.search')}}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
 
-            <div class="govuk-grid-row govuk-!-margin-bottom-6">
-                <div class="govuk-grid-column-full">
-                    <a href="/project-proposal/start" role="button" draggable="false" class="govuk-button"
+                <div class="govuk-grid-row govuk-!-margin-bottom-6">
+                    <div class="govuk-grid-column-full">
+                        <a href="/project/start" role="button" draggable="false" class="govuk-button"
                         data-module="govuk-button" data-govuk-button-init="">
-                        {{t('home.buttons.new_proposal')}}
-                    </a>
+                            {{t('home.buttons.new_proposal')}}
+                        </a>
+                    </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
-</div>
 
 {% endblock %}

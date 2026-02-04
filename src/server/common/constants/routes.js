@@ -1,3 +1,5 @@
+import { PROJECT_STEPS } from './projects.js'
+
 export const ROUTES = {
   // Auth routes
   LOGIN: '/login',
@@ -80,6 +82,37 @@ export const ROUTES = {
     DOWNLOAD_RMA: '/admin/download-rma'
   },
 
+  PROJECT: {
+    OVERVIEW: '/project/{referenceNumber}',
+    START: `/project/${PROJECT_STEPS.START}`,
+    NAME: `/project/${PROJECT_STEPS.NAME}`,
+    AREA: `/project/${PROJECT_STEPS.AREA}`,
+    TYPE: `/project/${PROJECT_STEPS.TYPE}`,
+    INTERVENTION_TYPE: `/project/${PROJECT_STEPS.INTERVENTION_TYPE}`,
+    PRIMARY_INTERVENTION_TYPE: `/project/${PROJECT_STEPS.PRIMARY_INTERVENTION_TYPE}`,
+    FINANCIAL_START_YEAR: `/project/${PROJECT_STEPS.FINANCIAL_START_YEAR}`,
+    FINANCIAL_START_YEAR_MANUAL: `/project/${PROJECT_STEPS.FINANCIAL_START_YEAR_MANUAL}`,
+    FINANCIAL_END_YEAR: `/project/${PROJECT_STEPS.FINANCIAL_END_YEAR}`,
+    FINANCIAL_END_YEAR_MANUAL: `/project/${PROJECT_STEPS.FINANCIAL_END_YEAR_MANUAL}`,
+    EDIT: {
+      NAME: `/project/{referenceNumber}/${PROJECT_STEPS.NAME}`,
+      TYPE: `/project/{referenceNumber}/${PROJECT_STEPS.TYPE}`,
+      INTERVENTION_TYPE: `/project/{referenceNumber}/${PROJECT_STEPS.INTERVENTION_TYPE}`,
+      PRIMARY_INTERVENTION_TYPE: `/project/{referenceNumber}/${PROJECT_STEPS.PRIMARY_INTERVENTION_TYPE}`,
+      FINANCIAL_START_YEAR: `/project/{referenceNumber}/${PROJECT_STEPS.FINANCIAL_START_YEAR}`,
+      FINANCIAL_START_YEAR_MANUAL: `/project/{referenceNumber}/${PROJECT_STEPS.FINANCIAL_START_YEAR_MANUAL}`,
+      FINANCIAL_END_YEAR: `/project/{referenceNumber}/${PROJECT_STEPS.FINANCIAL_END_YEAR}`,
+      FINANCIAL_END_YEAR_MANUAL: `/project/{referenceNumber}/${PROJECT_STEPS.FINANCIAL_END_YEAR_MANUAL}`,
+      START_OUTLINE_BUSINESS_CASE: `/project/{referenceNumber}/${PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE}`,
+      COMPLETE_OUTLINE_BUSINESS_CASE: `/project/{referenceNumber}/${PROJECT_STEPS.COMPLETE_OUTLINE_BUSINESS_CASE}`,
+      AWARD_MAIN_CONTRACT: `/project/{referenceNumber}/${PROJECT_STEPS.AWARD_MAIN_CONTRACT}`,
+      START_WORK: `/project/{referenceNumber}/${PROJECT_STEPS.START_WORK}`,
+      START_BENEFITS: `/project/{referenceNumber}/${PROJECT_STEPS.START_BENEFITS}`,
+      COULD_START_EARLY: `/project/{referenceNumber}/${PROJECT_STEPS.COULD_START_EARLY}`,
+      EARLIEST_START_DATE: `/project/{referenceNumber}/${PROJECT_STEPS.EARLIEST_START_DATE}`
+    }
+  },
+
   // Project Proposal routes
   PROJECT_PROPOSAL: {
     START_PROPOSAL: '/project-proposal/start',
@@ -101,7 +134,15 @@ export const ROUTES = {
       INTERVENTION_TYPE:
         '/project-proposal/intervention-type/{referenceNumber}/edit',
       PRIMARY_INTERVENTION_TYPE:
-        '/project-proposal/primary-intervention-type/{referenceNumber}/edit'
+        '/project-proposal/primary-intervention-type/{referenceNumber}/edit',
+      FIRST_FINANCIAL_YEAR:
+        '/project-proposal/first-financial-year/{referenceNumber}/edit',
+      FIRST_FINANCIAL_YEAR_MANUAL:
+        '/project-proposal/first-financial-year-manual/{referenceNumber}/edit',
+      LAST_FINANCIAL_YEAR:
+        '/project-proposal/last-financial-year/{referenceNumber}/edit',
+      LAST_FINANCIAL_YEAR_MANUAL:
+        '/project-proposal/last-financial-year-manual/{referenceNumber}/edit'
     }
   }
 }

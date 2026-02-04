@@ -1,0 +1,88 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "partials/projects/type-error.njk" import getTypeError %}
+
+{% block body %}
+  <form method="post" novalidate>
+
+    {% if fieldErrors and(fieldErrors[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] or fieldErrors[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] or fieldErrors[PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE]) %}
+      {% set errorKey = getTypeError(fieldErrors, ERROR_CODES) | trim %}
+      {% set typeError = {
+        text: t(localKeyPrefix + '.errors.' + errorKey)
+      } %}
+    {% else %}
+      {% set typeError = false %}
+    {% endif %}
+
+    {% if step == projectSteps.TYPE %}
+      {{ govukRadios({
+        id: PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE,
+        name: PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE,
+        fieldset: {
+          legend: {
+          text: t(localKeyPrefix + '.heading'),
+          classes: "govuk-fieldset__legend--xl",
+          isPageHeading: true
+          }
+        },
+        value: formData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE],
+        items: projectTypeOptions,
+        classes: "govuk-!-width-full",
+        errorMessage: typeError
+      }) }}
+    {%- elif step == projectSteps.INTERVENTION_TYPE -%}
+      <input type="hidden" name="{{PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE}}" value="{{ formData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] }}">
+      {%- set checkedInterventionTypes = formData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] or [] -%}
+      {%- set interventionItems = [] -%}
+      {%- for option in interventionTypeOptions -%}
+        {%- set itemConfig = {
+          text: option.text,
+          value: option.value,
+          checked: option.value in checkedInterventionTypes
+        } -%}
+        {%- set interventionItems = (interventionItems.push(itemConfig), interventionItems) -%}
+      {%- endfor -%}
+      {{ govukCheckboxes({
+        name: PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES,
+        id: PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES,
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.heading'),
+            classes: "govuk-fieldset__legend--xl",
+            isPageHeading: true
+          }
+        },
+        items: interventionItems,
+        classes: "govuk-!-width-full",
+        errorMessage: typeError
+      }) }}
+    {%- elif step == projectSteps.PRIMARY_INTERVENTION_TYPE -%}
+      <input type="hidden" name="{{PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE}}" value="{{ formData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] }}">
+      {%- set interventionTypes = formData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] or [] -%}
+      {%- for type in interventionTypes -%}
+        <input type="hidden" name="{{PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES}}" value="{{ type }}">
+      {%- endfor -%}
+      {{ govukRadios({
+        id: PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE,
+        name: PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE,
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.heading'),
+            classes: "govuk-fieldset__legend--xl",
+            isPageHeading: true
+          }
+        },
+        value: formData[PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE],
+        items: mainInterventionTypeOptions,
+        classes: "govuk-!-width-full",
+        errorMessage: typeError
+      }) }}
+    {% endif %}
+
+    {{ govukButton({
+      text: t('common.buttons.save_and_continue')
+    }) }}
+  </form>
+{% endblock %}
