@@ -58,7 +58,8 @@ export const router = {
         'area',
         'type',
         'financial-year',
-        'important-dates'
+        'important-dates',
+        'benefit-area'
       ])
 
       // Static assets

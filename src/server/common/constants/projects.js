@@ -15,12 +15,14 @@ export const PROJECT_STEPS = {
   START_WORK: 'start-work',
   START_BENEFITS: 'start-benefits',
   COULD_START_EARLY: 'could-start-early',
-  EARLIEST_START_DATE: 'earliest-start-date'
+  EARLIEST_START_DATE: 'earliest-start-date',
+  BENEFIT_AREA: 'benefit-area'
 }
 
 export const PROJECT_SESSION_KEY = 'projectData'
 
 export const PROJECT_PAYLOAD_FIELDS = {
+  ID: 'id',
   SLUG: 'slug',
   REFERENCE_NUMBER: 'referenceNumber',
   NAME: 'name',

@@ -45,7 +45,7 @@
 
   {{ proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t) }}
 
-  {{ projectBenefitAreaCard(projectData, t) }}
+  {{ projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t) }}
 
   {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate) }}
 

@@ -39,7 +39,8 @@ export const PROJECT_VIEWS = {
   AREA: 'modules/projects/area/index',
   TYPE: 'modules/projects/type/index',
   FINANCIAL_YEAR: 'modules/projects/financial-year/index',
-  IMPORTANT_DATES: 'modules/projects/important-dates/index'
+  IMPORTANT_DATES: 'modules/projects/important-dates/index',
+  BENEFIT_AREA: 'modules/projects/benefit-area/index'
 }
 
 export const PROPOSAL_VIEWS = {

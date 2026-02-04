@@ -1,11 +1,11 @@
-{% macro projectBenefitAreaCard(values, t) %}
+{% macro projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t) %}
 
   <div class="govuk-summary-card">
     <div class="govuk-summary-card__title-wrapper">
       <h2 class="govuk-summary-card__title">{{ t('projects.overview.project_benefit_area_summary_card.title') }}</h2>
       <ul class="govuk-summary-card__actions">
         <li class="govuk-summary-card__action">
-          <a class="govuk-link" href="/proposal/create-proposal/location">
+          <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.BENEFIT_AREA }}">
             {% if data['grid-reference'] %}{{ t('common.change') }}
             {% else %}{{ t('common.add') }}
             {% endif %}

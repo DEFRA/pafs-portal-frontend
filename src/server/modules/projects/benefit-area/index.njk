@@ -1,0 +1,122 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block body %}
+  {% if uploadErrors or errorCode %}
+    {% set errorList = [] %}
+    
+    {# Add upload validation errors from session #}
+    {% if uploadErrors %}
+      {% for error in uploadErrors %}
+        {% set errorList = (errorList.push({
+          text: error.message or t('projects.project_benefit_area.UPLOAD_FAILED'),
+          href: '#benefitAreaFile'
+        }), errorList) %}
+      {% endfor %}
+    {% endif %}
+    
+    {# Add error code if present #}
+    {% if errorCode and not uploadErrors %}
+      {% set errorList = (errorList.push({
+        text: t('projects.project_benefit_area.' + errorCode) if t('projects.project_benefit_area.' + errorCode) else t('projects.project_benefit_area.UPLOAD_FAILED'),
+        href: '#benefitAreaFile'
+      }), errorList) %}
+    {% endif %}
+    
+    {{ govukErrorSummary({
+      titleText: t('common.there_is_a_problem'),
+      errorList: errorList
+    }) }}
+  {% endif %}
+
+  <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
+
+  <p class="govuk-body">{{ t(localKeyPrefix + '.introduction') }}</p>
+
+  <form method="post" action="{{ uploadUrl }}" enctype="multipart/form-data" novalidate>
+    {% if fieldErrors and fieldErrors['benefitAreaFile'] %}
+      {% set fileError = {
+        text: t(localKeyPrefix + '.errors.' + fieldErrors['benefitAreaFile'])
+      } %}
+    {% else %}
+      {% set fileError = false %}
+    {% endif %}
+
+    {{ govukFileUpload({
+      id: "benefitAreaFile",
+      name: "file",
+      label: {
+        text: t(localKeyPrefix + '.heading'),
+        classes: "govuk-visually-hidden"
+      },
+      hint: {
+        text: t(localKeyPrefix + '.hint')
+      },
+      errorMessage: fileError,
+      attributes: {
+        accept: ".zip"
+      }
+    }) }}
+
+    {% if benefitAreaFileName %}
+      <p class="govuk-body">
+        <strong>{{ t('common.labels.current_file') }}:</strong>
+        {{ benefitAreaFileName }}
+      </p>
+    {% endif %}
+
+    {{ govukButton({
+      text: 'Upload and continue'
+    }) }}
+  </form>
+
+  {% set instructionsDetailsHtml %}
+  <p class="govuk-body">{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_intro') }}</p>
+  <ol class="govuk-list govuk-list--number govuk-!-margin-left-4">
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_1') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_2') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_3') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_4') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_5') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_6') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_7') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_8') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_9') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_10') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_11') }}</li>
+    <li>{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_steps.step_12') }}</li>
+  </ol>
+  {% endset %}
+
+  {% set detailsHtml %}
+  <p class="govuk-body">{{ t(localKeyPrefix + '.footer.free_mapping_tool.intro') }}</p>
+
+  <p class="govuk-body">
+    <a href="{{ t(localKeyPrefix + '.footer.free_mapping_tool.link') }}" 
+           class="govuk-link" 
+           target="_blank" 
+           rel="noopener noreferrer">
+      {{ t(localKeyPrefix + '.footer.free_mapping_tool.link_text') }}
+    </a>
+  </p>
+
+  {{ govukDetails({
+        summaryText: t(localKeyPrefix + '.footer.free_mapping_tool.instructions_heading'),
+        html: instructionsDetailsHtml
+      }) }}
+  {% endset %}
+
+  {{ govukDetails({
+    summaryText: t(localKeyPrefix + '.footer.free_mapping_tool.title'),
+    html: detailsHtml
+  }) }}
+
+  {{ govukDetails({
+    summaryText: t(localKeyPrefix + '.footer.unable_to_create_shape_file.title'),
+    text: t(localKeyPrefix + '.footer.unable_to_create_shape_file.help_text')
+  }) }}
+{% endblock %}

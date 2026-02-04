@@ -96,6 +96,8 @@ export const ROUTES = {
     FINANCIAL_END_YEAR_MANUAL: `/project/${PROJECT_STEPS.FINANCIAL_END_YEAR_MANUAL}`,
     EDIT: {
       NAME: `/project/{referenceNumber}/${PROJECT_STEPS.NAME}`,
+      BENEFIT_AREA: `/project/{referenceNumber}/${PROJECT_STEPS.BENEFIT_AREA}`,
+      BENEFIT_AREA_UPLOAD_STATUS: `/project/{referenceNumber}/${PROJECT_STEPS.BENEFIT_AREA}/upload-status`,
       TYPE: `/project/{referenceNumber}/${PROJECT_STEPS.TYPE}`,
       INTERVENTION_TYPE: `/project/{referenceNumber}/${PROJECT_STEPS.INTERVENTION_TYPE}`,
       PRIMARY_INTERVENTION_TYPE: `/project/{referenceNumber}/${PROJECT_STEPS.PRIMARY_INTERVENTION_TYPE}`,

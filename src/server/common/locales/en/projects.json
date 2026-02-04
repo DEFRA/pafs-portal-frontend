@@ -233,5 +233,39 @@
       "earliest_date_in_past": "You cannot enter a date in the past for the earliest date the project can start",
       "earliest_date_after_financial_start": "The earliest date the project can start must be before the financial year start date selected for the project {{financialYearStart}}"
     }
+  },
+  "project_benefit_area": {
+    "title": "What area is the project likely to benefit?",
+    "heading": "What area is the project likely to benefit?",
+    "introduction": "Upload a shapefile. The shapefile should show the approximate area the project is likely to benefit. Draw as many separate areas as necessary, but make sure they don't overlap.",
+    "hint": "Your shapefile files should be in a single compressed folder or zipfile (.zip) to upload successfully",
+    "footer": {
+      "free_mapping_tool": {
+        "title": "Free mapping tool",
+        "intro": "You can use your own mapping tool or our recommended tool - Magic Map (free to use) - to draw your project's benefit area",
+        "link_text": "Magic Map Application (opens in a new window)",
+        "link": "https://magic.defra.gov.uk/MagicMap.html",
+        "instructions_heading": "Here are simple steps to draw your polygon in Magic Map",
+        "instructions_intro": "Follow these simple steps to create and upload your polygon:",
+        "instructions_steps": {
+          "step_1": "Click on the Mapping tool link above to open the Magic Map tool.",
+          "step_2": "Use the search field on the top left-hand corner, to zoom in on your area of benefit. The arrow pointing downwards allows you to choose your preferred method to zoom in (e.g. postcode, grid ref. etc)",
+          "step_3": "Click on the 'Drawing Tool' icon.",
+          "step_4": "Click on the Polygon icon.",
+          "step_5": "Now click to start your first vertices and then select to draw your polygon.",
+          "step_6": "Double click to complete your shape.",
+          "step_7": "If you want to start again you can select the rubbish bin icon in the Sketch Styler menu.",
+          "step_8": "When you are happy with the shape that you have drawn select on the polygon, it should go blue with an orange box around it.",
+          "step_9": "Now select the Save Graphics menu within the Sketch Styler menu and select Save.",
+          "step_10": "The Shape file ZIP will download to your machine.",
+          "step_11": "Go to your computers download folder, to view your file, at this point you can rename it.",
+          "step_12": "Return to PAFs, then upload and continue."
+        }
+      },
+      "unable_to_create_shape_file": {
+        "title": "Unable to create a shapefile?",
+        "help_text": "If you are unable to upload or create a shapefile, contact your local partnership and strategic overview officer and they will be able to help you."
+      }
+    }
   }
 }
