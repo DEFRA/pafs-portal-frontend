@@ -1,4 +1,5 @@
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
+import { UPLOAD_STATUS } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
@@ -86,14 +87,17 @@ function storeUploadSession(request, uploadId, uploadUrl) {
  * Check if status indicates completion
  */
 function isUploadComplete(uploadStatus) {
-  return uploadStatus === 'ready' || uploadStatus === 'complete'
+  return (
+    uploadStatus === UPLOAD_STATUS.READY ||
+    uploadStatus === UPLOAD_STATUS.COMPLETE
+  )
 }
 
 /**
  * Check if status indicates failure
  */
 function isUploadFailed(uploadStatus) {
-  return uploadStatus === 'failed'
+  return uploadStatus === UPLOAD_STATUS.FAILED
 }
 
 /**
@@ -284,6 +288,11 @@ class BenefitAreaController {
       referenceNumber
     )
 
+    const overviewUrl = ROUTES.PROJECT.OVERVIEW.replace(
+      '{referenceNumber}',
+      referenceNumber
+    )
+
     if (!uploadId) {
       return h.redirect(benefitAreaUrl)
     }
@@ -300,12 +309,14 @@ class BenefitAreaController {
       if (pollResult.success) {
         storeUploadSuccess(request, pollResult.data.filename)
         request.logger.info({ uploadId }, 'Upload successful')
+        // Redirect to overview page on success
+        return h.redirect(overviewUrl)
       } else {
         storeUploadErrors(request, pollResult.errors)
         request.logger.warn({ uploadId }, 'Upload failed')
+        // Redirect back to benefit area page on error
+        return h.redirect(benefitAreaUrl)
       }
-
-      return h.redirect(benefitAreaUrl)
     } catch (error) {
       request.logger.error({ error, uploadId }, 'Failed to check upload status')
       storeUploadErrors(request, [

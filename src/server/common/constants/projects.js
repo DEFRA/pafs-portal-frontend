@@ -46,7 +46,15 @@ export const PROJECT_PAYLOAD_FIELDS = {
   READY_FOR_SERVICE_YEAR: 'readyForServiceYear',
   COULD_START_EARLY: 'couldStartEarly',
   EARLIEST_WITH_GIA_MONTH: 'earliestWithGiaMonth',
-  EARLIEST_WITH_GIA_YEAR: 'earliestWithGiaYear'
+  EARLIEST_WITH_GIA_YEAR: 'earliestWithGiaYear',
+  BENEFIT_AREA_FILE_NAME: 'benefitAreaFileName',
+  BENEFIT_AREA_FILE_SIZE: 'benefitAreaFileSize',
+  BENEFIT_AREA_CONTENT_TYPE: 'benefitAreaContentType',
+  BENEFIT_AREA_FILE_S3_BUCKET: 'benefitAreaFileS3Bucket',
+  BENEFIT_AREA_FILE_S3_KEY: 'benefitAreaFileS3Key',
+  BENEFIT_AREA_FILE_UPDATED_AT: 'benefitAreaFileUpdatedAt',
+  BENEFIT_AREA_FILE_DOWNLOAD_URL: 'benefitAreaFileDownloadUrl',
+  BENEFIT_AREA_FILE_DOWNLOAD_EXPIRY: 'benefitAreaFileDownloadExpiry'
 }
 
 export const PROJECT_PAYLOAD_LEVELS = {
@@ -122,7 +130,20 @@ export const PROJECT_VALIDATION_MESSAGES = {
   DATE_AFTER_FINANCIAL_END: 'DATE_AFTER_FINANCIAL_END',
   DATE_BEFORE_PREVIOUS_STAGE: 'DATE_BEFORE_PREVIOUS_STAGE',
   COULD_START_EARLY_REQUIRED: 'COULD_START_EARLY_REQUIRED',
-  COULD_START_EARLY_INVALID: 'COULD_START_EARLY_INVALID'
+  COULD_START_EARLY_INVALID: 'COULD_START_EARLY_INVALID',
+  FAILED_TO_UPLOAD_FILE: 'FAILED_TO_UPLOAD_FILE'
+}
+
+/**
+ * Upload status values
+ * Represents the current state of the file upload process
+ */
+export const UPLOAD_STATUS = {
+  PENDING: 'pending', // Upload initiated but not started
+  PROCESSING: 'processing', // Files being downloaded/processed by CDP
+  INITIATED: 'initiated', // Upload session created
+  READY: 'ready', // Upload complete and file available
+  FAILED: 'failed' // Upload failed
 }
 
 export const PROJECT_ERROR_CODES = {

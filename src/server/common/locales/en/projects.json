@@ -266,6 +266,9 @@
         "title": "Unable to create a shapefile?",
         "help_text": "If you are unable to upload or create a shapefile, contact your local partnership and strategic overview officer and they will be able to help you."
       }
+    },
+    "validation": {
+      "FAILED_TO_UPLOAD_FILE": "Failed to upload a shapefile"
     }
   }
 }
