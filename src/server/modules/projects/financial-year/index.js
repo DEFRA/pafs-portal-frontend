@@ -1,57 +1,12 @@
 import { ROUTES } from '../../../common/constants/routes.js'
-import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
 import {
   requireRmaUser,
   requireFinancialStartYearSet,
   requirePrimaryInterventionTypeSet,
-  requireEditPermission,
   noEditSessionRequired
 } from '../helpers/permissions.js'
-import {
-  fetchProjectForEdit,
-  initializeEditSessionPreHandler
-} from '../helpers/project-edit-session.js'
+import { createRoutePair } from '../helpers/route-helpers.js'
 import { financialYearController } from './controller.js'
-
-/**
- * Create GET/POST route pair for creation and edit modes
- */
-const createRoutePair = (
-  createPath,
-  editPath,
-  createPreHandlers,
-  controller
-) => {
-  const editPreHandlers = [
-    { method: requireAuth },
-    { method: fetchProjectForEdit },
-    { method: initializeEditSessionPreHandler },
-    { method: requireEditPermission }
-  ]
-
-  return [
-    {
-      method: 'GET',
-      path: createPath,
-      options: { pre: createPreHandlers, handler: controller.getHandler }
-    },
-    {
-      method: 'POST',
-      path: createPath,
-      options: { pre: createPreHandlers, handler: controller.postHandler }
-    },
-    {
-      method: 'GET',
-      path: editPath,
-      options: { pre: editPreHandlers, handler: controller.getHandler }
-    },
-    {
-      method: 'POST',
-      path: editPath,
-      options: { pre: editPreHandlers, handler: controller.postHandler }
-    }
-  ]
-}
 
 export const projectFinancialYear = {
   plugin: {
