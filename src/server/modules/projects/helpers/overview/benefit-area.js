@@ -14,10 +14,13 @@ export function _shouldGenerateDownloadUrl(projectData) {
   const downloadExpiry =
     projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_DOWNLOAD_EXPIRY]
 
-  const isUrlMissing = !downloadUrl
-  const isExpired = downloadExpiry && new Date(downloadExpiry) < new Date()
+  // Regenerate if URL or expiry date is missing
+  if (!downloadUrl || !downloadExpiry) {
+    return true
+  }
 
-  return isUrlMissing || isExpired
+  // Regenerate if expired
+  return new Date(downloadExpiry) < new Date()
 }
 
 /**
