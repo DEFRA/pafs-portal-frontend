@@ -1,0 +1,11 @@
+{% macro getNameError(fieldErrors, ERROR_CODES) %}
+  {%- if fieldErrors and fieldErrors.name -%}
+    {%- if fieldErrors.name == ERROR_CODES.NAME_REQUIRED -%}
+      required
+    {%- elif fieldErrors.name == ERROR_CODES.NAME_INVALID_FORMAT -%}
+      invalid_format
+    {%- elif fieldErrors.name == ERROR_CODES.NAME_DUPLICATE -%}
+      already_exists
+    {%- endif -%}
+  {%- endif -%}
+{% endmacro %}

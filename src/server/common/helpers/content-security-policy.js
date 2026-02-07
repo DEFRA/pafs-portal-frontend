@@ -1,4 +1,5 @@
 import Blankie from 'blankie'
+import { config } from '../../../config/config.js'
 
 /**
  * Manage content security policies.
@@ -22,7 +23,10 @@ const contentSecurityPolicy = {
     frameSrc: ['self', 'data:'],
     objectSrc: ['none'],
     frameAncestors: ['none'],
-    formAction: ['self'],
+    // Allow form submissions to CDP Uploader in local development
+    formAction: config.get('isDevelopment')
+      ? ['self', 'http://localhost:7337']
+      : ['self'],
     manifestSrc: ['self'],
     generateNonces: false
   }

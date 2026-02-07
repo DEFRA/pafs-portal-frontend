@@ -1,0 +1,442 @@
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{# Build error summary list #}
+{% set errorList = [] %}
+
+{# Name errors #}
+{% if fieldErrors.name == ERROR_CODES.NAME_REQUIRED or errorCode == ERROR_CODES.NAME_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_name.errors.required'),
+      href: "#name"
+    }
+  ]) %}
+{% elif fieldErrors.name == ERROR_CODES.NAME_INVALID_FORMAT or errorCode == ERROR_CODES.NAME_INVALID_FORMAT %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_name.errors.invalid_format'),
+      href: "#name"
+    }
+  ]) %}
+{% elif fieldErrors.name == ERROR_CODES.NAME_DUPLICATE or errorCode == ERROR_CODES.NAME_DUPLICATE %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_name.errors.already_exists'),
+      href: "#name"
+    }
+  ]) %}
+{% endif %}
+
+{# Area Id errors #}
+{% if fieldErrors.areaId == ERROR_CODES.AREA_ID_REQUIRED or errorCode == ERROR_CODES.AREA_ID_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.area_selection.errors.required'),
+      href: "#areaId"
+    }
+  ]) %}
+{% elif fieldErrors.areaId == ERROR_CODES.AREA_ID_INVALID or errorCode == ERROR_CODES.AREA_ID_INVALID %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.area_selection.errors.invalid'),
+      href: "#areaId"
+    }
+  ]) %}
+{% endif %}
+
+{# Project Type errors #}
+{% if fieldErrors.projectType == ERROR_CODES.PROJECT_TYPE_REQUIRED or errorCode == ERROR_CODES.PROJECT_TYPE_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_type.errors.required'),
+      href: "#projectType"
+    }
+  ]) %}
+{% elif fieldErrors.projectType == ERROR_CODES.PROJECT_TYPE_INVALID or errorCode == ERROR_CODES.PROJECT_TYPE_INVALID %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_type.errors.invalid'),
+      href: "#projectType"
+    }
+  ]) %}
+{% endif %}
+
+{# Project Intervention Types errors #}
+{% if fieldErrors.projectInterventionTypes == ERROR_CODES.PROJECT_INTERVENTION_TYPE_REQUIRED or errorCode == ERROR_CODES.PROJECT_INTERVENTION_TYPE_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.intervention_type.errors.required'),
+      href: "#projectInterventionTypes"
+    }
+  ]) %}
+{% elif fieldErrors.projectInterventionTypes == ERROR_CODES.PROJECT_INTERVENTION_TYPE_INVALID or errorCode == ERROR_CODES.PROJECT_INTERVENTION_TYPE_INVALID %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.intervention_type.errors.required'),
+      href: "#projectInterventionTypes"
+    }
+  ]) %}
+{% endif %}
+
+{# Project Main Intervention Type errors #}
+{% if fieldErrors.mainInterventionType == ERROR_CODES.PROJECT_MAIN_INTERVENTION_TYPE_REQUIRED or errorCode == ERROR_CODES.PROJECT_MAIN_INTERVENTION_TYPE_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.primary_intervention_type.errors.required'),
+      href: "#mainInterventionType"
+    }
+  ]) %}
+{% elif fieldErrors.mainInterventionType == ERROR_CODES.PROJECT_MAIN_INTERVENTION_TYPE_INVALID or errorCode == ERROR_CODES.PROJECT_MAIN_INTERVENTION_TYPE_INVALID %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.primary_intervention_type.errors.required'),
+      href: "#mainInterventionType"
+    }
+  ]) %}
+{% endif %}
+
+{# Project Financial Year errors #}
+{% if fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_REQUIRED or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_REQUIRED or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_REQUIRED or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.financial_year_start_manual.errors.required'),
+      href: "#financialStartYear"
+    }
+  ]) %}
+{% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_INVALID or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_INVALID %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.financial_year_start_manual.errors.invalid_format'),
+      href: "#financialStartYear"
+    }
+  ]) %}
+{% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_IN_FUTURE or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_IN_FUTURE or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_IN_FUTURE or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_IN_FUTURE %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.financial_year_start_manual.errors.should_be_in_future'),
+      href: "#financialStartYear"
+    }
+  ]) %}
+{% elif step and projectSteps and fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_LESS_THAN_END_YEAR and(step == projectSteps.FINANCIAL_START_YEAR or step == projectSteps.FINANCIAL_START_YEAR_MANUAL) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.financial_year_start_manual.errors.invalid_range'),
+      href: "#financialStartYear"
+    }
+  ]) %}
+{% elif step and projectSteps and fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_GREATER_THAN_START_YEAR and(step == projectSteps.FINANCIAL_END_YEAR or step == projectSteps.FINANCIAL_END_YEAR_MANUAL) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.financial_year_end_manual.errors.invalid_range'),
+      href: "#financialEndYear"
+    }
+  ]) %}
+{% elif not step and(fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_LESS_THAN_END_YEAR or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_GREATER_THAN_START_YEAR or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_LESS_THAN_END_YEAR or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_GREATER_THAN_START_YEAR) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.financial_year_start_manual.errors.invalid_range'),
+      href: "#financialStartYear"
+    }
+  ]) %}
+{% endif %}
+
+{# Important Dates - Start Outline Business Case errors #}
+{% if fieldErrors.startOutlineBusinessCaseMonth and(fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.MONTH_REQUIRED or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.YEAR_REQUIRED) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.required', {placeholder: t('projects.important_dates.start_outline_business_case.placeholder')}),
+      href: "#startOutlineBusinessCaseMonth"
+    }
+  ]) %}
+{% elif fieldErrors.startOutlineBusinessCaseMonth and(fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.MONTH_INVALID or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.YEAR_INVALID) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.invalid', {placeholder: t('projects.important_dates.start_outline_business_case.placeholder')}),
+      href: "#startOutlineBusinessCaseMonth"
+    }
+  ]) %}
+{% elif fieldErrors.startOutlineBusinessCaseMonth and(fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.DATE_IN_PAST) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.in_past', {placeholder: t('projects.important_dates.start_outline_business_case.placeholder')}),
+      href: "#startOutlineBusinessCaseMonth"
+    }
+  ]) %}
+{% elif fieldErrors.startOutlineBusinessCaseMonth and(fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.DATE_AFTER_FINANCIAL_END) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.financial_year_range', {
+        placeholder: t('projects.important_dates.start_outline_business_case.placeholder'),
+        financialYearStart: financialYearStart or '',
+        financialYearEnd: financialYearEnd or ''
+      }),
+      href: "#startOutlineBusinessCaseMonth"
+    }
+  ]) %}
+{% endif %}
+
+{# Important Dates - Complete Outline Business Case errors #}
+{% if fieldErrors.completeOutlineBusinessCaseMonth and(fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.MONTH_REQUIRED or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.YEAR_REQUIRED) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.required', {placeholder: t('projects.important_dates.complete_outline_business_case.placeholder')}),
+      href: "#completeOutlineBusinessCaseMonth"
+    }
+  ]) %}
+{% elif fieldErrors.completeOutlineBusinessCaseMonth and(fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.MONTH_INVALID or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.YEAR_INVALID) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.invalid', {placeholder: t('projects.important_dates.complete_outline_business_case.placeholder')}),
+      href: "#completeOutlineBusinessCaseMonth"
+    }
+  ]) %}
+{% elif fieldErrors.completeOutlineBusinessCaseMonth and(fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.DATE_IN_PAST) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.in_past', {placeholder: t('projects.important_dates.complete_outline_business_case.placeholder')}),
+      href: "#completeOutlineBusinessCaseMonth"
+    }
+  ]) %}
+{% elif fieldErrors.completeOutlineBusinessCaseMonth and(fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or errorCode == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.before_previous_stage', {
+        placeholder: t('projects.important_dates.complete_outline_business_case.placeholder'),
+        previousStagePlaceholder: t('projects.important_dates.complete_outline_business_case.previousStagePlaceholder'),
+        previousStageDate: previousStageDate or ''
+      }),
+      href: "#completeOutlineBusinessCaseMonth"
+    }
+  ]) %}
+{% elif fieldErrors.completeOutlineBusinessCaseMonth and(fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.DATE_AFTER_FINANCIAL_END or errorCode == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or errorCode == ERROR_CODES.DATE_AFTER_FINANCIAL_END) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.financial_year_range', {
+        placeholder: t('projects.important_dates.complete_outline_business_case.placeholder'),
+        financialYearStart: financialYearStart or '',
+        financialYearEnd: financialYearEnd or ''
+      }),
+      href: "#completeOutlineBusinessCaseMonth"
+    }
+  ]) %}
+{% endif %}
+
+{# Important Dates - Award Main Contract errors #}
+{% if fieldErrors.awardContractMonth and(fieldErrors.awardContractMonth == ERROR_CODES.MONTH_REQUIRED or fieldErrors.awardContractYear == ERROR_CODES.YEAR_REQUIRED) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.required', {placeholder: t('projects.important_dates.award_main_contract.placeholder')}),
+      href: "#awardContractMonth"
+    }
+  ]) %}
+{% elif fieldErrors.awardContractMonth and(fieldErrors.awardContractMonth == ERROR_CODES.MONTH_INVALID or fieldErrors.awardContractYear == ERROR_CODES.YEAR_INVALID) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.invalid', {placeholder: t('projects.important_dates.award_main_contract.placeholder')}),
+      href: "#awardContractMonth"
+    }
+  ]) %}
+{% elif fieldErrors.awardContractMonth and(fieldErrors.awardContractMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.awardContractYear == ERROR_CODES.DATE_IN_PAST) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.in_past', {placeholder: t('projects.important_dates.award_main_contract.placeholder')}),
+      href: "#awardContractMonth"
+    }
+  ]) %}
+{% elif fieldErrors.awardContractMonth and(fieldErrors.awardContractMonth == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or fieldErrors.awardContractYear == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or errorCode == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.before_previous_stage', {
+        placeholder: t('projects.important_dates.award_main_contract.placeholder'),
+        previousStagePlaceholder: t('projects.important_dates.award_main_contract.previousStagePlaceholder'),
+        previousStageDate: previousStageDate or ''
+      }),
+      href: "#awardContractMonth"
+    }
+  ]) %}
+{% elif fieldErrors.awardContractMonth and(fieldErrors.awardContractMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.awardContractYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.awardContractMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors.awardContractYear == ERROR_CODES.DATE_AFTER_FINANCIAL_END or errorCode == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or errorCode == ERROR_CODES.DATE_AFTER_FINANCIAL_END) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.financial_year_range', {
+        placeholder: t('projects.important_dates.award_main_contract.placeholder'),
+        financialYearStart: financialYearStart or '',
+        financialYearEnd: financialYearEnd or ''
+      }),
+      href: "#awardContractMonth"
+    }
+  ]) %}
+{% endif %}
+
+{# Important Dates - Start Work errors #}
+{% if fieldErrors.startConstructionMonth and(fieldErrors.startConstructionMonth == ERROR_CODES.MONTH_REQUIRED or fieldErrors.startConstructionYear == ERROR_CODES.YEAR_REQUIRED) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.required', {placeholder: t('projects.important_dates.expect_to_start_the_work.placeholder')}),
+      href: "#startConstructionMonth"
+    }
+  ]) %}
+{% elif fieldErrors.startConstructionMonth and(fieldErrors.startConstructionMonth == ERROR_CODES.MONTH_INVALID or fieldErrors.startConstructionYear == ERROR_CODES.YEAR_INVALID) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.invalid', {placeholder: t('projects.important_dates.expect_to_start_the_work.placeholder')}),
+      href: "#startConstructionMonth"
+    }
+  ]) %}
+{% elif fieldErrors.startConstructionMonth and(fieldErrors.startConstructionMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.startConstructionYear == ERROR_CODES.DATE_IN_PAST) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.in_past', {placeholder: t('projects.important_dates.expect_to_start_the_work.placeholder')}),
+      href: "#startConstructionMonth"
+    }
+  ]) %}
+{% elif fieldErrors.startConstructionMonth and(fieldErrors.startConstructionMonth == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or fieldErrors.startConstructionYear == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or errorCode == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.before_previous_stage', {
+        placeholder: t('projects.important_dates.expect_to_start_the_work.placeholder'),
+        previousStagePlaceholder: t('projects.important_dates.expect_to_start_the_work.previousStagePlaceholder'),
+        previousStageDate: previousStageDate or ''
+      }),
+      href: "#startConstructionMonth"
+    }
+  ]) %}
+{% elif fieldErrors.startConstructionMonth and(fieldErrors.startConstructionMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.startConstructionYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.startConstructionMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors.startConstructionYear == ERROR_CODES.DATE_AFTER_FINANCIAL_END or errorCode == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or errorCode == ERROR_CODES.DATE_AFTER_FINANCIAL_END) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.financial_year_range', {
+        placeholder: t('projects.important_dates.expect_to_start_the_work.placeholder'),
+        financialYearStart: financialYearStart or '',
+        financialYearEnd: financialYearEnd or ''
+      }),
+      href: "#startConstructionMonth"
+    }
+  ]) %}
+{% endif %}
+
+{# Important Dates - Start Benefits errors #}
+{% if fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.MONTH_REQUIRED or fieldErrors.readyForServiceYear == ERROR_CODES.YEAR_REQUIRED) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.required', {placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder')}),
+      href: "#readyForServiceMonth"
+    }
+  ]) %}
+{% elif fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.MONTH_INVALID or fieldErrors.readyForServiceYear == ERROR_CODES.YEAR_INVALID) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.invalid', {placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder')}),
+      href: "#readyForServiceMonth"
+    }
+  ]) %}
+{% elif fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.readyForServiceYear == ERROR_CODES.DATE_IN_PAST) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.in_past', {placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder')}),
+      href: "#readyForServiceMonth"
+    }
+  ]) %}
+{% elif fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or fieldErrors.readyForServiceYear == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or errorCode == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.before_previous_stage', {
+        placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder'),
+        previousStagePlaceholder: t('projects.important_dates.start_achieving_its_benefits.previousStagePlaceholder'),
+        previousStageDate: previousStageDate or ''
+      }),
+      href: "#readyForServiceMonth"
+    }
+  ]) %}
+{% elif fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.readyForServiceYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.readyForServiceMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors.readyForServiceYear == ERROR_CODES.DATE_AFTER_FINANCIAL_END or errorCode == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or errorCode == ERROR_CODES.DATE_AFTER_FINANCIAL_END) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.financial_year_range', {
+        placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder'),
+        financialYearStart: financialYearStart or '',
+        financialYearEnd: financialYearEnd or ''
+      }),
+      href: "#readyForServiceMonth"
+    }
+  ]) %}
+{% endif %}
+
+{# Important Dates - Could Start Earlier errors #}
+{% if fieldErrors.couldStartEarly and(fieldErrors.couldStartEarly == ERROR_CODES.COULD_START_EARLY_REQUIRED or errorCode == ERROR_CODES.COULD_START_EARLY_REQUIRED) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.could_start_earlier_required'),
+      href: "#couldStartEarly"
+    }
+  ]) %}
+{% endif %}
+
+{# Important Dates - Earliest Start Date errors #}
+{% if fieldErrors.earliestWithGiaMonth and(fieldErrors.earliestWithGiaMonth == ERROR_CODES.MONTH_REQUIRED or fieldErrors.earliestWithGiaYear == ERROR_CODES.YEAR_REQUIRED) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.earliest_date_required'),
+      href: "#earliestWithGiaMonth"
+    }
+  ]) %}
+{% elif fieldErrors.earliestWithGiaMonth and(fieldErrors.earliestWithGiaMonth == ERROR_CODES.MONTH_INVALID or fieldErrors.earliestWithGiaYear == ERROR_CODES.YEAR_INVALID) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.earliest_date_invalid'),
+      href: "#earliestWithGiaMonth"
+    }
+  ]) %}
+{% elif fieldErrors.earliestWithGiaMonth and(fieldErrors.earliestWithGiaMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.earliestWithGiaYear == ERROR_CODES.DATE_IN_PAST) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.earliest_date_in_past'),
+      href: "#earliestWithGiaMonth"
+    }
+  ]) %}
+{% elif fieldErrors.earliestWithGiaMonth and(fieldErrors.earliestWithGiaMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_START or fieldErrors.earliestWithGiaYear == ERROR_CODES.DATE_AFTER_FINANCIAL_START) %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.important_dates.validation.earliest_date_after_financial_start', {financialYearStart: financialYearStart or ''}),
+      href: "#earliestWithGiaMonth"
+    }
+  ]) %}
+{% endif %}
+
+{# General errors #}
+{% if errorList.length == 0 and errorCode == ERROR_CODES.NETWORK_ERROR %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('common.service_error')
+    }
+  ]) %}
+{% elif errorList.length == 0 and errorCode == ERROR_CODES.NOT_ALLOWED_TO_CREATE %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.common.errors.not_allowed_to_create')
+    }
+  ]) %}
+{% elif errorList.length == 0 and errorCode == ERROR_CODES.NOT_ALLOWED_TO_UPDATE %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.common.errors.not_allowed_to_update')
+    }
+  ]) %}
+{% elif errorList.length == 0 and errorCode == ERROR_CODES.AREA_IS_NOT_ALLOWED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.common.errors.area_is_not_allowed')
+    }
+  ]) %}
+{% endif %}
+{% if errorList.length == 0 and errorCode %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('common.service_error')
+    }
+  ]) %}
+{% endif %}
+
+{% if errorList.length > 0 %}
+  {{ govukErrorSummary({
+    titleText: t('common.error_summary_title'),
+    errorList: errorList
+  }) }}
+{% endif %}

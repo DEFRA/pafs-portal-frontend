@@ -1,0 +1,71 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "views/proposal-details-card.njk" import proposalDetailsSummaryCard %}
+{% from "views/project-benefit-area-card.njk" import projectBenefitAreaCard %}
+{% from "views/important-dates-card.njk" import importantDatesSummaryCard %}
+{% from "views/funding-sources-and-spending-card.njk" import fundingSourcesAndSpendingSummaryCard %}
+{% from "views/risk-and-properties-benefitting-card.njk" import riskAndPropertiesBenefittingSummaryCard %}
+{% from "views/approach-card.njk" import approachSummaryCard %}
+{% from "views/environmental-benefits-card.njk" import environmentalBenefitsSummaryCard %}
+{% from "views/urgency-card.njk" import urgencySummaryCard %}
+
+{% block body %}
+
+  <h1 class="govuk-heading-xl">{{ t('projects.overview.heading') }}</h1>
+
+  <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-4">
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key govuk-body-m">{{ t('projects.overview.common.npn') }}</dt>
+      <dd class="govuk-summary-list__value govuk-body-m">{{ projectData[PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER] or t('projects.overview.common.not_submitted') }}</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key govuk-body-m">{{ t('projects.overview.common.last_updated') }}</dt>
+      <dd class="govuk-summary-list__value govuk-body-m">
+        {% if projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] %}
+          {{ projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] | formatDate('d MMM yyyy') }}&nbsp;
+              <span class="govuk-hint govuk-!-font-size-16">{{ projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] | formatDate('HH:mm') }}</span>
+        {% else %}
+          {{ t('projects.overview.common.not_submitted') }}
+        {% endif %}
+      </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key govuk-body-m">{{ t('projects.overview.common.status') }}</dt>
+      <dd class="govuk-summary-list__value govuk-body-m">
+        {{govukTag({
+          text: projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] | upper,
+          classes: projectStateTag
+        })}} &nbsp; | &nbsp;<a class="govuk-link" href="#">{{ t('projects.overview.common.archive') }}</a> &nbsp; | &nbsp;<a class="govuk-link" href="#">{{ t('projects.overview.common.delete') }}</a>
+      </dd>
+    </div>
+  </dl>
+
+  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+  {{ proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t) }}
+
+  {{ projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, formatFileSize, t) }}
+
+  {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate) }}
+
+  {{ fundingSourcesAndSpendingSummaryCard(projectData, t) }}
+
+  {{ riskAndPropertiesBenefittingSummaryCard(projectData, t) }}
+
+  {{ approachSummaryCard(projectData, t) }}
+
+  {{ environmentalBenefitsSummaryCard(projectData, t) }}
+
+  {{ urgencySummaryCard(projectData, t) }}
+
+  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
+
+  <p class="govuk-body">{{ t('projects.overview.submission_info') }}</p>
+
+  {{ govukButton({
+    text: t('common.buttons.submit_proposal')
+  }) }}
+
+{% endblock %}

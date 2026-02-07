@@ -1,0 +1,12 @@
+
+.overview-project-benefit-area-card {
+  .project-benefit-area-card__content-body {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+
+    .file-block {
+      border: 2px solid #b1b4b6;
+    }
+  }
+}

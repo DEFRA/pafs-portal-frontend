@@ -1,3 +1,5 @@
+import { PROJECT_STEPS } from './projects.js'
+
 export const ROUTES = {
   // Auth routes
   LOGIN: '/login',
@@ -51,8 +53,7 @@ export const ROUTES = {
       APPROVE: '/admin/users/{encodedId}/approve',
       DELETE: '/admin/users/{encodedId}/delete',
       RESEND_INVITATION: '/admin/users/{encodedId}/resend-invitation',
-      REACTIVATE: '/admin/users/{encodedId}/reactivate',
-      EDIT_DETAILS: '/admin/users/{encodedId}/edit-details'
+      REACTIVATE: '/admin/users/{encodedId}/reactivate'
     },
     ACCOUNTS: {
       START: '/admin/user-account',
@@ -66,14 +67,12 @@ export const ROUTES = {
       CHECK_ANSWERS: '/admin/user-account/check-answers',
       CONFIRMATION: '/admin/user-account/confirmation',
       EDIT: {
-        IS_ADMIN: '/admin/user-account/is-admin/{encodedId}/edit',
-        DETAILS: '/admin/user-account/details/{encodedId}/edit',
-        PARENT_AREAS:
-          '/admin/user-account/parent-areas/{type}/{encodedId}/edit',
-        MAIN_AREA: '/admin/user-account/main-area/{encodedId}/edit',
-        ADDITIONAL_AREAS:
-          '/admin/user-account/additional-areas/{encodedId}/edit',
-        CHECK_ANSWERS: '/admin/user-account/check-answers/{encodedId}/edit'
+        IS_ADMIN: '/admin/user-account/is-admin/{encodedId}',
+        DETAILS: '/admin/user-account/details/{encodedId}',
+        PARENT_AREAS: '/admin/user-account/parent-areas/{type}/{encodedId}',
+        MAIN_AREA: '/admin/user-account/main-area/{encodedId}',
+        ADDITIONAL_AREAS: '/admin/user-account/additional-areas/{encodedId}',
+        CHECK_ANSWERS: '/admin/user-account/check-answers/{encodedId}'
       }
     },
     PROJECTS: '/admin/projects',
@@ -81,6 +80,40 @@ export const ROUTES = {
     ORGANISATIONS: '/admin/organisations',
     DOWNLOAD_PROJECTS: '/admin/download-projects',
     DOWNLOAD_RMA: '/admin/download-rma'
+  },
+
+  PROJECT: {
+    OVERVIEW: '/project/{referenceNumber}',
+    START: `/project/${PROJECT_STEPS.START}`,
+    NAME: `/project/${PROJECT_STEPS.NAME}`,
+    AREA: `/project/${PROJECT_STEPS.AREA}`,
+    TYPE: `/project/${PROJECT_STEPS.TYPE}`,
+    INTERVENTION_TYPE: `/project/${PROJECT_STEPS.INTERVENTION_TYPE}`,
+    PRIMARY_INTERVENTION_TYPE: `/project/${PROJECT_STEPS.PRIMARY_INTERVENTION_TYPE}`,
+    FINANCIAL_START_YEAR: `/project/${PROJECT_STEPS.FINANCIAL_START_YEAR}`,
+    FINANCIAL_START_YEAR_MANUAL: `/project/${PROJECT_STEPS.FINANCIAL_START_YEAR_MANUAL}`,
+    FINANCIAL_END_YEAR: `/project/${PROJECT_STEPS.FINANCIAL_END_YEAR}`,
+    FINANCIAL_END_YEAR_MANUAL: `/project/${PROJECT_STEPS.FINANCIAL_END_YEAR_MANUAL}`,
+    EDIT: {
+      NAME: `/project/{referenceNumber}/${PROJECT_STEPS.NAME}`,
+      TYPE: `/project/{referenceNumber}/${PROJECT_STEPS.TYPE}`,
+      INTERVENTION_TYPE: `/project/{referenceNumber}/${PROJECT_STEPS.INTERVENTION_TYPE}`,
+      PRIMARY_INTERVENTION_TYPE: `/project/{referenceNumber}/${PROJECT_STEPS.PRIMARY_INTERVENTION_TYPE}`,
+      FINANCIAL_START_YEAR: `/project/{referenceNumber}/${PROJECT_STEPS.FINANCIAL_START_YEAR}`,
+      FINANCIAL_START_YEAR_MANUAL: `/project/{referenceNumber}/${PROJECT_STEPS.FINANCIAL_START_YEAR_MANUAL}`,
+      FINANCIAL_END_YEAR: `/project/{referenceNumber}/${PROJECT_STEPS.FINANCIAL_END_YEAR}`,
+      FINANCIAL_END_YEAR_MANUAL: `/project/{referenceNumber}/${PROJECT_STEPS.FINANCIAL_END_YEAR_MANUAL}`,
+      START_OUTLINE_BUSINESS_CASE: `/project/{referenceNumber}/${PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE}`,
+      COMPLETE_OUTLINE_BUSINESS_CASE: `/project/{referenceNumber}/${PROJECT_STEPS.COMPLETE_OUTLINE_BUSINESS_CASE}`,
+      AWARD_MAIN_CONTRACT: `/project/{referenceNumber}/${PROJECT_STEPS.AWARD_MAIN_CONTRACT}`,
+      START_WORK: `/project/{referenceNumber}/${PROJECT_STEPS.START_WORK}`,
+      START_BENEFITS: `/project/{referenceNumber}/${PROJECT_STEPS.START_BENEFITS}`,
+      COULD_START_EARLY: `/project/{referenceNumber}/${PROJECT_STEPS.COULD_START_EARLY}`,
+      EARLIEST_START_DATE: `/project/{referenceNumber}/${PROJECT_STEPS.EARLIEST_START_DATE}`,
+      BENEFIT_AREA: `/project/{referenceNumber}/${PROJECT_STEPS.BENEFIT_AREA}`,
+      BENEFIT_AREA_UPLOAD_STATUS: `/project/{referenceNumber}/${PROJECT_STEPS.BENEFIT_AREA}/upload-status`,
+      BENEFIT_AREA_DELETE: `/project/{referenceNumber}/${PROJECT_STEPS.BENEFIT_AREA}/delete`
+    }
   },
 
   // Project Proposal routes
