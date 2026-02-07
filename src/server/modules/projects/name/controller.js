@@ -103,7 +103,7 @@ class NameController {
       return null
     }
     const viewData = this._getViewData(request)
-    return await saveProjectWithErrorHandling(
+    return saveProjectWithErrorHandling(
       request,
       h,
       PROJECT_PAYLOAD_LEVELS.PROJECT_NAME,

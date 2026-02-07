@@ -3,7 +3,8 @@ import {
   PROJECT_SESSION_KEY,
   PROJECT_TYPES,
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_VIEW_ERROR_CODES
+  PROJECT_VIEW_ERROR_CODES,
+  REFERENCE_NUMBER_PARAM
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
@@ -22,7 +23,7 @@ export function getBackLink(request, options = {}) {
     return {
       text: overviewText,
       href: ROUTES.PROJECT.OVERVIEW.replace(
-        '{referenceNumber}',
+        REFERENCE_NUMBER_PARAM,
         referenceNumber
       )
     }
@@ -34,7 +35,7 @@ export function getBackLink(request, options = {}) {
     text: defaultLinkText,
     href:
       isEditMode && targetEditURL
-        ? targetEditURL.replace('{referenceNumber}', referenceNumber)
+        ? targetEditURL.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
         : targetURL
   }
 }
@@ -160,7 +161,7 @@ export function loggedInUserAreaOptions(request) {
 export function navigateToProjectOverview(referenceNumber, h) {
   return h
     .redirect(
-      ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', referenceNumber)
+      ROUTES.PROJECT.OVERVIEW.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
     )
     .takeover()
 }
@@ -172,10 +173,7 @@ export function requiredInterventionTypesForProjectType(projectType) {
     PROJECT_TYPES.STU,
     PROJECT_TYPES.ELO
   ]
-  if (skipInterventionTypes.includes(projectType)) {
-    return false
-  }
-  return true
+  return !skipInterventionTypes.includes(projectType)
 }
 
 export function getProjectStep(request) {
@@ -215,7 +213,9 @@ export function getAfterMarchYear(startYear, count = SIZE.LENGTH_6) {
  * @returns {boolean} True if the year is beyond the range
  */
 export function isYearBeyondRange(year, minYear) {
-  if (!year) return false
+  if (!year) {
+    return false
+  }
   const maxYear = getAfterMarchYear(minYear) - SIZE.LENGTH_1
   return year > maxYear
 }
@@ -235,7 +235,7 @@ export function getMonthName(monthNumber) {
     'November',
     'December'
   ]
-  const monthIndex = parseInt(monthNumber, 10) - 1
+  const monthIndex = Number.parseInt(monthNumber, 10) - 1
   return months[monthIndex] || monthNumber
 }
 
@@ -260,5 +260,5 @@ export function formatFileSize(bytes) {
   const sizes = ['B', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
+  return `${Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
 }

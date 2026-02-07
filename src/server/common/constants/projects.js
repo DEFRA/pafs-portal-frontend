@@ -19,6 +19,8 @@ export const PROJECT_STEPS = {
   BENEFIT_AREA: 'benefit-area'
 }
 
+export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'
+
 export const PROJECT_SESSION_KEY = 'projectData'
 
 export const PROJECT_PAYLOAD_FIELDS = {

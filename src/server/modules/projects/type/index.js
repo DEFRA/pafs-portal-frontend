@@ -14,162 +14,74 @@ import {
 } from '../helpers/project-edit-session.js'
 import { typeController } from './controller.js'
 
+/**
+ * Create GET/POST route pair for creation and edit modes
+ */
+const createRoutePair = (
+  createPath,
+  editPath,
+  createPreHandlers,
+  controller
+) => {
+  const editPreHandlers = [
+    { method: requireAuth },
+    { method: fetchProjectForEdit },
+    { method: initializeEditSessionPreHandler },
+    { method: requireEditPermission }
+  ]
+
+  return [
+    {
+      method: 'GET',
+      path: createPath,
+      options: { pre: createPreHandlers, handler: controller.getHandler }
+    },
+    {
+      method: 'POST',
+      path: createPath,
+      options: { pre: createPreHandlers, handler: controller.postHandler }
+    },
+    {
+      method: 'GET',
+      path: editPath,
+      options: { pre: editPreHandlers, handler: controller.getHandler }
+    },
+    {
+      method: 'POST',
+      path: editPath,
+      options: { pre: editPreHandlers, handler: controller.postHandler }
+    }
+  ]
+}
+
 export const projectType = {
   plugin: {
     name: 'Project - Project Type',
     register(server) {
-      server.route([
-        {
-          method: 'GET',
-          path: ROUTES.PROJECT.TYPE,
-          options: {
-            pre: [
-              { method: requireRmaUser },
-              { method: noEditSessionRequired },
-              requireProjectAreaSet
-            ],
-            handler: typeController.getHandler
-          }
-        },
-        {
-          method: 'POST',
-          path: ROUTES.PROJECT.TYPE,
-          options: {
-            pre: [
-              { method: requireRmaUser },
-              { method: noEditSessionRequired },
-              requireProjectAreaSet
-            ],
-            handler: typeController.postHandler
-          }
-        },
-        {
-          method: 'GET',
-          path: ROUTES.PROJECT.EDIT.TYPE,
-          options: {
-            pre: [
-              { method: requireAuth },
-              { method: fetchProjectForEdit },
-              { method: initializeEditSessionPreHandler },
-              { method: requireEditPermission }
-            ],
-            handler: typeController.getHandler
-          }
-        },
-        {
-          method: 'POST',
-          path: ROUTES.PROJECT.EDIT.TYPE,
-          options: {
-            pre: [
-              { method: requireAuth },
-              { method: fetchProjectForEdit },
-              { method: initializeEditSessionPreHandler },
-              { method: requireEditPermission }
-            ],
-            handler: typeController.postHandler
-          }
-        },
-        {
-          method: 'GET',
-          path: ROUTES.PROJECT.INTERVENTION_TYPE,
-          options: {
-            pre: [
-              { method: requireRmaUser },
-              { method: noEditSessionRequired },
-              requireProjectTypeSet
-            ],
-            handler: typeController.getHandler
-          }
-        },
-        {
-          method: 'POST',
-          path: ROUTES.PROJECT.INTERVENTION_TYPE,
-          options: {
-            pre: [
-              { method: requireRmaUser },
-              { method: noEditSessionRequired },
-              requireProjectTypeSet
-            ],
-            handler: typeController.postHandler
-          }
-        },
+      const basePreHandlers = [
+        { method: requireRmaUser },
+        { method: noEditSessionRequired }
+      ]
 
-        {
-          method: 'GET',
-          path: ROUTES.PROJECT.EDIT.INTERVENTION_TYPE,
-          options: {
-            pre: [
-              { method: requireAuth },
-              { method: fetchProjectForEdit },
-              { method: initializeEditSessionPreHandler },
-              { method: requireEditPermission }
-            ],
-            handler: typeController.getHandler
-          }
-        },
-        {
-          method: 'POST',
-          path: ROUTES.PROJECT.EDIT.INTERVENTION_TYPE,
-          options: {
-            pre: [
-              { method: requireAuth },
-              { method: fetchProjectForEdit },
-              { method: initializeEditSessionPreHandler },
-              { method: requireEditPermission }
-            ],
-            handler: typeController.postHandler
-          }
-        },
-        {
-          method: 'GET',
-          path: ROUTES.PROJECT.PRIMARY_INTERVENTION_TYPE,
-          options: {
-            pre: [
-              { method: requireRmaUser },
-              { method: noEditSessionRequired },
-              requireInterventionTypesSet
-            ],
-            handler: typeController.getHandler
-          }
-        },
-        {
-          method: 'POST',
-          path: ROUTES.PROJECT.PRIMARY_INTERVENTION_TYPE,
-          options: {
-            pre: [
-              { method: requireRmaUser },
-              { method: noEditSessionRequired },
-              requireInterventionTypesSet
-            ],
-            handler: typeController.postHandler
-          }
-        },
-        {
-          method: 'GET',
-          path: ROUTES.PROJECT.EDIT.PRIMARY_INTERVENTION_TYPE,
-          options: {
-            pre: [
-              { method: requireAuth },
-              { method: fetchProjectForEdit },
-              { method: initializeEditSessionPreHandler },
-              { method: requireEditPermission }
-            ],
-            handler: typeController.getHandler
-          }
-        },
-        {
-          method: 'POST',
-          path: ROUTES.PROJECT.EDIT.PRIMARY_INTERVENTION_TYPE,
-          options: {
-            pre: [
-              { method: requireAuth },
-              { method: fetchProjectForEdit },
-              { method: initializeEditSessionPreHandler },
-              { method: requireEditPermission }
-            ],
-            handler: typeController.postHandler
-          }
-        }
+      server.route([
+        ...createRoutePair(
+          ROUTES.PROJECT.TYPE,
+          ROUTES.PROJECT.EDIT.TYPE,
+          [...basePreHandlers, requireProjectAreaSet],
+          typeController
+        ),
+        ...createRoutePair(
+          ROUTES.PROJECT.INTERVENTION_TYPE,
+          ROUTES.PROJECT.EDIT.INTERVENTION_TYPE,
+          [...basePreHandlers, requireProjectTypeSet],
+          typeController
+        ),
+        ...createRoutePair(
+          ROUTES.PROJECT.PRIMARY_INTERVENTION_TYPE,
+          ROUTES.PROJECT.EDIT.PRIMARY_INTERVENTION_TYPE,
+          [...basePreHandlers, requireInterventionTypesSet],
+          typeController
+        )
       ])
     }
   }

@@ -1,6 +1,7 @@
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
+  REFERENCE_NUMBER_PARAM,
   UPLOAD_STATUS
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
@@ -21,6 +22,8 @@ import {
 // Constants for polling configuration
 const MAX_POLL_ATTEMPTS = 10
 const POLL_INTERVAL_MS = 2000
+
+const projectBenefitAreaLocalKeyPrefix = 'projects.project_benefit_area'
 
 /**
  * Delay helper for synchronous polling
@@ -49,7 +52,7 @@ function getAndClearUploadErrors(request) {
  */
 function buildUploadRedirectPath(referenceNumber) {
   return ROUTES.PROJECT.EDIT.BENEFIT_AREA_UPLOAD_STATUS.replace(
-    '{referenceNumber}',
+    REFERENCE_NUMBER_PARAM,
     referenceNumber
   )
 }
@@ -259,7 +262,7 @@ class BenefitAreaController {
         return h.view(
           PROJECT_VIEWS.BENEFIT_AREA,
           this._getViewData(request, {
-            localKeyPrefix: 'projects.project_benefit_area',
+            localKeyPrefix: projectBenefitAreaLocalKeyPrefix,
             errorCode: apiError?.errorCode,
             uploadErrors
           })
@@ -272,7 +275,7 @@ class BenefitAreaController {
       return h.view(
         PROJECT_VIEWS.BENEFIT_AREA,
         this._getViewData(request, {
-          localKeyPrefix: 'projects.project_benefit_area',
+          localKeyPrefix: projectBenefitAreaLocalKeyPrefix,
           uploadUrl,
           errorCode,
           uploadErrors
@@ -283,7 +286,7 @@ class BenefitAreaController {
       return h.view(
         PROJECT_VIEWS.BENEFIT_AREA,
         this._getViewData(request, {
-          localKeyPrefix: 'projects.project_benefit_area',
+          localKeyPrefix: projectBenefitAreaLocalKeyPrefix,
           errorCode: 'UPLOAD_INITIATION_FAILED',
           uploadErrors
         })
@@ -299,12 +302,12 @@ class BenefitAreaController {
     const uploadId = sessionData?.benefitAreaUploadId
 
     const benefitAreaUrl = ROUTES.PROJECT.EDIT.BENEFIT_AREA.replace(
-      '{referenceNumber}',
+      REFERENCE_NUMBER_PARAM,
       referenceNumber
     )
 
     const overviewUrl = ROUTES.PROJECT.OVERVIEW.replace(
-      '{referenceNumber}',
+      REFERENCE_NUMBER_PARAM,
       referenceNumber
     )
 
@@ -345,7 +348,7 @@ class BenefitAreaController {
     return h.view(
       PROJECT_VIEWS.BENEFIT_AREA_DELETE,
       this._getViewData(request, {
-        localKeyPrefix: 'projects.project_benefit_area.delete'
+        localKeyPrefix: `${projectBenefitAreaLocalKeyPrefix}.delete`
       })
     )
   }
@@ -368,7 +371,7 @@ class BenefitAreaController {
         return h.view(
           PROJECT_VIEWS.BENEFIT_AREA_DELETE,
           this._getViewData(request, {
-            localKeyPrefix: 'projects.project_benefit_area.delete',
+            localKeyPrefix: `${projectBenefitAreaLocalKeyPrefix}.delete`,
             errorCode: apiError?.errorCode,
             errorMessage:
               apiError?.message || 'Failed to delete benefit area file'
@@ -405,7 +408,7 @@ class BenefitAreaController {
       return h.view(
         PROJECT_VIEWS.BENEFIT_AREA_DELETE,
         this._getViewData(request, {
-          localKeyPrefix: 'projects.project_benefit_area.delete',
+          localKeyPrefix: `${projectBenefitAreaLocalKeyPrefix}.delete`,
           errorCode: 'DELETE_FAILED',
           errorMessage:
             'An error occurred while deleting the file. Please try again.'
