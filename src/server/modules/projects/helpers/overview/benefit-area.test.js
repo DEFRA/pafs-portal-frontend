@@ -76,7 +76,7 @@ describe('benefit-area', () => {
       expect(result).toBe(false)
     })
 
-    test('should return false when downloadUrl exists and no expiry date', () => {
+    test('should return true when downloadUrl exists and no expiry date', () => {
       const projectData = {
         [PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_DOWNLOAD_URL]:
           'https://example.com/file.zip',
@@ -85,7 +85,7 @@ describe('benefit-area', () => {
 
       const result = _shouldGenerateDownloadUrl(projectData)
 
-      expect(result).toBe(false)
+      expect(result).toBe(true)
     })
   })
 
