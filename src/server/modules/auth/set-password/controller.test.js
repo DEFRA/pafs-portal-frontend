@@ -9,6 +9,7 @@ import { ROUTES } from '../../../common/constants/routes.js'
 
 vi.mock('../../../common/services/auth/auth-service.js')
 vi.mock('../../../common/helpers/auth/session-manager.js')
+vi.mock('../helpers/cache-invalidation.js')
 vi.mock('../schema.js', () => ({
   passwordFormSchema: {
     validate: vi.fn()
@@ -19,6 +20,8 @@ const { validateInvitationToken, setPassword, login } =
   await import('../../../common/services/auth/auth-service.js')
 const { setAuthSession } =
   await import('../../../common/helpers/auth/session-manager.js')
+const { invalidateAccountsCacheOnAuth } =
+  await import('../helpers/cache-invalidation.js')
 const { passwordFormSchema } = await import('../schema.js')
 
 describe('setPasswordController', () => {
@@ -137,6 +140,8 @@ describe('setPasswordPostController', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
+    invalidateAccountsCacheOnAuth.mockResolvedValue(undefined)
+
     mockRequest = {
       payload: {
         token: 'valid-token',
@@ -225,6 +230,10 @@ describe('setPasswordPostController', () => {
     await setPasswordPostController.handler(mockRequest, mockH)
 
     expect(mockRequest.yar.clear).toHaveBeenCalledWith('setPasswordEmail')
+    expect(invalidateAccountsCacheOnAuth).toHaveBeenCalledWith(
+      mockRequest,
+      'auto-login'
+    )
   })
 
   it('auto-logs in user on successful password set', async () => {
@@ -243,6 +252,10 @@ describe('setPasswordPostController', () => {
     )
     expect(login).toHaveBeenCalledWith('test@example.com', 'Password123!')
     expect(setAuthSession).toHaveBeenCalled()
+    expect(invalidateAccountsCacheOnAuth).toHaveBeenCalledWith(
+      mockRequest,
+      'auto-login'
+    )
   })
 
   it('redirects admin users to journey selection', async () => {
@@ -254,6 +267,10 @@ describe('setPasswordPostController', () => {
 
     await setPasswordPostController.handler(mockRequest, mockH)
 
+    expect(invalidateAccountsCacheOnAuth).toHaveBeenCalledWith(
+      mockRequest,
+      'auto-login'
+    )
     expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.ADMIN.JOURNEY_SELECTION)
   })
 
@@ -266,6 +283,10 @@ describe('setPasswordPostController', () => {
 
     await setPasswordPostController.handler(mockRequest, mockH)
 
+    expect(invalidateAccountsCacheOnAuth).toHaveBeenCalledWith(
+      mockRequest,
+      'auto-login'
+    )
     expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.GENERAL.HOME)
   })
 
@@ -275,6 +296,16 @@ describe('setPasswordPostController', () => {
 
     await setPasswordPostController.handler(mockRequest, mockH)
 
+    expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.LOGIN)
+  })
+
+  it('redirects to login if auto-login throws exception', async () => {
+    setPassword.mockResolvedValue({ success: true })
+    login.mockRejectedValue(new Error('Login service error'))
+
+    await setPasswordPostController.handler(mockRequest, mockH)
+
+    expect(mockRequest.server.logger.error).toHaveBeenCalled()
     expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.LOGIN)
   })
 

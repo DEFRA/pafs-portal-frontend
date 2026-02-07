@@ -2,7 +2,9 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import {
   checkProjectNameExists,
   getProjectProposalOverview,
-  upsertProjectProposal
+  upsertProjectProposal,
+  getProjectBenefitAreaDownloadUrl,
+  deleteProject
 } from './project-service.js'
 import { apiRequest } from '../../helpers/api-client/index.js'
 
@@ -434,6 +436,247 @@ describe('project-service', () => {
         '/api/v1/project/upsert',
         expect.objectContaining({
           body: JSON.stringify(proposalData)
+        })
+      )
+    })
+  })
+
+  describe('getProjectBenefitAreaDownloadUrl', () => {
+    test('Should call apiRequest with correct endpoint and method', async () => {
+      apiRequest.mockResolvedValue({
+        data: { url: 'https://example.com/file' }
+      })
+
+      await getProjectBenefitAreaDownloadUrl('REF123', 'mock-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/benefit-area-file/download',
+        expect.objectContaining({
+          method: 'GET'
+        })
+      )
+    })
+
+    test('Should include Authorization header when accessToken is provided', async () => {
+      apiRequest.mockResolvedValue({
+        data: { url: 'https://example.com/file' }
+      })
+
+      await getProjectBenefitAreaDownloadUrl('REF456', 'test-token-123')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF456/benefit-area-file/download',
+        expect.objectContaining({
+          headers: {
+            Authorization: 'Bearer test-token-123'
+          }
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is not provided', async () => {
+      apiRequest.mockResolvedValue({
+        data: { url: 'https://example.com/file' }
+      })
+
+      await getProjectBenefitAreaDownloadUrl('REF123')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/benefit-area-file/download',
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is null', async () => {
+      apiRequest.mockResolvedValue({
+        data: { url: 'https://example.com/file' }
+      })
+
+      await getProjectBenefitAreaDownloadUrl('REF123', null)
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/benefit-area-file/download',
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is empty string', async () => {
+      apiRequest.mockResolvedValue({
+        data: { url: 'https://example.com/file' }
+      })
+
+      await getProjectBenefitAreaDownloadUrl('REF123', '')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/benefit-area-file/download',
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should return API response with download URL', async () => {
+      const mockResponse = {
+        data: { url: 'https://example.com/download/benefit-area.zip' }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await getProjectBenefitAreaDownloadUrl('REF123', 'token')
+
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('Should handle API errors', async () => {
+      const mockError = new Error('API Error')
+      apiRequest.mockRejectedValue(mockError)
+
+      await expect(
+        getProjectBenefitAreaDownloadUrl('REF123', 'token')
+      ).rejects.toThrow('API Error')
+    })
+
+    test('Should handle network errors', async () => {
+      const networkError = new Error('Network connection failed')
+      apiRequest.mockRejectedValue(networkError)
+
+      await expect(
+        getProjectBenefitAreaDownloadUrl('REF123', 'token')
+      ).rejects.toThrow('Network connection failed')
+    })
+
+    test('Should handle different reference number formats', async () => {
+      apiRequest.mockResolvedValue({
+        data: { url: 'https://example.com/file' }
+      })
+
+      await getProjectBenefitAreaDownloadUrl('PROJ-2024-001', 'token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/PROJ-2024-001/benefit-area-file/download',
+        expect.objectContaining({
+          method: 'GET'
+        })
+      )
+    })
+  })
+
+  describe('deleteProject', () => {
+    test('Should call apiRequest with correct endpoint and method', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await deleteProject('REF123', 'mock-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/benefit-area-file',
+        expect.objectContaining({
+          method: 'DELETE'
+        })
+      )
+    })
+
+    test('Should include Authorization header when accessToken is provided', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await deleteProject('REF456', 'test-token-123')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF456/benefit-area-file',
+        expect.objectContaining({
+          headers: {
+            Authorization: 'Bearer test-token-123'
+          }
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is not provided', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await deleteProject('REF123')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/benefit-area-file',
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is null', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await deleteProject('REF123', null)
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/benefit-area-file',
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is empty string', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await deleteProject('REF123', '')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/benefit-area-file',
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should return API response', async () => {
+      const mockResponse = { data: { success: true, message: 'Deleted' } }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await deleteProject('REF123', 'token')
+
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('Should handle API errors', async () => {
+      const mockError = new Error('API Error')
+      apiRequest.mockRejectedValue(mockError)
+
+      await expect(deleteProject('REF123', 'token')).rejects.toThrow(
+        'API Error'
+      )
+    })
+
+    test('Should handle network errors', async () => {
+      const networkError = new Error('Network connection failed')
+      apiRequest.mockRejectedValue(networkError)
+
+      await expect(deleteProject('REF123', 'token')).rejects.toThrow(
+        'Network connection failed'
+      )
+    })
+
+    test('Should handle 404 not found errors', async () => {
+      const notFoundError = new Error('File not found')
+      apiRequest.mockRejectedValue(notFoundError)
+
+      await expect(deleteProject('NONEXISTENT', 'token')).rejects.toThrow(
+        'File not found'
+      )
+    })
+
+    test('Should handle different reference number formats', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await deleteProject('PROJ-2024-001', 'token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/PROJ-2024-001/benefit-area-file',
+        expect.objectContaining({
+          method: 'DELETE'
         })
       )
     })
