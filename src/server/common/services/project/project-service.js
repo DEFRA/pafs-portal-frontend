@@ -47,3 +47,27 @@ export async function upsertProjectProposal(proposalData, accessToken) {
     headers
   })
 }
+
+export async function getProjectBenefitAreaDownloadUrl(
+  referenceNumber,
+  accessToken
+) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(
+    `/api/v1/project/${referenceNumber}/benefit-area-file/download`,
+    {
+      method: 'GET',
+      headers
+    }
+  )
+}
+
+export async function deleteProject(referenceNumber, accessToken) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(`/api/v1/project/${referenceNumber}/benefit-area-file`, {
+    method: 'DELETE',
+    headers
+  })
+}

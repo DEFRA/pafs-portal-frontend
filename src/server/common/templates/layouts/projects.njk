@@ -1,7 +1,9 @@
 {% extends 'layouts/page.njk' %}
 
 {% block beforeContent %}
-  <a href="{{ backLinkURL }}" class="govuk-back-link">{{ backLinkText }}</a>
+  {% if backLinkText and backLinkURL %}
+    <a href="{{ backLinkURL }}" class="govuk-back-link">{{ backLinkText }}</a>
+  {% endif %}
 {% endblock %}
 
 {% block content %}

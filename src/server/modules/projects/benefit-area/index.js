@@ -37,6 +37,32 @@ export const projectBenefitArea = {
             ],
             handler: benefitAreaController.uploadStatusHandler
           }
+        },
+        {
+          method: 'GET',
+          path: ROUTES.PROJECT.EDIT.BENEFIT_AREA_DELETE,
+          options: {
+            pre: [
+              { method: requireAuth },
+              { method: fetchProjectForEdit },
+              { method: initializeEditSessionPreHandler },
+              { method: requireEditPermission }
+            ],
+            handler: benefitAreaController.getDeleteHandler
+          }
+        },
+        {
+          method: 'POST',
+          path: ROUTES.PROJECT.EDIT.BENEFIT_AREA_DELETE,
+          options: {
+            pre: [
+              { method: requireAuth },
+              { method: fetchProjectForEdit },
+              { method: initializeEditSessionPreHandler },
+              { method: requireEditPermission }
+            ],
+            handler: benefitAreaController.postDeleteHandler
+          }
         }
       ])
     }

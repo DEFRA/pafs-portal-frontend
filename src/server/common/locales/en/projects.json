@@ -35,7 +35,11 @@
     },
     "project_benefit_area_summary_card": {
       "title": "Project benefit area",
-      "not_added": "No shapefile uploaded yet"
+      "not_added": "No shapefile uploaded yet",
+      "zip": "ZIP",
+      "file_size": "Size",
+      "kb": "KB",
+      "uploaded_on": "Uploaded on"
     },
     "important_dates_summary_card": {
       "title": "Important dates",
@@ -266,6 +270,12 @@
         "title": "Unable to create a shapefile?",
         "help_text": "If you are unable to upload or create a shapefile, contact your local partnership and strategic overview officer and they will be able to help you."
       }
+    },
+    "delete": {
+      "title": "Delete project benefit area",
+      "heading": "Are you sure you want to delete this shapefile?",
+      "warning": "This will permanently delete the shapefile from the system.",
+      "delete_button": "Yes, delete this file"
     },
     "validation": {
       "FAILED_TO_UPLOAD_FILE": "Failed to upload a shapefile"
