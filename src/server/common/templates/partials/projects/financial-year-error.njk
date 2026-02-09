@@ -1,0 +1,13 @@
+{% macro getFinancialYearError(fieldErrors, ERROR_CODES) %}
+  {%- if fieldErrors and (fieldErrors.financialStartYear or fieldErrors.financialEndYear) -%}
+    {%- if fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_REQUIRED or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_REQUIRED -%}
+      required
+    {%- elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_INVALID -%}
+      invalid_format
+    {%- elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_IN_FUTURE or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_IN_FUTURE -%}
+      should_be_in_future
+    {%- elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_LESS_THAN_END_YEAR or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_GREATER_THAN_START_YEAR -%}
+      invalid_range
+    {%- endif -%}
+  {%- endif -%}
+{% endmacro %}

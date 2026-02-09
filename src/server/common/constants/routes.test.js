@@ -247,6 +247,8 @@ describe('Routes Constants', () => {
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty(
         'FIRST_FINANCIAL_YEAR_MANUAL'
       )
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('PROJECT_NAME')
+      expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('RMA_SELECTION')
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('LAST_FINANCIAL_YEAR')
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty(
         'LAST_FINANCIAL_YEAR_MANUAL'

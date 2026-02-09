@@ -531,7 +531,7 @@ describe('MainAreaController', () => {
       await mainAreaPostController.handler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        '/admin/user-account/additional-areas/abc123/edit'
+        '/admin/user-account/additional-areas/abc123'
       )
     })
 
@@ -547,7 +547,7 @@ describe('MainAreaController', () => {
       await mainAreaPostController.handler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        '/admin/user-account/additional-areas/xyz789/edit'
+        '/admin/user-account/additional-areas/xyz789'
       )
     })
   })

@@ -24,10 +24,6 @@ export function buildActionRoutes(encodedId) {
     reactivate: ROUTES.ADMIN.USER_ACTIONS.REACTIVATE.replace(
       ENCODED_ID_PLACEHOLDER,
       encodedId
-    ),
-    editDetails: ROUTES.ADMIN.USER_ACTIONS.EDIT_DETAILS.replace(
-      ENCODED_ID_PLACEHOLDER,
-      encodedId
     )
   }
 }

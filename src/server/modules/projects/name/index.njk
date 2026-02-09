@@ -1,0 +1,38 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "partials/projects/name-error.njk" import getNameError %}
+
+{% block body %}
+  <form method="post" novalidate>
+    {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.NAME] %}
+      {% set errorKey = getNameError(fieldErrors, ERROR_CODES) | trim %}
+      {% set nameError = {
+        text: t(localKeyPrefix + '.errors.' + errorKey)
+      } %}
+    {% else %}
+      {% set nameError = false %}
+    {% endif %}
+
+    {{ govukInput({
+      label: {
+        text: t(localKeyPrefix + '.heading'),
+        classes: "govuk-label--xl",
+        isPageHeading: true
+      },
+      hint: {
+        text: t(localKeyPrefix + '.intro_paragraph')
+      },
+      id: PROJECT_PAYLOAD_FIELDS.NAME,
+      name: PROJECT_PAYLOAD_FIELDS.NAME,
+      value: formData[PROJECT_PAYLOAD_FIELDS.NAME],
+      autocomplete: "given-name",
+      classes: "govuk-!-width-full",
+      errorMessage: nameError
+    }) }}
+
+    {{ govukButton({
+      text: t('common.buttons.save_and_continue')
+    }) }}
+  </form>
+{% endblock %}

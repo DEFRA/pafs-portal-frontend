@@ -1,0 +1,150 @@
+{% macro proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t) %}
+
+  <div class="govuk-summary-card">
+    <div class="govuk-summary-card__title-wrapper">
+      <h2 class="govuk-summary-card__title">{{ t('projects.overview.proposal_details_summary_card.title') }}</h2>
+    </div>
+    <div class="govuk-summary-card__content">
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            {{ t('projects.overview.proposal_details_summary_card.project_name') }}
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {{ projectData[PROJECT_PAYLOAD_FIELDS.NAME] or t('projects.overview.common.not_provided') }}
+          </dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.NAME }}">
+              {{ t('common.change') }}
+              <span class="govuk-visually-hidden">
+                {{ t('projects.overview.proposal_details_summary_card.project_name') }}</span>
+            </a>
+          </dd>
+        </div>
+
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            {{ t('projects.overview.proposal_details_summary_card.rma') }}
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {{ projectData.rmaName or t('projects.overview.common.not_provided') }}
+          </dd>
+        </div>
+
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            {{ t('projects.overview.proposal_details_summary_card.project_type') }}
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {% set projectTypeLabel = '' %}
+            {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.DEF %}
+              {% set projectTypeLabel = t('projects.project_type.options.def') %}
+            {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REF %}
+              {% set projectTypeLabel = t('projects.project_type.options.ref') %}
+            {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REP %}
+              {% set projectTypeLabel = t('projects.project_type.options.rep') %}
+            {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.ELO %}
+              {% set projectTypeLabel = t('projects.project_type.options.elo') %}
+            {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.HCR %}
+              {% set projectTypeLabel = t('projects.project_type.options.hcr') %}
+            {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.STR %}
+              {% set projectTypeLabel = t('projects.project_type.options.str') %}
+            {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.STU %}
+              {% set projectTypeLabel = t('projects.project_type.options.stu') %}
+            {% endif %}
+            {{ projectTypeLabel or t('projects.overview.common.not_provided') }}
+          </dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.TYPE }}">
+              {{ t('common.change') }}
+              <span class="govuk-visually-hidden">
+                {{ t('projects.overview.proposal_details_summary_card.project_type') }}</span>
+            </a>
+          </dd>
+        </div>
+
+        {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.DEF or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REF or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REP %}
+          {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] %}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                {{ t('projects.overview.proposal_details_summary_card.intervention_types') }}
+              </dt>
+              <dd class="govuk-summary-list__value">
+                <ul class="govuk-list govuk-list--bullet">
+                  {% for type in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] %}
+                    <li>
+                      {% if type == PROJECT_INTERVENTION_TYPES.NFM %}{{ t('projects.intervention_type.options.nfm') }}
+                      {% elif type == PROJECT_INTERVENTION_TYPES.SUDS %}{{ t('projects.intervention_type.options.suds') }}
+                      {% elif type == PROJECT_INTERVENTION_TYPES.PFR %}{{ t('projects.intervention_type.options.pfr') }}
+                      {% elif type == PROJECT_INTERVENTION_TYPES.OTHER %}{{ t('projects.intervention_type.options.other') }}
+                      {% else %}{{ type }}
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </dd>
+            </div>
+
+            {% set mainInterventionType = projectData[PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE] %}
+            {% if mainInterventionType %}
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  {{ t('projects.overview.proposal_details_summary_card.primary_benefit_intervention') }}
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  {% if mainInterventionType == PROJECT_INTERVENTION_TYPES.NFM %}{{ t('projects.intervention_type.options.nfm') }}
+                  {% elif mainInterventionType == PROJECT_INTERVENTION_TYPES.SUDS %}{{ t('projects.intervention_type.options.suds') }}
+                  {% elif mainInterventionType == PROJECT_INTERVENTION_TYPES.PFR %}{{ t('projects.intervention_type.options.pfr') }}
+                  {% elif mainInterventionType == PROJECT_INTERVENTION_TYPES.OTHER %}{{ t('projects.intervention_type.options.other') }}
+                  {% else %}{{ mainInterventionType }}
+                  {% endif %}
+                </dd>
+              </div>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            {{ t('projects.overview.proposal_details_summary_card.financial_year_start') }}
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {% if projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR] %}
+              {{ buildFinancialYearLabel(projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]) }}
+            {% else %}
+              {{ t('projects.overview.common.not_provided') }}
+            {% endif %}
+          </dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.FINANCIAL_START_YEAR }}">
+              {{ t('common.change') }}
+              <span class="govuk-visually-hidden">
+                {{ t('projects.overview.proposal_details_summary_card.financial_year_start') }}</span>
+            </a>
+          </dd>
+        </div>
+
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            {{ t('projects.overview.proposal_details_summary_card.financial_year_end') }}
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {% if projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR] %}
+              {{ buildFinancialYearLabel(projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]) }}
+            {% else %}
+              {{ t('projects.overview.common.not_provided') }}
+            {% endif %}
+          </dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.FINANCIAL_END_YEAR }}">
+              {{ t('common.change') }}
+              <span class="govuk-visually-hidden">
+                {{ t('projects.overview.proposal_details_summary_card.financial_year_end') }}</span>
+            </a>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+{% endmacro %}

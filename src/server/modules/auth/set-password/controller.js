@@ -9,6 +9,7 @@ import { VIEW_ERROR_CODES } from '../../../common/constants/validation.js'
 import { AUTH_VIEWS, LOCALE_KEYS } from '../../../common/constants/common.js'
 import { extractJoiErrors } from '../../../common/helpers/error-renderer/index.js'
 import { passwordFormSchema } from '../schema.js'
+import { invalidateAccountsCacheOnAuth } from '../helpers/cache-invalidation.js'
 
 const FLOW_TYPE = 'invitation'
 const SESSION_KEY_EMAIL = 'setPasswordEmail'
@@ -148,6 +149,9 @@ async function autoLoginAndRedirect(email, password, request, h) {
 
     if (loginResult.success) {
       setAuthSession(request, loginResult.data)
+
+      // Invalidate accounts cache after successful login
+      await invalidateAccountsCacheOnAuth(request, 'auto-login')
 
       // Redirect based on user role
       if (loginResult.data.user.admin) {

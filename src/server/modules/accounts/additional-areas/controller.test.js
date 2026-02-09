@@ -654,7 +654,7 @@ describe('AdditionalAreasController', () => {
       await additionalAreasPostController.handler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        '/admin/user-account/check-answers/test123/edit'
+        '/admin/user-account/check-answers/test123'
       )
     })
 

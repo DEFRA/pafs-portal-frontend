@@ -261,7 +261,7 @@ describe('CheckAnswersController', () => {
 
       const result = await checkAnswersController.handler(mockRequest, mockH)
 
-      expect(result).toBe('/admin/user-account/details/abc123/edit')
+      expect(result).toBe('/admin/user-account/details/abc123')
     })
 
     test('redirects to edit main area if non-admin user has no main area in edit mode', async () => {
@@ -279,7 +279,7 @@ describe('CheckAnswersController', () => {
 
       const result = await checkAnswersController.handler(mockRequest, mockH)
 
-      expect(result).toBe('/admin/user-account/main-area/abc123/edit')
+      expect(result).toBe('/admin/user-account/main-area/abc123')
     })
   })
 
@@ -970,8 +970,7 @@ describe('CheckAnswersController', () => {
             approve: '/admin/users/abc123/approve',
             delete: '/admin/users/abc123/delete',
             resendInvitation: '/admin/users/abc123/resend-invitation',
-            reactivate: '/admin/users/abc123/reactivate',
-            editDetails: '/admin/users/abc123/edit-details'
+            reactivate: '/admin/users/abc123/reactivate'
           })
         })
       )

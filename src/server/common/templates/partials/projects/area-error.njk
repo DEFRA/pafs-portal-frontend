@@ -1,0 +1,9 @@
+{% macro getAreaError(fieldErrors, ERROR_CODES) %}
+  {%- if fieldErrors and fieldErrors.areaId -%}
+    {%- if fieldErrors.areaId == ERROR_CODES.AREA_ID_REQUIRED -%}
+      required
+    {%- elif fieldErrors.areaId == ERROR_CODES.AREA_ID_INVALID -%}
+      required
+    {%- endif -%}
+  {%- endif -%}
+{% endmacro %}
