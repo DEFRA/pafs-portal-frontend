@@ -35,6 +35,10 @@
     "download_projects": "Download Projects",
     "download_rma": "Download RMA"
   },
+  "phase_banner": {
+    "tag_text": "BETA",
+    "html_text": "This is a new service. Help us improve it and <a class=\"govuk-link\" href=\"mailto:pafs-support@environment-agency.gov.uk\">give your feedback (opens in new tab)</a>."
+  },
   "pagination": {
     "summary": "Showing {{from}} to {{to}} of {{total}} {{itemLabel}}",
     "previous": "Previous",
