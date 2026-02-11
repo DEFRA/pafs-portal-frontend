@@ -3,6 +3,7 @@
 {# Import GOVUK components globally #}
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 
 {# Import custom components globally #}
 {% from "heading/macro.njk" import appHeading %}
@@ -83,6 +84,22 @@
       items: breadcrumbs
     }) }}
   {% endif %}
+{% endblock %}
+
+{% block main %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+      {{ govukPhaseBanner({
+        tag: {
+          text: t('common.phase_banner.tag_text')
+        },
+        html: t('common.phase_banner.html_text')
+      }) }}
+        {{ super() }}
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block content %}{% endblock %}
