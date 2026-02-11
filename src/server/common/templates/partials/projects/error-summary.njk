@@ -38,7 +38,7 @@
 {% elif fieldErrors.areaId == ERROR_CODES.AREA_ID_INVALID or errorCode == ERROR_CODES.AREA_ID_INVALID %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.area_selection.errors.invalid'),
+      text: t('projects.area_selection.errors.required'),
       href: "#areaId"
     }
   ]) %}
@@ -96,18 +96,25 @@
 {% endif %}
 
 {# Project Financial Year errors #}
+{% if fieldErrors.financialStartYear or fieldErrors.financialEndYear %}
+  {% set financialLocalePrefixKey = localKeyPrefix %}
+{% else %}
+  {% set financialLocalePrefixKey = '' %}
+{% endif %}
 {% if fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_REQUIRED or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_REQUIRED or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_REQUIRED or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_REQUIRED %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.financial_year_start_manual.errors.required'),
-      href: "#financialStartYear"
+      text: t(financialLocalePrefixKey + '.errors.required')if financialLocalePrefixKey else 
+        t('projects.financial_year_start_manual.errors.required'),
+        href: "#financialStartYear"
     }
   ]) %}
 {% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_INVALID or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_INVALID %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.financial_year_start_manual.errors.invalid_format'),
-      href: "#financialStartYear"
+      text: t(financialLocalePrefixKey + '.errors.invalid_format')if financialLocalePrefixKey else 
+        t('projects.financial_year_start_manual.errors.invalid_format'),
+        href: "#financialStartYear"
     }
   ]) %}
 {% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_IN_FUTURE or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_IN_FUTURE or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_IN_FUTURE or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_IN_FUTURE %}

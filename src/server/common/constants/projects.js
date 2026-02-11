@@ -23,6 +23,8 @@ export const PROJECT_STEPS = {
   PROPERTY_AFFECTED_COASTAL_EROSION: 'property-affected-coastal-erosion'
 }
 
+export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'
+
 export const PROJECT_SESSION_KEY = 'projectData'
 
 export const PROJECT_PAYLOAD_FIELDS = {

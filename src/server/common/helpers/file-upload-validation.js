@@ -60,7 +60,7 @@ export function validateFileSize(file) {
  * @returns {{isValid: boolean, errorCode?: string}} Validation result
  */
 export function validateFileMimeType(file) {
-  if (!file || !file.type) {
+  if (!file?.type) {
     return {
       isValid: false,
       errorCode: FILE_UPLOAD_VALIDATION_CODES.FILE_MIME_TYPE_INVALID
@@ -83,7 +83,7 @@ export function validateFileMimeType(file) {
  * @returns {{isValid: boolean, errorCode?: string}} Validation result
  */
 export function validateFileExtension(file) {
-  if (!file || !file.name) {
+  if (!file?.name) {
     return {
       isValid: false,
       errorCode: FILE_UPLOAD_VALIDATION_CODES.FILE_TYPE_INVALID

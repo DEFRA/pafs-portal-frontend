@@ -1,6 +1,7 @@
 {% extends 'layouts/projects.njk' %}
 
-{%- from "govuk/components/tag/macro.njk" import govukTag -%}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "views/proposal-details-card.njk" import proposalDetailsSummaryCard %}
 {% from "views/project-benefit-area-card.njk" import projectBenefitAreaCard %}
 {% from "views/important-dates-card.njk" import importantDatesSummaryCard %}
@@ -24,7 +25,7 @@
       <dd class="govuk-summary-list__value govuk-body-m">
         {% if projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] %}
           {{ projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] | formatDate('d MMM yyyy') }}&nbsp;
-              <span class="govuk-hint">{{ projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] | formatDate('HH:mm') }}</span>
+              <span class="govuk-hint govuk-!-font-size-16">{{ projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] | formatDate('HH:mm') }}</span>
         {% else %}
           {{ t('projects.overview.common.not_submitted') }}
         {% endif %}
@@ -45,7 +46,7 @@
 
   {{ proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t) }}
 
-  {{ projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t) }}
+  {{ projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, formatFileSize, t) }}
 
   {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate) }}
 
@@ -61,6 +62,10 @@
 
   <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
 
-  <p class="govuk-body">{{ t('project-proposal.proposal_overview.submission_info') }}</p>
+  <p class="govuk-body">{{ t('projects.overview.submission_info') }}</p>
+
+  {{ govukButton({
+    text: t('common.buttons.submit_proposal')
+  }) }}
 
 {% endblock %}

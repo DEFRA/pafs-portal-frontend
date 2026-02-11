@@ -1,5 +1,9 @@
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
-import { UPLOAD_STATUS } from '../../../common/constants/projects.js'
+import {
+  PROJECT_PAYLOAD_FIELDS,
+  REFERENCE_NUMBER_PARAM,
+  UPLOAD_STATUS
+} from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
@@ -7,15 +11,19 @@ import {
   initiateFileUpload,
   getUploadStatus
 } from '../../../common/services/file-upload/file-upload-service.js'
+import { deleteProject } from '../../../common/services/project/project-service.js'
 import {
   buildViewData,
   getSessionData,
+  navigateToProjectOverview,
   updateSessionData
 } from '../helpers/project-utils.js'
 
 // Constants for polling configuration
 const MAX_POLL_ATTEMPTS = 10
 const POLL_INTERVAL_MS = 2000
+
+const projectBenefitAreaLocalKeyPrefix = 'projects.project_benefit_area'
 
 /**
  * Delay helper for synchronous polling
@@ -44,7 +52,7 @@ function getAndClearUploadErrors(request) {
  */
 function buildUploadRedirectPath(referenceNumber) {
   return ROUTES.PROJECT.EDIT.BENEFIT_AREA_UPLOAD_STATUS.replace(
-    '{referenceNumber}',
+    REFERENCE_NUMBER_PARAM,
     referenceNumber
   )
 }
@@ -214,14 +222,15 @@ function storeUploadErrors(request, errors) {
 class BenefitAreaController {
   _getViewData(request, additionalData = {}) {
     const sessionData = getSessionData(request)
-
+    const { localKeyPrefix } = additionalData
     return buildViewData(request, {
-      localKeyPrefix: 'projects.project_benefit_area',
+      localKeyPrefix,
       backLinkOptions: {
         targetURL: ROUTES.GENERAL.HOME,
         conditionalRedirect: true
       },
-      benefitAreaFileName: sessionData?.benefitAreaFileName || null,
+      benefitAreaFileName:
+        sessionData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] || null,
       additionalData
     })
   }
@@ -230,6 +239,12 @@ class BenefitAreaController {
     const session = getAuthSession(request)
     const accessToken = session?.accessToken
     const sessionData = getSessionData(request)
+    if (sessionData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME]) {
+      return navigateToProjectOverview(
+        sessionData[PROJECT_PAYLOAD_FIELDS.SLUG],
+        h
+      )
+    }
     const referenceNumber = request.params.referenceNumber || ''
     const errorCode = request.query.error
 
@@ -247,6 +262,7 @@ class BenefitAreaController {
         return h.view(
           PROJECT_VIEWS.BENEFIT_AREA,
           this._getViewData(request, {
+            localKeyPrefix: projectBenefitAreaLocalKeyPrefix,
             errorCode: apiError?.errorCode,
             uploadErrors
           })
@@ -259,6 +275,7 @@ class BenefitAreaController {
       return h.view(
         PROJECT_VIEWS.BENEFIT_AREA,
         this._getViewData(request, {
+          localKeyPrefix: projectBenefitAreaLocalKeyPrefix,
           uploadUrl,
           errorCode,
           uploadErrors
@@ -269,6 +286,7 @@ class BenefitAreaController {
       return h.view(
         PROJECT_VIEWS.BENEFIT_AREA,
         this._getViewData(request, {
+          localKeyPrefix: projectBenefitAreaLocalKeyPrefix,
           errorCode: 'UPLOAD_INITIATION_FAILED',
           uploadErrors
         })
@@ -284,12 +302,12 @@ class BenefitAreaController {
     const uploadId = sessionData?.benefitAreaUploadId
 
     const benefitAreaUrl = ROUTES.PROJECT.EDIT.BENEFIT_AREA.replace(
-      '{referenceNumber}',
+      REFERENCE_NUMBER_PARAM,
       referenceNumber
     )
 
     const overviewUrl = ROUTES.PROJECT.OVERVIEW.replace(
-      '{referenceNumber}',
+      REFERENCE_NUMBER_PARAM,
       referenceNumber
     )
 
@@ -325,11 +343,86 @@ class BenefitAreaController {
       return h.redirect(benefitAreaUrl)
     }
   }
+
+  async getDeleteHandler(request, h) {
+    return h.view(
+      PROJECT_VIEWS.BENEFIT_AREA_DELETE,
+      this._getViewData(request, {
+        localKeyPrefix: `${projectBenefitAreaLocalKeyPrefix}.delete`
+      })
+    )
+  }
+
+  async postDeleteHandler(request, h) {
+    const session = getAuthSession(request)
+    const accessToken = session?.accessToken
+    const referenceNumber = request.params.referenceNumber || ''
+
+    try {
+      const deleteResult = await deleteProject(referenceNumber, accessToken)
+
+      if (!deleteResult.success) {
+        request.logger.warn(
+          { referenceNumber, error: deleteResult.data },
+          'Failed to delete benefit area file'
+        )
+
+        const apiError = extractApiError(deleteResult)
+        return h.view(
+          PROJECT_VIEWS.BENEFIT_AREA_DELETE,
+          this._getViewData(request, {
+            localKeyPrefix: `${projectBenefitAreaLocalKeyPrefix}.delete`,
+            errorCode: apiError?.errorCode,
+            errorMessage:
+              apiError?.message || 'Failed to delete benefit area file'
+          })
+        )
+      }
+
+      request.logger.info(
+        { referenceNumber },
+        'Benefit area file deleted successfully'
+      )
+
+      // Clear any upload session data
+      updateSessionData(request, {
+        benefitAreaUploadId: null,
+        benefitAreaUploadUrl: null,
+        benefitAreaUploadErrors: null,
+        benefitAreaFileName: null,
+        benefitAreaFileSize: null,
+        benefitAreaContentType: null,
+        benefitAreaFileS3Bucket: null,
+        benefitAreaFileS3Key: null,
+        benefitAreaFileDownloadUrl: null,
+        benefitAreaFileDownloadExpiry: null
+      })
+
+      // Redirect to overview page
+      return navigateToProjectOverview(referenceNumber, h)
+    } catch (error) {
+      request.logger.error(
+        { error, referenceNumber },
+        'Error deleting benefit area file'
+      )
+      return h.view(
+        PROJECT_VIEWS.BENEFIT_AREA_DELETE,
+        this._getViewData(request, {
+          localKeyPrefix: `${projectBenefitAreaLocalKeyPrefix}.delete`,
+          errorCode: 'DELETE_FAILED',
+          errorMessage:
+            'An error occurred while deleting the file. Please try again.'
+        })
+      )
+    }
+  }
 }
 
 const controller = new BenefitAreaController()
 
 export const benefitAreaController = {
   getHandler: (request, h) => controller.get(request, h),
-  uploadStatusHandler: (request, h) => controller.uploadStatus(request, h)
+  uploadStatusHandler: (request, h) => controller.uploadStatus(request, h),
+  getDeleteHandler: (request, h) => controller.getDeleteHandler(request, h),
+  postDeleteHandler: (request, h) => controller.postDeleteHandler(request, h)
 }

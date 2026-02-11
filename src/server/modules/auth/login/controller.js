@@ -9,6 +9,7 @@ import {
   extractApiValidationErrors,
   extractApiError
 } from '../../../common/helpers/error-renderer/index.js'
+import { invalidateAccountsCacheOnAuth } from '../helpers/cache-invalidation.js'
 
 export const loginController = {
   handler(request, h) {
@@ -75,6 +76,9 @@ export const loginPostController = {
           ERROR_CODES: VIEW_ERROR_CODES
         })
       }
+
+      // Invalidate accounts cache before setting new session
+      await invalidateAccountsCacheOnAuth(request, 'login')
 
       setAuthSession(request, result.data)
 

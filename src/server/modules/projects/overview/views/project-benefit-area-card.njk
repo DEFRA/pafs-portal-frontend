@@ -1,12 +1,18 @@
-{% macro projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t) %}
+{% macro projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, formatFileSize, t) %}
 
-  <div class="govuk-summary-card">
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] %}
+    {% set targetUrl = '/project/' ~ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] ~ '/' ~ PROJECT_STEPS.BENEFIT_AREA ~ '/delete' %}
+  {% else %}
+    {% set targetUrl = '/project/' ~ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] ~ '/' ~ PROJECT_STEPS.BENEFIT_AREA %}
+  {% endif %}
+
+  <div class="govuk-summary-card overview-project-benefit-area-card">
     <div class="govuk-summary-card__title-wrapper">
       <h2 class="govuk-summary-card__title">{{ t('projects.overview.project_benefit_area_summary_card.title') }}</h2>
       <ul class="govuk-summary-card__actions">
         <li class="govuk-summary-card__action">
-          <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.BENEFIT_AREA }}">
-            {% if data['grid-reference'] %}{{ t('common.change') }}
+          <a class="govuk-link" href="{{ targetUrl }}">
+            {% if projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] %}{{ t('common.delete') }}
             {% else %}{{ t('common.add') }}
             {% endif %}
             <span class="govuk-visually-hidden">
@@ -16,7 +22,46 @@
       </ul>
     </div>
     <div class="govuk-summary-card__content">
-      <p class="govuk-body">{{ t('projects.overview.project_benefit_area_summary_card.not_added') }}</p>
+      {% if projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] %}
+        <div class="project-benefit-area-card__content-body">
+          <div>
+            <svg width="60" height="80" viewBox="0 0 60 80" class="file-block">
+              <rect width="60" height="80" fill="#f3f2f1"/>
+              <rect x="5" y="5" width="50" height="10" fill="#d4d4d4"/>
+              <rect x="5" y="20" width="35" height="6" fill="#d4d4d4"/>
+              <rect x="5" y="30" width="40" height="6" fill="#d4d4d4"/>
+              <rect x="5" y="40" width="30" height="6" fill="#d4d4d4"/>
+              <text x="30" y="65" text-anchor="middle" font-size="12" fill="#505a5f" font-family="Arial">ZIP</text>
+            </svg>
+          </div>
+          <div>
+            <p class="govuk-body govuk-!-margin-bottom-1">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_DOWNLOAD_URL] %}
+                <a class="govuk-link" href="{{ projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_DOWNLOAD_URL] }}" download>
+                  {{ projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] }}
+                </a>
+              {% else %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] }}
+              {% endif %}
+            </p>
+            {% if projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_SIZE] %}
+              <p class="govuk-body govuk-body-s govuk-!-margin-bottom-1">
+                {{ t('projects.overview.project_benefit_area_summary_card.file_size') }}:
+                {{ formatFileSize(projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_SIZE]) }}
+              </p>
+            {% endif %}
+            {% if projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_UPDATED_AT] %}
+              <p class="govuk-body govuk-body-s govuk-!-margin-bottom-0">
+                {{ t('projects.overview.project_benefit_area_summary_card.uploaded_on') }}:
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_UPDATED_AT] | formatDate('d MMM yyyy') }}&nbsp;
+                 <span class="govuk-hint govuk-!-font-size-16">{{ projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_UPDATED_AT] | formatDate('HH:mm') }}</span>
+              </p>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <p class="govuk-body">{{ t('projects.overview.project_benefit_area_summary_card.not_added') }}</p>
+      {% endif %}
     </div>
   </div>
 

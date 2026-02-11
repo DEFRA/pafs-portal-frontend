@@ -3,7 +3,7 @@ import {
   _cleanProjectTypeSpecificData,
   buildProjectPayload,
   submitProject,
-  handleProjectSubmissionError,
+  handleServiceConsumptionError,
   saveProjectWithErrorHandling
 } from './project-submission.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
@@ -258,7 +258,7 @@ describe('project-submission helpers', () => {
     })
   })
 
-  describe('handleProjectSubmissionError', () => {
+  describe('handleServiceConsumptionError', () => {
     const viewData = { pageTitle: 'Test' }
     const template = 'test-template'
 
@@ -273,7 +273,7 @@ describe('project-submission helpers', () => {
       const fieldErrors = { projectType: 'required' }
       extractApiValidationErrors.mockReturnValue(fieldErrors)
 
-      handleProjectSubmissionError(
+      handleServiceConsumptionError(
         mockRequest,
         mockH,
         error,
@@ -301,7 +301,7 @@ describe('project-submission helpers', () => {
       const apiError = { errorCode: 'CUSTOM_ERROR' }
       extractApiError.mockReturnValue(apiError)
 
-      handleProjectSubmissionError(
+      handleServiceConsumptionError(
         mockRequest,
         mockH,
         error,
@@ -322,7 +322,7 @@ describe('project-submission helpers', () => {
       const apiError = { errorCode: PROJECT_ERROR_CODES.NETWORK_ERROR }
       extractApiError.mockReturnValue(apiError)
 
-      handleProjectSubmissionError(
+      handleServiceConsumptionError(
         mockRequest,
         mockH,
         error,

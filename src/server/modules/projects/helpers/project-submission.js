@@ -107,7 +107,7 @@ export async function submitProject(request, level) {
 }
 
 /**
- * Handle project submission errors and return appropriate view data
+ * Handle service consumption errors and return appropriate view data
  * @param {Object} request - Hapi request object
  * @param {Object} h - Hapi response toolkit
  * @param {Error} error - Error from submission
@@ -115,7 +115,7 @@ export async function submitProject(request, level) {
  * @param {string} template - View template to render
  * @returns {Object} View response with error information
  */
-export function handleProjectSubmissionError(
+export function handleServiceConsumptionError(
   request,
   h,
   error,
@@ -171,7 +171,7 @@ export async function saveProjectWithErrorHandling(
   const result = await submitProject(request, level)
 
   if (!result.success) {
-    return handleProjectSubmissionError(
+    return handleServiceConsumptionError(
       request,
       h,
       result.error,

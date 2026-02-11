@@ -7,21 +7,26 @@ import {
 
 vi.mock('../../../common/services/auth/auth-service.js')
 vi.mock('../../../common/helpers/auth/session-manager.js')
+vi.mock('../helpers/cache-invalidation.js')
 
 const { login } = await import('../../../common/services/auth/auth-service.js')
 const { setAuthSession } =
   await import('../../../common/helpers/auth/session-manager.js')
+const { invalidateAccountsCacheOnAuth } =
+  await import('../helpers/cache-invalidation.js')
 
 describe('Login Controller', () => {
   let mockRequest
   let mockH
 
   beforeEach(() => {
+    invalidateAccountsCacheOnAuth.mockResolvedValue(undefined)
+
     mockRequest = {
       query: {},
       payload: {},
       t: vi.fn((key) => key),
-      server: { logger: { error: vi.fn() } },
+      server: { logger: { error: vi.fn(), warn: vi.fn() } },
       yar: {
         flash: vi.fn(() => [])
       }
@@ -139,6 +144,10 @@ describe('Login Controller', () => {
         }
       })
       await loginPostController.handler(mockRequest, mockH)
+      expect(invalidateAccountsCacheOnAuth).toHaveBeenCalledWith(
+        mockRequest,
+        'login'
+      )
       expect(setAuthSession).toHaveBeenCalled()
       expect(mockH.redirect).toHaveBeenCalledWith('/')
     })
@@ -154,6 +163,10 @@ describe('Login Controller', () => {
         }
       })
       await loginPostController.handler(mockRequest, mockH)
+      expect(invalidateAccountsCacheOnAuth).toHaveBeenCalledWith(
+        mockRequest,
+        'login'
+      )
       expect(setAuthSession).toHaveBeenCalled()
       expect(mockH.redirect).toHaveBeenCalledWith('/admin/journey-selection')
     })

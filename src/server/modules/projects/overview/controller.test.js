@@ -2,14 +2,20 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { overviewController } from './controller.js'
 import { PROJECT_STATUS } from '../../../common/constants/projects.js'
 import { getSessionData, getBackLink } from '../helpers/project-utils.js'
+import { enrichProjectData } from '../helpers/overview/data-enrichment.js'
+import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
-// Mock getSessionData
+// Mock dependencies
 vi.mock('../helpers/project-utils.js', () => ({
   getSessionData: vi.fn(),
   getBackLink: vi.fn(),
   formatDate: vi.fn(),
-  buildFinancialYearLabel: vi.fn()
+  buildFinancialYearLabel: vi.fn(),
+  formatFileSize: vi.fn()
 }))
+
+vi.mock('../helpers/overview/data-enrichment.js')
+vi.mock('../helpers/project-submission.js')
 
 describe('OverviewController', () => {
   let mockRequest
@@ -37,6 +43,18 @@ describe('OverviewController', () => {
       name: 'Test Project',
       projectState: PROJECT_STATUS.DRAFT
     })
+
+    enrichProjectData.mockResolvedValue({
+      success: true,
+      projectData: {
+        id: 1,
+        referenceNumber: 'REF123',
+        name: 'Test Project',
+        projectState: PROJECT_STATUS.DRAFT
+      }
+    })
+
+    handleServiceConsumptionError.mockReturnValue({ error: true })
   })
 
   describe('get', () => {
@@ -62,6 +80,11 @@ describe('OverviewController', () => {
         areaId: 5
       }
       getSessionData.mockReturnValue(projectData)
+
+      enrichProjectData.mockResolvedValue({
+        success: true,
+        projectData
+      })
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -340,6 +363,70 @@ describe('OverviewController', () => {
 
       const call = mockH.view.mock.calls[0]
       expect(call[1].projectStateTag).toBe('govuk-tag--grey')
+    })
+  })
+
+  describe('data enrichment', () => {
+    test('should call enrichProjectData with getBenefitAreaDownloadData', async () => {
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(enrichProjectData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          id: 1,
+          referenceNumber: 'REF123'
+        }),
+        expect.arrayContaining([expect.any(Function)])
+      )
+    })
+
+    test('should use enriched project data in view', async () => {
+      const enrichedData = {
+        id: 1,
+        referenceNumber: 'REF123',
+        name: 'Test Project',
+        benefitAreaFileDownloadUrl: 'https://example.com/download'
+      }
+
+      enrichProjectData.mockResolvedValue({
+        success: true,
+        projectData: enrichedData
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/projects/overview/index',
+        expect.objectContaining({
+          projectData: enrichedData
+        })
+      )
+    })
+
+    test('should handle enrichment failure', async () => {
+      enrichProjectData.mockResolvedValue({
+        success: false,
+        projectData: {
+          id: 1,
+          referenceNumber: 'REF123'
+        },
+        error: 'ENRICHMENT_FAILED'
+      })
+
+      handleServiceConsumptionError.mockReturnValue({ errorView: true })
+
+      const result = await overviewController.getHandler(mockRequest, mockH)
+
+      expect(handleServiceConsumptionError).toHaveBeenCalledWith(
+        mockRequest,
+        mockH,
+        'ENRICHMENT_FAILED',
+        expect.objectContaining({
+          pageTitle: 'projects.overview.heading'
+        }),
+        'modules/projects/overview/index'
+      )
+      expect(result).toEqual({ errorView: true })
     })
   })
 })

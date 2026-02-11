@@ -17,12 +17,18 @@ import { getSessionData } from './project-utils.js'
  */
 function areValuesEqual(value1, value2) {
   // Handle null/undefined
-  if (value1 === value2) return true
-  if (value1 == null || value2 == null) return false
+  if (value1 === value2) {
+    return true
+  }
+  if (value1 == null || value2 == null) {
+    return false
+  }
 
   // Handle arrays
   if (Array.isArray(value1) && Array.isArray(value2)) {
-    if (value1.length !== value2.length) return false
+    if (value1.length !== value2.length) {
+      return false
+    }
     return value1.every((item, index) => item === value2[index])
   }
 

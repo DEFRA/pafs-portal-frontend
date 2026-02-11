@@ -9,16 +9,19 @@ import {
   initiateFileUpload,
   getUploadStatus
 } from '../../../common/services/file-upload/file-upload-service.js'
+import { deleteProject } from '../../../common/services/project/project-service.js'
 import {
   buildViewData,
   getSessionData,
-  updateSessionData
+  updateSessionData,
+  navigateToProjectOverview
 } from '../helpers/project-utils.js'
 
 // Mock dependencies
 vi.mock('../../../common/helpers/auth/session-manager.js')
 vi.mock('../../../common/helpers/error-renderer/index.js')
 vi.mock('../../../common/services/file-upload/file-upload-service.js')
+vi.mock('../../../common/services/project/project-service.js')
 vi.mock('../helpers/project-utils.js')
 
 describe('BenefitAreaController', () => {
@@ -80,6 +83,8 @@ describe('BenefitAreaController', () => {
       }
     })
     updateSessionData.mockImplementation(() => {})
+    deleteProject.mockResolvedValue({ success: true, data: { success: true } })
+    navigateToProjectOverview.mockReturnValue({ redirect: true })
   })
 
   describe('getHandler', () => {
@@ -248,21 +253,18 @@ describe('BenefitAreaController', () => {
       )
     })
 
-    test('should include existing fileName in view data', async () => {
+    test('should redirect to overview if fileName exists in session', async () => {
       getSessionData.mockReturnValue({
         id: 'project-123',
         slug: 'TEST-001',
         benefitAreaFileName: 'existing-file.zip'
       })
 
-      await benefitAreaController.getHandler(mockRequest, mockH)
+      const result = await benefitAreaController.getHandler(mockRequest, mockH)
 
-      expect(buildViewData).toHaveBeenCalledWith(
-        mockRequest,
-        expect.objectContaining({
-          benefitAreaFileName: 'existing-file.zip'
-        })
-      )
+      expect(navigateToProjectOverview).toHaveBeenCalledWith('TEST-001', mockH)
+      expect(result).toEqual({ redirect: true })
+      expect(buildViewData).not.toHaveBeenCalled()
     })
 
     test('should pass null for benefitAreaFileName when not set', async () => {
@@ -732,6 +734,222 @@ describe('BenefitAreaController', () => {
       expect(updateSessionData).toHaveBeenCalledWith(mockRequest, {
         benefitAreaUploadErrors: null,
         benefitAreaUploadId: null
+      })
+    })
+  })
+
+  describe('getDeleteHandler', () => {
+    beforeEach(() => {
+      buildViewData.mockReturnValue({
+        pageTitle: 'Delete Benefit Area File',
+        backLink: ROUTES.GENERAL.HOME,
+        localKeyPrefix: 'projects.project_benefit_area.delete'
+      })
+    })
+
+    test('should render delete confirmation view', async () => {
+      await benefitAreaController.getDeleteHandler(mockRequest, mockH)
+
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          localKeyPrefix: 'projects.project_benefit_area.delete'
+        })
+      )
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.BENEFIT_AREA_DELETE,
+        expect.objectContaining({
+          localKeyPrefix: 'projects.project_benefit_area.delete'
+        })
+      )
+    })
+  })
+
+  describe('postDeleteHandler', () => {
+    beforeEach(() => {
+      navigateToProjectOverview.mockReturnValue({ redirect: true })
+      buildViewData.mockReturnValue({
+        pageTitle: 'Delete Benefit Area File',
+        backLink: ROUTES.GENERAL.HOME,
+        localKeyPrefix: 'projects.project_benefit_area.delete'
+      })
+    })
+
+    test('should delete benefit area file and redirect to overview', async () => {
+      deleteProject.mockResolvedValue({
+        success: true,
+        data: {
+          success: true,
+          message: 'File deleted successfully'
+        }
+      })
+
+      const result = await benefitAreaController.postDeleteHandler(
+        mockRequest,
+        mockH
+      )
+
+      expect(getAuthSession).toHaveBeenCalledWith(mockRequest)
+      expect(deleteProject).toHaveBeenCalledWith('TEST-001', 'test-token')
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        { referenceNumber: 'TEST-001' },
+        'Benefit area file deleted successfully'
+      )
+      expect(updateSessionData).toHaveBeenCalledWith(mockRequest, {
+        benefitAreaUploadId: null,
+        benefitAreaUploadUrl: null,
+        benefitAreaUploadErrors: null,
+        benefitAreaFileName: null,
+        benefitAreaFileSize: null,
+        benefitAreaContentType: null,
+        benefitAreaFileS3Bucket: null,
+        benefitAreaFileS3Key: null,
+        benefitAreaFileDownloadUrl: null,
+        benefitAreaFileDownloadExpiry: null
+      })
+      expect(navigateToProjectOverview).toHaveBeenCalledWith('TEST-001', mockH)
+      expect(result).toEqual({ redirect: true })
+    })
+
+    test('should handle delete API error and show error view', async () => {
+      const apiError = {
+        errorCode: 'FILE_DELETE_FAILED',
+        message: 'File not found'
+      }
+
+      deleteProject.mockResolvedValue({
+        success: false,
+        data: { error: apiError }
+      })
+
+      extractApiError.mockReturnValue(apiError)
+
+      await benefitAreaController.postDeleteHandler(mockRequest, mockH)
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          referenceNumber: 'TEST-001'
+        }),
+        'Failed to delete benefit area file'
+      )
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          localKeyPrefix: 'projects.project_benefit_area.delete',
+          additionalData: expect.objectContaining({
+            errorCode: 'FILE_DELETE_FAILED',
+            errorMessage: 'File not found'
+          })
+        })
+      )
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.BENEFIT_AREA_DELETE,
+        expect.objectContaining({
+          localKeyPrefix: 'projects.project_benefit_area.delete'
+        })
+      )
+      expect(navigateToProjectOverview).not.toHaveBeenCalled()
+    })
+
+    test('should handle delete API error with fallback error message', async () => {
+      deleteProject.mockResolvedValue({
+        success: false,
+        data: { error: {} }
+      })
+
+      extractApiError.mockReturnValue({ errorCode: 'UNKNOWN_ERROR' })
+
+      await benefitAreaController.postDeleteHandler(mockRequest, mockH)
+
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          localKeyPrefix: 'projects.project_benefit_area.delete',
+          additionalData: expect.objectContaining({
+            errorMessage: 'Failed to delete benefit area file'
+          })
+        })
+      )
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.BENEFIT_AREA_DELETE,
+        expect.objectContaining({
+          localKeyPrefix: 'projects.project_benefit_area.delete'
+        })
+      )
+    })
+
+    test('should handle exception during delete', async () => {
+      const error = new Error('Network timeout')
+      deleteProject.mockRejectedValue(error)
+
+      await benefitAreaController.postDeleteHandler(mockRequest, mockH)
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error,
+          referenceNumber: 'TEST-001'
+        }),
+        'Error deleting benefit area file'
+      )
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          localKeyPrefix: 'projects.project_benefit_area.delete',
+          additionalData: expect.objectContaining({
+            errorCode: 'DELETE_FAILED',
+            errorMessage:
+              'An error occurred while deleting the file. Please try again.'
+          })
+        })
+      )
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.BENEFIT_AREA_DELETE,
+        expect.objectContaining({
+          localKeyPrefix: 'projects.project_benefit_area.delete'
+        })
+      )
+      expect(navigateToProjectOverview).not.toHaveBeenCalled()
+    })
+
+    test('should handle missing access token', async () => {
+      getAuthSession.mockReturnValue(null)
+
+      deleteProject.mockResolvedValue({
+        success: true,
+        data: { success: true }
+      })
+
+      await benefitAreaController.postDeleteHandler(mockRequest, mockH)
+
+      expect(deleteProject).toHaveBeenCalledWith('TEST-001', undefined)
+      expect(navigateToProjectOverview).toHaveBeenCalled()
+    })
+
+    test('should clear all upload session data on successful delete', async () => {
+      getSessionData.mockReturnValue({
+        benefitAreaUploadId: 'upload-123',
+        benefitAreaUploadUrl: 'https://cdp.example.com/upload',
+        benefitAreaUploadErrors: [{ message: 'Previous error' }]
+      })
+
+      deleteProject.mockResolvedValue({
+        success: true,
+        data: { success: true }
+      })
+
+      await benefitAreaController.postDeleteHandler(mockRequest, mockH)
+
+      expect(updateSessionData).toHaveBeenCalledWith(mockRequest, {
+        benefitAreaUploadId: null,
+        benefitAreaUploadUrl: null,
+        benefitAreaUploadErrors: null,
+        benefitAreaFileName: null,
+        benefitAreaFileSize: null,
+        benefitAreaContentType: null,
+        benefitAreaFileS3Bucket: null,
+        benefitAreaFileS3Key: null,
+        benefitAreaFileDownloadUrl: null,
+        benefitAreaFileDownloadExpiry: null
       })
     })
   })

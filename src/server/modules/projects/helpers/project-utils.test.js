@@ -18,7 +18,8 @@ import {
   getAfterMarchYear,
   isYearBeyondRange,
   getMonthName,
-  formatDate
+  formatDate,
+  formatFileSize
 } from './project-utils.js'
 import {
   PROJECT_SESSION_KEY,
@@ -630,6 +631,36 @@ describe('project-utils', () => {
 
     test('should return null when both are missing', () => {
       expect(formatDate(null, null)).toBeNull()
+    })
+  })
+
+  describe('formatFileSize', () => {
+    test('should format bytes correctly', () => {
+      expect(formatFileSize(0)).toBe('0 B')
+      expect(formatFileSize(512)).toBe('512 B')
+      expect(formatFileSize(1023)).toBe('1023 B')
+    })
+
+    test('should format kilobytes correctly', () => {
+      expect(formatFileSize(1024)).toBe('1 KB')
+      expect(formatFileSize(2048)).toBe('2 KB')
+      expect(formatFileSize(3456)).toBe('3.38 KB')
+    })
+
+    test('should format megabytes correctly', () => {
+      expect(formatFileSize(1048576)).toBe('1 MB')
+      expect(formatFileSize(2097152)).toBe('2 MB')
+      expect(formatFileSize(1572864)).toBe('1.5 MB')
+    })
+
+    test('should format gigabytes correctly', () => {
+      expect(formatFileSize(1073741824)).toBe('1 GB')
+      expect(formatFileSize(2147483648)).toBe('2 GB')
+    })
+
+    test('should handle null or undefined', () => {
+      expect(formatFileSize(null)).toBe('0 B')
+      expect(formatFileSize(undefined)).toBe('0 B')
     })
   })
 })
