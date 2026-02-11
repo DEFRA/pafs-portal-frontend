@@ -268,7 +268,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
         ttl: 1000,
         isSecure: true,
         isHttpOnly: true,
-        isSameSite: 'Lax'
+        isSameSite: 'Strict'
       })
     )
 
@@ -279,7 +279,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
         ttl: 1000,
         isSecure: true,
         isHttpOnly: true,
-        isSameSite: 'Lax'
+        isSameSite: 'Strict'
       })
     )
 
@@ -350,14 +350,14 @@ describe('StaticPageController - cookie banner accept', () => {
       expect.objectContaining({
         isSecure: true,
         isHttpOnly: true,
-        isSameSite: 'Lax'
+        isSameSite: 'Strict'
       })
     )
     expect(stateSpy).toHaveBeenCalledWith(
       'show_cookie_confirmation',
       'true',
       expect.objectContaining({
-        isSameSite: 'Lax'
+        isSameSite: 'Strict'
       })
     )
     expect(response).toBeDefined()
@@ -428,7 +428,7 @@ describe('StaticPageController - cookie banner reject', () => {
       expect.objectContaining({
         isSecure: true,
         isHttpOnly: true,
-        isSameSite: 'Lax'
+        isSameSite: 'Strict'
       })
     )
     expect(response).toBeDefined()

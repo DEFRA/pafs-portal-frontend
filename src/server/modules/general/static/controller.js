@@ -126,7 +126,7 @@ class StaticPageController {
       ttl: config.get(COOKIE_TTL_CONFIG_KEY),
       isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
       isHttpOnly: true,
-      isSameSite: 'Lax'
+      isSameSite: 'Strict'
     }
 
     response.state(
@@ -155,7 +155,7 @@ class StaticPageController {
       ttl: null, // Session cookie
       isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
       isHttpOnly: false,
-      isSameSite: 'Lax'
+      isSameSite: 'Strict'
     })
 
     // Clear hide message cookie so confirmation shows
