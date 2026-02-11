@@ -56,6 +56,22 @@
       "title": "Risks and properties benefitting",
       "not_added": "No risks and properties benefitting data added yet"
     },
+    "risk_and_properties_summary_card": {
+      "title": "Risks and properties benefitting",
+      "no_data": "No risks and properties benefitting data added yet",
+      "selected_risks": "Selected risks",
+      "main_risk": "Main risk",
+      "properties_affected_flooding": "Properties affected by flooding",
+      "no_properties_flooding": "No properties affected by flooding",
+      "maintaining_protection": "Maintaining flood protection",
+      "reducing_50_plus": "Reducing flood risk (50% or more)",
+      "reducing_less_50": "Reducing flood risk (less than 50%)",
+      "increasing_resilience": "Increasing flood resilience",
+      "properties_affected_coastal_erosion": "Properties affected by coastal erosion",
+      "no_properties_coastal_erosion": "No properties affected by coastal erosion",
+      "maintaining_assets_coastal": "Maintaining existing coastal assets",
+      "reducing_coastal_erosion": "Reducing coastal erosion risk"
+    },
     "approach_summary_card": {
       "title": "Approach",
       "not_added": "No approach added yet"
@@ -269,6 +285,65 @@
     },
     "validation": {
       "FAILED_TO_UPLOAD_FILE": "Failed to upload a shapefile"
+    }
+  },
+  "risk_and_properties": {
+    "risk": {
+      "title": "Select which risks your project protects against",
+      "heading": "Select which risks your project protects against",
+      "errors": {
+        "required": "Please select at least one risk"
+      },
+      "options": {
+        "fluvial_flooding": "Fluvial flooding (river flooding)",
+        "tidal_flooding": "Tidal flooding",
+        "groundwater_flooding": "Groundwater flooding",
+        "surface_water_flooding": "Surface water flooding",
+        "sea_flooding": "Sea flooding",
+        "reservoir_flooding": "Reservoir flooding",
+        "coastal_erosion": "Coastal erosion"
+      }
+    },
+    "main_risk": {
+      "title": "What is the main risk?",
+      "heading": "What is the main risk your proposed project will protect against?",
+      "errors": {
+        "required": "Please select the main source of risk"
+      }
+    },
+    "property_affected_flooding": {
+      "title": "Properties affected by flooding",
+      "heading": "How many properties affected by flooding is the project likely to benefit",
+      "description": "These are properties that are at risk today",
+      "no_properties_checkbox": "My project does not benefit any properties at risk of flooding",
+      "errors": {
+        "invalid_value": "Enter the number of properties affected by flooding"
+      },
+      "table": {
+        "maintaining_existing": "Maintaining flood protection",
+        "reducing_50_plus": "Reducing flood risk (50% or more)",
+        "reducing_less_50": "Reducing flood risk (less than 50%)",
+        "increasing_resilience": "Increasing flood resilience",
+        "maintaining_existing_question": "How many properties are estimated to benefit from maintaining existing assets?",
+        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more?",
+        "reducing_less_50_question": "How many properties are estimated to benefit from a reduction in flood probability of less than 50% (excluding property flood resilience)?",
+        "increasing_resilience_question": "How many properties will benefit from an individual property intervention?"
+      }
+    },
+    "property_affected_coastal_erosion": {
+      "title": "Properties affected by coastal erosion",
+      "heading": "How many properties affected by coastal erosion is the project likely to benefit",
+      "description": "These are properties that are at risk today.",
+      "no_properties_checkbox": "My project does not benefit any properties at risk of coastal erosion",
+      "errors": {
+        "invalid_value": "Enter the number of properties affected by coastal erosion"
+      },
+      "table": {
+        "maintaining_existing": "Maintaining coastal erosion protection",
+        "reducing_coastal_erosion": "Reducing coastal erosion risk",
+        "maintaining_existing_question": "How many properties are estimated to benefit from maintaining existing assets?",
+        "reducing_coastal_erosion_question": "How many properties are estimated to benefit from investment to reduce coastal erosion?"
+      }
     }
   }
 }

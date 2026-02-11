@@ -16,7 +16,11 @@ export const PROJECT_STEPS = {
   START_BENEFITS: 'start-benefits',
   COULD_START_EARLY: 'could-start-early',
   EARLIEST_START_DATE: 'earliest-start-date',
-  BENEFIT_AREA: 'benefit-area'
+  BENEFIT_AREA: 'benefit-area',
+  RISK: 'risk',
+  MAIN_RISK: 'main-risk',
+  PROPERTY_AFFECTED_FLOODING: 'property-affected-flooding',
+  PROPERTY_AFFECTED_COASTAL_EROSION: 'property-affected-coastal-erosion'
 }
 
 export const PROJECT_SESSION_KEY = 'projectData'
@@ -54,7 +58,19 @@ export const PROJECT_PAYLOAD_FIELDS = {
   BENEFIT_AREA_FILE_S3_KEY: 'benefitAreaFileS3Key',
   BENEFIT_AREA_FILE_UPDATED_AT: 'benefitAreaFileUpdatedAt',
   BENEFIT_AREA_FILE_DOWNLOAD_URL: 'benefitAreaFileDownloadUrl',
-  BENEFIT_AREA_FILE_DOWNLOAD_EXPIRY: 'benefitAreaFileDownloadExpiry'
+  BENEFIT_AREA_FILE_DOWNLOAD_EXPIRY: 'benefitAreaFileDownloadExpiry',
+  RISKS: 'risks',
+  MAIN_RISK: 'mainRisk',
+  NO_PROPERTIES_AT_RISK: 'noPropertiesAtRisk',
+  MAINTAINING_EXISTING_ASSETS: 'maintainingExistingAssets',
+  REDUCING_FLOOD_RISK_50_PLUS: 'reducingFloodRisk50Plus',
+  REDUCING_FLOOD_RISK_LESS_50: 'reducingFloodRiskLess50',
+  INCREASING_FLOOD_RESILIENCE: 'increasingFloodResilience',
+  NO_PROPERTIES_AT_COASTAL_EROSION_RISK: 'noPropertiesAtCoastalErosionRisk',
+  PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL:
+    'propertiesBenefitMaintainingAssetsCoastal',
+  PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION:
+    'propertiesBenefitInvestmentCoastalErosion'
 }
 
 export const PROJECT_PAYLOAD_LEVELS = {
@@ -70,7 +86,11 @@ export const PROJECT_PAYLOAD_LEVELS = {
   START_WORK: 'START_CONSTRUCTION',
   START_BENEFITS: 'READY_FOR_SERVICE',
   COULD_START_EARLY: 'COULD_START_EARLY',
-  EARLIEST_START_DATE: 'EARLIEST_WITH_GIA'
+  EARLIEST_START_DATE: 'EARLIEST_WITH_GIA',
+  RISK: 'RISK',
+  MAIN_RISK: 'MAIN_RISK',
+  PROPERTY_AFFECTED_FLOODING: 'PROPERTY_AFFECTED_FLOODING',
+  PROPERTY_AFFECTED_COASTAL_EROSION: 'PROPERTY_AFFECTED_COASTAL_EROSION'
 }
 
 export const PROJECT_TYPES = {
@@ -88,6 +108,16 @@ export const PROJECT_INTERVENTION_TYPES = {
   SUDS: 'SUDS',
   PFR: 'PFR',
   OTHER: 'Other'
+}
+
+export const PROJECT_RISK_TYPES = {
+  FLUVIAL: 'fluvial_flooding',
+  TIDAL: 'tidal_flooding',
+  GROUNDWATER: 'groundwater_flooding',
+  SURFACE_WATER: 'surface_water_flooding',
+  SEA: 'sea_flooding',
+  RESERVOIR: 'reservoir_flooding',
+  COASTAL_EROSION: 'coastal_erosion'
 }
 
 export const PROJECT_VALIDATION_MESSAGES = {
@@ -131,7 +161,12 @@ export const PROJECT_VALIDATION_MESSAGES = {
   DATE_BEFORE_PREVIOUS_STAGE: 'DATE_BEFORE_PREVIOUS_STAGE',
   COULD_START_EARLY_REQUIRED: 'COULD_START_EARLY_REQUIRED',
   COULD_START_EARLY_INVALID: 'COULD_START_EARLY_INVALID',
-  FAILED_TO_UPLOAD_FILE: 'FAILED_TO_UPLOAD_FILE'
+  FAILED_TO_UPLOAD_FILE: 'FAILED_TO_UPLOAD_FILE',
+  RISKS_REQUIRED: 'RISKS_REQUIRED',
+  RISKS_INVALID: 'RISKS_INVALID',
+  MAIN_RISK_REQUIRED: 'MAIN_RISK_REQUIRED',
+  MAIN_RISK_INVALID: 'MAIN_RISK_INVALID',
+  PROPERTY_VALUE_INVALID: 'PROPERTY_VALUE_INVALID'
 }
 
 /**

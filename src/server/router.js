@@ -59,7 +59,8 @@ export const router = {
         'type',
         'financial-year',
         'important-dates',
-        'benefit-area'
+        'benefit-area',
+        'risk-and-properties'
       ])
 
       // Static assets

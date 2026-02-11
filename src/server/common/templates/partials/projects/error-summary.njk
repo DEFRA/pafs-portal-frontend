@@ -400,6 +400,82 @@
   ]) %}
 {% endif %}
 
+{# Risk and Properties - Risks errors #}
+{% if fieldErrors.risks %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.risk.errors.required'),
+      href: "#risks"
+    }
+  ]) %}
+{% endif %}
+
+{# Risk and Properties - Main Risk errors #}
+{% if fieldErrors.mainRisk %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.main_risk.errors.required'),
+      href: "#mainRisk"
+    }
+  ]) %}
+{% endif %}
+
+{# Risk and Properties - Property Affected Flooding errors #}
+{% if fieldErrors.maintainingExistingAssets %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.property_affected_flooding.errors.invalid_value'),
+      href: "#maintainingExistingAssets"
+    }
+  ]) %}
+{% endif %}
+
+{% if fieldErrors.reducingFloodRisk50Plus %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.property_affected_flooding.errors.invalid_value'),
+      href: "#reducingFloodRisk50Plus"
+    }
+  ]) %}
+{% endif %}
+
+{% if fieldErrors.reducingFloodRiskLess50 %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.property_affected_flooding.errors.invalid_value'),
+      href: "#reducingFloodRiskLess50"
+    }
+  ]) %}
+{% endif %}
+
+{% if fieldErrors.increasingFloodResilience %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.property_affected_flooding.errors.invalid_value'),
+      href: "#increasingFloodResilience"
+    }
+  ]) %}
+{% endif %}
+
+{# Risk and Properties - Coastal Erosion errors #}
+{% if fieldErrors.propertiesBenefitMaintainingAssetsCoastal %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.property_affected_coastal_erosion.errors.invalid_value'),
+      href: "#propertiesBenefitMaintainingAssetsCoastal"
+    }
+  ]) %}
+{% endif %}
+
+{% if fieldErrors.propertiesBenefitInvestmentCoastalErosion %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.property_affected_coastal_erosion.errors.invalid_value'),
+      href: "#propertiesBenefitInvestmentCoastalErosion"
+    }
+  ]) %}
+{% endif %}
+
 {# General errors #}
 {% if errorList.length == 0 and errorCode == ERROR_CODES.NETWORK_ERROR %}
   {% set errorList = errorList.concat([

@@ -1,0 +1,238 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block body %}
+  <form method="post" novalidate>
+
+    {# RISK PAGE - Checkbox selection of risks #}
+    {% if step == projectSteps.RISK %}
+      {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.RISKS] %}
+        {% set riskError = {
+          text: t(localKeyPrefix + '.errors.required')
+        } %}
+      {% else %}
+        {% set riskError = false %}
+      {% endif %}
+
+      {% set checkedRisks = formData[PROJECT_PAYLOAD_FIELDS.RISKS] or [] %}
+      {% set riskItems = [] %}
+      {% for option in riskOptions %}
+        {% set itemConfig = {
+          text: option.text,
+          value: option.value,
+          checked: option.value in checkedRisks
+        } %}
+        {% set riskItems = (riskItems.push(itemConfig), riskItems) %}
+      {% endfor %}
+
+      {{ govukCheckboxes({
+        name: PROJECT_PAYLOAD_FIELDS.RISKS,
+        id: PROJECT_PAYLOAD_FIELDS.RISKS,
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.heading'),
+            classes: "govuk-fieldset__legend--xl",
+            isPageHeading: true
+          }
+        },
+        items: riskItems,
+        errorMessage: riskError
+      }) }}
+
+    {# MAIN RISK PAGE - Radio selection of main risk #}
+    {% elif step == projectSteps.MAIN_RISK %}
+      <input type="hidden" name="{{PROJECT_PAYLOAD_FIELDS.RISKS}}" value="{{ formData[PROJECT_PAYLOAD_FIELDS.RISKS] | join(',') }}">
+      
+      {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.MAIN_RISK] %}
+        {% set mainRiskError = {
+          text: t(localKeyPrefix + '.errors.required')
+        } %}
+      {% else %}
+        {% set mainRiskError = false %}
+      {% endif %}
+
+      {{ govukRadios({
+        id: PROJECT_PAYLOAD_FIELDS.MAIN_RISK,
+        name: PROJECT_PAYLOAD_FIELDS.MAIN_RISK,
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.heading'),
+            classes: "govuk-fieldset__legend--xl",
+            isPageHeading: true
+          }
+        },
+        value: formData[PROJECT_PAYLOAD_FIELDS.MAIN_RISK],
+        items: mainRiskOptions,
+        errorMessage: mainRiskError
+      }) }}
+
+    {# PROPERTY AFFECTED FLOODING PAGE - Table with inputs #}
+    {% elif step == projectSteps.PROPERTY_AFFECTED_FLOODING %}
+      <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
+      
+      <p class="govuk-body-s">{{ t(localKeyPrefix + '.description') }}</p>
+
+      {# Checkbox for "My project does not benefit any properties at risk of flooding" #}
+      {{ govukCheckboxes({
+        name: PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK,
+        id: PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK,
+        items: [
+          {
+            text: t(localKeyPrefix + '.no_properties_checkbox'),
+            value: 'true',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK] == 'true' or formData[PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK] == true
+          }
+        ]
+      }) }}
+
+      {# Property values table #}
+      <div class="govuk-form-group {% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] or fieldErrors[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE]) %}govuk-form-group--error{% endif %}">
+        
+        {% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] or fieldErrors[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE]) %}
+          <span class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span>
+            {{ t(localKeyPrefix + '.errors.invalid_value') }}
+          </span>
+        {% endif %}
+
+        <table class="govuk-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">{{ t(localKeyPrefix + '.table.maintaining_existing') }}</th>
+              <th scope="col" class="govuk-table__header">{{ t(localKeyPrefix + '.table.reducing_50_plus') }}</th>
+              <th scope="col" class="govuk-table__header">{{ t(localKeyPrefix + '.table.reducing_less_50') }}</th>
+              <th scope="col" class="govuk-table__header">{{ t(localKeyPrefix + '.table.increasing_resilience') }}</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t(localKeyPrefix + '.table.maintaining_existing_question') }}</td>
+              <td class="govuk-table__cell">{{ t(localKeyPrefix + '.table.reducing_50_plus_question') }}</td>
+              <td class="govuk-table__cell">{{ t(localKeyPrefix + '.table.reducing_less_50_question') }}</td>
+              <td class="govuk-table__cell">{{ t(localKeyPrefix + '.table.increasing_resilience_question') }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">
+                <input 
+                  class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] %}govuk-input--error{% endif %}"
+                  id="{{ PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS }}"
+                  name="{{ PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS }}"
+                  type="text"
+                  inputmode="numeric"
+                  value="{{ formData[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] or '' }}"
+                >
+              </td>
+              <td class="govuk-table__cell">
+                <input 
+                  class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] %}govuk-input--error{% endif %}"
+                  id="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS }}"
+                  name="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS }}"
+                  type="text"
+                  inputmode="numeric"
+                  value="{{ formData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] or '' }}"
+                >
+              </td>
+              <td class="govuk-table__cell">
+                <input 
+                  class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] %}govuk-input--error{% endif %}"
+                  id="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50 }}"
+                  name="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50 }}"
+                  type="text"
+                  inputmode="numeric"
+                  value="{{ formData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] or '' }}"
+                >
+              </td>
+              <td class="govuk-table__cell">
+                <input 
+                  class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] %}govuk-input--error{% endif %}"
+                  id="{{ PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE }}"
+                  name="{{ PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE }}"
+                  type="text"
+                  inputmode="numeric"
+                  value="{{ formData[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] or '' }}"
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    {# PROPERTY AFFECTED COASTAL EROSION PAGE - Table with inputs #}
+    {% elif step == projectSteps.PROPERTY_AFFECTED_COASTAL_EROSION %}
+      <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
+      
+      <p class="govuk-body">{{ t(localKeyPrefix + '.description') }}</p>
+
+      {# Checkbox for "My project does not benefit any properties at risk of coastal erosion" #}
+      {{ govukCheckboxes({
+        name: PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK,
+        id: PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK,
+        items: [
+          {
+            text: t(localKeyPrefix + '.no_properties_checkbox'),
+            value: 'true',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK] == 'true' or formData[PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK] == true
+          }
+        ]
+      }) }}
+
+      {# Property values table #}
+      <div class="govuk-form-group {% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] or fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION]) %}govuk-form-group--error{% endif %}">
+        
+        {% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] or fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION]) %}
+          <span class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span>
+            {{ t(localKeyPrefix + '.errors.invalid_value') }}
+          </span>
+        {% endif %}
+
+        <table class="govuk-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">{{ t(localKeyPrefix + '.table.maintaining_existing') }}</th>
+              <th scope="col" class="govuk-table__header">{{ t(localKeyPrefix + '.table.reducing_coastal_erosion') }}</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t(localKeyPrefix + '.table.maintaining_existing_question') }}</td>
+              <td class="govuk-table__cell">{{ t(localKeyPrefix + '.table.reducing_coastal_erosion_question') }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">
+                <input 
+                  class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] %}govuk-input--error{% endif %}"
+                  id="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL }}"
+                  name="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL }}"
+                  type="text"
+                  inputmode="numeric"
+                  value="{{ formData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] or '' }}"
+                >
+              </td>
+              <td class="govuk-table__cell">
+                <input 
+                  class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] %}govuk-input--error{% endif %}"
+                  id="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION }}"
+                  name="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION }}"
+                  type="text"
+                  inputmode="numeric"
+                  value="{{ formData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] or '' }}"
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    {% endif %}
+
+    {{ govukButton({
+      text: t('common.buttons.save_and_continue'),
+      preventDoubleClick: true
+    }) }}
+  </form>
+{% endblock %}

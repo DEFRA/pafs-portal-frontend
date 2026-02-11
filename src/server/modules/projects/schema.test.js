@@ -13,9 +13,16 @@ import {
   validateStartWork,
   validateStartBenefits,
   validateCouldStartEarlier,
-  validateEarliestStartDate
+  validateEarliestStartDate,
+  validateRisks,
+  validateMainRisk,
+  validatePropertyAffectedFlooding,
+  validatePropertyAffectedCoastalErosion
 } from './schema.js'
-import { PROJECT_PAYLOAD_FIELDS } from '../../common/constants/projects.js'
+import {
+  PROJECT_PAYLOAD_FIELDS,
+  PROJECT_RISK_TYPES
+} from '../../common/constants/projects.js'
 
 describe('Project Schemas', () => {
   describe('validateProjectName', () => {
@@ -269,6 +276,161 @@ describe('Project Schemas', () => {
       const result = validateEarliestStartDate.validate({
         [PROJECT_PAYLOAD_FIELDS.COULD_START_EARLY]: true,
         [PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH]: '4'
+      })
+      expect(result.error).toBeDefined()
+    })
+  })
+
+  describe('validateRisks', () => {
+    test('should validate valid risks array', () => {
+      const result = validateRisks.validate({
+        [PROJECT_PAYLOAD_FIELDS.RISKS]: [
+          PROJECT_RISK_TYPES.FLUVIAL,
+          PROJECT_RISK_TYPES.TIDAL
+        ]
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('should validate single risk', () => {
+      const result = validateRisks.validate({
+        [PROJECT_PAYLOAD_FIELDS.RISKS]: [PROJECT_RISK_TYPES.COASTAL_EROSION]
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('should return error for empty risks array', () => {
+      const result = validateRisks.validate({
+        [PROJECT_PAYLOAD_FIELDS.RISKS]: []
+      })
+      expect(result.error).toBeDefined()
+    })
+
+    test('should return error for missing risks', () => {
+      const result = validateRisks.validate({})
+      expect(result.error).toBeDefined()
+    })
+
+    test('should allow unknown fields for clearing properties', () => {
+      const result = validateRisks.validate({
+        [PROJECT_PAYLOAD_FIELDS.RISKS]: [PROJECT_RISK_TYPES.FLUVIAL],
+        [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK]: null,
+        [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL]:
+          null
+      })
+      expect(result.error).toBeUndefined()
+    })
+  })
+
+  describe('validateMainRisk', () => {
+    test('should validate valid main risk', () => {
+      const result = validateMainRisk.validate({
+        [PROJECT_PAYLOAD_FIELDS.MAIN_RISK]: PROJECT_RISK_TYPES.FLUVIAL
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('should validate coastal erosion as main risk', () => {
+      const result = validateMainRisk.validate({
+        [PROJECT_PAYLOAD_FIELDS.MAIN_RISK]: PROJECT_RISK_TYPES.COASTAL_EROSION
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('should return error for missing main risk', () => {
+      const result = validateMainRisk.validate({})
+      expect(result.error).toBeDefined()
+    })
+
+    test('should return error for invalid risk type', () => {
+      const result = validateMainRisk.validate({
+        [PROJECT_PAYLOAD_FIELDS.MAIN_RISK]: 'invalid_risk'
+      })
+      expect(result.error).toBeDefined()
+    })
+  })
+
+  describe('validatePropertyAffectedFlooding', () => {
+    test('should validate when checkbox is checked (no properties)', () => {
+      const result = validatePropertyAffectedFlooding.validate({
+        [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK]: true
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('should validate with property values when checkbox unchecked', () => {
+      const result = validatePropertyAffectedFlooding.validate({
+        [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK]: false,
+        [PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS]: 10,
+        [PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS]: 5,
+        [PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50]: 3,
+        [PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE]: 2
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('should allow empty strings when checkbox is checked', () => {
+      const result = validatePropertyAffectedFlooding.validate({
+        [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS]: '',
+        [PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS]: '',
+        [PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50]: '',
+        [PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE]: ''
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('should return error for invalid property value when checkbox unchecked', () => {
+      const result = validatePropertyAffectedFlooding.validate({
+        [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK]: false,
+        [PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS]: 'invalid'
+      })
+      expect(result.error).toBeDefined()
+    })
+  })
+
+  describe('validatePropertyAffectedCoastalErosion', () => {
+    test('should validate when checkbox is checked (no properties)', () => {
+      const result = validatePropertyAffectedCoastalErosion.validate({
+        [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK]: true
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('should validate with property values when checkbox unchecked', () => {
+      const result = validatePropertyAffectedCoastalErosion.validate({
+        [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK]: false,
+        [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL]: 8,
+        [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION]: 12
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('should allow empty strings when checkbox is checked', () => {
+      const result = validatePropertyAffectedCoastalErosion.validate({
+        [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL]:
+          '',
+        [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION]:
+          ''
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('should return error for invalid property value when checkbox unchecked', () => {
+      const result = validatePropertyAffectedCoastalErosion.validate({
+        [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK]: false,
+        [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL]:
+          'invalid'
+      })
+      expect(result.error).toBeDefined()
+    })
+
+    test('should return error for negative property values', () => {
+      const result = validatePropertyAffectedCoastalErosion.validate({
+        [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK]: false,
+        [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL]:
+          -5
       })
       expect(result.error).toBeDefined()
     })

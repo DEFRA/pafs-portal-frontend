@@ -111,7 +111,11 @@ export const ROUTES = {
       START_WORK: `/project/{referenceNumber}/${PROJECT_STEPS.START_WORK}`,
       START_BENEFITS: `/project/{referenceNumber}/${PROJECT_STEPS.START_BENEFITS}`,
       COULD_START_EARLY: `/project/{referenceNumber}/${PROJECT_STEPS.COULD_START_EARLY}`,
-      EARLIEST_START_DATE: `/project/{referenceNumber}/${PROJECT_STEPS.EARLIEST_START_DATE}`
+      EARLIEST_START_DATE: `/project/{referenceNumber}/${PROJECT_STEPS.EARLIEST_START_DATE}`,
+      RISK: `/project/{referenceNumber}/${PROJECT_STEPS.RISK}`,
+      MAIN_RISK: `/project/{referenceNumber}/${PROJECT_STEPS.MAIN_RISK}`,
+      PROPERTY_AFFECTED_FLOODING: `/project/{referenceNumber}/${PROJECT_STEPS.PROPERTY_AFFECTED_FLOODING}`,
+      PROPERTY_AFFECTED_COASTAL_EROSION: `/project/{referenceNumber}/${PROJECT_STEPS.PROPERTY_AFFECTED_COASTAL_EROSION}`
     }
   },
 

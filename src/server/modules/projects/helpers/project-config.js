@@ -16,7 +16,11 @@ import {
   validateStartWork,
   validateStartBenefits,
   validateCouldStartEarlier,
-  validateEarliestStartDate
+  validateEarliestStartDate,
+  validateRisks,
+  validateMainRisk,
+  validatePropertyAffectedFlooding,
+  validatePropertyAffectedCoastalErosion
 } from '../schema.js'
 
 export const interventionTypesLocalKeyPrefix = 'projects.intervention_type'
@@ -261,5 +265,82 @@ export const PROJECT_PAYLOAD_LEVEL_FIELDS = {
     PROJECT_PAYLOAD_FIELDS.COULD_START_EARLY,
     PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH,
     PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_YEAR
+  ],
+  [PROJECT_PAYLOAD_LEVELS.RISK]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.RISKS,
+    // Include property fields so they can be cleared when risks change
+    PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK,
+    PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS,
+    PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS,
+    PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50,
+    PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE,
+    PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK,
+    PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL,
+    PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION
+  ],
+  [PROJECT_PAYLOAD_LEVELS.MAIN_RISK]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.MAIN_RISK
+  ],
+  [PROJECT_PAYLOAD_LEVELS.PROPERTY_AFFECTED_FLOODING]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK,
+    PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS,
+    PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS,
+    PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50,
+    PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE
+  ],
+  [PROJECT_PAYLOAD_LEVELS.PROPERTY_AFFECTED_COASTAL_EROSION]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK,
+    PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL,
+    PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION
   ]
+}
+
+/**
+ * Configuration for risk and properties benefitting related steps
+ */
+export const RISK_AND_PROPERTIES_CONFIG = {
+  [PROJECT_STEPS.RISK]: {
+    localKeyPrefix: 'projects.risk_and_properties.risk',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.OVERVIEW,
+      conditionalRedirect: true
+    },
+    schema: validateRisks,
+    fieldType: 'checkbox'
+  },
+  [PROJECT_STEPS.MAIN_RISK]: {
+    localKeyPrefix: 'projects.risk_and_properties.main_risk',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.OVERVIEW,
+      targetEditURL: ROUTES.PROJECT.EDIT.RISK,
+      conditionalRedirect: false
+    },
+    schema: validateMainRisk,
+    fieldType: 'radio'
+  },
+  [PROJECT_STEPS.PROPERTY_AFFECTED_FLOODING]: {
+    localKeyPrefix: 'projects.risk_and_properties.property_affected_flooding',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.OVERVIEW,
+      targetEditURL: ROUTES.PROJECT.EDIT.MAIN_RISK,
+      conditionalRedirect: false
+    },
+    schema: validatePropertyAffectedFlooding,
+    fieldType: 'table'
+  },
+  [PROJECT_STEPS.PROPERTY_AFFECTED_COASTAL_EROSION]: {
+    localKeyPrefix:
+      'projects.risk_and_properties.property_affected_coastal_erosion',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.OVERVIEW,
+      targetEditURL: ROUTES.PROJECT.EDIT.PROPERTY_AFFECTED_FLOODING,
+      conditionalRedirect: false
+    },
+    schema: validatePropertyAffectedCoastalErosion,
+    fieldType: 'table'
+  }
 }
