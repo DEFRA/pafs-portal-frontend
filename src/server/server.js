@@ -12,6 +12,7 @@ import { requestTracing } from './common/helpers/request-tracing.js'
 import { requestLogger } from './common/helpers/logging/request-logger.js'
 import { sessionCache } from './common/helpers/session-cache/session-cache.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
+import { registerCookieStates } from './common/helpers/cookie-config.js'
 import { secureContext } from '@defra/hapi-secure-context'
 import { contentSecurityPolicy } from './common/helpers/content-security-policy.js'
 import { i18nPlugin } from './common/helpers/i18n/index.js'
@@ -55,6 +56,10 @@ export async function createServer() {
       strictHeader: false
     }
   })
+
+  // Register cookie state definitions so Hapi knows how to decode them
+  registerCookieStates(server)
+
   await server.register([
     requestLogger,
     requestTracing,
