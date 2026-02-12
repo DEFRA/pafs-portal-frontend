@@ -246,6 +246,42 @@ export const config = convict({
       env: 'PAGINATION_DEFAULT_PAGE_SIZE'
     }
   },
+  cacheFeatures: {
+    accounts: {
+      account: {
+        doc: 'Enable caching for individual account data',
+        format: Boolean,
+        default: false,
+        env: 'CACHE_ACCOUNT_ENABLED'
+      },
+      accountsList: {
+        doc: 'Enable caching for accounts list metadata',
+        format: Boolean,
+        default: false,
+        env: 'CACHE_ACCOUNTS_LIST_ENABLED'
+      }
+    },
+    areas: {
+      area: {
+        doc: 'Enable caching for individual area data',
+        format: Boolean,
+        default: false,
+        env: 'CACHE_AREA_ENABLED'
+      },
+      areasByList: {
+        doc: 'Enable caching for areas list with pagination',
+        format: Boolean,
+        default: false,
+        env: 'CACHE_AREAS_BY_LIST_ENABLED'
+      },
+      areasByType: {
+        doc: 'Enable caching for areas grouped by type',
+        format: Boolean,
+        default: true,
+        env: 'CACHE_AREAS_BY_TYPE_ENABLED'
+      }
+    }
+  },
   privacyNotice: {
     lastUpdatedDate: {
       doc: 'Privacy notice last updated date',

@@ -294,6 +294,13 @@ class BenefitAreaController {
     }
   }
 
+  _getBenefitAreaEditLink(referenceNumber) {
+    return ROUTES.PROJECT.EDIT.BENEFIT_AREA.replace(
+      REFERENCE_NUMBER_PARAM,
+      referenceNumber
+    )
+  }
+
   async uploadStatus(request, h) {
     const session = getAuthSession(request)
     const accessToken = session?.accessToken
@@ -301,10 +308,7 @@ class BenefitAreaController {
     const referenceNumber = request.params.referenceNumber || ''
     const uploadId = sessionData?.benefitAreaUploadId
 
-    const benefitAreaUrl = ROUTES.PROJECT.EDIT.BENEFIT_AREA.replace(
-      REFERENCE_NUMBER_PARAM,
-      referenceNumber
-    )
+    const benefitAreaUrl = this._getBenefitAreaEditLink(referenceNumber)
 
     const overviewUrl = ROUTES.PROJECT.OVERVIEW.replace(
       REFERENCE_NUMBER_PARAM,
@@ -398,8 +402,9 @@ class BenefitAreaController {
         benefitAreaFileDownloadExpiry: null
       })
 
-      // Redirect to overview page
-      return navigateToProjectOverview(referenceNumber, h)
+      // Redirect to benefit area edit page after deletion
+      const benefitAreaEditLink = this._getBenefitAreaEditLink(referenceNumber)
+      return h.redirect(benefitAreaEditLink).takeover()
     } catch (error) {
       request.logger.error(
         { error, referenceNumber },
