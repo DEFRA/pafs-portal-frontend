@@ -12,6 +12,8 @@ vi.mock('../../../../config/config.js', () => ({
       if (key === 'session.cache.ttl') return 1800000
       if (key === 'session.cache.engine') return 'redis'
       if (key === 'pagination.defaultPageSize') return 25
+      if (key === 'cacheFeatures.accounts.account') return true
+      if (key === 'cacheFeatures.accounts.accountsList') return true
       return null
     })
   }
@@ -69,6 +71,8 @@ describe('AccountsCacheService', () => {
       config.get.mockImplementation((key) => {
         if (key === 'session.cache.engine') return 'redis'
         if (key === 'session.cache.ttl') return DEFAULT_TTL
+        if (key === 'cacheFeatures.accounts.account') return true
+        if (key === 'cacheFeatures.accounts.accountsList') return true
         return null
       })
       cacheService = new AccountsCacheService(mockServer)
@@ -76,6 +80,14 @@ describe('AccountsCacheService', () => {
 
     test('isCacheEnabled returns true', () => {
       expect(cacheService.isCacheEnabled()).toBe(true)
+    })
+
+    test('isAccountCacheEnabled returns true when both flags enabled', () => {
+      expect(cacheService.isAccountCacheEnabled()).toBe(true)
+    })
+
+    test('isListCacheEnabled returns true when both flags enabled', () => {
+      expect(cacheService.isListCacheEnabled()).toBe(true)
     })
 
     describe('generateAccountKey', () => {
@@ -431,6 +443,90 @@ describe('AccountsCacheService', () => {
       await cacheService.setByKey('pending:::1', { data: [] })
 
       expect(mockServer.cache).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('when account cache feature is disabled', () => {
+    beforeEach(() => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'session.cache.ttl') return DEFAULT_TTL
+        if (key === 'cacheFeatures.accounts.account') return false
+        if (key === 'cacheFeatures.accounts.accountsList') return true
+        return null
+      })
+      cacheService = new AccountsCacheService(mockServer)
+    })
+
+    test('isAccountCacheEnabled returns false', () => {
+      expect(cacheService.isAccountCacheEnabled()).toBe(false)
+    })
+
+    test('isListCacheEnabled returns true', () => {
+      expect(cacheService.isListCacheEnabled()).toBe(true)
+    })
+
+    test('getAccount returns null without calling cache', async () => {
+      const result = await cacheService.getAccount(1)
+
+      expect(result).toBeNull()
+      expect(mockCache.get).not.toHaveBeenCalled()
+    })
+
+    test('setAccount does nothing', async () => {
+      await cacheService.setAccount(1, { id: 1, firstName: 'John' })
+
+      expect(mockCache.set).not.toHaveBeenCalled()
+    })
+
+    test('getAccountsByIds returns empty array', async () => {
+      const result = await cacheService.getAccountsByIds([1, 2, 3])
+
+      expect(result).toEqual([])
+      expect(mockCache.get).not.toHaveBeenCalled()
+    })
+
+    test('setAccounts does nothing', async () => {
+      await cacheService.setAccounts([{ id: 1 }, { id: 2 }])
+
+      expect(mockCache.set).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('when list cache feature is disabled', () => {
+    beforeEach(() => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'session.cache.ttl') return DEFAULT_TTL
+        if (key === 'cacheFeatures.accounts.account') return true
+        if (key === 'cacheFeatures.accounts.accountsList') return false
+        return null
+      })
+      cacheService = new AccountsCacheService(mockServer)
+    })
+
+    test('isAccountCacheEnabled returns true', () => {
+      expect(cacheService.isAccountCacheEnabled()).toBe(true)
+    })
+
+    test('isListCacheEnabled returns false', () => {
+      expect(cacheService.isListCacheEnabled()).toBe(false)
+    })
+
+    test('getListMetadata returns null without calling cache', async () => {
+      const result = await cacheService.getListMetadata({
+        status: 'pending',
+        page: 1
+      })
+
+      expect(result).toBeNull()
+      expect(mockCache.get).not.toHaveBeenCalled()
+    })
+
+    test('setListMetadata does nothing', async () => {
+      await cacheService.setListMetadata({ status: 'pending' }, [1, 2], {})
+
+      expect(mockCache.set).not.toHaveBeenCalled()
     })
   })
 

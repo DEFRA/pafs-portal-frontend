@@ -47,7 +47,8 @@ describe('BenefitAreaController', () => {
 
     mockH = {
       view: vi.fn(),
-      redirect: vi.fn().mockReturnThis()
+      redirect: vi.fn().mockReturnThis(),
+      takeover: vi.fn().mockReturnThis()
     }
 
     // Default mocks
@@ -775,7 +776,7 @@ describe('BenefitAreaController', () => {
       })
     })
 
-    test('should delete benefit area file and redirect to overview', async () => {
+    test('should delete benefit area file and redirect to benefit area page', async () => {
       deleteProject.mockResolvedValue({
         success: true,
         data: {
@@ -807,8 +808,11 @@ describe('BenefitAreaController', () => {
         benefitAreaFileDownloadUrl: null,
         benefitAreaFileDownloadExpiry: null
       })
-      expect(navigateToProjectOverview).toHaveBeenCalledWith('TEST-001', mockH)
-      expect(result).toEqual({ redirect: true })
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/project/TEST-001/benefit-area'
+      )
+      expect(mockH.takeover).toHaveBeenCalled()
+      expect(result).toBe(mockH)
     })
 
     test('should handle delete API error and show error view', async () => {
@@ -922,7 +926,10 @@ describe('BenefitAreaController', () => {
       await benefitAreaController.postDeleteHandler(mockRequest, mockH)
 
       expect(deleteProject).toHaveBeenCalledWith('TEST-001', undefined)
-      expect(navigateToProjectOverview).toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/project/TEST-001/benefit-area'
+      )
+      expect(mockH.takeover).toHaveBeenCalled()
     })
 
     test('should clear all upload session data on successful delete', async () => {

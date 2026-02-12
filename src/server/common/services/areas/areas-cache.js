@@ -1,5 +1,6 @@
 import { BaseCacheService } from '../../helpers/cache/base-cache-service.js'
 import { AREA_SEGMENT_KEYS, CACHE_SEGMENTS } from '../../constants/common.js'
+import { config } from '../../../../config/config.js'
 
 // Shared cache key registry across all instances since Catbox doesn't support wildcard deletion
 // This needs to be at module level to persist across service instantiations
@@ -11,6 +12,30 @@ export class AreasCacheService extends BaseCacheService {
     super(server, CACHE_SEGMENTS.AREAS, 0)
     // Use the shared cache key registry
     this.cacheKeys = cacheKeyRegistry
+  }
+
+  /**
+   * Check if individual area caching is enabled
+   * @returns {boolean}
+   */
+  isAreaCacheEnabled() {
+    return this.enabled && config.get('cacheFeatures.areas.area')
+  }
+
+  /**
+   * Check if areas list caching is enabled
+   * @returns {boolean}
+   */
+  isAreasListCacheEnabled() {
+    return this.enabled && config.get('cacheFeatures.areas.areasByList')
+  }
+
+  /**
+   * Check if areas-by-type caching is enabled
+   * @returns {boolean}
+   */
+  isAreasByTypeCacheEnabled() {
+    return this.enabled && config.get('cacheFeatures.areas.areasByType')
   }
 
   generateKey(segmentKey) {
@@ -31,14 +56,20 @@ export class AreasCacheService extends BaseCacheService {
   }
 
   async getAreasByType() {
+    if (!this.isAreasByTypeCacheEnabled()) {
+      return null
+    }
     const key = this.generateKey(AREA_SEGMENT_KEYS.BY_TYPE)
     return this.getByKey(key)
   }
 
   async setAreasByType(areasData, ttl = 0) {
+    if (!this.isAreasByTypeCacheEnabled()) {
+      return
+    }
     const key = this.generateKey(AREA_SEGMENT_KEYS.BY_TYPE)
     this.cacheKeys.add(key)
-    return this.setByKey(key, areasData, ttl)
+    await this.setByKey(key, areasData, ttl)
   }
 
   async invalidateAreasByType() {
@@ -60,6 +91,9 @@ export class AreasCacheService extends BaseCacheService {
    * @returns {Promise<Object|null>} Cached areas list or null
    */
   async getAreasByList(params) {
+    if (!this.isAreasListCacheEnabled()) {
+      return null
+    }
     const key = this.generateListKey(params)
     return this.getByKey(key)
   }
@@ -72,9 +106,12 @@ export class AreasCacheService extends BaseCacheService {
    * @returns {Promise<void>}
    */
   async setAreasByList(params, data, ttl = 0) {
+    if (!this.isAreasListCacheEnabled()) {
+      return
+    }
     const key = this.generateListKey(params)
     this.cacheKeys.add(key)
-    return this.setByKey(key, data, ttl)
+    await this.setByKey(key, data, ttl)
   }
 
   /**
@@ -111,7 +148,7 @@ export class AreasCacheService extends BaseCacheService {
    * @returns {Promise<Object|null>} Area object or null
    */
   async getAreaFromCachedList(areaId) {
-    if (!this.enabled || !areaId) {
+    if (!this.isAreaCacheEnabled() || !areaId) {
       return null
     }
 
@@ -136,7 +173,7 @@ export class AreasCacheService extends BaseCacheService {
    * @returns {Promise<void>}
    */
   async setAreaInCache(areaId, areaData, ttl = 0) {
-    if (!this.enabled || !areaId) {
+    if (!this.isAreaCacheEnabled() || !areaId) {
       return
     }
 
