@@ -121,7 +121,7 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS }}"
-                  type="text"
+                  type="number"
                   inputmode="numeric"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] or '' }}"
                 >
@@ -131,7 +131,7 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS }}"
-                  type="text"
+                  type="number"
                   inputmode="numeric"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] or '' }}"
                 >
@@ -141,7 +141,7 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50 }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50 }}"
-                  type="text"
+                  type="number"
                   inputmode="numeric"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] or '' }}"
                 >
@@ -151,7 +151,7 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE }}"
-                  type="text"
+                  type="number"
                   inputmode="numeric"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] or '' }}"
                 >
@@ -208,7 +208,7 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL }}"
-                  type="text"
+                  type="number"
                   inputmode="numeric"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] or '' }}"
                 >
@@ -218,7 +218,7 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION }}"
-                  type="text"
+                  type="number"
                   inputmode="numeric"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] or '' }}"
                 >
@@ -227,6 +227,68 @@
           </tbody>
         </table>
       </div>
+
+    {# TWENTY PERCENT DEPRIVED PAGE #}
+    {% elif step == projectSteps.TWENTY_PERCENT_DEPRIVED %}
+      {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] %}
+        {% set percentError20 = {
+          text: t(localKeyPrefix + '.errors.invalid')
+        } %}
+      {% else %}
+        {% set percentError20 = false %}
+      {% endif %}
+
+      {{ govukInput({
+        label: {
+          text: t(localKeyPrefix + '.heading'),
+          classes: "govuk-label--xl",
+          isPageHeading: true
+        },
+        hint: {
+          text: t(localKeyPrefix + '.hint')
+        },
+        suffix: {
+          text: "%"
+        },
+        id: PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED,
+        name: PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED,
+        classes: "govuk-input--width-5",
+        value: formData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] or '',
+        errorMessage: percentError20,
+        type: "number",
+        inputmode: "decimal"
+      }) }}
+
+    {# FORTY PERCENT DEPRIVED PAGE #}
+    {% elif step == projectSteps.FORTY_PERCENT_DEPRIVED %}
+      {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] %}
+        {% set percentError40 = {
+          text: t(localKeyPrefix + '.errors.invalid')
+        } %}
+      {% else %}
+        {% set percentError40 = false %}
+      {% endif %}
+
+      {{ govukInput({
+        label: {
+          text: t(localKeyPrefix + '.heading'),
+          classes: "govuk-label--xl",
+          isPageHeading: true
+        },
+        hint: {
+          text: t(localKeyPrefix + '.hint')
+        },
+        suffix: {
+          text: "%"
+        },
+        id: PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED,
+        name: PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED,
+        classes: "govuk-input--width-5",
+        value: formData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] or '',
+        errorMessage: percentError40,
+        type: "number",
+        inputmode: "decimal"
+      }) }}
 
     {% endif %}
 

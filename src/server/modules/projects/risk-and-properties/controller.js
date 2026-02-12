@@ -28,7 +28,11 @@ const PAYLOAD_LEVEL_MAP = {
   [PROJECT_STEPS.PROPERTY_AFFECTED_FLOODING]:
     PROJECT_PAYLOAD_LEVELS.PROPERTY_AFFECTED_FLOODING,
   [PROJECT_STEPS.PROPERTY_AFFECTED_COASTAL_EROSION]:
-    PROJECT_PAYLOAD_LEVELS.PROPERTY_AFFECTED_COASTAL_EROSION
+    PROJECT_PAYLOAD_LEVELS.PROPERTY_AFFECTED_COASTAL_EROSION,
+  [PROJECT_STEPS.TWENTY_PERCENT_DEPRIVED]:
+    PROJECT_PAYLOAD_LEVELS.TWENTY_PERCENT_DEPRIVED,
+  [PROJECT_STEPS.FORTY_PERCENT_DEPRIVED]:
+    PROJECT_PAYLOAD_LEVELS.FORTY_PERCENT_DEPRIVED
 }
 
 // Step sequence for navigation flow
@@ -37,7 +41,11 @@ const STEP_SEQUENCE = {
   [PROJECT_STEPS.MAIN_RISK]: ROUTES.PROJECT.EDIT.PROPERTY_AFFECTED_FLOODING,
   [PROJECT_STEPS.PROPERTY_AFFECTED_FLOODING]:
     ROUTES.PROJECT.EDIT.PROPERTY_AFFECTED_COASTAL_EROSION,
-  [PROJECT_STEPS.PROPERTY_AFFECTED_COASTAL_EROSION]: ROUTES.PROJECT.OVERVIEW
+  [PROJECT_STEPS.PROPERTY_AFFECTED_COASTAL_EROSION]:
+    ROUTES.PROJECT.EDIT.TWENTY_PERCENT_DEPRIVED,
+  [PROJECT_STEPS.TWENTY_PERCENT_DEPRIVED]:
+    ROUTES.PROJECT.EDIT.FORTY_PERCENT_DEPRIVED,
+  [PROJECT_STEPS.FORTY_PERCENT_DEPRIVED]: ROUTES.PROJECT.OVERVIEW
 }
 
 /**
@@ -106,7 +114,86 @@ class RiskAndPropertiesController {
   _getViewData(request) {
     const step = getProjectStep(request)
     const config = this._getConfig(step)
-    const { backLinkOptions, localKeyPrefix, fieldType } = config
+    let { backLinkOptions, localKeyPrefix, fieldType } = config
+    const sessionData = getSessionData(request)
+
+    // Override back link for property affected flooding based on risks
+    if (step === PROJECT_STEPS.PROPERTY_AFFECTED_FLOODING) {
+      const risks = sessionData.risks || []
+
+      if (this._shouldSkipMainRisk(risks)) {
+        // If only one risk was selected, main risk page was skipped
+        // So back goes to risk page
+        backLinkOptions = {
+          targetURL: ROUTES.PROJECT.OVERVIEW,
+          targetEditURL: ROUTES.PROJECT.EDIT.RISK,
+          conditionalRedirect: false
+        }
+      } else {
+        // Multiple risks selected, back goes to main risk page
+        backLinkOptions = {
+          targetURL: ROUTES.PROJECT.OVERVIEW,
+          targetEditURL: ROUTES.PROJECT.EDIT.MAIN_RISK,
+          conditionalRedirect: false
+        }
+      }
+    }
+
+    // Override back link for property affected coastal erosion based on risks
+    if (step === PROJECT_STEPS.PROPERTY_AFFECTED_COASTAL_EROSION) {
+      const risks = sessionData.risks || []
+      const mainRisk = sessionData.mainRisk
+
+      if (this._shouldSkipPropertyAffectedFlooding(mainRisk, risks)) {
+        // If coastal erosion is the ONLY risk, flooding page was skipped
+        if (this._shouldSkipMainRisk(risks)) {
+          // Only one risk (coastal erosion), both main risk and flooding pages were skipped
+          // So back goes to risk page
+          backLinkOptions = {
+            targetURL: ROUTES.PROJECT.OVERVIEW,
+            targetEditURL: ROUTES.PROJECT.EDIT.RISK,
+            conditionalRedirect: false
+          }
+        } else {
+          // Multiple risks but main risk is coastal erosion, main risk page was shown
+          // So back goes to main risk page
+          backLinkOptions = {
+            targetURL: ROUTES.PROJECT.OVERVIEW,
+            targetEditURL: ROUTES.PROJECT.EDIT.MAIN_RISK,
+            conditionalRedirect: false
+          }
+        }
+      } else {
+        // Multiple risks including coastal erosion, flooding page was shown
+        // So back goes to flooding page
+        backLinkOptions = {
+          targetURL: ROUTES.PROJECT.OVERVIEW,
+          targetEditURL: ROUTES.PROJECT.EDIT.PROPERTY_AFFECTED_FLOODING,
+          conditionalRedirect: false
+        }
+      }
+    }
+
+    // Override back link for twenty percent deprived based on risks
+    if (step === PROJECT_STEPS.TWENTY_PERCENT_DEPRIVED) {
+      const risks = sessionData.risks || []
+
+      if (this._shouldShowPropertyAffectedCoastalErosion(risks)) {
+        // If coastal erosion was selected, back goes to coastal erosion page
+        backLinkOptions = {
+          targetURL: ROUTES.PROJECT.OVERVIEW,
+          targetEditURL: ROUTES.PROJECT.EDIT.PROPERTY_AFFECTED_COASTAL_EROSION,
+          conditionalRedirect: false
+        }
+      } else {
+        // If coastal erosion not selected, back goes to flooding page
+        backLinkOptions = {
+          targetURL: ROUTES.PROJECT.OVERVIEW,
+          targetEditURL: ROUTES.PROJECT.EDIT.PROPERTY_AFFECTED_FLOODING,
+          conditionalRedirect: false
+        }
+      }
+    }
 
     const additionalData = {
       step,
@@ -140,12 +227,15 @@ class RiskAndPropertiesController {
 
   /**
    * Check if property affected flooding step should be skipped
-   * Skip if main risk is coastal erosion only
+   * Skip if coastal erosion is the ONLY risk selected
    * @param {string} mainRisk - Selected main risk
+   * @param {Array} risks - Selected risks
    * @returns {boolean} True if should skip flooding property step
    */
-  _shouldSkipPropertyAffectedFlooding(mainRisk) {
-    return mainRisk === PROJECT_RISK_TYPES.COASTAL_EROSION
+  _shouldSkipPropertyAffectedFlooding(mainRisk, risks) {
+    return (
+      mainRisk === PROJECT_RISK_TYPES.COASTAL_EROSION && risks?.length === 1
+    )
   }
 
   /**
@@ -184,8 +274,8 @@ class RiskAndPropertiesController {
         }
 
         // Check if we should skip flooding property step
-        if (this._shouldSkipPropertyAffectedFlooding(mainRisk)) {
-          // If main risk is coastal erosion, check if we should show coastal erosion properties
+        if (this._shouldSkipPropertyAffectedFlooding(mainRisk, risks)) {
+          // If main risk is coastal erosion only, check if we should show coastal erosion properties
           if (this._shouldShowPropertyAffectedCoastalErosion(risks)) {
             return h
               .redirect(
@@ -196,7 +286,15 @@ class RiskAndPropertiesController {
               )
               .takeover()
           }
-          return navigateToProjectOverview(referenceNumber, h)
+          // Go to twenty percent deprived page
+          return h
+            .redirect(
+              ROUTES.PROJECT.EDIT.TWENTY_PERCENT_DEPRIVED.replace(
+                '{referenceNumber}',
+                referenceNumber
+              )
+            )
+            .takeover()
         }
 
         return h
@@ -223,10 +321,10 @@ class RiskAndPropertiesController {
     // Handle MAIN_RISK step - conditional branching based on selected main risk
     if (step === PROJECT_STEPS.MAIN_RISK) {
       const mainRisk = sessionData.mainRisk
+      const risks = sessionData.risks || []
 
-      if (this._shouldSkipPropertyAffectedFlooding(mainRisk)) {
-        // Skip flooding properties, go to coastal erosion if applicable
-        const risks = sessionData.risks || []
+      if (this._shouldSkipPropertyAffectedFlooding(mainRisk, risks)) {
+        // Skip flooding properties (coastal erosion is the only risk), go to coastal erosion if applicable
         if (this._shouldShowPropertyAffectedCoastalErosion(risks)) {
           return h
             .redirect(
@@ -237,7 +335,15 @@ class RiskAndPropertiesController {
             )
             .takeover()
         }
-        return navigateToProjectOverview(referenceNumber, h)
+        // Go to twenty percent deprived page
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.TWENTY_PERCENT_DEPRIVED.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
       }
 
       return h
@@ -265,8 +371,15 @@ class RiskAndPropertiesController {
           .takeover()
       }
 
-      // No coastal erosion, go to overview
-      return navigateToProjectOverview(referenceNumber, h)
+      // No coastal erosion, go to twenty percent deprived page
+      return h
+        .redirect(
+          ROUTES.PROJECT.EDIT.TWENTY_PERCENT_DEPRIVED.replace(
+            '{referenceNumber}',
+            referenceNumber
+          )
+        )
+        .takeover()
     }
 
     // For all other cases, move to the next step in sequence

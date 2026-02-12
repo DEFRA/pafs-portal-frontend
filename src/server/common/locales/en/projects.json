@@ -74,7 +74,9 @@
       "properties_affected_coastal_erosion": "Properties affected by coastal erosion",
       "no_properties_coastal_erosion": "No properties affected by coastal erosion",
       "maintaining_assets_coastal": "Maintaining existing coastal assets",
-      "reducing_coastal_erosion": "Reducing coastal erosion risk"
+      "reducing_coastal_erosion": "Reducing coastal erosion risk",
+      "percent_properties_20_deprived": "Percentage of properties in 20% most deprived areas",
+      "percent_properties_40_deprived": "Percentage of properties in 40% most deprived areas"
     },
     "approach_summary_card": {
       "title": "Approach",
@@ -353,6 +355,22 @@
         "reducing_coastal_erosion": "Reducing coastal erosion risk",
         "maintaining_existing_question": "How many properties are estimated to benefit from maintaining existing assets?",
         "reducing_coastal_erosion_question": "How many properties are estimated to benefit from investment to reduce coastal erosion?"
+      }
+    },
+    "twenty_percent_deprived": {
+      "title": "Properties in 20% most deprived areas",
+      "heading": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
+      "hint": "Enter a number between 0 and 100",
+      "errors": {
+        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places"
+      }
+    },
+    "forty_percent_deprived": {
+      "title": "Properties in 40% most deprived areas",
+      "heading": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
+      "hint": "Enter a number between 0 and 100",
+      "errors": {
+        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places"
       }
     }
   }

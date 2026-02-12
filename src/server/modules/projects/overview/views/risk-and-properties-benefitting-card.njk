@@ -98,6 +98,32 @@
             </dd>
           </div>
         {% endif %}
+
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            {{ t('projects.overview.risk_and_properties_summary_card.percent_properties_20_deprived') }}
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {% if projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] %}
+              {{ projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] }}%
+            {% else %}
+              {{ t('projects.overview.common.not_provided') }}
+            {% endif %}
+          </dd>
+        </div>
+
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            {{ t('projects.overview.risk_and_properties_summary_card.percent_properties_40_deprived') }}
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {% if projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] %}
+              {{ projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] }}%
+            {% else %}
+              {{ t('projects.overview.common.not_provided') }}
+            {% endif %}
+          </dd>
+        </div>
       </dl>
     {% else %}
       <p class="govuk-body">{{ t('projects.overview.risk_and_properties_summary_card.no_data') }}</p>

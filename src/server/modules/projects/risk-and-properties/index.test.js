@@ -32,8 +32,8 @@ describe('projectRiskAndProperties plugin', () => {
 
     const routes = mockServer.route.mock.calls[0][0]
 
-    // Should have 8 routes (4 steps x 2 methods each - GET and POST)
-    expect(routes).toHaveLength(8)
+    // Should have 12 routes (6 steps x 2 methods each - GET and POST)
+    expect(routes).toHaveLength(12)
   })
 
   test('should register GET and POST routes for RISK step', () => {

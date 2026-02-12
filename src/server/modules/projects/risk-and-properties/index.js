@@ -48,6 +48,16 @@ const createRiskAndPropertiesRoutes = (editPreHandlers) => [
     ROUTES.PROJECT.EDIT.PROPERTY_AFFECTED_COASTAL_EROSION,
     editPreHandlers,
     riskAndPropertiesController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.TWENTY_PERCENT_DEPRIVED,
+    editPreHandlers,
+    riskAndPropertiesController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.FORTY_PERCENT_DEPRIVED,
+    editPreHandlers,
+    riskAndPropertiesController
   )
 ]
 

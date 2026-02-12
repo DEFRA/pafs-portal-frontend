@@ -697,3 +697,31 @@ export const propertiesBenefitInvestmentCoastalErosionSchema =
   propertyValueSchema.label(
     PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION
   )
+/**
+ * Percentage schema - accepts 0-100 with up to 2 decimal places
+ * Can be number or string representation
+ * No negatives, no values above 100, numbers only (no text or symbols)
+ */
+const percentageSchema = Joi.string()
+  .allow('', null)
+  .pattern(/^(?:100(?:\.0{1,2})?|[1-9]?\d(?:\.\d{1,2})?)$/)
+  .optional()
+  .label('Percentage')
+  .messages({
+    'string.pattern.base':
+      'Enter a valid number between 0 and 100 with at most 2 decimal places'
+  })
+
+/**
+ * Percent properties in 20% most deprived areas schema
+ */
+export const percentProperties20PercentDeprivedSchema = percentageSchema.label(
+  PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED
+)
+
+/**
+ * Percent properties in 40% most deprived areas schema
+ */
+export const percentProperties40PercentDeprivedSchema = percentageSchema.label(
+  PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED
+)

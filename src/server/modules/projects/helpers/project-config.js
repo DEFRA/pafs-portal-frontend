@@ -20,7 +20,9 @@ import {
   validateRisks,
   validateMainRisk,
   validatePropertyAffectedFlooding,
-  validatePropertyAffectedCoastalErosion
+  validatePropertyAffectedCoastalErosion,
+  validateTwentyPercentDeprived,
+  validateFortyPercentDeprived
 } from '../schema.js'
 
 export const interventionTypesLocalKeyPrefix = 'projects.intervention_type'
@@ -296,6 +298,14 @@ export const PROJECT_PAYLOAD_LEVEL_FIELDS = {
     PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK,
     PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL,
     PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION
+  ],
+  [PROJECT_PAYLOAD_LEVELS.TWENTY_PERCENT_DEPRIVED]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED
+  ],
+  [PROJECT_PAYLOAD_LEVELS.FORTY_PERCENT_DEPRIVED]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED
   ]
 }
 
@@ -342,5 +352,25 @@ export const RISK_AND_PROPERTIES_CONFIG = {
     },
     schema: validatePropertyAffectedCoastalErosion,
     fieldType: 'table'
+  },
+  [PROJECT_STEPS.TWENTY_PERCENT_DEPRIVED]: {
+    localKeyPrefix: 'projects.risk_and_properties.twenty_percent_deprived',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.OVERVIEW,
+      targetEditURL: ROUTES.PROJECT.EDIT.PROPERTY_AFFECTED_COASTAL_EROSION,
+      conditionalRedirect: false
+    },
+    schema: validateTwentyPercentDeprived,
+    fieldType: 'percentage'
+  },
+  [PROJECT_STEPS.FORTY_PERCENT_DEPRIVED]: {
+    localKeyPrefix: 'projects.risk_and_properties.forty_percent_deprived',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.OVERVIEW,
+      targetEditURL: ROUTES.PROJECT.EDIT.TWENTY_PERCENT_DEPRIVED,
+      conditionalRedirect: false
+    },
+    schema: validateFortyPercentDeprived,
+    fieldType: 'percentage'
   }
 }

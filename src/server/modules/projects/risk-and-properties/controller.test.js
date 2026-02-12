@@ -309,7 +309,7 @@ describe('RiskAndPropertiesController', () => {
       )
     })
 
-    test('should skip flooding and navigate to coastal erosion when main risk is coastal erosion', async () => {
+    test('should navigate to flooding page when main risk is coastal erosion but multiple risks selected', async () => {
       getProjectStep.mockReturnValue(PROJECT_STEPS.MAIN_RISK)
 
       const sessionData = {
@@ -328,7 +328,7 @@ describe('RiskAndPropertiesController', () => {
       await riskAndPropertiesController.postHandler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        expect.stringContaining('property-affected-coastal-erosion')
+        expect.stringContaining('property-affected-flooding')
       )
     })
 
@@ -418,9 +418,8 @@ describe('RiskAndPropertiesController', () => {
 
       await riskAndPropertiesController.postHandler(mockRequest, mockH)
 
-      expect(navigateToProjectOverview).toHaveBeenCalledWith(
-        'TEST-001A-002A',
-        mockH
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('twenty-percent-deprived')
       )
     })
   })

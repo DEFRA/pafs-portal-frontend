@@ -20,7 +20,9 @@ export const PROJECT_STEPS = {
   RISK: 'risk',
   MAIN_RISK: 'main-risk',
   PROPERTY_AFFECTED_FLOODING: 'property-affected-flooding',
-  PROPERTY_AFFECTED_COASTAL_EROSION: 'property-affected-coastal-erosion'
+  PROPERTY_AFFECTED_COASTAL_EROSION: 'property-affected-coastal-erosion',
+  TWENTY_PERCENT_DEPRIVED: 'twenty-percent-deprived',
+  FORTY_PERCENT_DEPRIVED: 'forty-percent-deprived'
 }
 
 export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'
@@ -72,7 +74,9 @@ export const PROJECT_PAYLOAD_FIELDS = {
   PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL:
     'propertiesBenefitMaintainingAssetsCoastal',
   PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION:
-    'propertiesBenefitInvestmentCoastalErosion'
+    'propertiesBenefitInvestmentCoastalErosion',
+  PERCENT_PROPERTIES_20_PERCENT_DEPRIVED: 'percentProperties20PercentDeprived',
+  PERCENT_PROPERTIES_40_PERCENT_DEPRIVED: 'percentProperties40PercentDeprived'
 }
 
 export const PROJECT_PAYLOAD_LEVELS = {
@@ -92,7 +96,9 @@ export const PROJECT_PAYLOAD_LEVELS = {
   RISK: 'RISK',
   MAIN_RISK: 'MAIN_RISK',
   PROPERTY_AFFECTED_FLOODING: 'PROPERTY_AFFECTED_FLOODING',
-  PROPERTY_AFFECTED_COASTAL_EROSION: 'PROPERTY_AFFECTED_COASTAL_EROSION'
+  PROPERTY_AFFECTED_COASTAL_EROSION: 'PROPERTY_AFFECTED_COASTAL_EROSION',
+  TWENTY_PERCENT_DEPRIVED: 'TWENTY_PERCENT_DEPRIVED',
+  FORTY_PERCENT_DEPRIVED: 'FORTY_PERCENT_DEPRIVED'
 }
 
 export const PROJECT_TYPES = {

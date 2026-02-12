@@ -29,7 +29,9 @@ import {
   increasingFloodResilienceSchema,
   noPropertiesAtCoastalErosionRiskSchema,
   propertiesBenefitMaintainingAssetsCoastalSchema,
-  propertiesBenefitInvestmentCoastalErosionSchema
+  propertiesBenefitInvestmentCoastalErosionSchema,
+  percentProperties20PercentDeprivedSchema,
+  percentProperties40PercentDeprivedSchema
 } from '../../common/schemas/projects.js'
 import { PROJECT_PAYLOAD_FIELDS } from '../../common/constants/projects.js'
 
@@ -240,3 +242,22 @@ export const validatePropertyAffectedCoastalErosion = Joi.object({
 })
   .options({ abortEarly: false })
   .label('Property Affected Coastal Erosion')
+/**
+ * Validate twenty percent deprived schema
+ */
+export const validateTwentyPercentDeprived = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED]:
+    percentProperties20PercentDeprivedSchema
+})
+  .options({ abortEarly: false })
+  .label('Twenty Percent Deprived')
+
+/**
+ * Validate forty percent deprived schema
+ */
+export const validateFortyPercentDeprived = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED]:
+    percentProperties40PercentDeprivedSchema
+})
+  .options({ abortEarly: false })
+  .label('Forty Percent Deprived')
