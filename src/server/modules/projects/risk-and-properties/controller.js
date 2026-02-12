@@ -32,10 +32,15 @@ const PAYLOAD_LEVEL_MAP = {
   [PROJECT_STEPS.TWENTY_PERCENT_DEPRIVED]:
     PROJECT_PAYLOAD_LEVELS.TWENTY_PERCENT_DEPRIVED,
   [PROJECT_STEPS.FORTY_PERCENT_DEPRIVED]:
-    PROJECT_PAYLOAD_LEVELS.FORTY_PERCENT_DEPRIVED
+    PROJECT_PAYLOAD_LEVELS.FORTY_PERCENT_DEPRIVED,
+  [PROJECT_STEPS.CURRENT_FLOOD_RISK]: PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_RISK,
+  [PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK]:
+    PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_SURFACE_WATER_RISK,
+  [PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK]:
+    PROJECT_PAYLOAD_LEVELS.CURRENT_COASTAL_EROSION_RISK
 }
 
-// Step sequence for navigation flow
+// Static step sequence (for steps that don't require conditional logic)
 const STEP_SEQUENCE = {
   [PROJECT_STEPS.RISK]: ROUTES.PROJECT.EDIT.MAIN_RISK,
   [PROJECT_STEPS.MAIN_RISK]: ROUTES.PROJECT.EDIT.PROPERTY_AFFECTED_FLOODING,
@@ -44,8 +49,8 @@ const STEP_SEQUENCE = {
   [PROJECT_STEPS.PROPERTY_AFFECTED_COASTAL_EROSION]:
     ROUTES.PROJECT.EDIT.TWENTY_PERCENT_DEPRIVED,
   [PROJECT_STEPS.TWENTY_PERCENT_DEPRIVED]:
-    ROUTES.PROJECT.EDIT.FORTY_PERCENT_DEPRIVED,
-  [PROJECT_STEPS.FORTY_PERCENT_DEPRIVED]: ROUTES.PROJECT.OVERVIEW
+    ROUTES.PROJECT.EDIT.FORTY_PERCENT_DEPRIVED
+  // FORTY_PERCENT_DEPRIVED and risk steps handled by conditional logic
 }
 
 /**
@@ -195,6 +200,55 @@ class RiskAndPropertiesController {
       }
     }
 
+    // Override back link for current flood surface water risk based on risks
+    if (step === PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK) {
+      const risks = sessionData.risks || []
+
+      if (this._shouldShowCurrentFloodRisk(risks)) {
+        // If flood risk page was shown, back goes to flood risk page
+        backLinkOptions = {
+          targetURL: ROUTES.PROJECT.OVERVIEW,
+          targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK,
+          conditionalRedirect: false
+        }
+      } else {
+        // If flood risk page was not shown, back goes to forty percent deprived
+        backLinkOptions = {
+          targetURL: ROUTES.PROJECT.OVERVIEW,
+          targetEditURL: ROUTES.PROJECT.EDIT.FORTY_PERCENT_DEPRIVED,
+          conditionalRedirect: false
+        }
+      }
+    }
+
+    // Override back link for current coastal erosion risk based on risks
+    if (step === PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK) {
+      const risks = sessionData.risks || []
+
+      if (this._shouldShowCurrentFloodSurfaceWaterRisk(risks)) {
+        // If surface water risk page was shown, back goes to surface water risk page
+        backLinkOptions = {
+          targetURL: ROUTES.PROJECT.OVERVIEW,
+          targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_SURFACE_WATER_RISK,
+          conditionalRedirect: false
+        }
+      } else if (this._shouldShowCurrentFloodRisk(risks)) {
+        // If flood risk page was shown but not surface water, back goes to flood risk page
+        backLinkOptions = {
+          targetURL: ROUTES.PROJECT.OVERVIEW,
+          targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK,
+          conditionalRedirect: false
+        }
+      } else {
+        // If neither flood nor surface water risk pages were shown, back goes to forty percent deprived
+        backLinkOptions = {
+          targetURL: ROUTES.PROJECT.OVERVIEW,
+          targetEditURL: ROUTES.PROJECT.EDIT.FORTY_PERCENT_DEPRIVED,
+          conditionalRedirect: false
+        }
+      }
+    }
+
     const additionalData = {
       step,
       projectSteps: PROJECT_STEPS,
@@ -246,6 +300,116 @@ class RiskAndPropertiesController {
    */
   _shouldShowPropertyAffectedCoastalErosion(risks) {
     return risks && risks.includes(PROJECT_RISK_TYPES.COASTAL_EROSION)
+  }
+
+  /**
+   * Check if current flood risk page should be shown
+   * Show if risks include fluvial, tidal, or sea flooding
+   * @param {Array} risks - Selected risks
+   * @returns {boolean} True if should show current flood risk page
+   */
+  _shouldShowCurrentFloodRisk(risks) {
+    return (
+      risks &&
+      (risks.includes(PROJECT_RISK_TYPES.FLUVIAL) ||
+        risks.includes(PROJECT_RISK_TYPES.TIDAL) ||
+        risks.includes(PROJECT_RISK_TYPES.SEA))
+    )
+  }
+
+  /**
+   * Check if current surface water flood risk page should be shown
+   * Show if risks include surface water flooding
+   * @param {Array} risks - Selected risks
+   * @returns {boolean} True if should show current surface water flood risk page
+   */
+  _shouldShowCurrentFloodSurfaceWaterRisk(risks) {
+    return risks && risks.includes(PROJECT_RISK_TYPES.SURFACE_WATER)
+  }
+
+  /**
+   * Check if current coastal erosion risk page should be shown
+   * Show if risks include coastal erosion
+   * @param {Array} risks - Selected risks
+   * @returns {boolean} True if should show current coastal erosion risk page
+   */
+  _shouldShowCurrentCoastalErosionRisk(risks) {
+    return risks && risks.includes(PROJECT_RISK_TYPES.COASTAL_EROSION)
+  }
+
+  /**
+   * Get the next step after FORTY_PERCENT_DEPRIVED based on selected risks
+   * Returns the appropriate current risk page or overview if no risk pages apply
+   * @param {Array} risks - Selected risks
+   * @param {string} referenceNumber - Project reference number
+   * @returns {string} The next route URL
+   */
+  _getNextStepAfterFortyPercent(risks, referenceNumber) {
+    // Check each risk type in priority order
+    if (this._shouldShowCurrentFloodRisk(risks)) {
+      return ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK.replace(
+        '{referenceNumber}',
+        referenceNumber
+      )
+    }
+
+    if (this._shouldShowCurrentFloodSurfaceWaterRisk(risks)) {
+      return ROUTES.PROJECT.EDIT.CURRENT_FLOOD_SURFACE_WATER_RISK.replace(
+        '{referenceNumber}',
+        referenceNumber
+      )
+    }
+
+    if (this._shouldShowCurrentCoastalErosionRisk(risks)) {
+      return ROUTES.PROJECT.EDIT.CURRENT_COASTAL_EROSION_RISK.replace(
+        '{referenceNumber}',
+        referenceNumber
+      )
+    }
+
+    // No applicable risk pages, go to overview
+    return ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', referenceNumber)
+  }
+
+  /**
+   * Get the next step after current flood risk page based on selected risks
+   * @param {Array} risks - Selected risks
+   * @param {string} referenceNumber - Project reference number
+   * @returns {string} The next route URL
+   */
+  _getNextStepAfterCurrentFloodRisk(risks, referenceNumber) {
+    if (this._shouldShowCurrentFloodSurfaceWaterRisk(risks)) {
+      return ROUTES.PROJECT.EDIT.CURRENT_FLOOD_SURFACE_WATER_RISK.replace(
+        '{referenceNumber}',
+        referenceNumber
+      )
+    }
+
+    if (this._shouldShowCurrentCoastalErosionRisk(risks)) {
+      return ROUTES.PROJECT.EDIT.CURRENT_COASTAL_EROSION_RISK.replace(
+        '{referenceNumber}',
+        referenceNumber
+      )
+    }
+
+    return ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', referenceNumber)
+  }
+
+  /**
+   * Get the next step after current surface water flood risk page
+   * @param {Array} risks - Selected risks
+   * @param {string} referenceNumber - Project reference number
+   * @returns {string} The next route URL
+   */
+  _getNextStepAfterCurrentSurfaceWaterRisk(risks, referenceNumber) {
+    if (this._shouldShowCurrentCoastalErosionRisk(risks)) {
+      return ROUTES.PROJECT.EDIT.CURRENT_COASTAL_EROSION_RISK.replace(
+        '{referenceNumber}',
+        referenceNumber
+      )
+    }
+
+    return ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', referenceNumber)
   }
 
   async _postRedirect(request, h) {
@@ -380,6 +544,41 @@ class RiskAndPropertiesController {
           )
         )
         .takeover()
+    }
+
+    // Handle FORTY_PERCENT_DEPRIVED step - determine next risk page based on risks
+    if (step === PROJECT_STEPS.FORTY_PERCENT_DEPRIVED) {
+      const risks = sessionData.risks || []
+      const nextUrl = this._getNextStepAfterFortyPercent(risks, referenceNumber)
+
+      return h.redirect(nextUrl).takeover()
+    }
+
+    // Handle CURRENT_FLOOD_RISK step
+    if (step === PROJECT_STEPS.CURRENT_FLOOD_RISK) {
+      const risks = sessionData.risks || []
+      const nextUrl = this._getNextStepAfterCurrentFloodRisk(
+        risks,
+        referenceNumber
+      )
+
+      return h.redirect(nextUrl).takeover()
+    }
+
+    // Handle CURRENT_FLOOD_SURFACE_WATER_RISK step
+    if (step === PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK) {
+      const risks = sessionData.risks || []
+      const nextUrl = this._getNextStepAfterCurrentSurfaceWaterRisk(
+        risks,
+        referenceNumber
+      )
+
+      return h.redirect(nextUrl).takeover()
+    }
+
+    // Handle CURRENT_COASTAL_EROSION_RISK step - last in sequence, go to overview
+    if (step === PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK) {
+      return navigateToProjectOverview(referenceNumber, h)
     }
 
     // For all other cases, move to the next step in sequence

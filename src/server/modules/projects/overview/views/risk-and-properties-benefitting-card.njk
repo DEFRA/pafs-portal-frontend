@@ -124,6 +124,53 @@
             {% endif %}
           </dd>
         </div>
+
+        {% set hasFloodRisk = projectData[PROJECT_PAYLOAD_FIELDS.RISKS] and (PROJECT_RISK_TYPES.FLUVIAL in projectData[PROJECT_PAYLOAD_FIELDS.RISKS] or PROJECT_RISK_TYPES.TIDAL in projectData[PROJECT_PAYLOAD_FIELDS.RISKS] or PROJECT_RISK_TYPES.SEA in projectData[PROJECT_PAYLOAD_FIELDS.RISKS]) %}
+        {% if hasFloodRisk %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              {{ t('projects.overview.risk_and_properties_summary_card.current_flood_risk') }}
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] %}
+                {{ t('projects.overview.risk_and_properties_summary_card.flood_risk.' + projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK]) }}
+              {% else %}
+                {{ t('projects.overview.common.not_provided') }}
+              {% endif %}
+            </dd>
+          </div>
+        {% endif %}
+
+        {% set hasSurfaceWaterRisk = projectData[PROJECT_PAYLOAD_FIELDS.RISKS] and (PROJECT_RISK_TYPES.SURFACE_WATER in projectData[PROJECT_PAYLOAD_FIELDS.RISKS]) %}
+        {% if hasSurfaceWaterRisk %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              {{ t('projects.overview.risk_and_properties_summary_card.current_flood_surface_water_risk') }}
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK] %}
+                {{ t('projects.overview.risk_and_properties_summary_card.flood_risk.' + projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK]) }}
+              {% else %}
+                {{ t('projects.overview.common.not_provided') }}
+              {% endif %}
+            </dd>
+          </div>
+        {% endif %}
+
+        {% if hasCoastalErosion %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              {{ t('projects.overview.risk_and_properties_summary_card.current_coastal_erosion_risk') }}
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK] %}
+                {{ t('projects.overview.risk_and_properties_summary_card.coastal_erosion_risk.' + projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK]) }}
+              {% else %}
+                {{ t('projects.overview.common.not_provided') }}
+              {% endif %}
+            </dd>
+          </div>
+        {% endif %}
       </dl>
     {% else %}
       <p class="govuk-body">{{ t('projects.overview.risk_and_properties_summary_card.no_data') }}</p>

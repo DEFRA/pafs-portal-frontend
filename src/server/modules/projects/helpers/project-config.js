@@ -22,7 +22,10 @@ import {
   validatePropertyAffectedFlooding,
   validatePropertyAffectedCoastalErosion,
   validateTwentyPercentDeprived,
-  validateFortyPercentDeprived
+  validateFortyPercentDeprived,
+  validateCurrentFloodRisk,
+  validateCurrentFloodSurfaceWaterRisk,
+  validateCurrentCoastalErosionRisk
 } from '../schema.js'
 
 export const interventionTypesLocalKeyPrefix = 'projects.intervention_type'
@@ -306,6 +309,18 @@ export const PROJECT_PAYLOAD_LEVEL_FIELDS = {
   [PROJECT_PAYLOAD_LEVELS.FORTY_PERCENT_DEPRIVED]: [
     PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
     PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED
+  ],
+  [PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_RISK]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK
+  ],
+  [PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_SURFACE_WATER_RISK]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK
+  ],
+  [PROJECT_PAYLOAD_LEVELS.CURRENT_COASTAL_EROSION_RISK]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK
   ]
 }
 
@@ -372,5 +387,36 @@ export const RISK_AND_PROPERTIES_CONFIG = {
     },
     schema: validateFortyPercentDeprived,
     fieldType: 'percentage'
+  },
+  [PROJECT_STEPS.CURRENT_FLOOD_RISK]: {
+    localKeyPrefix: 'projects.risk_and_properties.current_flood_risk',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.OVERVIEW,
+      targetEditURL: ROUTES.PROJECT.EDIT.FORTY_PERCENT_DEPRIVED,
+      conditionalRedirect: false
+    },
+    schema: validateCurrentFloodRisk,
+    fieldType: 'radio'
+  },
+  [PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK]: {
+    localKeyPrefix:
+      'projects.risk_and_properties.current_flood_surface_water_risk',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.OVERVIEW,
+      targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK,
+      conditionalRedirect: false
+    },
+    schema: validateCurrentFloodSurfaceWaterRisk,
+    fieldType: 'radio'
+  },
+  [PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK]: {
+    localKeyPrefix: 'projects.risk_and_properties.current_coastal_erosion_risk',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.OVERVIEW,
+      targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_SURFACE_WATER_RISK,
+      conditionalRedirect: false
+    },
+    schema: validateCurrentCoastalErosionRisk,
+    fieldType: 'radio'
   }
 }

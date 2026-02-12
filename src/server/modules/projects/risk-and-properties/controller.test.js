@@ -6,6 +6,7 @@ import {
   PROJECT_RISK_TYPES,
   PROJECT_STEPS
 } from '../../../common/constants/projects.js'
+import { ROUTES } from '../../../common/constants/routes.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
 import { RISK_AND_PROPERTIES_CONFIG } from '../helpers/project-config.js'
 import {
@@ -537,6 +538,299 @@ describe('RiskAndPropertiesController', () => {
         expect.any(Error)
       )
       expect(mockH.redirect).toHaveBeenCalled() // Should still redirect
+    })
+  })
+
+  describe('postHandler - FORTY_PERCENT_DEPRIVED step', () => {
+    beforeEach(() => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.FORTY_PERCENT_DEPRIVED)
+      RISK_AND_PROPERTIES_CONFIG[PROJECT_STEPS.FORTY_PERCENT_DEPRIVED] = {
+        localKeyPrefix: 'projects.risk_and_properties.forty_percent_deprived',
+        backLinkOptions: { url: '/twenty-percent-deprived' },
+        schema: {},
+        fieldType: 'radio'
+      }
+    })
+
+    test('should navigate to current flood risk when fluvial flooding is selected', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.FLUVIAL]
+      })
+      mockRequest.payload = {
+        percentProperties40PercentDeprived: '10'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK.replace(
+          '{referenceNumber}',
+          'TEST-001A-002A'
+        )
+      )
+    })
+
+    test('should navigate to current flood risk when tidal flooding is selected', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.TIDAL]
+      })
+      mockRequest.payload = {
+        percentProperties40PercentDeprived: '20'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK.replace(
+          '{referenceNumber}',
+          'TEST-001A-002A'
+        )
+      )
+    })
+
+    test('should navigate to current flood risk when sea flooding is selected', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.SEA]
+      })
+      mockRequest.payload = {
+        percentProperties40PercentDeprived: '15'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK.replace(
+          '{referenceNumber}',
+          'TEST-001A-002A'
+        )
+      )
+    })
+
+    test('should navigate to current surface water risk when only surface water is selected', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.SURFACE_WATER]
+      })
+      mockRequest.payload = {
+        percentProperties40PercentDeprived: '25'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_SURFACE_WATER_RISK.replace(
+          '{referenceNumber}',
+          'TEST-001A-002A'
+        )
+      )
+    })
+
+    test('should navigate to current coastal erosion risk when only coastal erosion is selected', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.COASTAL_EROSION]
+      })
+      mockRequest.payload = {
+        percentProperties40PercentDeprived: '30'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.CURRENT_COASTAL_EROSION_RISK.replace(
+          '{referenceNumber}',
+          'TEST-001A-002A'
+        )
+      )
+    })
+
+    test('should navigate to overview when only reservoir or groundwater are selected', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.RESERVOIR, PROJECT_RISK_TYPES.GROUNDWATER]
+      })
+      mockRequest.payload = {
+        percentProperties40PercentDeprived: '5'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'TEST-001A-002A')
+      )
+    })
+  })
+
+  describe('postHandler - CURRENT_FLOOD_RISK step', () => {
+    beforeEach(() => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.CURRENT_FLOOD_RISK)
+      RISK_AND_PROPERTIES_CONFIG[PROJECT_STEPS.CURRENT_FLOOD_RISK] = {
+        localKeyPrefix: 'projects.risk_and_properties.current_flood_risk',
+        backLinkOptions: { url: '/forty-percent-deprived' },
+        schema: {},
+        fieldType: 'radio'
+      }
+    })
+
+    test('should navigate to surface water risk when surface water flooding is selected', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.FLUVIAL, PROJECT_RISK_TYPES.SURFACE_WATER]
+      })
+      mockRequest.payload = {
+        currentFloodRisk: 'high'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_SURFACE_WATER_RISK.replace(
+          '{referenceNumber}',
+          'TEST-001A-002A'
+        )
+      )
+    })
+
+    test('should navigate to coastal erosion risk when coastal erosion is selected but not surface water', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.SEA, PROJECT_RISK_TYPES.COASTAL_EROSION]
+      })
+      mockRequest.payload = {
+        currentFloodRisk: 'medium'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.CURRENT_COASTAL_EROSION_RISK.replace(
+          '{referenceNumber}',
+          'TEST-001A-002A'
+        )
+      )
+    })
+
+    test('should navigate to overview when only flood risks are selected', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.TIDAL]
+      })
+      mockRequest.payload = {
+        currentFloodRisk: 'low'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'TEST-001A-002A')
+      )
+    })
+  })
+
+  describe('postHandler - CURRENT_FLOOD_SURFACE_WATER_RISK step', () => {
+    beforeEach(() => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK
+      )
+      RISK_AND_PROPERTIES_CONFIG[
+        PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK
+      ] = {
+        localKeyPrefix:
+          'projects.risk_and_properties.current_flood_surface_water_risk',
+        backLinkOptions: { url: '/current-flood-risk' },
+        schema: {},
+        fieldType: 'radio'
+      }
+    })
+
+    test('should navigate to coastal erosion risk when coastal erosion is selected', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [
+          PROJECT_RISK_TYPES.SURFACE_WATER,
+          PROJECT_RISK_TYPES.COASTAL_EROSION
+        ]
+      })
+      mockRequest.payload = {
+        currentFloodSurfaceWaterRisk: 'high'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.CURRENT_COASTAL_EROSION_RISK.replace(
+          '{referenceNumber}',
+          'TEST-001A-002A'
+        )
+      )
+    })
+
+    test('should navigate to overview when coastal erosion is not selected', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.SURFACE_WATER]
+      })
+      mockRequest.payload = {
+        currentFloodSurfaceWaterRisk: 'medium'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'TEST-001A-002A')
+      )
+    })
+  })
+
+  describe('postHandler - CURRENT_COASTAL_EROSION_RISK step', () => {
+    beforeEach(() => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK)
+      RISK_AND_PROPERTIES_CONFIG[PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK] = {
+        localKeyPrefix:
+          'projects.risk_and_properties.current_coastal_erosion_risk',
+        backLinkOptions: { url: '/current-flood-surface-water-risk' },
+        schema: {},
+        fieldType: 'radio'
+      }
+    })
+
+    test('should navigate to overview after saving coastal erosion risk', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.COASTAL_EROSION]
+      })
+      mockRequest.payload = {
+        currentCoastalErosionRisk: 'medium_term'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(navigateToProjectOverview).toHaveBeenCalledWith(
+        'TEST-001A-002A',
+        mockH
+      )
+    })
+
+    test('should save longer term coastal erosion risk', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.COASTAL_EROSION]
+      })
+      mockRequest.payload = {
+        currentCoastalErosionRisk: 'longer_term'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(updateSessionData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          currentCoastalErosionRisk: 'longer_term'
+        })
+      )
     })
   })
 })

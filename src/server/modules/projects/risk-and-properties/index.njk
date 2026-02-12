@@ -290,6 +290,137 @@
         inputmode: "decimal"
       }) }}
 
+    {# CURRENT FLOOD RISK PAGE (for fluvial, tidal, sea) #}
+    {% elif step == projectSteps.CURRENT_FLOOD_RISK %}
+      {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] %}
+        {% set currentFloodRiskError = {
+          text: t(localKeyPrefix + '.errors.required')
+        } %}
+      {% else %}
+        {% set currentFloodRiskError = false %}
+      {% endif %}
+
+      <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
+      <p class="govuk-body">{{ t(localKeyPrefix + '.hint') }}</p>
+
+      {{ govukRadios({
+        id: PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK,
+        name: PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK,
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.legend'),
+            classes: "govuk-fieldset__legend--m"
+          }
+        },
+        items: [
+          {
+            text: t(localKeyPrefix + '.options.high'),
+            value: 'high',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] == 'high'
+          },
+          {
+            text: t(localKeyPrefix + '.options.medium'),
+            value: 'medium',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] == 'medium'
+          },
+          {
+            text: t(localKeyPrefix + '.options.low'),
+            value: 'low',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] == 'low'
+          },
+          {
+            text: t(localKeyPrefix + '.options.very_low'),
+            value: 'very_low',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] == 'very_low'
+          }
+        ],
+        errorMessage: currentFloodRiskError
+      }) }}
+
+    {# CURRENT SURFACE WATER FLOOD RISK PAGE #}
+    {% elif step == projectSteps.CURRENT_FLOOD_SURFACE_WATER_RISK %}
+      {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK] %}
+        {% set currentSurfaceWaterRiskError = {
+          text: t(localKeyPrefix + '.errors.required')
+        } %}
+      {% else %}
+        {% set currentSurfaceWaterRiskError = false %}
+      {% endif %}
+
+      <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
+      <p class="govuk-body">{{ t(localKeyPrefix + '.hint') }}</p>
+
+      {{ govukRadios({
+        id: PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK,
+        name: PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK,
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.legend'),
+            classes: "govuk-fieldset__legend--m"
+          }
+        },
+        items: [
+          {
+            text: t(localKeyPrefix + '.options.high'),
+            value: 'high',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK] == 'high'
+          },
+          {
+            text: t(localKeyPrefix + '.options.medium'),
+            value: 'medium',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK] == 'medium'
+          },
+          {
+            text: t(localKeyPrefix + '.options.low'),
+            value: 'low',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK] == 'low'
+          },
+          {
+            text: t(localKeyPrefix + '.options.very_low'),
+            value: 'very_low',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK] == 'very_low'
+          }
+        ],
+        errorMessage: currentSurfaceWaterRiskError
+      }) }}
+
+    {# CURRENT COASTAL EROSION RISK PAGE #}
+    {% elif step == projectSteps.CURRENT_COASTAL_EROSION_RISK %}
+      {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK] %}
+        {% set currentCoastalErosionRiskError = {
+          text: t(localKeyPrefix + '.errors.required')
+        } %}
+      {% else %}
+        {% set currentCoastalErosionRiskError = false %}
+      {% endif %}
+
+      <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
+      <p class="govuk-body">{{ t(localKeyPrefix + '.hint') }}</p>
+
+      {{ govukRadios({
+        id: PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK,
+        name: PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK,
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.legend'),
+            classes: "govuk-fieldset__legend--m"
+          }
+        },
+        items: [
+          {
+            text: t(localKeyPrefix + '.options.medium_term'),
+            value: 'medium_term',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK] == 'medium_term'
+          },
+          {
+            text: t(localKeyPrefix + '.options.longer_term'),
+            value: 'longer_term',
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK] == 'longer_term'
+          }
+        ],
+        errorMessage: currentCoastalErosionRiskError
+      }) }}
+
     {% endif %}
 
     {{ govukButton({

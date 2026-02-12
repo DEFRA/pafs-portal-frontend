@@ -58,6 +58,21 @@ const createRiskAndPropertiesRoutes = (editPreHandlers) => [
     ROUTES.PROJECT.EDIT.FORTY_PERCENT_DEPRIVED,
     editPreHandlers,
     riskAndPropertiesController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK,
+    editPreHandlers,
+    riskAndPropertiesController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.CURRENT_FLOOD_SURFACE_WATER_RISK,
+    editPreHandlers,
+    riskAndPropertiesController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.CURRENT_COASTAL_EROSION_RISK,
+    editPreHandlers,
+    riskAndPropertiesController
   )
 ]
 

@@ -725,3 +725,42 @@ export const percentProperties20PercentDeprivedSchema = percentageSchema.label(
 export const percentProperties40PercentDeprivedSchema = percentageSchema.label(
   PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED
 )
+
+/**
+ * Current flood risk schema (for fluvial, tidal, sea flooding)
+ * Valid values: high, medium, low, very_low
+ */
+export const currentFloodRiskSchema = Joi.string()
+  .valid('high', 'medium', 'low', 'very_low')
+  .required()
+  .label(PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK)
+  .messages({
+    'any.required': 'Select a flood risk level',
+    'any.only': 'Select a valid flood risk level'
+  })
+
+/**
+ * Current flood surface water risk schema
+ * Valid values: high, medium, low, very_low
+ */
+export const currentFloodSurfaceWaterRiskSchema = Joi.string()
+  .valid('high', 'medium', 'low', 'very_low')
+  .required()
+  .label(PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK)
+  .messages({
+    'any.required': 'Select a surface water flood risk level',
+    'any.only': 'Select a valid surface water flood risk level'
+  })
+
+/**
+ * Current coastal erosion risk schema
+ * Valid values: medium_term, longer_term
+ */
+export const currentCoastalErosionRiskSchema = Joi.string()
+  .valid('medium_term', 'longer_term')
+  .required()
+  .label(PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK)
+  .messages({
+    'any.required': 'Select a coastal erosion risk level',
+    'any.only': 'Select a valid coastal erosion risk level'
+  })
