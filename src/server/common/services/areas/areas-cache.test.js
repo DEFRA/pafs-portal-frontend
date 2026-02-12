@@ -6,6 +6,9 @@ vi.mock('../../../../config/config.js', () => ({
     get: vi.fn((key) => {
       if (key === 'session.cache.ttl') return 1800000
       if (key === 'session.cache.engine') return 'redis'
+      if (key === 'cacheFeatures.areas.area') return true
+      if (key === 'cacheFeatures.areas.areasByList') return true
+      if (key === 'cacheFeatures.areas.areasByType') return true
       return null
     })
   }
@@ -59,6 +62,9 @@ describe('AreasCacheService', () => {
       config.get.mockImplementation((key) => {
         if (key === 'session.cache.engine') return 'redis'
         if (key === 'session.cache.ttl') return 1800000
+        if (key === 'cacheFeatures.areas.area') return true
+        if (key === 'cacheFeatures.areas.areasByList') return true
+        if (key === 'cacheFeatures.areas.areasByType') return true
         return null
       })
       cacheService = new AreasCacheService(mockServer)
@@ -66,6 +72,18 @@ describe('AreasCacheService', () => {
 
     test('isCacheEnabled returns true', () => {
       expect(cacheService.isCacheEnabled()).toBe(true)
+    })
+
+    test('isAreaCacheEnabled returns true when all flags enabled', () => {
+      expect(cacheService.isAreaCacheEnabled()).toBe(true)
+    })
+
+    test('isAreasListCacheEnabled returns true when all flags enabled', () => {
+      expect(cacheService.isAreasListCacheEnabled()).toBe(true)
+    })
+
+    test('isAreasByTypeCacheEnabled returns true when all flags enabled', () => {
+      expect(cacheService.isAreasByTypeCacheEnabled()).toBe(true)
     })
 
     describe('generateKey', () => {
@@ -271,6 +289,126 @@ describe('AreasCacheService', () => {
     })
   })
 
+  describe('when area cache feature is disabled', () => {
+    beforeEach(() => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'session.cache.ttl') return 1800000
+        if (key === 'cacheFeatures.areas.area') return false
+        if (key === 'cacheFeatures.areas.areasByList') return true
+        if (key === 'cacheFeatures.areas.areasByType') return true
+        return null
+      })
+      cacheService = new AreasCacheService(mockServer)
+    })
+
+    test('isAreaCacheEnabled returns false', () => {
+      expect(cacheService.isAreaCacheEnabled()).toBe(false)
+    })
+
+    test('isAreasListCacheEnabled returns true', () => {
+      expect(cacheService.isAreasListCacheEnabled()).toBe(true)
+    })
+
+    test('isAreasByTypeCacheEnabled returns true', () => {
+      expect(cacheService.isAreasByTypeCacheEnabled()).toBe(true)
+    })
+
+    test('getAreaFromCachedList returns null without calling cache', async () => {
+      const result = await cacheService.getAreaFromCachedList('1')
+
+      expect(result).toBeNull()
+      expect(mockCache.get).not.toHaveBeenCalled()
+    })
+
+    test('setAreaInCache does nothing', async () => {
+      await cacheService.setAreaInCache('1', { id: '1', name: 'Test' })
+
+      expect(mockCache.set).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('when areas-by-list cache feature is disabled', () => {
+    beforeEach(() => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'session.cache.ttl') return 1800000
+        if (key === 'cacheFeatures.areas.area') return true
+        if (key === 'cacheFeatures.areas.areasByList') return false
+        if (key === 'cacheFeatures.areas.areasByType') return true
+        return null
+      })
+      cacheService = new AreasCacheService(mockServer)
+    })
+
+    test('isAreaCacheEnabled returns true', () => {
+      expect(cacheService.isAreaCacheEnabled()).toBe(true)
+    })
+
+    test('isAreasListCacheEnabled returns false', () => {
+      expect(cacheService.isAreasListCacheEnabled()).toBe(false)
+    })
+
+    test('isAreasByTypeCacheEnabled returns true', () => {
+      expect(cacheService.isAreasByTypeCacheEnabled()).toBe(true)
+    })
+
+    test('getAreasByList returns null without calling cache', async () => {
+      const result = await cacheService.getAreasByList({
+        search: 'test',
+        page: 1
+      })
+
+      expect(result).toBeNull()
+      expect(mockCache.get).not.toHaveBeenCalled()
+    })
+
+    test('setAreasByList does nothing', async () => {
+      await cacheService.setAreasByList({ page: 1 }, { areas: [] })
+
+      expect(mockCache.set).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('when areas-by-type cache feature is disabled', () => {
+    beforeEach(() => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'session.cache.ttl') return 1800000
+        if (key === 'cacheFeatures.areas.area') return true
+        if (key === 'cacheFeatures.areas.areasByList') return true
+        if (key === 'cacheFeatures.areas.areasByType') return false
+        return null
+      })
+      cacheService = new AreasCacheService(mockServer)
+    })
+
+    test('isAreaCacheEnabled returns true', () => {
+      expect(cacheService.isAreaCacheEnabled()).toBe(true)
+    })
+
+    test('isAreasListCacheEnabled returns true', () => {
+      expect(cacheService.isAreasListCacheEnabled()).toBe(true)
+    })
+
+    test('isAreasByTypeCacheEnabled returns false', () => {
+      expect(cacheService.isAreasByTypeCacheEnabled()).toBe(false)
+    })
+
+    test('getAreasByType returns null without calling cache', async () => {
+      const result = await cacheService.getAreasByType()
+
+      expect(result).toBeNull()
+      expect(mockCache.get).not.toHaveBeenCalled()
+    })
+
+    test('setAreasByType does nothing', async () => {
+      await cacheService.setAreasByType({ EA: [] })
+
+      expect(mockCache.set).not.toHaveBeenCalled()
+    })
+  })
+
   describe('createAreasCacheService', () => {
     test('creates cache service instance', () => {
       config.get.mockReturnValue('redis')
@@ -292,6 +430,9 @@ describe('AreasCacheService', () => {
       config.get.mockImplementation((key) => {
         if (key === 'session.cache.engine') return 'redis'
         if (key === 'session.cache.ttl') return 1800000
+        if (key === 'cacheFeatures.areas.area') return true
+        if (key === 'cacheFeatures.areas.areasByList') return true
+        if (key === 'cacheFeatures.areas.areasByType') return true
         return null
       })
       cacheService = new AreasCacheService(mockServer)
@@ -631,6 +772,9 @@ describe('AreasCacheService', () => {
       config.get.mockImplementation((key) => {
         if (key === 'session.cache.engine') return 'redis'
         if (key === 'session.cache.ttl') return 1800000
+        if (key === 'cacheFeatures.areas.area') return true
+        if (key === 'cacheFeatures.areas.areasByList') return true
+        if (key === 'cacheFeatures.areas.areasByType') return true
         return null
       })
       cacheService = new AreasCacheService(mockServer)
@@ -666,6 +810,9 @@ describe('AreasCacheService', () => {
       config.get.mockImplementation((key) => {
         if (key === 'session.cache.engine') return 'redis'
         if (key === 'session.cache.ttl') return 1800000
+        if (key === 'cacheFeatures.areas.area') return true
+        if (key === 'cacheFeatures.areas.areasByList') return true
+        if (key === 'cacheFeatures.areas.areasByType') return true
         return null
       })
       cacheService = new AreasCacheService(mockServer)

@@ -265,6 +265,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
       'cookies_policy',
       JSON.stringify({ analytics: 'yes', policyVersion: 1 }),
       expect.objectContaining({
+        path: '/',
         ttl: 1000,
         isSecure: true,
         isHttpOnly: true,
@@ -276,6 +277,7 @@ describe('StaticPageController - cookie settings page (POST)', () => {
       'cookies_preferences_set',
       'true',
       expect.objectContaining({
+        path: '/',
         ttl: 1000,
         isSecure: true,
         isHttpOnly: true,
@@ -348,6 +350,7 @@ describe('StaticPageController - cookie banner accept', () => {
       'cookies_policy',
       JSON.stringify({ analytics: 'yes', policyVersion: 1 }),
       expect.objectContaining({
+        path: '/',
         isSecure: true,
         isHttpOnly: true,
         isSameSite: 'Lax'
@@ -357,6 +360,7 @@ describe('StaticPageController - cookie banner accept', () => {
       'show_cookie_confirmation',
       'true',
       expect.objectContaining({
+        path: '/',
         isSameSite: 'Lax'
       })
     )
@@ -426,6 +430,7 @@ describe('StaticPageController - cookie banner reject', () => {
       'cookies_policy',
       JSON.stringify({ analytics: 'no', policyVersion: 1 }),
       expect.objectContaining({
+        path: '/',
         isSecure: true,
         isHttpOnly: true,
         isSameSite: 'Lax'

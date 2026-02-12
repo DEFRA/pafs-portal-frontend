@@ -1,6 +1,7 @@
 import { BaseCacheService } from '../../helpers/cache/base-cache-service.js'
 import { CACHE_SEGMENTS } from '../../constants/common.js'
 import { getDefaultPageSize } from '../../helpers/pagination/index.js'
+import { config } from '../../../../config/config.js'
 
 /**
  * Accounts cache service
@@ -12,6 +13,22 @@ export class AccountsCacheService extends BaseCacheService {
    */
   constructor(server) {
     super(server, CACHE_SEGMENTS.ACCOUNTS)
+  }
+
+  /**
+   * Check if account caching is enabled
+   * @returns {boolean}
+   */
+  isAccountCacheEnabled() {
+    return this.enabled && config.get('cacheFeatures.accounts.account')
+  }
+
+  /**
+   * Check if list caching is enabled
+   * @returns {boolean}
+   */
+  isListCacheEnabled() {
+    return this.enabled && config.get('cacheFeatures.accounts.accountsList')
   }
 
   /**
@@ -47,6 +64,9 @@ export class AccountsCacheService extends BaseCacheService {
    * @returns {Promise<Object|null>} Cached account or null
    */
   async getAccount(id) {
+    if (!this.isAccountCacheEnabled()) {
+      return null
+    }
     const key = this.generateAccountKey(id)
     return this.getByKey(key)
   }
@@ -59,8 +79,11 @@ export class AccountsCacheService extends BaseCacheService {
    * @returns {Promise<void>}
    */
   async setAccount(id, account) {
+    if (!this.isAccountCacheEnabled()) {
+      return
+    }
     const key = this.generateAccountKey(id)
-    return this.setByKey(key, account)
+    await this.setByKey(key, account)
   }
 
   /**
@@ -71,7 +94,7 @@ export class AccountsCacheService extends BaseCacheService {
    * @returns {Promise<Array<Object|null>>} Array of accounts (null for cache misses)
    */
   async getAccountsByIds(ids) {
-    if (!this.enabled || !ids || ids.length === 0) {
+    if (!this.isAccountCacheEnabled() || !ids || ids.length === 0) {
       return []
     }
 
@@ -86,7 +109,7 @@ export class AccountsCacheService extends BaseCacheService {
    * @returns {Promise<void>}
    */
   async setAccounts(accounts) {
-    if (!this.enabled || !accounts || accounts.length === 0) {
+    if (!this.isAccountCacheEnabled() || !accounts || accounts.length === 0) {
       return
     }
 
@@ -106,7 +129,7 @@ export class AccountsCacheService extends BaseCacheService {
    * @returns {Promise<void>}
    */
   async setListMetadata(params, accountIds, pagination) {
-    if (!this.enabled) {
+    if (!this.isListCacheEnabled()) {
       return
     }
 
@@ -131,6 +154,10 @@ export class AccountsCacheService extends BaseCacheService {
    * @returns {Promise<Object|null>} List metadata or null
    */
   async getListMetadata(params) {
+    if (!this.isListCacheEnabled()) {
+      return null
+    }
+
     const key = this.generateListKey(params)
     const metadata = await this.getByKey(key)
 

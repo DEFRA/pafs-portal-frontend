@@ -2,17 +2,16 @@ import { config } from '../../../../config/config.js'
 import { statusCodes } from '../../../common/constants/status-codes.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { GENERAL_VIEWS } from '../../../common/constants/common.js'
+import {
+  COOKIE_NAMES,
+  getCookieOptions,
+  createCookiePolicyValue
+} from '../../../common/helpers/cookie-config.js'
 
 /**
  * Generic controller for static pages
  * Renders different views based on the route path
  */
-
-const COOKIE_POLICY_NAME = 'cookies_policy'
-const COOKIE_PREFS_SET_NAME = 'cookies_preferences_set'
-const COOKIE_TTL_CONFIG_KEY = 'cookie.preferences.ttl'
-const COOKIE_SECURE_CONFIG_KEY = 'session.cookie.secure'
-const COOKIE_POLICY_VERSION_KEY = 'cookie.policy.version'
 
 class StaticPageController {
   getPageKey(path) {
@@ -113,32 +112,20 @@ class StaticPageController {
   hideMessage(request, h) {
     const response = h.redirect(request.headers.referer || '/')
     // Clear the confirmation cookie so banner doesn't show
-    response.unstate('show_cookie_confirmation', {
+    response.unstate(COOKIE_NAMES.SHOW_CONFIRMATION, {
       path: '/'
     })
     return response
   }
 
   _setCookiePolicy(response, consentValue) {
-    const currentPolicyVersion = config.get(COOKIE_POLICY_VERSION_KEY)
-    const cookieOptions = {
-      path: '/',
-      ttl: config.get(COOKIE_TTL_CONFIG_KEY),
-      isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
-      isHttpOnly: true,
-      isSameSite: 'Lax'
-    }
-
     response.state(
-      COOKIE_POLICY_NAME,
-      JSON.stringify({
-        analytics: consentValue,
-        policyVersion: currentPolicyVersion
-      }),
-      cookieOptions
+      COOKIE_NAMES.POLICY,
+      createCookiePolicyValue(consentValue),
+      getCookieOptions()
     )
 
-    response.state(COOKIE_PREFS_SET_NAME, 'true', cookieOptions)
+    response.state(COOKIE_NAMES.PREFERENCES_SET, 'true', getCookieOptions())
   }
 
   /**
@@ -146,20 +133,13 @@ class StaticPageController {
    */
   _setCookieConsent(h, consentValue, redirectPath) {
     const response = h.redirect(redirectPath)
-
     this._setCookiePolicy(response, consentValue)
 
-    // Set a session cookie to show confirmation message
-    response.state('show_cookie_confirmation', 'true', {
-      path: '/',
-      ttl: null, // Session cookie
-      isSecure: config.get(COOKIE_SECURE_CONFIG_KEY),
-      isHttpOnly: false,
-      isSameSite: 'Lax'
-    })
-
-    // Clear hide message cookie so confirmation shows
-    response.unstate('hide_cookie_message')
+    response.state(
+      COOKIE_NAMES.SHOW_CONFIRMATION,
+      'true',
+      getCookieOptions({ ttl: null, isHttpOnly: false })
+    )
 
     return response
   }
