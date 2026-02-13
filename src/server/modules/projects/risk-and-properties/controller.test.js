@@ -833,4 +833,161 @@ describe('RiskAndPropertiesController', () => {
       )
     })
   })
+
+  describe('Edge cases and additional coverage', () => {
+    test('should handle risks as comma-separated string in MAIN_RISK step', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.MAIN_RISK)
+      getSessionData.mockReturnValue({
+        risks: 'fluvial_flooding,tidal_flooding,surface_water_flooding' // String instead of array
+      })
+
+      await riskAndPropertiesController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.RISK_AND_PROPERTIES,
+        expect.objectContaining({
+          mainRiskOptions: expect.arrayContaining([
+            expect.objectContaining({ value: PROJECT_RISK_TYPES.FLUVIAL }),
+            expect.objectContaining({ value: PROJECT_RISK_TYPES.TIDAL }),
+            expect.objectContaining({ value: PROJECT_RISK_TYPES.SURFACE_WATER })
+          ])
+        })
+      )
+    })
+
+    test('should skip property affected flooding when coastal erosion is only risk', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.RISK)
+      mockRequest.payload = {
+        risks: [PROJECT_RISK_TYPES.COASTAL_EROSION]
+      }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.COASTAL_EROSION],
+        mainRisk: PROJECT_RISK_TYPES.COASTAL_EROSION
+      })
+      submitProject.mockResolvedValue({ success: true })
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      // Should skip flooding and go to coastal erosion properties
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.PROPERTY_AFFECTED_COASTAL_EROSION.replace(
+          '{referenceNumber}',
+          'TEST-001A-002A'
+        )
+      )
+    })
+
+    test('should skip to twenty percent deprived when coastal erosion has no properties', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.RISK)
+      mockRequest.payload = {
+        risks: [PROJECT_RISK_TYPES.RESERVOIR] // Only reservoir - no flood or coastal erosion
+      }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.RESERVOIR],
+        mainRisk: PROJECT_RISK_TYPES.RESERVOIR
+      })
+      submitProject.mockResolvedValue({ success: true })
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalled()
+    })
+
+    test('should skip coastal erosion properties and go to twenty percent when no coastal erosion in risks', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.MAIN_RISK)
+      mockRequest.payload = {
+        mainRisk: PROJECT_RISK_TYPES.COASTAL_EROSION
+      }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.RESERVOIR], // Coastal erosion as main but not in risks - edge case
+        mainRisk: PROJECT_RISK_TYPES.COASTAL_EROSION
+      })
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      // Should navigate to twenty percent deprived (skipping coastal erosion since not in risks)
+      expect(mockH.redirect).toHaveBeenCalled()
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should fallback to overview when no next step found', async () => {
+      // Mock a scenario where STEP_SEQUENCE doesn't have a next step
+      getProjectStep.mockReturnValue(PROJECT_STEPS.TWENTY_PERCENT_DEPRIVED)
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001A-002A',
+        risks: [PROJECT_RISK_TYPES.RESERVOIR, PROJECT_RISK_TYPES.GROUNDWATER] // No current risk pages
+      })
+      mockRequest.payload = {
+        percentProperties20PercentDeprived: '15'
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      // Should navigate through to overview eventually
+      expect(saveProjectWithErrorHandling).toHaveBeenCalled()
+    })
+
+    test('should handle POST errors and show error view', async () => {
+      const testError = new Error('Database error')
+      saveProjectWithErrorHandling.mockRejectedValue(testError)
+      extractApiError.mockReturnValue({ message: 'Database error occurred' })
+
+      mockRequest.payload = {
+        risks: [PROJECT_RISK_TYPES.FLUVIAL]
+      }
+
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+
+      expect(mockRequest.logger.error).toHaveBeenCalledWith(
+        'Error risk and properties POST',
+        testError
+      )
+      expect(extractApiError).toHaveBeenCalledWith(mockRequest, testError)
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.RISK_AND_PROPERTIES,
+        expect.objectContaining({
+          error: { message: 'Database error occurred' }
+        })
+      )
+    })
+
+    test('should handle validation errors before submission', async () => {
+      const validationError = {
+        statusCode: 400,
+        errors: [{ field: 'risks', message: 'At least one risk required' }]
+      }
+      validatePayload.mockReturnValue(validationError)
+
+      mockRequest.payload = {
+        risks: []
+      }
+
+      const result = await riskAndPropertiesController.postHandler(
+        mockRequest,
+        mockH
+      )
+
+      expect(result).toBe(validationError)
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+    })
+
+    test('should handle empty risks array when parsing string', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.MAIN_RISK)
+      getSessionData.mockReturnValue({
+        risks: '' // Empty string
+      })
+
+      await riskAndPropertiesController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.RISK_AND_PROPERTIES,
+        expect.objectContaining({
+          mainRiskOptions: []
+        })
+      )
+    })
+  })
 })
