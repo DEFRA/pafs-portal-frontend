@@ -280,5 +280,148 @@
     "validation": {
       "FAILED_TO_UPLOAD_FILE": "Failed to upload a shapefile"
     }
+  },
+  "project_goals": {
+    "title": "What work does the project plan to do to achieve its benefits?",
+    "heading": "What work does the project plan to do to achieve its benefits?",
+    "goals": {
+      "example": "For example, the project will improve the standard of protection to 500 properties by:",
+      "example_items": [
+        "constructing an upstream storage area",
+        "replacing an existing culvert to increase capacity"
+      ]
+    },
+    "hint": "Limit your answer to 700 characters or fewer",
+    "validation": {
+      "required": "Tell us about the work the project plans to do to achieve its benefits.",
+      "max_length": "Limit the work the project plans to do to achieve its benefits to 700 characters or fewer"
+    }
+  },
+  "confidence_assessment": {
+    "property_confidence": {
+      "title": "Confidence in number of properties benefiting by this project",
+      "heading": "Confidence in number of properties benefiting by this project",
+      "options": {
+        "high": {
+          "label": "High",
+          "hint": "In Construction/Scheme complete and properties delivered"
+        },
+        "medium_high": {
+          "label": "Medium High",
+          "hint": "Number of properties verified in approved business case"
+        },
+        "medium_low": {
+          "label": "Medium Low",
+          "hint": "Initial modelling carried out"
+        },
+        "low": {
+          "label": "Low",
+          "hint": "Based on Shapefile / Estimate"
+        },
+        "not_applicable": {
+          "label": "N/A",
+          "hint": "No properties benefitting from this project"
+        }
+      }
+    },
+    "gateway_confidence": {
+      "title": "Confidence in achieving the project's forecast Gateway 4 (readiness for service) date",
+      "heading": "Confidence in achieving the project's forecast Gateway 4 (readiness for service) date",
+      "options": {
+        "high": {
+          "label": "High",
+          "hint": "High confidence in completing by specified Gateway 4 date / Scheme complete and properties delivered"
+        },
+        "medium_high": {
+          "label": "Medium High",
+          "hint": "Low level concerns in completing by specified Gateway 4 date or profile of properties benefitting"
+        },
+        "medium_low": {
+          "label": "Medium Low",
+          "hint": "Moderate concerns in completing by specified Gateway 4 date or profile of properties benefitting"
+        },
+        "low": {
+          "label": "Low",
+          "hint": "Significant concerns in completing by specified Gateway 4 date or profile of properties benefitting"
+        },
+        "not_applicable": {
+          "label": "N/A",
+          "hint": "No property benefits being provided by the project"
+        }
+      }
+    },
+    "funding_confidence": {
+      "title": "Confidence in securing contributions",
+      "heading": "Confidence in securing contributions",
+      "options": {
+        "high": {
+          "label": "High",
+          "hint": "Secured, or heads of terms in place / scheme complete with funding secured"
+        },
+        "medium_high": {
+          "label": "Medium High",
+          "hint": "Expected that contributions will be received. Some issues to overcome but confidence in contributions being achieved"
+        },
+        "medium_low": {
+          "label": "Medium Low",
+          "hint": "Optimistic contributions will be secured but contribution not known and/or concerns over those identified"
+        },
+        "low": {
+          "label": "Low",
+          "hint": "Low confidence contributions will be secured"
+        },
+        "not_applicable": {
+          "label": "N/A",
+          "hint": "Schema to be fully funded through Grant in Aid"
+        }
+      }
+    },
+    "validation": {
+      "required": "Select the confidence level"
+    }
+  },
+  "project_urgency": {
+    "urgency_reason": {
+      "title": "Is the project urgent for any of the following reasons?",
+      "heading": "Is the project urgent for any of the following reasons?",
+      "hint": "Urgency proposals must be agreed with your local Partnership and Strategic Overview (PSO) officer before submission.",
+      "options": {
+        "not_urgent": {
+          "label": "The project is not urgent"
+        },
+        "divider": "",
+        "statutory_need": {
+          "label": "There is a business critical statutory need"
+        },
+        "legal_need": {
+          "label": "There is a business critical legal need"
+        },
+        "health_and_safety": {
+          "label": "There is a health and safety issue"
+        },
+        "emergency_works": {
+          "label": "There is an emergency"
+        },
+        "time_limited": {
+          "label": "There is a specific aspect of the project that has a time limit"
+        }
+      },
+      "validation": {
+        "required": "If your project is urgent, select a reason. If it isn't urgent, select the first option."
+      }
+    },
+    "urgency_detail": {
+      "title": "Why is your project urgent?",
+      "statutory_need_heading": "What is the business critical statutory need?",
+      "legal_need_heading": "What is the business critical legal need?",
+      "health_and_safety_heading": "What is the health and safety issue?",
+      "emergency_works_heading": "What is the emergency?",
+      "time_limited_heading": "What is the specific aspect of the project that has a time limit?",
+      "hint": "Limit your answer to 700 characters or fewer",
+      "validation": {
+        "required": "You told us the project is urgent due to a specific aspect of the project that has a time limit. Tell us more information about this.",
+        "max_length": "Limit the details about why your project is urgent to 700 characters or fewer"
+      }
+    }
   }
 }
