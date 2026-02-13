@@ -467,7 +467,7 @@ describe('RiskAndPropertiesController', () => {
       )
     })
 
-    test('should navigate to overview after coastal erosion page', async () => {
+    test('should navigate to twenty percent deprived after coastal erosion page', async () => {
       getProjectStep.mockReturnValue(
         PROJECT_STEPS.PROPERTY_AFFECTED_COASTAL_EROSION
       )
@@ -479,8 +479,10 @@ describe('RiskAndPropertiesController', () => {
 
       await riskAndPropertiesController.postHandler(mockRequest, mockH)
 
-      // PROPERTY_AFFECTED_COASTAL_EROSION is the last step, so it navigates to overview via redirect
-      expect(mockH.redirect).toHaveBeenCalled()
+      // PROPERTY_AFFECTED_COASTAL_EROSION navigates to TWENTY_PERCENT_DEPRIVED next
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('twenty-percent-deprived')
+      )
     })
   })
 
@@ -809,12 +811,17 @@ describe('RiskAndPropertiesController', () => {
         currentCoastalErosionRisk: 'medium_term'
       }
 
-      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+      const result = await riskAndPropertiesController.postHandler(
+        mockRequest,
+        mockH
+      )
 
+      expect(saveProjectWithErrorHandling).toHaveBeenCalled()
       expect(navigateToProjectOverview).toHaveBeenCalledWith(
         'TEST-001A-002A',
         mockH
       )
+      expect(result).toBeDefined()
     })
 
     test('should save longer term coastal erosion risk', async () => {
