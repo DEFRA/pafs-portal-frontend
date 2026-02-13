@@ -390,7 +390,6 @@
       "title": "Current flood risk",
       "heading": "What is the current flood risk (fluvial and coastal) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
-      "legend": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
         "high": "High risk – this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
         "medium": "Medium risk – this means that each year an area has a chance of flooding between 1% and 3.3% (1 in 30 to a 1 in 100 chance of flooding)",
@@ -405,7 +404,6 @@
       "title": "Current surface water flood risk",
       "heading": "What is the current flood risk (Surface water) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
-      "legend": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
         "high": "High risk – this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
         "medium": "Medium risk – this means that each year an area has a chance of flooding between 1% and 3.3% (1 in 30 to a 1 in 100 chance of flooding)",
@@ -420,7 +418,6 @@
       "title": "Current coastal erosion risk",
       "heading": "What is the current coastal erosion risk in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
-      "legend": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
         "medium_term": "Medium term loss: Less than or equal to 30 years (1 year to 30 years), in a no future intervention scenario",
         "longer_term": "Longer term loss: Greater than 30 years (31 years to 100 years), in a no future intervention scenario"

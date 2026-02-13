@@ -14,6 +14,10 @@ vi.mock('../helpers/permissions.js')
 vi.mock('../helpers/project-edit-session.js')
 vi.mock('./controller.js')
 
+// Test constants
+const EXPECTED_ROUTE_COUNT = 18 // 9 steps x 2 methods (GET and POST)
+const PRE_HANDLER_INDEX_REQUIRE_EDIT = 3
+
 describe('projectRiskAndProperties plugin', () => {
   test('should have correct plugin name', () => {
     expect(projectRiskAndProperties.plugin.name).toBe(
@@ -33,7 +37,7 @@ describe('projectRiskAndProperties plugin', () => {
     const routes = mockServer.route.mock.calls[0][0]
 
     // Should have 18 routes (9 steps x 2 methods each - GET and POST)
-    expect(routes).toHaveLength(18)
+    expect(routes).toHaveLength(EXPECTED_ROUTE_COUNT)
   })
 
   test('should register GET and POST routes for RISK step', () => {
@@ -145,7 +149,9 @@ describe('projectRiskAndProperties plugin', () => {
       expect(route.options.pre[0].method).toBe(requireAuth)
       expect(route.options.pre[1].method).toBe(fetchProjectForEdit)
       expect(route.options.pre[2].method).toBe(initializeEditSessionPreHandler)
-      expect(route.options.pre[3].method).toBe(requireEditPermission)
+      expect(route.options.pre[PRE_HANDLER_INDEX_REQUIRE_EDIT].method).toBe(
+        requireEditPermission
+      )
     })
   })
 })

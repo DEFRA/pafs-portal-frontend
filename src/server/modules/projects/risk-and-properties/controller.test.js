@@ -28,6 +28,9 @@ vi.mock('../helpers/project-config.js')
 vi.mock('../helpers/project-submission.js')
 vi.mock('../helpers/project-utils.js')
 
+// Test constants
+const TEST_REFERENCE_NUMBER = 'TEST-001A-002A'
+
 describe('RiskAndPropertiesController', () => {
   let mockRequest
   let mockH
@@ -37,7 +40,7 @@ describe('RiskAndPropertiesController', () => {
 
     mockRequest = {
       payload: {},
-      params: { referenceNumber: 'TEST-001A-002A' },
+      params: { referenceNumber: TEST_REFERENCE_NUMBER },
       logger: {
         error: vi.fn()
       },
@@ -52,7 +55,7 @@ describe('RiskAndPropertiesController', () => {
 
     // Mock session data object that can be updated
     const sessionDataMock = {
-      slug: 'TEST-001A-002A',
+      slug: TEST_REFERENCE_NUMBER,
       risks: [PROJECT_RISK_TYPES.FLUVIAL],
       mainRisk: PROJECT_RISK_TYPES.FLUVIAL
     }
@@ -61,7 +64,7 @@ describe('RiskAndPropertiesController', () => {
     getSessionData.mockReturnValue(sessionDataMock)
 
     // Mock updateSessionData to actually update the session mock
-    updateSessionData.mockImplementation((request, updates) => {
+    updateSessionData.mockImplementation((_request, updates) => {
       Object.assign(sessionDataMock, updates)
     })
 
@@ -98,7 +101,7 @@ describe('RiskAndPropertiesController', () => {
       fieldType: 'table'
     }
 
-    buildViewData.mockImplementation((request, options) => {
+    buildViewData.mockImplementation((_request, options) => {
       // Merge additionalData like the real buildViewData does
       return {
         pageTitle: 'Test Page',
