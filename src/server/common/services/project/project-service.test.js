@@ -4,7 +4,8 @@ import {
   getProjectProposalOverview,
   upsertProjectProposal,
   getProjectBenefitAreaDownloadUrl,
-  deleteProject
+  deleteProject,
+  getProjects
 } from './project-service.js'
 import { apiRequest } from '../../helpers/api-client/index.js'
 
@@ -12,9 +13,437 @@ vi.mock('../../helpers/api-client/index.js', () => ({
   apiRequest: vi.fn()
 }))
 
+vi.mock('../../helpers/pagination/index.js', () => ({
+  getDefaultPageSize: vi.fn(() => 10)
+}))
+
 describe('project-service', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  describe('getProjects', () => {
+    test('Should call apiRequest with correct endpoint and default parameters', async () => {
+      const mockResponse = {
+        success: true,
+        data: {
+          data: [],
+          pagination: { page: 1, totalPages: 1, total: 0 }
+        }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({ accessToken: 'test-token' })
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.stringContaining('/api/v1/projects?'),
+        expect.objectContaining({
+          method: 'GET',
+          headers: { Authorization: 'Bearer test-token' }
+        })
+      )
+    })
+
+    test('Should include search parameter in query string', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({ search: 'flood', accessToken: 'test-token' })
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.stringContaining('search=flood'),
+        expect.any(Object)
+      )
+    })
+
+    test('Should trim search parameter before adding to query', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({ search: '  flood  ', accessToken: 'test-token' })
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.stringContaining('search=flood'),
+        expect.any(Object)
+      )
+    })
+
+    test('Should not include search parameter when empty', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({ search: '', accessToken: 'test-token' })
+
+      const callArgs = apiRequest.mock.calls[0][0]
+      expect(callArgs).not.toContain('search=')
+    })
+
+    test('Should include areaId parameter in query string', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({ areaId: 5, accessToken: 'test-token' })
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.stringContaining('areaId=5'),
+        expect.any(Object)
+      )
+    })
+
+    test('Should include status parameter in query string', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({ status: 'submitted', accessToken: 'test-token' })
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.stringContaining('status=submitted'),
+        expect.any(Object)
+      )
+    })
+
+    test('Should include page parameter in query string', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({ page: 2, accessToken: 'test-token' })
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.stringContaining('page=2'),
+        expect.any(Object)
+      )
+    })
+
+    test('Should use default page when not provided', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({ accessToken: 'test-token' })
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.stringContaining('page=1'),
+        expect.any(Object)
+      )
+    })
+
+    test('Should include pageSize parameter in query string', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({ pageSize: 25, accessToken: 'test-token' })
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.stringContaining('pageSize=25'),
+        expect.any(Object)
+      )
+    })
+
+    test('Should use default pageSize when not provided', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({ accessToken: 'test-token' })
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.stringContaining('pageSize=10'),
+        expect.any(Object)
+      )
+    })
+
+    test('Should include all parameters in query string', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({
+        search: 'coastal',
+        areaId: 3,
+        status: 'draft',
+        page: 2,
+        pageSize: 20,
+        accessToken: 'test-token'
+      })
+
+      const callArgs = apiRequest.mock.calls[0][0]
+      expect(callArgs).toContain('search=coastal')
+      expect(callArgs).toContain('areaId=3')
+      expect(callArgs).toContain('status=draft')
+      expect(callArgs).toContain('page=2')
+      expect(callArgs).toContain('pageSize=20')
+    })
+
+    test('Should not include Authorization header when no accessToken', async () => {
+      const mockResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      await getProjects({})
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should return data from cache when available', async () => {
+      const mockCachedProjects = [
+        { id: 1, name: 'Cached Project 1' },
+        { id: 2, name: 'Cached Project 2' }
+      ]
+      const mockMetadata = {
+        projectIds: [1, 2],
+        pagination: { page: 1, totalPages: 1, total: 2 }
+      }
+
+      const mockCacheService = {
+        getListMetadata: vi.fn().mockResolvedValue(mockMetadata),
+        getProjectsByIds: vi.fn().mockResolvedValue(mockCachedProjects)
+      }
+
+      const result = await getProjects({
+        page: 1,
+        accessToken: 'test-token',
+        cacheService: mockCacheService
+      })
+
+      expect(result.success).toBe(true)
+      expect(result.data.data).toEqual(mockCachedProjects)
+      expect(result.data.pagination).toEqual(mockMetadata.pagination)
+      expect(apiRequest).not.toHaveBeenCalled()
+    })
+
+    test('Should fetch from API when cache misses', async () => {
+      const mockApiResponse = {
+        success: true,
+        data: {
+          data: [{ id: 1, name: 'API Project' }],
+          pagination: { page: 1, totalPages: 1, total: 1 }
+        }
+      }
+
+      const mockCacheService = {
+        getListMetadata: vi.fn().mockResolvedValue(null),
+        setProjects: vi.fn(),
+        setListMetadata: vi.fn()
+      }
+
+      apiRequest.mockResolvedValue(mockApiResponse)
+
+      const result = await getProjects({
+        page: 1,
+        accessToken: 'test-token',
+        cacheService: mockCacheService
+      })
+
+      expect(apiRequest).toHaveBeenCalled()
+      expect(result.success).toBe(true)
+      expect(result.data.data).toEqual(mockApiResponse.data.data)
+    })
+
+    test('Should cache API response when data is returned', async () => {
+      const mockProjects = [
+        { id: 1, name: 'Project 1' },
+        { id: 2, name: 'Project 2' }
+      ]
+      const mockPagination = { page: 1, totalPages: 1, total: 2 }
+      const mockApiResponse = {
+        success: true,
+        data: { data: mockProjects, pagination: mockPagination }
+      }
+
+      const mockCacheService = {
+        getListMetadata: vi.fn().mockResolvedValue(null),
+        setProjects: vi.fn(),
+        setListMetadata: vi.fn()
+      }
+
+      apiRequest.mockResolvedValue(mockApiResponse)
+
+      await getProjects({
+        page: 1,
+        accessToken: 'test-token',
+        cacheService: mockCacheService
+      })
+
+      expect(mockCacheService.setProjects).toHaveBeenCalledWith(mockProjects)
+      expect(mockCacheService.setListMetadata).toHaveBeenCalledWith(
+        expect.any(Object),
+        [1, 2],
+        mockPagination
+      )
+    })
+
+    test('Should not cache when no data returned', async () => {
+      const mockApiResponse = {
+        success: true,
+        data: { data: [], pagination: {} }
+      }
+
+      const mockCacheService = {
+        getListMetadata: vi.fn().mockResolvedValue(null),
+        setProjects: vi.fn(),
+        setListMetadata: vi.fn()
+      }
+
+      apiRequest.mockResolvedValue(mockApiResponse)
+
+      await getProjects({
+        page: 1,
+        accessToken: 'test-token',
+        cacheService: mockCacheService
+      })
+
+      expect(mockCacheService.setProjects).not.toHaveBeenCalled()
+      expect(mockCacheService.setListMetadata).not.toHaveBeenCalled()
+    })
+
+    test('Should return API error response', async () => {
+      const mockErrorResponse = {
+        success: false,
+        errors: [{ errorCode: 'FETCH_FAILED' }]
+      }
+
+      apiRequest.mockResolvedValue(mockErrorResponse)
+
+      const result = await getProjects({ accessToken: 'test-token' })
+
+      expect(result.success).toBe(false)
+      expect(result.errors).toBeDefined()
+    })
+
+    test('Should handle API request failure', async () => {
+      apiRequest.mockRejectedValue(new Error('Network error'))
+
+      await expect(getProjects({ accessToken: 'test-token' })).rejects.toThrow(
+        'Network error'
+      )
+    })
+
+    test('Should work without cache service', async () => {
+      const mockApiResponse = {
+        success: true,
+        data: {
+          data: [{ id: 1, name: 'Project 1' }],
+          pagination: { page: 1, totalPages: 1, total: 1 }
+        }
+      }
+
+      apiRequest.mockResolvedValue(mockApiResponse)
+
+      const result = await getProjects({
+        page: 1,
+        accessToken: 'test-token'
+      })
+
+      expect(result.success).toBe(true)
+      expect(apiRequest).toHaveBeenCalled()
+    })
+
+    test('Should fetch from API when some cached projects are missing', async () => {
+      const mockMetadata = {
+        projectIds: [1, 2, 3],
+        pagination: { page: 1, totalPages: 1, total: 3 }
+      }
+      const mockCachedProjects = [
+        { id: 1, name: 'Project 1' },
+        null, // Missing project
+        { id: 3, name: 'Project 3' }
+      ]
+
+      const mockCacheService = {
+        getListMetadata: vi.fn().mockResolvedValue(mockMetadata),
+        getProjectsByIds: vi.fn().mockResolvedValue(mockCachedProjects),
+        setProjects: vi.fn(),
+        setListMetadata: vi.fn()
+      }
+
+      const mockApiResponse = {
+        success: true,
+        data: {
+          data: [
+            { id: 1, name: 'Project 1' },
+            { id: 2, name: 'Project 2' },
+            { id: 3, name: 'Project 3' }
+          ],
+          pagination: mockMetadata.pagination
+        }
+      }
+
+      apiRequest.mockResolvedValue(mockApiResponse)
+
+      const result = await getProjects({
+        page: 1,
+        accessToken: 'test-token',
+        cacheService: mockCacheService
+      })
+
+      expect(apiRequest).toHaveBeenCalled()
+      expect(result.success).toBe(true)
+    })
+
+    test('Should use referenceNumber as fallback for projectId in cache', async () => {
+      const mockProjects = [
+        { referenceNumber: 'RMS12345/ABC001', name: 'Project 1' },
+        { id: 2, name: 'Project 2' }
+      ]
+      const mockApiResponse = {
+        success: true,
+        data: { data: mockProjects, pagination: {} }
+      }
+
+      const mockCacheService = {
+        getListMetadata: vi.fn().mockResolvedValue(null),
+        setProjects: vi.fn(),
+        setListMetadata: vi.fn()
+      }
+
+      apiRequest.mockResolvedValue(mockApiResponse)
+
+      await getProjects({
+        page: 1,
+        accessToken: 'test-token',
+        cacheService: mockCacheService
+      })
+
+      expect(mockCacheService.setListMetadata).toHaveBeenCalledWith(
+        expect.any(Object),
+        ['RMS12345/ABC001', 2],
+        expect.any(Object)
+      )
+    })
   })
 
   describe('checkProjectNameExists', () => {
