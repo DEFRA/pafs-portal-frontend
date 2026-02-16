@@ -186,29 +186,22 @@ export class ProjectsCacheService extends BaseCacheService {
       return
     }
 
-    try {
-      const defaultPageSize = getDefaultPageSize()
-      // Drop common list patterns for all statuses
-      const statusList = ['draft', 'submitted', 'archived']
-      const listPromises = statusList.flatMap((status) => [
-        // First page with default page size (most common)
-        this.dropByKey(`list:${status}:::1:${defaultPageSize}`),
-        // Count keys
-        this.dropByKey(`count:${status}`)
-      ])
+    const defaultPageSize = getDefaultPageSize()
+    // Drop common list patterns for all statuses
+    const statusList = ['draft', 'submitted', 'archived']
+    const listPromises = statusList.flatMap((status) => [
+      // First page with default page size (most common)
+      this.dropByKey(`list:${status}:::1:${defaultPageSize}`),
+      // Count keys
+      this.dropByKey(`count:${status}`)
+    ])
 
-      await Promise.all(listPromises)
+    await Promise.all(listPromises)
 
-      this.server.logger.info(
-        { segment: this.segment },
-        'Invalidated common projects cache keys (lists and counts)'
-      )
-    } catch (error) {
-      this.server.logger.warn(
-        { error, segment: this.segment },
-        'Failed to invalidate projects cache'
-      )
-    }
+    this.server.logger.info(
+      { segment: this.segment },
+      'Invalidated common projects cache keys (lists and counts)'
+    )
   }
 }
 

@@ -37,8 +37,6 @@ vi.mock('../../helpers/pagination/index.js', () => ({
 }))
 
 const { config } = await import('../../../../config/config.js')
-const { createLogger } = await import('../../helpers/logging/logger.js')
-const baseLogger = createLogger()
 
 describe('ProjectsCacheService', () => {
   let mockServer
@@ -530,21 +528,6 @@ describe('ProjectsCacheService', () => {
       expect(mockServer.logger.info).toHaveBeenCalledWith(
         { segment: CACHE_SEGMENTS.PROJECTS },
         'Invalidated common projects cache keys (lists and counts)'
-      )
-    })
-
-    test('Should handle errors gracefully and log warning', async () => {
-      const error = new Error('Drop failed')
-      mockCache.drop.mockRejectedValue(error)
-
-      await cacheService.invalidateAll()
-
-      expect(baseLogger.warn).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error,
-          segment: CACHE_SEGMENTS.PROJECTS
-        }),
-        'Failed to drop cache key'
       )
     })
 

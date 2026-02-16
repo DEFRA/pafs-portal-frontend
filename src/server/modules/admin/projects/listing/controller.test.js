@@ -614,5 +614,101 @@ describe('projectsListingController', () => {
         })
       )
     })
+
+    test('Should handle missing data object with fallback values', async () => {
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: null
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            projects: [],
+            areas: expect.any(Array)
+          }),
+          pagination: {}
+        })
+      )
+    })
+
+    test('Should handle missing projects array with fallback', async () => {
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: {
+          data: null,
+          pagination: { page: 1, total: 0 }
+        }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            projects: []
+          })
+        })
+      )
+    })
+
+    test('Should handle missing pagination object with fallback', async () => {
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: {
+          data: [{ id: 1, name: 'Test' }],
+          pagination: null
+        }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pagination: {}
+        })
+      )
+    })
   })
 })
