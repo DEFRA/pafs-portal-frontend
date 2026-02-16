@@ -218,7 +218,8 @@ describe('Accounts Service', () => {
         getAccountsByIds: vi.fn(),
         setAccounts: vi.fn(),
         getAccount: vi.fn(),
-        setAccount: vi.fn()
+        setAccount: vi.fn(),
+        isAccountCacheEnabled: vi.fn().mockReturnValue(true)
       }
     })
 

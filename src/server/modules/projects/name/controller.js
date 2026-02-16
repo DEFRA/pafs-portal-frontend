@@ -83,7 +83,7 @@ class NameController {
       return h.redirect(ROUTES.PROJECT.AREA).takeover()
     }
     const loggedInUserMainAreaData = loggedInUserMainArea(request)
-    const areaId = Number(loggedInUserMainAreaData?.id)
+    const areaId = Number(loggedInUserMainAreaData?.areaId)
     request.server.logger.info(
       { areaId },
       'User has single area, setting area in session and redirecting to project type step'

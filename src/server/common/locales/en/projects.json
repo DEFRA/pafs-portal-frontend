@@ -143,7 +143,8 @@
     "after_march_link": "The project starts after March {{afterMarchYear}}",
     "errors": {
       "required": "Select the financial year when the project first requires funding",
-      "after_last_year": "Your first financial year should be less than your last financial year"
+      "after_last_year": "Your first financial year should be less than your last financial year",
+      "invalid_range": "Your first financial year should be less than your last financial year"
     }
   },
   "financial_year_start_manual": {

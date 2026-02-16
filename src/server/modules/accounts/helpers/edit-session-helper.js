@@ -7,6 +7,7 @@ import {
   determineResponsibilityFromAreas,
   getParentAreas
 } from '../../../common/helpers/areas/areas-helper.js'
+import { isAdminContext } from './navigation-helper.js'
 
 /**
  * Extract parent area IDs from account areas
@@ -144,7 +145,8 @@ export function initializeEditSession(request, accountData) {
     ...mapAccountToSessionData(account, responsibility),
     encodedId: request.params.encodedId,
     originalData: storeOriginalAccountData(account, responsibility),
-    ...mapAreaDataForSession(account, areasData, responsibility)
+    ...mapAreaDataForSession(account, areasData, responsibility),
+    isAdminContext: isAdminContext(request)
   }
 
   request.yar.set(sessionKey, sessionData)

@@ -147,7 +147,7 @@ export async function getAccountsCount(status, accessToken, cacheService) {
   const count = result.success ? result.data?.pagination?.total || 0 : 0
 
   // Cache the count
-  if (cacheService) {
+  if (cacheService?.isAccountCacheEnabled()) {
     await cacheService.setByKey(cacheKey, count)
   }
 

@@ -22,6 +22,7 @@ describe('edit-session-helper', () => {
   describe('initializeEditSession', () => {
     test('initializes session with EA user data', () => {
       const mockRequest = {
+        path: '/admin/users/edit',
         params: { encodedId: 'abc123' },
         yar: { set: vi.fn() }
       }
@@ -79,6 +80,7 @@ describe('edit-session-helper', () => {
 
     test('initializes session with PSO user data and EA parent areas', () => {
       const mockRequest = {
+        path: '/admin/users/edit',
         params: { encodedId: 'xyz789' },
         yar: { set: vi.fn() }
       }
@@ -117,6 +119,7 @@ describe('edit-session-helper', () => {
 
     test('initializes session with RMA user data and EA + PSO parent areas', () => {
       const mockRequest = {
+        path: '/admin/users/edit',
         params: { encodedId: 'rma123' },
         yar: { set: vi.fn() }
       }
@@ -154,6 +157,7 @@ describe('edit-session-helper', () => {
 
     test('initializes session with admin user data (no areas)', () => {
       const mockRequest = {
+        path: '/admin/users/edit',
         params: { encodedId: 'admin123' },
         yar: { set: vi.fn() }
       }
@@ -185,6 +189,7 @@ describe('edit-session-helper', () => {
 
     test('handles account with empty/null fields', () => {
       const mockRequest = {
+        path: '/admin/users/edit',
         params: { encodedId: 'empty123' },
         yar: { set: vi.fn() }
       }
@@ -586,6 +591,7 @@ describe('edit-session-helper', () => {
   describe('initializeEditSessionPreHandler', () => {
     test('initializes session when encodedId and accountData present', () => {
       const mockRequest = {
+        path: '/admin/users/edit',
         params: { encodedId: 'abc123' },
         yar: {
           get: vi.fn().mockReturnValue(null),
@@ -617,6 +623,7 @@ describe('edit-session-helper', () => {
 
     test('initializes session when existing session is for different user', () => {
       const mockRequest = {
+        path: '/admin/users/edit',
         params: { encodedId: 'xyz789' },
         yar: {
           get: vi.fn().mockReturnValue({
