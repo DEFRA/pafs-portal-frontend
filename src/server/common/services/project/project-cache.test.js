@@ -5,31 +5,73 @@ import {
 } from './project-cache.js'
 import { CACHE_SEGMENTS } from '../../constants/common.js'
 
+const DEFAULT_TTL = 1800000 // 30 minutes
+
+vi.mock('../../../../config/config.js', () => ({
+  config: {
+    get: vi.fn((key) => {
+      if (key === 'session.cache.ttl') return 1800000
+      if (key === 'session.cache.engine') return 'redis'
+      if (key === 'pagination.defaultPageSize') return 10
+      if (key === 'cacheFeatures.projects.project') return true
+      if (key === 'cacheFeatures.projects.projectsList') return true
+      return null
+    })
+  }
+}))
+
+vi.mock('../../helpers/logging/logger.js', () => {
+  const logger = {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
+  }
+  return {
+    createLogger: () => logger
+  }
+})
+
 vi.mock('../../helpers/pagination/index.js', () => ({
   getDefaultPageSize: vi.fn(() => 10)
 }))
 
+const { config } = await import('../../../../config/config.js')
+const { createLogger } = await import('../../helpers/logging/logger.js')
+const baseLogger = createLogger()
+
 describe('ProjectsCacheService', () => {
   let mockServer
+  let mockCache
   let cacheService
 
   beforeEach(() => {
+    vi.clearAllMocks()
+
+    mockCache = {
+      get: vi.fn(),
+      set: vi.fn(),
+      drop: vi.fn()
+    }
+
     mockServer = {
+      cache: vi.fn(() => mockCache),
       logger: {
         debug: vi.fn(),
         info: vi.fn(),
+        warn: vi.fn(),
         error: vi.fn()
-      },
-      cache: vi.fn().mockReturnValue({
-        get: vi.fn(),
-        set: vi.fn(),
-        drop: vi.fn()
-      })
+      }
     }
 
+    config.get.mockImplementation((key) => {
+      if (key === 'session.cache.engine') return 'redis'
+      if (key === 'session.cache.ttl') return DEFAULT_TTL
+      if (key === 'cacheFeatures.projects.project') return true
+      if (key === 'cacheFeatures.projects.projectsList') return true
+      return null
+    })
     cacheService = new ProjectsCacheService(mockServer)
-    // Mock the enabled flag for tests
-    cacheService.enabled = true
   })
 
   describe('constructor', () => {
@@ -111,57 +153,83 @@ describe('ProjectsCacheService', () => {
   describe('getProject', () => {
     test('Should retrieve cached project by id', async () => {
       const mockProject = { id: 1, name: 'Test Project' }
-      cacheService.getByKey = vi.fn().mockResolvedValue(mockProject)
+      mockCache.get.mockResolvedValue(mockProject)
 
       const result = await cacheService.getProject(1)
 
-      expect(cacheService.getByKey).toHaveBeenCalledWith('project:1')
+      expect(mockCache.get).toHaveBeenCalledWith('project:1')
       expect(result).toEqual(mockProject)
     })
 
     test('Should return null when project not in cache', async () => {
-      cacheService.getByKey = vi.fn().mockResolvedValue(null)
+      mockCache.get.mockResolvedValue(null)
 
       const result = await cacheService.getProject(999)
 
       expect(result).toBeNull()
     })
 
+    test('Should return null when project cache is disabled', async () => {
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
+
+      const result = await disabledService.getProject(1)
+
+      expect(result).toBeNull()
+    })
+
+    test('Should return null when project cache is disabled', async () => {
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
+
+      const result = await disabledService.getProject(999)
+
+      expect(result).toBeNull()
+      expect(mockCache.get).not.toHaveBeenCalled()
+    })
+
     test('Should handle string reference number', async () => {
       const mockProject = { referenceNumber: 'RMS12345/ABC001' }
-      cacheService.getByKey = vi.fn().mockResolvedValue(mockProject)
+      mockCache.get.mockResolvedValue(mockProject)
 
       await cacheService.getProject('RMS12345/ABC001')
 
-      expect(cacheService.getByKey).toHaveBeenCalledWith(
-        'project:RMS12345/ABC001'
-      )
+      expect(mockCache.get).toHaveBeenCalledWith('project:RMS12345/ABC001')
     })
   })
 
   describe('setProject', () => {
     test('Should cache project with numeric id', async () => {
       const mockProject = { id: 1, name: 'Test Project' }
-      cacheService.setByKey = vi.fn().mockResolvedValue()
 
       await cacheService.setProject(1, mockProject)
 
-      expect(cacheService.setByKey).toHaveBeenCalledWith(
+      expect(mockCache.set).toHaveBeenCalledWith(
         'project:1',
-        mockProject
+        mockProject,
+        DEFAULT_TTL
       )
     })
 
     test('Should cache project with string reference number', async () => {
       const mockProject = { referenceNumber: 'RMS12345/ABC001' }
-      cacheService.setByKey = vi.fn().mockResolvedValue()
 
       await cacheService.setProject('RMS12345/ABC001', mockProject)
 
-      expect(cacheService.setByKey).toHaveBeenCalledWith(
+      expect(mockCache.set).toHaveBeenCalledWith(
         'project:RMS12345/ABC001',
-        mockProject
+        mockProject,
+        DEFAULT_TTL
       )
+    })
+
+    test('Should not cache when project cache is disabled', async () => {
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
+
+      await disabledService.setProject(1, { id: 1, name: 'Test' })
+
+      expect(mockCache.set).not.toHaveBeenCalled()
     })
   })
 
@@ -173,8 +241,7 @@ describe('ProjectsCacheService', () => {
         { id: 3, name: 'Project 3' }
       ]
 
-      cacheService.getProject = vi
-        .fn()
+      mockCache.get
         .mockResolvedValueOnce(mockProjects[0])
         .mockResolvedValueOnce(mockProjects[1])
         .mockResolvedValueOnce(mockProjects[2])
@@ -182,13 +249,14 @@ describe('ProjectsCacheService', () => {
       const result = await cacheService.getProjectsByIds([1, 2, 3])
 
       expect(result).toEqual(mockProjects)
-      expect(cacheService.getProject).toHaveBeenCalledTimes(3)
+      expect(mockCache.get).toHaveBeenCalledTimes(3)
     })
 
     test('Should return empty array when cache is disabled', async () => {
-      cacheService.enabled = false
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
 
-      const result = await cacheService.getProjectsByIds([1, 2, 3])
+      const result = await disabledService.getProjectsByIds([1, 2, 3])
 
       expect(result).toEqual([])
     })
@@ -206,8 +274,7 @@ describe('ProjectsCacheService', () => {
     })
 
     test('Should return null for missing projects', async () => {
-      cacheService.getProject = vi
-        .fn()
+      mockCache.get
         .mockResolvedValueOnce({ id: 1, name: 'Project 1' })
         .mockResolvedValueOnce(null)
         .mockResolvedValueOnce({ id: 3, name: 'Project 3' })
@@ -229,38 +296,40 @@ describe('ProjectsCacheService', () => {
         { id: 2, name: 'Project 2' }
       ]
 
-      cacheService.setProject = vi.fn().mockResolvedValue()
-
       await cacheService.setProjects(mockProjects)
 
-      expect(cacheService.setProject).toHaveBeenCalledTimes(2)
-      expect(cacheService.setProject).toHaveBeenCalledWith(1, mockProjects[0])
-      expect(cacheService.setProject).toHaveBeenCalledWith(2, mockProjects[1])
+      expect(mockCache.set).toHaveBeenCalledTimes(2)
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'project:1',
+        mockProjects[0],
+        DEFAULT_TTL
+      )
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'project:2',
+        mockProjects[1],
+        DEFAULT_TTL
+      )
     })
 
     test('Should not cache when disabled', async () => {
-      cacheService.enabled = false
-      cacheService.setProject = vi.fn()
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
 
-      await cacheService.setProjects([{ id: 1, name: 'Project 1' }])
+      await disabledService.setProjects([{ id: 1, name: 'Project 1' }])
 
-      expect(cacheService.setProject).not.toHaveBeenCalled()
+      expect(mockCache.set).not.toHaveBeenCalled()
     })
 
     test('Should not cache when projects is null', async () => {
-      cacheService.setProject = vi.fn()
-
       await cacheService.setProjects(null)
 
-      expect(cacheService.setProject).not.toHaveBeenCalled()
+      expect(mockCache.set).not.toHaveBeenCalled()
     })
 
     test('Should not cache when projects is empty', async () => {
-      cacheService.setProject = vi.fn()
-
       await cacheService.setProjects([])
 
-      expect(cacheService.setProject).not.toHaveBeenCalled()
+      expect(mockCache.set).not.toHaveBeenCalled()
     })
 
     test('Should skip projects without id', async () => {
@@ -270,13 +339,19 @@ describe('ProjectsCacheService', () => {
         { id: 3, name: 'Project 3' }
       ]
 
-      cacheService.setProject = vi.fn().mockResolvedValue()
-
       await cacheService.setProjects(mockProjects)
 
-      expect(cacheService.setProject).toHaveBeenCalledTimes(2)
-      expect(cacheService.setProject).toHaveBeenCalledWith(1, mockProjects[0])
-      expect(cacheService.setProject).toHaveBeenCalledWith(3, mockProjects[2])
+      expect(mockCache.set).toHaveBeenCalledTimes(2)
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'project:1',
+        mockProjects[0],
+        DEFAULT_TTL
+      )
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'project:3',
+        mockProjects[2],
+        DEFAULT_TTL
+      )
     })
   })
 
@@ -286,17 +361,16 @@ describe('ProjectsCacheService', () => {
       const projectIds = [1, 2, 3]
       const pagination = { page: 1, totalPages: 1, total: 3 }
 
-      cacheService.setByKey = vi.fn().mockResolvedValue()
-
       await cacheService.setListMetadata(params, projectIds, pagination)
 
-      expect(cacheService.setByKey).toHaveBeenCalledWith(
+      expect(mockCache.set).toHaveBeenCalledWith(
         'list:test:::1:10',
         expect.objectContaining({
           projectIds,
           pagination,
           timestamp: expect.any(Number)
-        })
+        }),
+        DEFAULT_TTL
       )
       expect(mockServer.logger.debug).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -309,22 +383,21 @@ describe('ProjectsCacheService', () => {
     })
 
     test('Should not cache when disabled', async () => {
-      cacheService.enabled = false
-      cacheService.setByKey = vi.fn()
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
 
-      await cacheService.setListMetadata({}, [], {})
+      await disabledService.setListMetadata({}, [], {})
 
-      expect(cacheService.setByKey).not.toHaveBeenCalled()
+      expect(mockCache.set).not.toHaveBeenCalled()
     })
 
     test('Should include timestamp in metadata', async () => {
       const beforeTimestamp = Date.now()
-      cacheService.setByKey = vi.fn().mockResolvedValue()
 
       await cacheService.setListMetadata({}, [1, 2], {})
 
       const afterTimestamp = Date.now()
-      const callArgs = cacheService.setByKey.mock.calls[0][1]
+      const callArgs = mockCache.set.mock.calls[0][1]
 
       expect(callArgs.timestamp).toBeGreaterThanOrEqual(beforeTimestamp)
       expect(callArgs.timestamp).toBeLessThanOrEqual(afterTimestamp)
@@ -339,7 +412,7 @@ describe('ProjectsCacheService', () => {
         timestamp: Date.now()
       }
 
-      cacheService.getByKey = vi.fn().mockResolvedValue(mockMetadata)
+      mockCache.get.mockResolvedValue(mockMetadata)
 
       const result = await cacheService.getListMetadata({
         search: 'test',
@@ -358,7 +431,7 @@ describe('ProjectsCacheService', () => {
     })
 
     test('Should return null when metadata not in cache', async () => {
-      cacheService.getByKey = vi.fn().mockResolvedValue(null)
+      mockCache.get.mockResolvedValue(null)
 
       const result = await cacheService.getListMetadata({ page: 1 })
 
@@ -372,8 +445,18 @@ describe('ProjectsCacheService', () => {
       )
     })
 
+    test('Should return null when list cache is disabled', async () => {
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
+
+      const result = await disabledService.getListMetadata({ page: 1 })
+
+      expect(result).toBeNull()
+      expect(mockCache.get).not.toHaveBeenCalled()
+    })
+
     test('Should log cache miss when metadata is null', async () => {
-      cacheService.getByKey = vi.fn().mockResolvedValue(null)
+      mockCache.get.mockResolvedValue(null)
 
       await cacheService.getListMetadata({})
 
@@ -381,6 +464,94 @@ describe('ProjectsCacheService', () => {
         expect.any(Object),
         'List metadata cache miss'
       )
+    })
+  })
+
+  describe('isProjectCacheEnabled', () => {
+    test('Should return true when cache is enabled and feature flag is true', () => {
+      const result = cacheService.isProjectCacheEnabled()
+
+      expect(result).toBe(true)
+    })
+
+    test('Should return false when cache is disabled', () => {
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
+
+      const result = disabledService.isProjectCacheEnabled()
+
+      expect(result).toBe(false)
+    })
+  })
+
+  describe('isListCacheEnabled', () => {
+    test('Should return true when cache is enabled and feature flag is true', () => {
+      const result = cacheService.isListCacheEnabled()
+
+      expect(result).toBe(true)
+    })
+
+    test('Should return false when cache is disabled', () => {
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
+
+      const result = disabledService.isListCacheEnabled()
+
+      expect(result).toBe(false)
+    })
+  })
+
+  describe('invalidateAll', () => {
+    test('Should drop common cache keys for all statuses', async () => {
+      await cacheService.invalidateAll()
+
+      // Should drop list keys and count keys for each status
+      expect(mockCache.drop).toHaveBeenCalledWith('list:draft:::1:10')
+      expect(mockCache.drop).toHaveBeenCalledWith('count:draft')
+      expect(mockCache.drop).toHaveBeenCalledWith('list:submitted:::1:10')
+      expect(mockCache.drop).toHaveBeenCalledWith('count:submitted')
+      expect(mockCache.drop).toHaveBeenCalledWith('list:archived:::1:10')
+      expect(mockCache.drop).toHaveBeenCalledWith('count:archived')
+      expect(mockCache.drop).toHaveBeenCalledTimes(6)
+    })
+
+    test('Should not drop keys when cache is disabled', async () => {
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
+
+      await disabledService.invalidateAll()
+
+      expect(mockCache.drop).not.toHaveBeenCalled()
+    })
+
+    test('Should log info message on successful invalidation', async () => {
+      await cacheService.invalidateAll()
+
+      expect(mockServer.logger.info).toHaveBeenCalledWith(
+        { segment: CACHE_SEGMENTS.PROJECTS },
+        'Invalidated common projects cache keys (lists and counts)'
+      )
+    })
+
+    test('Should handle errors gracefully and log warning', async () => {
+      const error = new Error('Drop failed')
+      mockCache.drop.mockRejectedValue(error)
+
+      await cacheService.invalidateAll()
+
+      expect(baseLogger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error,
+          segment: CACHE_SEGMENTS.PROJECTS
+        }),
+        'Failed to drop cache key'
+      )
+    })
+
+    test('Should not throw error when drop fails', async () => {
+      mockCache.drop.mockRejectedValue(new Error('Drop failed'))
+
+      await expect(cacheService.invalidateAll()).resolves.not.toThrow()
     })
   })
 
