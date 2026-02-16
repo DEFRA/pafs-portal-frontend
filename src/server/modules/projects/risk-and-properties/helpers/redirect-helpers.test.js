@@ -12,7 +12,7 @@ import {
 
 // Mock dependencies
 vi.mock('../../helpers/project-utils.js', () => ({
-  updateSessionData: vi.fn(async (request, data) => data)
+  updateSessionData: vi.fn(async (_request, data) => data)
 }))
 
 vi.mock('../../helpers/project-submission.js', () => ({
@@ -21,6 +21,12 @@ vi.mock('../../helpers/project-submission.js', () => ({
 
 const { updateSessionData } = await import('../../helpers/project-utils.js')
 const { submitProject } = await import('../../helpers/project-submission.js')
+
+// Test constants
+const TEST_REFERENCE_NUMBER = 'TEST123'
+const ROUTE_PROPERTY_AFFECTED_FLOODING = 'property-affected-flooding'
+const ROUTE_PROPERTY_AFFECTED_COASTAL_EROSION =
+  'property-affected-coastal-erosion'
 
 describe('redirect-helpers', () => {
   const createMockH = () => {
@@ -48,18 +54,18 @@ describe('redirect-helpers', () => {
       const mockRequest = {}
       const sessionData = {
         risks: [PROJECT_RISK_TYPES.FLUVIAL],
-        referenceNumber: 'TEST123'
+        referenceNumber: TEST_REFERENCE_NUMBER
       }
 
       const result = await handleRiskStepRedirect(
         mockRequest,
         mockH,
         sessionData,
-        'TEST123'
+        TEST_REFERENCE_NUMBER
       )
 
-      expect(result.redirectTo).toContain('property-affected-flooding')
-      expect(result.redirectTo).toContain('TEST123')
+      expect(result.redirectTo).toContain(ROUTE_PROPERTY_AFFECTED_FLOODING)
+      expect(result.redirectTo).toContain(TEST_REFERENCE_NUMBER)
       expect(updateSessionData).toHaveBeenCalled()
       expect(submitProject).toHaveBeenCalled()
     })
@@ -69,28 +75,30 @@ describe('redirect-helpers', () => {
       const mockRequest = {}
       const sessionData = {
         risks: [PROJECT_RISK_TYPES.COASTAL_EROSION],
-        referenceNumber: 'TEST123'
+        referenceNumber: TEST_REFERENCE_NUMBER
       }
 
       const result = await handleRiskStepRedirect(
         mockRequest,
         mockH,
         sessionData,
-        'TEST123'
+        TEST_REFERENCE_NUMBER
       )
 
-      expect(result.redirectTo).toContain('property-affected-coastal-erosion')
-      expect(result.redirectTo).toContain('TEST123')
+      expect(result.redirectTo).toContain(
+        ROUTE_PROPERTY_AFFECTED_COASTAL_EROSION
+      )
+      expect(result.redirectTo).toContain(TEST_REFERENCE_NUMBER)
       expect(updateSessionData).toHaveBeenCalled()
       expect(submitProject).toHaveBeenCalled()
     })
 
-    it('should redirect to property-affected-flooding when single groundwater risk', async () => {
+    it(`should redirect to ${ROUTE_PROPERTY_AFFECTED_FLOODING} when single groundwater risk`, async () => {
       const mockH = createMockH()
       const mockRequest = {}
       const sessionData = {
         risks: [PROJECT_RISK_TYPES.GROUNDWATER],
-        referenceNumber: 'TEST123'
+        referenceNumber: TEST_REFERENCE_NUMBER
       }
 
       submitProject.mockResolvedValueOnce({ success: true })
@@ -99,11 +107,11 @@ describe('redirect-helpers', () => {
         mockRequest,
         mockH,
         sessionData,
-        'TEST123'
+        TEST_REFERENCE_NUMBER
       )
 
-      expect(result.redirectTo).toContain('property-affected-flooding')
-      expect(result.redirectTo).toContain('TEST123')
+      expect(result.redirectTo).toContain(ROUTE_PROPERTY_AFFECTED_FLOODING)
+      expect(result.redirectTo).toContain(TEST_REFERENCE_NUMBER)
     })
 
     it('should handle submit failure', async () => {
@@ -135,7 +143,7 @@ describe('redirect-helpers', () => {
         'Failed to save main risk',
         'Test error'
       )
-      expect(result.redirectTo).toContain('property-affected-flooding')
+      expect(result.redirectTo).toContain(ROUTE_PROPERTY_AFFECTED_FLOODING)
     })
 
     it('should navigate to main risk step when multiple risks selected', async () => {
@@ -143,25 +151,25 @@ describe('redirect-helpers', () => {
       const mockRequest = {}
       const sessionData = {
         risks: [PROJECT_RISK_TYPES.FLUVIAL, PROJECT_RISK_TYPES.TIDAL],
-        referenceNumber: 'TEST123'
+        referenceNumber: TEST_REFERENCE_NUMBER
       }
 
       const result = await handleRiskStepRedirect(
         mockRequest,
         mockH,
         sessionData,
-        'TEST123'
+        TEST_REFERENCE_NUMBER
       )
 
       expect(result.redirectTo).toContain('main-risk')
-      expect(result.redirectTo).toContain('TEST123')
+      expect(result.redirectTo).toContain(TEST_REFERENCE_NUMBER)
       expect(updateSessionData).not.toHaveBeenCalled()
       expect(submitProject).not.toHaveBeenCalled()
     })
   })
 
   describe('handleMainRiskStepRedirect', () => {
-    it('should redirect to property-affected-flooding when main risk is not coastal erosion', () => {
+    it(`should redirect to ${ROUTE_PROPERTY_AFFECTED_FLOODING} when main risk is not coastal erosion`, () => {
       const mockH = createMockH()
       const sessionData = {
         mainRisk: PROJECT_RISK_TYPES.FLUVIAL,
@@ -171,11 +179,11 @@ describe('redirect-helpers', () => {
 
       const result = handleMainRiskStepRedirect(mockH, sessionData, 'TEST123')
 
-      expect(result.redirectTo).toContain('property-affected-flooding')
+      expect(result.redirectTo).toContain(ROUTE_PROPERTY_AFFECTED_FLOODING)
       expect(result.redirectTo).toContain('TEST123')
     })
 
-    it('should skip to property-affected-coastal-erosion when main risk is coastal erosion and only risk', () => {
+    it(`should skip to ${ROUTE_PROPERTY_AFFECTED_COASTAL_EROSION} when main risk is coastal erosion and only risk`, () => {
       const mockH = createMockH()
       const sessionData = {
         mainRisk: PROJECT_RISK_TYPES.COASTAL_EROSION,
@@ -185,11 +193,13 @@ describe('redirect-helpers', () => {
 
       const result = handleMainRiskStepRedirect(mockH, sessionData, 'TEST123')
 
-      expect(result.redirectTo).toContain('property-affected-coastal-erosion')
+      expect(result.redirectTo).toContain(
+        ROUTE_PROPERTY_AFFECTED_COASTAL_EROSION
+      )
       expect(result.redirectTo).toContain('TEST123')
     })
 
-    it('should go to property-affected-flooding when coastal erosion with other risks', () => {
+    it(`should go to ${ROUTE_PROPERTY_AFFECTED_FLOODING} when coastal erosion with other risks`, () => {
       const mockH = createMockH()
       const sessionData = {
         mainRisk: PROJECT_RISK_TYPES.COASTAL_EROSION,
@@ -199,7 +209,7 @@ describe('redirect-helpers', () => {
 
       const result = handleMainRiskStepRedirect(mockH, sessionData, 'TEST123')
 
-      expect(result.redirectTo).toContain('property-affected-flooding')
+      expect(result.redirectTo).toContain(ROUTE_PROPERTY_AFFECTED_FLOODING)
       expect(result.redirectTo).toContain('TEST123')
     })
   })
@@ -218,7 +228,9 @@ describe('redirect-helpers', () => {
         'TEST123'
       )
 
-      expect(result.redirectTo).toContain('property-affected-coastal-erosion')
+      expect(result.redirectTo).toContain(
+        ROUTE_PROPERTY_AFFECTED_COASTAL_EROSION
+      )
       expect(result.redirectTo).toContain('TEST123')
     })
 
@@ -257,7 +269,7 @@ describe('redirect-helpers', () => {
         'TEST123'
       )
 
-      expect(result.redirectTo).toContain('property-affected-flooding')
+      expect(result.redirectTo).toContain(ROUTE_PROPERTY_AFFECTED_FLOODING)
     })
 
     it('should handle MAIN_RISK step', async () => {
@@ -278,14 +290,14 @@ describe('redirect-helpers', () => {
       )
 
       expect(result).not.toBeNull()
-      expect(result.redirectTo).toContain('property-affected-flooding')
+      expect(result.redirectTo).toContain(ROUTE_PROPERTY_AFFECTED_FLOODING)
     })
 
     it('should handle PROPERTY_AFFECTED_FLOODING step', async () => {
       const mockH = createMockH()
       const mockRequest = {}
       const sessionData = {
-        risks: [PROJECT_RISK_TYPES.SURFACE_WATER],
+        risks: [PROJECT_RISK_TYPES.FLUVIAL, PROJECT_RISK_TYPES.COASTAL_EROSION],
         referenceNumber: 'TEST123'
       }
 
@@ -298,7 +310,7 @@ describe('redirect-helpers', () => {
       )
 
       expect(result).not.toBeNull()
-      expect(result.redirectTo).toContain('twenty-percent-deprived')
+      expect(result.redirectTo).toContain(ROUTE_PROPERTY_AFFECTED_COASTAL_EROSION)
     })
 
     it('should handle FORTY_PERCENT_DEPRIVED step with fluvial risk', async () => {
@@ -345,7 +357,7 @@ describe('redirect-helpers', () => {
       const mockH = createMockH()
       const mockRequest = {}
       const sessionData = {
-        risks: [PROJECT_RISK_TYPES.SURFACE_WATER],
+        risks: [PROJECT_RISK_TYPES.FLUVIAL],
         referenceNumber: 'TEST123'
       }
 
