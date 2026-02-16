@@ -112,7 +112,16 @@ export const ROUTES = {
       EARLIEST_START_DATE: `/project/{referenceNumber}/${PROJECT_STEPS.EARLIEST_START_DATE}`,
       BENEFIT_AREA: `/project/{referenceNumber}/${PROJECT_STEPS.BENEFIT_AREA}`,
       BENEFIT_AREA_UPLOAD_STATUS: `/project/{referenceNumber}/${PROJECT_STEPS.BENEFIT_AREA}/upload-status`,
-      BENEFIT_AREA_DELETE: `/project/{referenceNumber}/${PROJECT_STEPS.BENEFIT_AREA}/delete`
+      BENEFIT_AREA_DELETE: `/project/{referenceNumber}/${PROJECT_STEPS.BENEFIT_AREA}/delete`,
+      RISK: `/project/{referenceNumber}/${PROJECT_STEPS.RISK}`,
+      MAIN_RISK: `/project/{referenceNumber}/${PROJECT_STEPS.MAIN_RISK}`,
+      PROPERTY_AFFECTED_FLOODING: `/project/{referenceNumber}/${PROJECT_STEPS.PROPERTY_AFFECTED_FLOODING}`,
+      PROPERTY_AFFECTED_COASTAL_EROSION: `/project/{referenceNumber}/${PROJECT_STEPS.PROPERTY_AFFECTED_COASTAL_EROSION}`,
+      TWENTY_PERCENT_DEPRIVED: `/project/{referenceNumber}/${PROJECT_STEPS.TWENTY_PERCENT_DEPRIVED}`,
+      FORTY_PERCENT_DEPRIVED: `/project/{referenceNumber}/${PROJECT_STEPS.FORTY_PERCENT_DEPRIVED}`,
+      CURRENT_FLOOD_RISK: `/project/{referenceNumber}/${PROJECT_STEPS.CURRENT_FLOOD_RISK}`,
+      CURRENT_FLOOD_SURFACE_WATER_RISK: `/project/{referenceNumber}/${PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK}`,
+      CURRENT_COASTAL_EROSION_RISK: `/project/{referenceNumber}/${PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK}`
     }
   },
 

@@ -2,6 +2,7 @@ import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
   PROJECT_INTERVENTION_TYPES,
   PROJECT_PAYLOAD_FIELDS,
+  PROJECT_RISK_TYPES,
   PROJECT_STATUS,
   PROJECT_STEPS,
   PROJECT_TYPES,
@@ -41,6 +42,7 @@ class OverviewController {
       columnWidth: 'full',
       PROJECT_TYPES,
       PROJECT_INTERVENTION_TYPES,
+      PROJECT_RISK_TYPES,
       PROJECT_PAYLOAD_FIELDS,
       PROJECT_STEPS,
       buildFinancialYearLabel,
