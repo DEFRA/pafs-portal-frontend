@@ -282,6 +282,45 @@
       "FAILED_TO_UPLOAD_FILE": "Failed to upload a shapefile"
     }
   },
+  "manage_projects": {
+    "title": "All projects",
+    "heading": "All projects",
+    "filters": {
+      "search_label": "Enter a project number or name",
+      "search_hint": "Enter a project number or name to search for projects",
+      "area_label": "Filter by RMA",
+      "all_areas": "All RMAs",
+      "filter_button": "Filter",
+      "clear_filters": "Clear filters",
+      "aria_label": "Filter projects"
+    },
+    "table": {
+      "project_number": "Project number",
+      "project_name": "Project name",
+      "status": {
+        "label": "Status",
+        "draft": "Draft",
+        "submitted": "Submitted",
+        "archived": "Archived"
+      },
+      "last_updated": "Last updated",
+      "assigned_rma": "Assigned RMA",
+      "action": "Action",
+      "edit": "Edit",
+      "caption": "List of all projects"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "projects": "projects",
+      "aria_label": "Results pagination"
+    },
+    "empty": "No projects found",
+    "errors": {
+      "fetch_failed": "There was a problem loading projects. Please try again later."
+    }
+  },
   "project_goals": {
     "title": "What work does the project plan to do to achieve its benefits?",
     "heading": "What work does the project plan to do to achieve its benefits?",
