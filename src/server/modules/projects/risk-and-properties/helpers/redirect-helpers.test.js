@@ -119,7 +119,10 @@ describe('redirect-helpers', () => {
       }
 
       // Mock submitProject to fail
-      submitProject.mockResolvedValueOnce({ success: false, error: 'Test error' })
+      submitProject.mockResolvedValueOnce({
+        success: false,
+        error: 'Test error'
+      })
 
       const result = await handleRiskStepRedirect(
         mockRequest,
@@ -209,7 +212,11 @@ describe('redirect-helpers', () => {
         referenceNumber: 'TEST123'
       }
 
-      const result = handlePropertyAffectedFloodingRedirect(mockH, sessionData, 'TEST123')
+      const result = handlePropertyAffectedFloodingRedirect(
+        mockH,
+        sessionData,
+        'TEST123'
+      )
 
       expect(result.redirectTo).toContain('property-affected-coastal-erosion')
       expect(result.redirectTo).toContain('TEST123')
@@ -222,7 +229,11 @@ describe('redirect-helpers', () => {
         referenceNumber: 'TEST123'
       }
 
-      const result = handlePropertyAffectedFloodingRedirect(mockH, sessionData, 'TEST123')
+      const result = handlePropertyAffectedFloodingRedirect(
+        mockH,
+        sessionData,
+        'TEST123'
+      )
 
       expect(result.redirectTo).toContain('twenty-percent-deprived')
       expect(result.redirectTo).toContain('TEST123')
