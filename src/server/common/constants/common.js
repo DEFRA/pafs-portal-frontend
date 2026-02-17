@@ -17,7 +17,8 @@ export const ADMIN_VIEWS = {
   DELETE_USER: 'modules/admin/users/delete/index',
   ORGANISATIONS: 'modules/admin/organisations/listing/index',
   ORGANISATION_TYPE: 'modules/admin/organisations/type/index',
-  ORGANISATION_MANAGE: 'modules/admin/organisations/manage/index'
+  ORGANISATION_MANAGE: 'modules/admin/organisations/manage/index',
+  PROJECTS: 'modules/admin/projects/listing/index'
 }
 
 export const ACCOUNT_VIEWS = {
@@ -153,7 +154,8 @@ export const CACHE_SEGMENTS = {
   APP_DATA: 'app-data',
   ACCOUNTS: 'accounts',
   AREAS: 'areas',
-  USERS: 'users'
+  USERS: 'users',
+  PROJECTS: 'projects'
 }
 
 export const AREA_SEGMENT_KEYS = {

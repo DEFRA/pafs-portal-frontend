@@ -38,7 +38,8 @@ export const router = {
         'users/reactivate',
         'journey-selection',
         'accounts',
-        'organisations'
+        'organisations',
+        'projects'
       ])
 
       // General user routes

@@ -87,4 +87,47 @@ describe('Configuration', () => {
       expect(config.get('assetPath')).toBe('/public')
     })
   })
+
+  describe('Cache features configuration', () => {
+    describe('Accounts cache', () => {
+      test('Should have account cache feature flag', () => {
+        const enabled = config.get('cacheFeatures.accounts.account')
+        expect(typeof enabled).toBe('boolean')
+      })
+
+      test('Should have accounts list cache feature flag', () => {
+        const enabled = config.get('cacheFeatures.accounts.accountsList')
+        expect(typeof enabled).toBe('boolean')
+      })
+    })
+
+    describe('Areas cache', () => {
+      test('Should have area cache feature flag', () => {
+        const enabled = config.get('cacheFeatures.areas.area')
+        expect(typeof enabled).toBe('boolean')
+      })
+
+      test('Should have areas by list cache feature flag', () => {
+        const enabled = config.get('cacheFeatures.areas.areasByList')
+        expect(typeof enabled).toBe('boolean')
+      })
+
+      test('Should have areas by type cache feature flag', () => {
+        const enabled = config.get('cacheFeatures.areas.areasByType')
+        expect(typeof enabled).toBe('boolean')
+      })
+    })
+
+    describe('Projects cache', () => {
+      test('Should have project cache feature flag', () => {
+        const enabled = config.get('cacheFeatures.projects.project')
+        expect(typeof enabled).toBe('boolean')
+      })
+
+      test('Should have projects list cache feature flag', () => {
+        const enabled = config.get('cacheFeatures.projects.projectsList')
+        expect(typeof enabled).toBe('boolean')
+      })
+    })
+  })
 })

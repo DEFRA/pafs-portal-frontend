@@ -71,7 +71,7 @@ describe('NameController', () => {
     checkProjectNameExists.mockResolvedValue({ success: true })
     saveProjectWithErrorHandling.mockResolvedValue(null)
     loggedInUserAreas.mockReturnValue([{ id: '1' }])
-    loggedInUserMainArea.mockReturnValue({ id: '1' })
+    loggedInUserMainArea.mockReturnValue({ areaId: 1 })
   })
 
   describe('getHandler', () => {
@@ -182,7 +182,7 @@ describe('NameController', () => {
 
       test('should redirect to TYPE when user has single area', async () => {
         loggedInUserAreas.mockReturnValue([{ id: '1' }])
-        loggedInUserMainArea.mockReturnValue({ id: '1' })
+        loggedInUserMainArea.mockReturnValue({ areaId: 1 })
 
         await nameController.postHandler(mockRequest, mockH)
 

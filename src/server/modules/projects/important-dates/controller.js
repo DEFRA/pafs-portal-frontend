@@ -93,13 +93,17 @@ class ImportantDatesController {
       sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]
     const financialEndYear =
       sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]
+    const finalFinancialEndYear =
+      financialStartYear === financialEndYear
+        ? financialStartYear + 1
+        : financialEndYear
 
     return {
       financialYearStart: financialStartYear
         ? formatDate('4', financialStartYear)
         : '',
       financialYearEnd: financialEndYear
-        ? formatDate('3', financialEndYear)
+        ? formatDate('3', finalFinancialEndYear)
         : ''
     }
   }

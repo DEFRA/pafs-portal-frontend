@@ -174,7 +174,8 @@
     "after_march_link": "The project starts after March {{afterMarchYear}}",
     "errors": {
       "required": "Select the financial year when the project first requires funding",
-      "after_last_year": "Your first financial year should be less than your last financial year"
+      "after_last_year": "Your first financial year should be less than your last financial year",
+      "invalid_range": "Your first financial year should be less than your last financial year"
     }
   },
   "financial_year_start_manual": {
@@ -425,6 +426,45 @@
       "errors": {
         "required": "Select a coastal erosion risk level"
       }
+    }
+  },
+  "manage_projects": {
+    "title": "All projects",
+    "heading": "All projects",
+    "filters": {
+      "search_label": "Enter a project number or name",
+      "search_hint": "Enter a project number or name to search for projects",
+      "area_label": "Filter by RMA",
+      "all_areas": "All RMAs",
+      "filter_button": "Filter",
+      "clear_filters": "Clear filters",
+      "aria_label": "Filter projects"
+    },
+    "table": {
+      "project_number": "Project number",
+      "project_name": "Project name",
+      "status": {
+        "label": "Status",
+        "draft": "Draft",
+        "submitted": "Submitted",
+        "archived": "Archived"
+      },
+      "last_updated": "Last updated",
+      "assigned_rma": "Assigned RMA",
+      "action": "Action",
+      "edit": "Edit",
+      "caption": "List of all projects"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "projects": "projects",
+      "aria_label": "Results pagination"
+    },
+    "empty": "No projects found",
+    "errors": {
+      "fetch_failed": "There was a problem loading projects. Please try again later."
     }
   }
 }
