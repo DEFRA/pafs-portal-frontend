@@ -152,9 +152,8 @@ class RiskAndPropertiesController {
     const { slug: referenceNumber } = sessionData
     const step = getProjectStep(request)
 
-    // Handle conditional redirects (await required for async helper functions)
-
-    const conditionalRedirect = handleConditionalRedirect(
+    // handleConditionalRedirect is async - await needed to resolve the Promise
+    const conditionalRedirect = await handleConditionalRedirect(
       step,
       request,
       h,
