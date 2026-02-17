@@ -19,7 +19,22 @@ import {
   readyForServiceYearSchema,
   couldStartEarlySchema,
   earliestWithGiaMonthSchema,
-  earliestWithGiaYearSchema
+  earliestWithGiaYearSchema,
+  risksSchema,
+  mainRiskSchema,
+  noPropertiesAtRiskSchema,
+  maintainingExistingAssetsSchema,
+  reducingFloodRisk50PlusSchema,
+  reducingFloodRiskLess50Schema,
+  increasingFloodResilienceSchema,
+  noPropertiesAtCoastalErosionRiskSchema,
+  propertiesBenefitMaintainingAssetsCoastalSchema,
+  propertiesBenefitInvestmentCoastalErosionSchema,
+  percentProperties20PercentDeprivedSchema,
+  percentProperties40PercentDeprivedSchema,
+  currentFloodRiskSchema,
+  currentFloodSurfaceWaterRiskSchema,
+  currentCoastalErosionRiskSchema
 } from '../../common/schemas/projects.js'
 import { PROJECT_PAYLOAD_FIELDS } from '../../common/constants/projects.js'
 
@@ -140,3 +155,141 @@ export const validateEarliestStartDate = Joi.object({
 })
   .options({ abortEarly: false })
   .label('Earliest Start Date')
+
+/**
+ * Validate risk selection
+ */
+export const validateRisks = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.RISKS]: risksSchema
+})
+  .unknown(true)
+  .options({ abortEarly: false })
+  .label('Risks')
+
+/**
+ * Validate main risk selection
+ * Note: risks field is already validated in previous step, only validate mainRisk here
+ */
+export const validateMainRisk = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.MAIN_RISK]: mainRiskSchema
+})
+  .unknown(true)
+  .options({ abortEarly: false })
+  .label('Main Risk')
+
+/**
+ * Validate property affected flooding
+ */
+export const validatePropertyAffectedFlooding = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK]: noPropertiesAtRiskSchema,
+  [PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS]: Joi.when(
+    Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK),
+    {
+      is: Joi.valid('true', true),
+      then: Joi.any().optional().allow(''),
+      otherwise: maintainingExistingAssetsSchema
+    }
+  ),
+  [PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS]: Joi.when(
+    Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK),
+    {
+      is: Joi.valid('true', true),
+      then: Joi.any().optional().allow(''),
+      otherwise: reducingFloodRisk50PlusSchema
+    }
+  ),
+  [PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50]: Joi.when(
+    Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK),
+    {
+      is: Joi.valid('true', true),
+      then: Joi.any().optional().allow(''),
+      otherwise: reducingFloodRiskLess50Schema
+    }
+  ),
+  [PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE]: Joi.when(
+    Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK),
+    {
+      is: Joi.valid('true', true),
+      then: Joi.any().optional().allow(''),
+      otherwise: increasingFloodResilienceSchema
+    }
+  )
+})
+  .options({ abortEarly: false })
+  .label('Property Affected Flooding')
+
+/**
+ * Validate property affected coastal erosion schema
+ */
+export const validatePropertyAffectedCoastalErosion = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK]:
+    noPropertiesAtCoastalErosionRiskSchema,
+  [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL]:
+    Joi.when(
+      Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK),
+      {
+        is: Joi.valid('true', true),
+        then: Joi.any().optional().allow(''),
+        otherwise: propertiesBenefitMaintainingAssetsCoastalSchema
+      }
+    ),
+  [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION]:
+    Joi.when(
+      Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK),
+      {
+        is: Joi.valid('true', true),
+        then: Joi.any().optional().allow(''),
+        otherwise: propertiesBenefitInvestmentCoastalErosionSchema
+      }
+    )
+})
+  .options({ abortEarly: false })
+  .label('Property Affected Coastal Erosion')
+/**
+ * Validate twenty percent deprived schema
+ */
+export const validateTwentyPercentDeprived = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED]:
+    percentProperties20PercentDeprivedSchema
+})
+  .options({ abortEarly: false })
+  .label('Twenty Percent Deprived')
+
+/**
+ * Validate forty percent deprived schema
+ */
+export const validateFortyPercentDeprived = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED]:
+    percentProperties40PercentDeprivedSchema
+})
+  .options({ abortEarly: false })
+  .label('Forty Percent Deprived')
+
+/**
+ * Validate current flood risk schema
+ */
+export const validateCurrentFloodRisk = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK]: currentFloodRiskSchema
+})
+  .options({ abortEarly: false })
+  .label('Current Flood Risk')
+
+/**
+ * Validate current flood surface water risk schema
+ */
+export const validateCurrentFloodSurfaceWaterRisk = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK]:
+    currentFloodSurfaceWaterRiskSchema
+})
+  .options({ abortEarly: false })
+  .label('Current Flood Surface Water Risk')
+
+/**
+ * Validate current coastal erosion risk schema
+ */
+export const validateCurrentCoastalErosionRisk = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK]:
+    currentCoastalErosionRiskSchema
+})
+  .options({ abortEarly: false })
+  .label('Current Coastal Erosion Risk')

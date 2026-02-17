@@ -407,6 +407,62 @@
   ]) %}
 {% endif %}
 
+{# Risk and Properties - Risks errors #}
+{% if fieldErrors.risks %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.risk.errors.required'),
+      href: "#risks"
+    }
+  ]) %}
+{% endif %}
+
+{# Risk and Properties - Main Risk errors #}
+{% if fieldErrors.mainRisk %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.main_risk.errors.required'),
+      href: "#mainRisk"
+    }
+  ]) %}
+{% endif %}
+
+{# Risk and Properties - Property Affected Flooding errors #}
+{# Only show one error message for all property flooding fields to avoid duplicates #}
+  {# Link to the first field that has an error #}
+  {% if fieldErrors.maintainingExistingAssets or fieldErrors.reducingFloodRisk50Plus or fieldErrors.reducingFloodRiskLess50 or fieldErrors.increasingFloodResilience %}
+    {% set firstErrorField = "#maintainingExistingAssets" %}
+    {% if not fieldErrors.maintainingExistingAssets and fieldErrors.reducingFloodRisk50Plus %}
+      {% set firstErrorField = "#reducingFloodRisk50Plus" %}
+    {% elif not fieldErrors.maintainingExistingAssets and not fieldErrors.reducingFloodRisk50Plus and fieldErrors.reducingFloodRiskLess50 %}
+      {% set firstErrorField = "#reducingFloodRiskLess50" %}
+    {% elif not fieldErrors.maintainingExistingAssets and not fieldErrors.reducingFloodRisk50Plus and not fieldErrors.reducingFloodRiskLess50 and fieldErrors.increasingFloodResilience %}
+      {% set firstErrorField = "#increasingFloodResilience" %}
+    {% endif %}
+    {% set errorList = errorList.concat([
+      {
+        text: t('projects.risk_and_properties.property_affected_flooding.errors.invalid_value'),
+        href: firstErrorField
+      }
+    ]) %}
+  {% endif %}
+
+  {# Risk and Properties - Coastal Erosion errors #}
+  {# Only show one error message for all coastal erosion fields to avoid duplicates #}
+  {# Link to the first field that has an error #}
+  {% if fieldErrors.propertiesBenefitMaintainingAssetsCoastal or fieldErrors.propertiesBenefitInvestmentCoastalErosion %}
+    {% set firstErrorField = "#propertiesBenefitMaintainingAssetsCoastal" %}
+    {% if not fieldErrors.propertiesBenefitMaintainingAssetsCoastal and fieldErrors.propertiesBenefitInvestmentCoastalErosion %}
+      {% set firstErrorField = "#propertiesBenefitInvestmentCoastalErosion" %}
+    {% endif %}
+    {% set errorList = errorList.concat([
+      {
+        text: t('projects.risk_and_properties.property_affected_coastal_erosion.errors.invalid_value'),
+        href: firstErrorField
+      }
+    ]) %}
+  {% endif %}
+
 {# General errors #}
 {% if errorList.length == 0 and errorCode == ERROR_CODES.NETWORK_ERROR %}
   {% set errorList = errorList.concat([
