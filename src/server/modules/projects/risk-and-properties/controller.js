@@ -153,7 +153,7 @@ class RiskAndPropertiesController {
     const step = getProjectStep(request)
 
     // Handle conditional redirects (await required for async helper functions)
-     
+
     const conditionalRedirect = await handleConditionalRedirect(
       step,
       request,

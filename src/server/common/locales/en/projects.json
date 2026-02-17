@@ -77,7 +77,7 @@
       "reducing_coastal_erosion": "Reducing coastal erosion risk",
       "percent_properties_20_deprived": "Percentage of properties in 20% most deprived areas",
       "percent_properties_40_deprived": "Percentage of properties in 40% most deprived areas",
-      "current_flood_risk": "Current flood risk (fluvial and coastal)",
+      "current_flood_fluvial_risk": "Current flood risk (fluvial and coastal)",
       "current_flood_surface_water_risk": "Current flood risk (surface water)",
       "current_coastal_erosion_risk": "Current coastal erosion risk",
       "flood_risk": {
@@ -387,7 +387,7 @@
         "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places"
       }
     },
-    "current_flood_risk": {
+    "current_flood_fluvial_risk": {
       "title": "Current flood risk",
       "heading": "What is the current flood risk (fluvial and coastal) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",

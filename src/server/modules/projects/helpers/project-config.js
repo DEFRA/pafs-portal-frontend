@@ -389,7 +389,7 @@ export const RISK_AND_PROPERTIES_CONFIG = {
     fieldType: 'percentage'
   },
   [PROJECT_STEPS.CURRENT_FLOOD_RISK]: {
-    localKeyPrefix: 'projects.risk_and_properties.current_flood_risk',
+    localKeyPrefix: 'projects.risk_and_properties.current_flood_fluvial_risk',
     backLinkOptions: {
       targetURL: ROUTES.PROJECT.OVERVIEW,
       targetEditURL: ROUTES.PROJECT.EDIT.FORTY_PERCENT_DEPRIVED,

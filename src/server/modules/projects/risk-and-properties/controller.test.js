@@ -673,7 +673,8 @@ describe('RiskAndPropertiesController', () => {
     beforeEach(() => {
       getProjectStep.mockReturnValue(PROJECT_STEPS.CURRENT_FLOOD_RISK)
       RISK_AND_PROPERTIES_CONFIG[PROJECT_STEPS.CURRENT_FLOOD_RISK] = {
-        localKeyPrefix: 'projects.risk_and_properties.current_flood_risk',
+        localKeyPrefix:
+          'projects.risk_and_properties.current_flood_fluvial_risk',
         backLinkOptions: { url: '/forty-percent-deprived' },
         schema: {},
         fieldType: 'radio'
