@@ -44,16 +44,14 @@ function getRmaAreaFilterOptions(t, areasByType) {
 async function fetchProjectsData({ session, cacheService, page, filters }) {
   const { search, areaId } = filters
 
-  return Promise.all([
-    getProjects({
-      search,
-      areaId,
-      page,
-      pageSize: getDefaultPageSize(),
-      accessToken: session?.accessToken,
-      cacheService
-    })
-  ])
+  return getProjects({
+    search,
+    areaId,
+    page,
+    pageSize: getDefaultPageSize(),
+    accessToken: session?.accessToken,
+    cacheService
+  })
 }
 
 function renderEmptyView(params) {
@@ -106,6 +104,7 @@ function renderProjectsView(params) {
     buildListingViewModel({
       request,
       session,
+      pageTitle: request.t('projects.manage_projects.title'),
       pagination,
       filters,
       baseUrl,
@@ -202,7 +201,7 @@ export const projectsListingController = {
     try {
       const areasByType = await request.getAreas()
 
-      const [projectsResult] = await fetchProjectsData({
+      const projectsResult = await fetchProjectsData({
         session,
         cacheService,
         page,

@@ -2,6 +2,10 @@ import { apiRequest } from '../../helpers/api-client/index.js'
 import { ACCOUNT_STATUS } from '../../constants/accounts.js'
 import { getDefaultPageSize } from '../../helpers/pagination/index.js'
 import { PAGINATION } from '../../constants/common.js'
+import {
+  tryGetFromCache as tryGetListFromCache,
+  storeInCache as storeListInCache
+} from '../../helpers/cache/list-cache-helper.js'
 
 function buildAccountsQueryParams({ status, search, areaId, page, pageSize }) {
   const queryParams = new URLSearchParams()
@@ -19,42 +23,6 @@ function buildAccountsQueryParams({ status, search, areaId, page, pageSize }) {
   }
 
   return queryParams
-}
-
-async function tryGetFromCache(cacheService, cacheParams) {
-  if (!cacheService) {
-    return { metadata: null, data: null }
-  }
-
-  const metadata = await cacheService.getListMetadata(cacheParams)
-
-  if (!metadata?.accountIds) {
-    return { metadata: null, data: null }
-  }
-
-  const cachedAccounts = await cacheService.getAccountsByIds(
-    metadata.accountIds
-  )
-
-  const allAccountsCached = cachedAccounts.every((account) => account !== null)
-  if (!allAccountsCached) {
-    return { metadata: null, data: null }
-  }
-
-  return { metadata, data: cachedAccounts }
-}
-
-async function storeInCache(cacheService, cacheParams, accounts, pagination) {
-  if (!cacheService || !accounts || accounts.length === 0) {
-    return
-  }
-
-  await cacheService.setAccounts(accounts)
-
-  const accountIds = accounts
-    .map((account) => account.id || account.userId)
-    .filter(Boolean)
-  await cacheService.setListMetadata(cacheParams, accountIds, pagination)
 }
 
 export async function getAccounts({
@@ -75,7 +43,13 @@ export async function getAccounts({
     pageSize: effectivePageSize
   }
 
-  const { metadata, data } = await tryGetFromCache(cacheService, cacheParams)
+  const { metadata, data } = await tryGetListFromCache(
+    cacheService,
+    cacheParams,
+    'accountIds',
+    (ids) => cacheService?.getAccountsByIds(ids)
+  )
+
   if (metadata && data) {
     return {
       success: true,
@@ -105,11 +79,13 @@ export async function getAccounts({
   )
 
   if (result.success && result.data?.data?.length) {
-    await storeInCache(
+    await storeListInCache(
       cacheService,
       cacheParams,
       result.data.data,
-      result.data.pagination
+      result.data.pagination,
+      (accounts) => cacheService?.setAccounts(accounts),
+      (account) => account.id || account.userId
     )
 
     // Normalize response structure for UI

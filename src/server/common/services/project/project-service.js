@@ -1,6 +1,10 @@
 import { apiRequest } from '../../helpers/api-client/index.js'
 import { getDefaultPageSize } from '../../helpers/pagination/index.js'
 import { PAGINATION } from '../../constants/common.js'
+import {
+  tryGetFromCache as tryGetListFromCache,
+  storeInCache as storeListInCache
+} from '../../helpers/cache/list-cache-helper.js'
 
 function buildProjectsQueryParams({ search, areaId, status, page, pageSize }) {
   const queryParams = new URLSearchParams()
@@ -23,42 +27,6 @@ function buildProjectsQueryParams({ search, areaId, status, page, pageSize }) {
   return queryParams
 }
 
-async function tryGetFromCache(cacheService, cacheParams) {
-  if (!cacheService) {
-    return { metadata: null, data: null }
-  }
-
-  const metadata = await cacheService.getListMetadata(cacheParams)
-
-  if (!metadata?.projectIds) {
-    return { metadata: null, data: null }
-  }
-
-  const cachedProjects = await cacheService.getProjectsByIds(
-    metadata.projectIds
-  )
-
-  const allProjectsCached = cachedProjects.every((project) => project !== null)
-  if (!allProjectsCached) {
-    return { metadata: null, data: null }
-  }
-
-  return { metadata, data: cachedProjects }
-}
-
-async function storeInCache(cacheService, cacheParams, projects, pagination) {
-  if (!cacheService || !projects || projects.length === 0) {
-    return
-  }
-
-  await cacheService.setProjects(projects)
-
-  const projectIds = projects
-    .map((project) => project.id || project.referenceNumber)
-    .filter(Boolean)
-  await cacheService.setListMetadata(cacheParams, projectIds, pagination)
-}
-
 export async function getProjects({
   search,
   areaId,
@@ -77,7 +45,13 @@ export async function getProjects({
     pageSize: effectivePageSize
   }
 
-  const { metadata, data } = await tryGetFromCache(cacheService, cacheParams)
+  const { metadata, data } = await tryGetListFromCache(
+    cacheService,
+    cacheParams,
+    'projectIds',
+    (ids) => cacheService?.getProjectsByIds(ids)
+  )
+
   if (metadata && data) {
     return {
       success: true,
@@ -107,11 +81,13 @@ export async function getProjects({
   )
 
   if (result.success && result.data?.data?.length) {
-    await storeInCache(
+    await storeListInCache(
       cacheService,
       cacheParams,
       result.data.data,
-      result.data.pagination
+      result.data.pagination,
+      (projects) => cacheService?.setProjects(projects),
+      (project) => project.id || project.referenceNumber
     )
 
     // Normalize response structure for UI

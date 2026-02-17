@@ -3,7 +3,9 @@ import { SIZE } from '../constants/common.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_RISK_TYPES,
-  PROJECT_VALIDATION_MESSAGES
+  PROJECT_VALIDATION_MESSAGES,
+  FLOOD_RISK_LEVELS,
+  COASTAL_EROSION_RISK_LEVELS
 } from '../constants/projects.js'
 
 /**
@@ -127,7 +129,7 @@ export const percentProperties40PercentDeprivedSchema = percentageSchema.label(
  * Valid values: high, medium, low, very_low
  */
 export const currentFloodRiskSchema = Joi.string()
-  .valid('high', 'medium', 'low', 'very_low')
+  .valid(...Object.values(FLOOD_RISK_LEVELS))
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK)
   .messages({
@@ -140,7 +142,7 @@ export const currentFloodRiskSchema = Joi.string()
  * Valid values: high, medium, low, very_low
  */
 export const currentFloodSurfaceWaterRiskSchema = Joi.string()
-  .valid('high', 'medium', 'low', 'very_low')
+  .valid(...Object.values(FLOOD_RISK_LEVELS))
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK)
   .messages({
@@ -153,7 +155,7 @@ export const currentFloodSurfaceWaterRiskSchema = Joi.string()
  * Valid values: medium_term, longer_term
  */
 export const currentCoastalErosionRiskSchema = Joi.string()
-  .valid('medium_term', 'longer_term')
+  .valid(...Object.values(COASTAL_EROSION_RISK_LEVELS))
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK)
   .messages({

@@ -280,6 +280,20 @@ export const config = convict({
         default: true,
         env: 'CACHE_AREAS_BY_TYPE_ENABLED'
       }
+    },
+    projects: {
+      project: {
+        doc: 'Enable caching for individual project data',
+        format: Boolean,
+        default: false,
+        env: 'CACHE_PROJECT_ENABLED'
+      },
+      projectsList: {
+        doc: 'Enable caching for projects list metadata',
+        format: Boolean,
+        default: false,
+        env: 'CACHE_PROJECTS_LIST_ENABLED'
+      }
     }
   },
   privacyNotice: {

@@ -137,6 +137,18 @@ export const PROJECT_RISK_TYPES = {
   COASTAL_EROSION: 'coastal_erosion'
 }
 
+export const FLOOD_RISK_LEVELS = {
+  HIGH: 'high',
+  MEDIUM: 'medium',
+  LOW: 'low',
+  VERY_LOW: 'very_low'
+}
+
+export const COASTAL_EROSION_RISK_LEVELS = {
+  MEDIUM_TERM: 'medium_term',
+  LONGER_TERM: 'longer_term'
+}
+
 export const PROJECT_VALIDATION_MESSAGES = {
   NOT_ALLOWED_TO_CREATE: 'NOT_ALLOWED_TO_CREATE',
   NOT_ALLOWED_TO_UPDATE: 'NOT_ALLOWED_TO_UPDATE',

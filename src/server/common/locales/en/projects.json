@@ -392,10 +392,10 @@
       "heading": "What is the current flood risk (fluvial and coastal) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
-        "high": "High risk – this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
-        "medium": "Medium risk – this means that each year an area has a chance of flooding between 1% and 3.3% (1 in 30 to a 1 in 100 chance of flooding)",
-        "low": "Low risk – this means that each year an area has a chance of flooding of between 0.1% and 1% (1 in 100 to a 1 in 1,000 chance of flooding)",
-        "very_low": "Very low risk – this means that each year an area has a chance of flooding of less than 0.1% (less than a 1 in 1,000 chance of flooding)"
+        "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
+        "medium": "Medium risk - this means that each year an area has a chance of flooding between 1% and 3.3% (1 in 30 to a 1 in 100 chance of flooding)",
+        "low": "Low risk - this means that each year an area has a chance of flooding of between 0.1% and 1% (1 in 100 to a 1 in 1,000 chance of flooding)",
+        "very_low": "Very low risk - this means that each year an area has a chance of flooding of less than 0.1% (less than a 1 in 1,000 chance of flooding)"
       },
       "errors": {
         "required": "Select a flood risk level"
@@ -406,10 +406,10 @@
       "heading": "What is the current flood risk (Surface water) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
-        "high": "High risk – this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
-        "medium": "Medium risk – this means that each year an area has a chance of flooding between 1% and 3.3% (1 in 30 to a 1 in 100 chance of flooding)",
-        "low": "Low risk – this means that each year an area has a chance of flooding of between 0.1% and 1% (1 in 100 to a 1 in 1,000 chance of flooding)",
-        "very_low": "Very low risk – this means that each year an area has a chance of flooding of less than 0.1% (less than a 1 in 1,000 chance of flooding)"
+        "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
+        "medium": "Medium risk - this means that each year an area has a chance of flooding between 1% and 3.3% (1 in 30 to a 1 in 100 chance of flooding)",
+        "low": "Low risk - this means that each year an area has a chance of flooding of between 0.1% and 1% (1 in 100 to a 1 in 1,000 chance of flooding)",
+        "very_low": "Very low risk - this means that each year an area has a chance of flooding of less than 0.1% (less than a 1 in 1,000 chance of flooding)"
       },
       "errors": {
         "required": "Select a surface water flood risk level"
