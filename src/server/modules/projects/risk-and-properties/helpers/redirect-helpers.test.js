@@ -19,8 +19,25 @@ vi.mock('../../helpers/project-submission.js', () => ({
   submitProject: vi.fn(async () => ({ success: true }))
 }))
 
+vi.mock('./navigation-helpers.js', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    shouldSkipPropertyAffectedFlooding: vi.fn(
+      actual.shouldSkipPropertyAffectedFlooding
+    ),
+    shouldShowPropertyAffectedCoastalErosion: vi.fn(
+      actual.shouldShowPropertyAffectedCoastalErosion
+    )
+  }
+})
+
 const { updateSessionData } = await import('../../helpers/project-utils.js')
 const { submitProject } = await import('../../helpers/project-submission.js')
+const {
+  shouldSkipPropertyAffectedFlooding,
+  shouldShowPropertyAffectedCoastalErosion
+} = await import('./navigation-helpers.js')
 
 // Test constants
 const TEST_REFERENCE_NUMBER = 'TEST123'
@@ -416,6 +433,151 @@ describe('redirect-helpers', () => {
       )
 
       expect(result).toBeNull()
+    })
+  })
+
+  describe('Edge cases with mocked navigation helpers', () => {
+    beforeEach(() => {
+      // Reset mocks to their default implementations
+      shouldSkipPropertyAffectedFlooding.mockImplementation(
+        (mainRisk, risks) => {
+          return (
+            mainRisk === PROJECT_RISK_TYPES.COASTAL_EROSION &&
+            risks?.length === 1 &&
+            risks[0] === PROJECT_RISK_TYPES.COASTAL_EROSION
+          )
+        }
+      )
+      shouldShowPropertyAffectedCoastalErosion.mockImplementation((risks) => {
+        return risks?.includes(PROJECT_RISK_TYPES.COASTAL_EROSION)
+      })
+    })
+
+    it('should redirect to twenty-percent-deprived when skip flooding but no coastal erosion (handleRiskStepRedirect)', async () => {
+      const mockH = createMockH()
+      const mockRequest = {}
+      const sessionData = {
+        risks: [PROJECT_RISK_TYPES.COASTAL_EROSION],
+        referenceNumber: 'TEST123'
+      }
+
+      // Mock the navigation helpers to force the edge case
+      shouldSkipPropertyAffectedFlooding.mockReturnValue(true)
+      shouldShowPropertyAffectedCoastalErosion.mockReturnValue(false)
+
+      const result = await handleRiskStepRedirect(
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST123'
+      )
+
+      expect(result.redirectTo).toContain('twenty-percent-deprived')
+      expect(result.redirectTo).toContain('TEST123')
+    })
+
+    it('should redirect to twenty-percent-deprived when skip flooding but no coastal erosion (handleMainRiskStepRedirect)', () => {
+      const mockH = createMockH()
+      const sessionData = {
+        mainRisk: PROJECT_RISK_TYPES.COASTAL_EROSION,
+        risks: [PROJECT_RISK_TYPES.COASTAL_EROSION],
+        referenceNumber: 'TEST123'
+      }
+
+      // Mock the navigation helpers to force the edge case
+      shouldSkipPropertyAffectedFlooding.mockReturnValue(true)
+      shouldShowPropertyAffectedCoastalErosion.mockReturnValue(false)
+
+      const result = handleMainRiskStepRedirect(mockH, sessionData, 'TEST123')
+
+      expect(result.redirectTo).toContain('twenty-percent-deprived')
+      expect(result.redirectTo).toContain('TEST123')
+    })
+
+    it('should handle empty risks array in handleRiskStepRedirect', async () => {
+      const mockH = createMockH()
+      const mockRequest = {}
+      const sessionData = {
+        risks: [],
+        referenceNumber: 'TEST123'
+      }
+
+      const result = await handleRiskStepRedirect(
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST123'
+      )
+
+      expect(result.redirectTo).toContain('main-risk')
+      expect(result.redirectTo).toContain('TEST123')
+    })
+
+    it('should handle undefined risks in handleMainRiskStepRedirect', () => {
+      const mockH = createMockH()
+      const sessionData = {
+        mainRisk: PROJECT_RISK_TYPES.FLUVIAL,
+        referenceNumber: 'TEST123'
+      }
+
+      const result = handleMainRiskStepRedirect(mockH, sessionData, 'TEST123')
+
+      expect(result.redirectTo).toContain(ROUTE_PROPERTY_AFFECTED_FLOODING)
+      expect(result.redirectTo).toContain('TEST123')
+    })
+
+    it('should handle undefined risks in handlePropertyAffectedFloodingRedirect', () => {
+      const mockH = createMockH()
+      const sessionData = {
+        referenceNumber: 'TEST123'
+      }
+
+      const result = handlePropertyAffectedFloodingRedirect(
+        mockH,
+        sessionData,
+        'TEST123'
+      )
+
+      expect(result.redirectTo).toContain('twenty-percent-deprived')
+      expect(result.redirectTo).toContain('TEST123')
+    })
+
+    it('should handle null risks in handleRiskStepRedirect', async () => {
+      const mockH = createMockH()
+      const mockRequest = {}
+      const sessionData = {
+        risks: null,
+        referenceNumber: 'TEST123'
+      }
+
+      const result = await handleRiskStepRedirect(
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST123'
+      )
+
+      expect(result.redirectTo).toContain('main-risk')
+      expect(result.redirectTo).toContain('TEST123')
+    })
+
+    it('should handle undefined sessionData.risks in handleConditionalRedirect', async () => {
+      const mockH = createMockH()
+      const mockRequest = {}
+      const sessionData = {
+        referenceNumber: 'TEST123'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.FORTY_PERCENT_DEPRIVED,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST123'
+      )
+
+      expect(result).not.toBeNull()
+      expect(result.redirectTo).toContain('/project/TEST123')
     })
   })
 })
