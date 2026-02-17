@@ -565,6 +565,63 @@ describe('project-basic-schemas', () => {
         expect(error).toBeUndefined()
         expect(value[PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE]).toBe('NFM')
       })
+
+      test('should allow optional main intervention type when projectInterventionTypes is not provided', () => {
+        const schema = Joi.object({
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: projectTypeSchema,
+          [PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE]:
+            projectMainInterventionTypeSchema
+        })
+        const { error } = schema.validate({
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: PROJECT_TYPES.DEF,
+          [PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE]:
+            PROJECT_INTERVENTION_TYPES.NFM
+        })
+        // When projectInterventionTypes is not provided, main intervention type is optional
+        expect(error).toBeUndefined()
+      })
+    })
+
+    describe('for REP project type', () => {
+      test('should allow main intervention type from selected types for REP', () => {
+        const schema = Joi.object({
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: projectTypeSchema,
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]:
+            projectInterventionTypeSchema,
+          [PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE]:
+            projectMainInterventionTypeSchema
+        })
+        const { error } = schema.validate({
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: PROJECT_TYPES.REP,
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]: [
+            PROJECT_INTERVENTION_TYPES.NFM,
+            PROJECT_INTERVENTION_TYPES.PFR
+          ],
+          [PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE]:
+            PROJECT_INTERVENTION_TYPES.PFR
+        })
+        expect(error).toBeUndefined()
+      })
+
+      test('should reject main not in selected types for REP', () => {
+        const schema = Joi.object({
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: projectTypeSchema,
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]:
+            projectInterventionTypeSchema,
+          [PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE]:
+            projectMainInterventionTypeSchema
+        })
+        const { error } = schema.validate({
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: PROJECT_TYPES.REP,
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]: [
+            PROJECT_INTERVENTION_TYPES.NFM
+          ],
+          [PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE]:
+            PROJECT_INTERVENTION_TYPES.SUDS
+        })
+        expect(error).toBeDefined()
+        expect(error.details[0].type).toBe('any.only')
+      })
     })
 
     describe('for REF project type', () => {

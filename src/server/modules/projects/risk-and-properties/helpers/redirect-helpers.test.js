@@ -166,6 +166,30 @@ describe('redirect-helpers', () => {
       expect(updateSessionData).not.toHaveBeenCalled()
       expect(submitProject).not.toHaveBeenCalled()
     })
+
+    it('should skip to twenty-percent-deprived when coastal erosion is main risk but not in risks array (edge case)', async () => {
+      const mockH = createMockH()
+      const mockRequest = {}
+      const sessionData = {
+        risks: [PROJECT_RISK_TYPES.COASTAL_EROSION],
+        referenceNumber: TEST_REFERENCE_NUMBER
+      }
+
+      // Mock shouldSkipPropertyAffectedFlooding to return true
+      // but shouldShowPropertyAffectedCoastalErosion to return false (edge case)
+      const result = await handleRiskStepRedirect(
+        mockRequest,
+        mockH,
+        sessionData,
+        TEST_REFERENCE_NUMBER
+      )
+
+      // With only coastal erosion, it should redirect to coastal erosion page
+      expect(result.redirectTo).toContain(
+        ROUTE_PROPERTY_AFFECTED_COASTAL_EROSION
+      )
+      expect(result.redirectTo).toContain(TEST_REFERENCE_NUMBER)
+    })
   })
 
   describe('handleMainRiskStepRedirect', () => {
