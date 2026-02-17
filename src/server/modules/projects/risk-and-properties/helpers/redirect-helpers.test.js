@@ -310,7 +310,9 @@ describe('redirect-helpers', () => {
       )
 
       expect(result).not.toBeNull()
-      expect(result.redirectTo).toContain(ROUTE_PROPERTY_AFFECTED_COASTAL_EROSION)
+      expect(result.redirectTo).toContain(
+        ROUTE_PROPERTY_AFFECTED_COASTAL_EROSION
+      )
     })
 
     it('should handle FORTY_PERCENT_DEPRIVED step with fluvial risk', async () => {
