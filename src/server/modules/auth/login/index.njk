@@ -47,7 +47,7 @@
     {% elif errorCode == ERROR_CODES.ACCOUNT_DISABLED %}
     {% set errorList = errorList.concat([{ text: t('auth.errors.account_disabled'), href: "#email" }]) %}
     {% elif errorCode == ERROR_CODES.NETWORK_ERROR %}
-    {% set errorList = errorList.concat([{ text: t('auth.errors.network_error'), href: "#email" }]) %}
+    {% set errorList = errorList.concat([{ text: t('auth.network_error'), href: "#email" }]) %}
     {% endif %}
 
     {% if errorList.length > 0 %}
