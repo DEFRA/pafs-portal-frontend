@@ -569,7 +569,7 @@ describe('RiskAndPropertiesController', () => {
       await riskAndPropertiesController.postHandler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK.replace(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK.replace(
           '{referenceNumber}',
           'TEST-001A-002A'
         )
@@ -588,7 +588,7 @@ describe('RiskAndPropertiesController', () => {
       await riskAndPropertiesController.postHandler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK.replace(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK.replace(
           '{referenceNumber}',
           'TEST-001A-002A'
         )
@@ -607,7 +607,7 @@ describe('RiskAndPropertiesController', () => {
       await riskAndPropertiesController.postHandler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(
-        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK.replace(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK.replace(
           '{referenceNumber}',
           'TEST-001A-002A'
         )
@@ -669,10 +669,10 @@ describe('RiskAndPropertiesController', () => {
     })
   })
 
-  describe('postHandler - CURRENT_FLOOD_RISK step', () => {
+  describe('postHandler - CURRENT_FLOOD_FLUVIAL_RISK step', () => {
     beforeEach(() => {
-      getProjectStep.mockReturnValue(PROJECT_STEPS.CURRENT_FLOOD_RISK)
-      RISK_AND_PROPERTIES_CONFIG[PROJECT_STEPS.CURRENT_FLOOD_RISK] = {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.CURRENT_FLOOD_FLUVIAL_RISK)
+      RISK_AND_PROPERTIES_CONFIG[PROJECT_STEPS.CURRENT_FLOOD_FLUVIAL_RISK] = {
         localKeyPrefix:
           'projects.risk_and_properties.current_flood_fluvial_risk',
         backLinkOptions: { url: '/forty-percent-deprived' },
@@ -687,7 +687,7 @@ describe('RiskAndPropertiesController', () => {
         risks: [PROJECT_RISK_TYPES.FLUVIAL, PROJECT_RISK_TYPES.SURFACE_WATER]
       })
       mockRequest.payload = {
-        currentFloodRisk: 'high'
+        currentFloodFluvialRisk: 'high'
       }
 
       await riskAndPropertiesController.postHandler(mockRequest, mockH)
@@ -706,7 +706,7 @@ describe('RiskAndPropertiesController', () => {
         risks: [PROJECT_RISK_TYPES.SEA, PROJECT_RISK_TYPES.COASTAL_EROSION]
       })
       mockRequest.payload = {
-        currentFloodRisk: 'medium'
+        currentFloodFluvialRisk: 'medium'
       }
 
       await riskAndPropertiesController.postHandler(mockRequest, mockH)
@@ -725,7 +725,7 @@ describe('RiskAndPropertiesController', () => {
         risks: [PROJECT_RISK_TYPES.TIDAL]
       })
       mockRequest.payload = {
-        currentFloodRisk: 'low'
+        currentFloodFluvialRisk: 'low'
       }
 
       await riskAndPropertiesController.postHandler(mockRequest, mockH)
@@ -746,7 +746,7 @@ describe('RiskAndPropertiesController', () => {
       ] = {
         localKeyPrefix:
           'projects.risk_and_properties.current_flood_surface_water_risk',
-        backLinkOptions: { url: '/current-flood-risk' },
+        backLinkOptions: { url: '/current-flood-fluvial-risk' },
         schema: {},
         fieldType: 'radio'
       }

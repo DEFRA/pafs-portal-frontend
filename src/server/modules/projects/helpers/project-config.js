@@ -23,7 +23,7 @@ import {
   validatePropertyAffectedCoastalErosion,
   validateTwentyPercentDeprived,
   validateFortyPercentDeprived,
-  validateCurrentFloodRisk,
+  validateCurrentFloodFluvialRisk,
   validateCurrentFloodSurfaceWaterRisk,
   validateCurrentCoastalErosionRisk
 } from '../schema.js'
@@ -310,9 +310,9 @@ export const PROJECT_PAYLOAD_LEVEL_FIELDS = {
     PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
     PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED
   ],
-  [PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_RISK]: [
+  [PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_FLUVIAL_RISK]: [
     PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
-    PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK
+    PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK
   ],
   [PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_SURFACE_WATER_RISK]: [
     PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
@@ -388,14 +388,14 @@ export const RISK_AND_PROPERTIES_CONFIG = {
     schema: validateFortyPercentDeprived,
     fieldType: 'percentage'
   },
-  [PROJECT_STEPS.CURRENT_FLOOD_RISK]: {
+  [PROJECT_STEPS.CURRENT_FLOOD_FLUVIAL_RISK]: {
     localKeyPrefix: 'projects.risk_and_properties.current_flood_fluvial_risk',
     backLinkOptions: {
       targetURL: ROUTES.PROJECT.OVERVIEW,
       targetEditURL: ROUTES.PROJECT.EDIT.FORTY_PERCENT_DEPRIVED,
       conditionalRedirect: false
     },
-    schema: validateCurrentFloodRisk,
+    schema: validateCurrentFloodFluvialRisk,
     fieldType: 'radio'
   },
   [PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK]: {
@@ -403,7 +403,7 @@ export const RISK_AND_PROPERTIES_CONFIG = {
       'projects.risk_and_properties.current_flood_surface_water_risk',
     backLinkOptions: {
       targetURL: ROUTES.PROJECT.OVERVIEW,
-      targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK,
+      targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK,
       conditionalRedirect: false
     },
     schema: validateCurrentFloodSurfaceWaterRisk,

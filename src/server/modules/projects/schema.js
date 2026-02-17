@@ -32,7 +32,7 @@ import {
   propertiesBenefitInvestmentCoastalErosionSchema,
   percentProperties20PercentDeprivedSchema,
   percentProperties40PercentDeprivedSchema,
-  currentFloodRiskSchema,
+  currentFloodFluvialRiskSchema,
   currentFloodSurfaceWaterRiskSchema,
   currentCoastalErosionRiskSchema
 } from '../../common/schemas/projects.js'
@@ -268,8 +268,9 @@ export const validateFortyPercentDeprived = Joi.object({
 /**
  * Validate current flood risk schema
  */
-export const validateCurrentFloodRisk = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK]: currentFloodRiskSchema
+export const validateCurrentFloodFluvialRisk = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK]:
+    currentFloodFluvialRiskSchema
 })
   .options({ abortEarly: false })
   .label('Current Flood Risk')

@@ -11,7 +11,7 @@ import {
   shouldSkipPropertyAffectedFlooding,
   shouldShowPropertyAffectedCoastalErosion,
   getNextStepAfterFortyPercent,
-  getNextStepAfterCurrentFloodRisk,
+  getNextStepAfterCurrentFloodFluvialRisk,
   getNextStepAfterCurrentSurfaceWaterRisk
 } from './navigation-helpers.js'
 
@@ -198,9 +198,11 @@ export async function handleConditionalRedirect(
         .redirect(getNextStepAfterFortyPercent(risks, referenceNumber))
         .takeover()
 
-    case PROJECT_STEPS.CURRENT_FLOOD_RISK:
+    case PROJECT_STEPS.CURRENT_FLOOD_FLUVIAL_RISK:
       return h
-        .redirect(getNextStepAfterCurrentFloodRisk(risks, referenceNumber))
+        .redirect(
+          getNextStepAfterCurrentFloodFluvialRisk(risks, referenceNumber)
+        )
         .takeover()
 
     case PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK:

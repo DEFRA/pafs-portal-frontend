@@ -128,10 +128,10 @@ export const percentProperties40PercentDeprivedSchema = percentageSchema.label(
  * Current flood risk schema (for fluvial, tidal, sea flooding)
  * Valid values: high, medium, low, very_low
  */
-export const currentFloodRiskSchema = Joi.string()
+export const currentFloodFluvialRiskSchema = Joi.string()
   .valid(...Object.values(FLOOD_RISK_LEVELS))
   .required()
-  .label(PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK)
+  .label(PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK)
   .messages({
     'any.required': 'Select a flood risk level',
     'any.only': 'Select a valid flood risk level'

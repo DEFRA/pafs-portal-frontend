@@ -60,7 +60,7 @@ const createRiskAndPropertiesRoutes = (editPreHandlers) => [
     riskAndPropertiesController
   ),
   ...createRoutePair(
-    ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK,
+    ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK,
     editPreHandlers,
     riskAndPropertiesController
   ),

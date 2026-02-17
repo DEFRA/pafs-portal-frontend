@@ -58,7 +58,7 @@ export function shouldShowPropertyAffectedCoastalErosion(risks) {
  * @param {Array} risks - Selected risks
  * @returns {boolean} True if should show current flood risk page
  */
-export function shouldShowCurrentFloodRisk(risks) {
+export function shouldShowCurrentFloodFluvialRisk(risks) {
   return (
     risks?.includes(PROJECT_RISK_TYPES.FLUVIAL) ||
     risks?.includes(PROJECT_RISK_TYPES.TIDAL) ||
@@ -160,10 +160,10 @@ export function getTwentyPercentDeprivedBackLink(risks) {
  * @returns {object} Back link options
  */
 export function getCurrentFloodSurfaceWaterRiskBackLink(risks) {
-  if (shouldShowCurrentFloodRisk(risks)) {
+  if (shouldShowCurrentFloodFluvialRisk(risks)) {
     return {
       targetURL: ROUTES.PROJECT.OVERVIEW,
-      targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK,
+      targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK,
       conditionalRedirect: false
     }
   }
@@ -187,10 +187,10 @@ export function getCurrentCoastalErosionRiskBackLink(risks) {
       conditionalRedirect: false
     }
   }
-  if (shouldShowCurrentFloodRisk(risks)) {
+  if (shouldShowCurrentFloodFluvialRisk(risks)) {
     return {
       targetURL: ROUTES.PROJECT.OVERVIEW,
-      targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK,
+      targetEditURL: ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK,
       conditionalRedirect: false
     }
   }
@@ -208,9 +208,9 @@ export function getCurrentCoastalErosionRiskBackLink(risks) {
  * @returns {string} The next route URL
  */
 export function getNextStepAfterFortyPercent(risks, referenceNumber) {
-  if (shouldShowCurrentFloodRisk(risks)) {
+  if (shouldShowCurrentFloodFluvialRisk(risks)) {
     return replaceReferenceNumber(
-      ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK,
+      ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK,
       referenceNumber
     )
   }
@@ -233,12 +233,15 @@ export function getNextStepAfterFortyPercent(risks, referenceNumber) {
 }
 
 /**
- * Get the next step after CURRENT_FLOOD_RISK based on selected risks
+ * Get the next step after CURRENT_FLOOD_FLUVIAL_RISK based on selected risks
  * @param {Array} risks - Selected risks
  * @param {string} referenceNumber - Project reference number
  * @returns {string} The next route URL
  */
-export function getNextStepAfterCurrentFloodRisk(risks, referenceNumber) {
+export function getNextStepAfterCurrentFloodFluvialRisk(
+  risks,
+  referenceNumber
+) {
   if (shouldShowCurrentFloodSurfaceWaterRisk(risks)) {
     return replaceReferenceNumber(
       ROUTES.PROJECT.EDIT.CURRENT_FLOOD_SURFACE_WATER_RISK,

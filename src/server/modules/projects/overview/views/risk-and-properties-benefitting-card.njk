@@ -133,8 +133,8 @@
                 {{ t('projects.overview.risk_and_properties_summary_card.current_flood_fluvial_risk') }}
               </dt>
               <dd class="govuk-summary-list__value">
-                {% if projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] %}
-                  {{ t('projects.overview.risk_and_properties_summary_card.flood_risk.' + projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK]) }}
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK] %}
+                  {{ t('projects.overview.risk_and_properties_summary_card.flood_risk.' + projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK]) }}
                 {% else %}
                   {{ t('projects.overview.common.not_provided') }}
                 {% endif %}

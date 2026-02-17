@@ -4,7 +4,7 @@ import {
   shouldSkipMainRisk,
   shouldSkipPropertyAffectedFlooding,
   shouldShowPropertyAffectedCoastalErosion,
-  shouldShowCurrentFloodRisk,
+  shouldShowCurrentFloodFluvialRisk,
   shouldShowCurrentFloodSurfaceWaterRisk,
   shouldShowCurrentCoastalErosionRisk,
   getPropertyAffectedFloodingBackLink,
@@ -13,7 +13,7 @@ import {
   getCurrentFloodSurfaceWaterRiskBackLink,
   getCurrentCoastalErosionRiskBackLink,
   getNextStepAfterFortyPercent,
-  getNextStepAfterCurrentFloodRisk,
+  getNextStepAfterCurrentFloodFluvialRisk,
   getNextStepAfterCurrentSurfaceWaterRisk,
   getDynamicBackLink
 } from './navigation-helpers.js'
@@ -98,23 +98,25 @@ describe('navigation-helpers', () => {
     })
   })
 
-  describe('shouldShowCurrentFloodRisk', () => {
+  describe('shouldShowCurrentFloodFluvialRisk', () => {
     it('should return true for fluvial, tidal, or sea flooding', () => {
       expect(
-        shouldShowCurrentFloodRisk([PROJECT_RISK_TYPES.FLUVIAL])
+        shouldShowCurrentFloodFluvialRisk([PROJECT_RISK_TYPES.FLUVIAL])
       ).toBeTruthy()
       expect(
-        shouldShowCurrentFloodRisk([PROJECT_RISK_TYPES.TIDAL])
+        shouldShowCurrentFloodFluvialRisk([PROJECT_RISK_TYPES.TIDAL])
       ).toBeTruthy()
-      expect(shouldShowCurrentFloodRisk([PROJECT_RISK_TYPES.SEA])).toBeTruthy()
+      expect(
+        shouldShowCurrentFloodFluvialRisk([PROJECT_RISK_TYPES.SEA])
+      ).toBeTruthy()
     })
 
     it('should return falsy for other risk types', () => {
       expect(
-        shouldShowCurrentFloodRisk([PROJECT_RISK_TYPES.SURFACE_WATER])
+        shouldShowCurrentFloodFluvialRisk([PROJECT_RISK_TYPES.SURFACE_WATER])
       ).toBeFalsy()
       expect(
-        shouldShowCurrentFloodRisk([PROJECT_RISK_TYPES.COASTAL_EROSION])
+        shouldShowCurrentFloodFluvialRisk([PROJECT_RISK_TYPES.COASTAL_EROSION])
       ).toBeFalsy()
     })
   })
@@ -211,7 +213,9 @@ describe('navigation-helpers', () => {
       const result1 = getCurrentFloodSurfaceWaterRiskBackLink([
         PROJECT_RISK_TYPES.FLUVIAL
       ])
-      expect(result1.targetEditURL).toBe(ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK)
+      expect(result1.targetEditURL).toBe(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK
+      )
 
       const result2 = getCurrentFloodSurfaceWaterRiskBackLink([
         PROJECT_RISK_TYPES.SURFACE_WATER
@@ -234,7 +238,9 @@ describe('navigation-helpers', () => {
       const result2 = getCurrentCoastalErosionRiskBackLink([
         PROJECT_RISK_TYPES.FLUVIAL
       ])
-      expect(result2.targetEditURL).toBe(ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK)
+      expect(result2.targetEditURL).toBe(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK
+      )
 
       const result3 = getCurrentCoastalErosionRiskBackLink([
         PROJECT_RISK_TYPES.COASTAL_EROSION
@@ -253,7 +259,7 @@ describe('navigation-helpers', () => {
         [PROJECT_RISK_TYPES.FLUVIAL],
         ref
       )
-      expect(result1).toContain('current-flood-risk')
+      expect(result1).toContain('current-flood-fluvial-risk')
       expect(result1).toContain(ref)
 
       const result2 = getNextStepAfterFortyPercent(
@@ -276,23 +282,23 @@ describe('navigation-helpers', () => {
     })
   })
 
-  describe('getNextStepAfterCurrentFloodRisk', () => {
+  describe('getNextStepAfterCurrentFloodFluvialRisk', () => {
     it('should return correct next step', () => {
       const ref = 'TEST123'
 
-      const result1 = getNextStepAfterCurrentFloodRisk(
+      const result1 = getNextStepAfterCurrentFloodFluvialRisk(
         [PROJECT_RISK_TYPES.FLUVIAL, PROJECT_RISK_TYPES.SURFACE_WATER],
         ref
       )
       expect(result1).toContain('current-flood-surface-water-risk')
 
-      const result2 = getNextStepAfterCurrentFloodRisk(
+      const result2 = getNextStepAfterCurrentFloodFluvialRisk(
         [PROJECT_RISK_TYPES.FLUVIAL, PROJECT_RISK_TYPES.COASTAL_EROSION],
         ref
       )
       expect(result2).toContain('current-coastal-erosion-risk')
 
-      const result3 = getNextStepAfterCurrentFloodRisk(
+      const result3 = getNextStepAfterCurrentFloodFluvialRisk(
         [PROJECT_RISK_TYPES.FLUVIAL],
         ref
       )
@@ -365,7 +371,9 @@ describe('navigation-helpers', () => {
         }
       )
       expect(result).toBeTruthy()
-      expect(result.targetEditURL).toBe(ROUTES.PROJECT.EDIT.CURRENT_FLOOD_RISK)
+      expect(result.targetEditURL).toBe(
+        ROUTES.PROJECT.EDIT.CURRENT_FLOOD_FLUVIAL_RISK
+      )
     })
 
     it('should return back link for current coastal erosion risk step', () => {

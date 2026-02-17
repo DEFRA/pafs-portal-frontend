@@ -72,7 +72,7 @@ export {
   propertiesBenefitInvestmentCoastalErosionSchema,
   percentProperties20PercentDeprivedSchema,
   percentProperties40PercentDeprivedSchema,
-  currentFloodRiskSchema,
+  currentFloodFluvialRiskSchema,
   currentFloodSurfaceWaterRiskSchema,
   currentCoastalErosionRiskSchema
 } from './project-risk-property-schemas.js'

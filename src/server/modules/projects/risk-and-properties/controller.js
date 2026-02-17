@@ -32,7 +32,8 @@ const PAYLOAD_LEVEL_MAP = {
     PROJECT_PAYLOAD_LEVELS.TWENTY_PERCENT_DEPRIVED,
   [PROJECT_STEPS.FORTY_PERCENT_DEPRIVED]:
     PROJECT_PAYLOAD_LEVELS.FORTY_PERCENT_DEPRIVED,
-  [PROJECT_STEPS.CURRENT_FLOOD_RISK]: PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_RISK,
+  [PROJECT_STEPS.CURRENT_FLOOD_FLUVIAL_RISK]:
+    PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_FLUVIAL_RISK,
   [PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK]:
     PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_SURFACE_WATER_RISK,
   [PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK]:
@@ -153,7 +154,7 @@ class RiskAndPropertiesController {
     const step = getProjectStep(request)
 
     // Handle conditional redirects (await required for async helper functions)
-
+    // eslint-disable-next-line
     const conditionalRedirect = await handleConditionalRedirect(
       step,
       request,
