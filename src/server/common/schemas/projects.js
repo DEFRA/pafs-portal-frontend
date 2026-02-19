@@ -33,13 +33,13 @@ export {
   projectTypeSchema,
   projectInterventionTypeSchema,
   projectMainInterventionTypeSchema
-} from './project-basic-schemas.js'
+} from './projects/project-basic-schemas.js'
 
 // Financial year schemas
 export {
   projectFinancialStartYearSchema,
   projectFinancialEndYearSchema
-} from './project-financial-schemas.js'
+} from './projects/project-financial-schemas.js'
 
 // Timeline and date schemas
 export {
@@ -56,7 +56,7 @@ export {
   couldStartEarlySchema,
   earliestWithGiaMonthSchema,
   earliestWithGiaYearSchema
-} from './project-timeline-schemas.js'
+} from './projects/project-timeline-schemas.js'
 
 // Risk and property schemas
 export {
@@ -75,4 +75,14 @@ export {
   currentFloodFluvialRiskSchema,
   currentFloodSurfaceWaterRiskSchema,
   currentCoastalErosionRiskSchema
-} from './project-risk-property-schemas.js'
+} from './projects/project-risk-property-schemas.js'
+
+// Goals, urgency, and confidence schemas
+export {
+  approachSchema,
+  urgencyReasonSchema,
+  urgencyDetailsSchema,
+  confidenceHomesBetterProtectedSchema,
+  confidenceHomesByGatewayFourSchema,
+  confidenceSecuredPartnershipFundingSchema
+} from './projects/project-goals-urgency-confidence-schemas.js'

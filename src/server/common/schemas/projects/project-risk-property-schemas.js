@@ -1,12 +1,12 @@
 import Joi from 'joi'
-import { SIZE } from '../constants/common.js'
+import { SIZE } from '../../constants/common.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_RISK_TYPES,
   PROJECT_VALIDATION_MESSAGES,
   FLOOD_RISK_LEVELS,
   COASTAL_EROSION_RISK_LEVELS
-} from '../constants/projects.js'
+} from '../../constants/projects.js'
 
 /**
  * Risks schema - array of selected risk types

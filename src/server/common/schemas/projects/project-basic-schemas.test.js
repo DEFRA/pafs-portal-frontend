@@ -12,7 +12,7 @@ import {
   PROJECT_TYPES,
   PROJECT_INTERVENTION_TYPES,
   PROJECT_PAYLOAD_FIELDS
-} from '../constants/projects.js'
+} from '../../constants/projects.js'
 
 describe('project-basic-schemas', () => {
   describe('projectReferenceNumberSchema', () => {

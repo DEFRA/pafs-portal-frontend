@@ -34,7 +34,13 @@ import {
   percentProperties40PercentDeprivedSchema,
   currentFloodFluvialRiskSchema,
   currentFloodSurfaceWaterRiskSchema,
-  currentCoastalErosionRiskSchema
+  currentCoastalErosionRiskSchema,
+  approachSchema,
+  urgencyReasonSchema,
+  urgencyDetailsSchema,
+  confidenceHomesBetterProtectedSchema,
+  confidenceHomesByGatewayFourSchema,
+  confidenceSecuredPartnershipFundingSchema
 } from '../../common/schemas/projects.js'
 import { PROJECT_PAYLOAD_FIELDS } from '../../common/constants/projects.js'
 
@@ -294,3 +300,61 @@ export const validateCurrentCoastalErosionRisk = Joi.object({
 })
   .options({ abortEarly: false })
   .label('Current Coastal Erosion Risk')
+
+/**
+ * Validate project goals (approach) schema
+ */
+export const validateProjectGoals = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.APPROACH]: approachSchema
+})
+  .options({ abortEarly: false })
+  .label('Project Goals')
+
+/**
+ * Validate urgency reason schema
+ */
+export const validateUrgencyReason = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: urgencyReasonSchema
+})
+  .options({ abortEarly: false })
+  .label('Urgency Reason')
+
+/**
+ * Validate urgency details schema
+ */
+export const validateUrgencyDetails = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: urgencyReasonSchema,
+  [PROJECT_PAYLOAD_FIELDS.URGENCY_DETAILS]: urgencyDetailsSchema
+})
+  .options({ abortEarly: false })
+  .label('Urgency Details')
+
+/**
+ * Validate confidence - homes better protected schema
+ */
+export const validateConfidenceHomesBetterProtected = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BETTER_PROTECTED]:
+    confidenceHomesBetterProtectedSchema
+})
+  .options({ abortEarly: false })
+  .label('Confidence Homes Better Protected')
+
+/**
+ * Validate confidence - homes by gateway four schema
+ */
+export const validateConfidenceHomesByGatewayFour = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR]:
+    confidenceHomesByGatewayFourSchema
+})
+  .options({ abortEarly: false })
+  .label('Confidence Homes By Gateway Four')
+
+/**
+ * Validate confidence - secured partnership funding schema
+ */
+export const validateConfidenceSecuredPartnershipFunding = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING]:
+    confidenceSecuredPartnershipFundingSchema
+})
+  .options({ abortEarly: false })
+  .label('Confidence Secured Partnership Funding')

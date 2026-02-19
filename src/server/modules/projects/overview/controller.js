@@ -6,7 +6,9 @@ import {
   PROJECT_STATUS,
   PROJECT_STEPS,
   PROJECT_TYPES,
-  PROJECT_VIEW_ERROR_CODES
+  PROJECT_VIEW_ERROR_CODES,
+  URGENCY_REASONS,
+  CONFIDENCE_LEVELS
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
@@ -45,6 +47,8 @@ class OverviewController {
       PROJECT_RISK_TYPES,
       PROJECT_PAYLOAD_FIELDS,
       PROJECT_STEPS,
+      URGENCY_REASONS,
+      CONFIDENCE_LEVELS,
       buildFinancialYearLabel,
       formatDate,
       formatFileSize

@@ -91,17 +91,26 @@
         "longer_term": "Longer term loss (>30 years)"
       }
     },
-    "approach_summary_card": {
-      "title": "Approach",
-      "not_added": "No approach added yet"
+    "goals_approach_summary_card": {
+      "title": "Project goals and approach",
+      "not_added": "No project goals or approach added yet"
+    },
+    "urgency_assessment_summary_card": {
+      "title": "Project Urgency",
+      "urgency_reason": "Urgency reason",
+      "urgency_details": "Urgency details",
+      "not_added": "No urgency data added yet"
+    },
+    "confidence_assessment_summary_card": {
+      "title": "Confidence assessment",
+      "homes_better_protected": "Confidence in number of homes better protected",
+      "homes_by_gateway_four": "Confidence in number of homes by gateway 4",
+      "secured_partnership_funding": "Confidence in securing partnership funding",
+      "not_added": "No confidence assessment added yet"
     },
     "environmental_summary_card": {
       "title": "Environmental benefits",
       "not_added": "No environmental benefits data added yet"
-    },
-    "urgency_summary_card": {
-      "title": "Urgency",
-      "not_added": "No urgency data added yet"
     },
     "submission_info": "By submitting this proposal you confirm all the information provided is accurate and complete."
   },
@@ -508,6 +517,9 @@
           "label": "N/A",
           "hint": "No properties benefitting from this project"
         }
+      },
+      "validation": {
+        "required": "Select the confidence level"
       }
     },
     "gateway_confidence": {
@@ -534,6 +546,9 @@
           "label": "N/A",
           "hint": "No property benefits being provided by the project"
         }
+      },
+      "validation": {
+        "required": "Select the confidence level"
       }
     },
     "funding_confidence": {
@@ -560,10 +575,10 @@
           "label": "N/A",
           "hint": "Schema to be fully funded through Grant in Aid"
         }
+      },
+      "validation": {
+        "required": "Select the confidence level"
       }
-    },
-    "validation": {
-      "required": "Select the confidence level"
     }
   },
   "project_urgency": {
@@ -575,7 +590,7 @@
         "not_urgent": {
           "label": "The project is not urgent"
         },
-        "divider": "",
+        "divider": "or",
         "statutory_need": {
           "label": "There is a business critical statutory need"
         },
@@ -605,7 +620,7 @@
       "time_limited_heading": "What is the specific aspect of the project that has a time limit?",
       "hint": "Limit your answer to 700 characters or fewer",
       "validation": {
-        "required": "You told us the project is urgent due to a specific aspect of the project that has a time limit. Tell us more information about this.",
+        "required": "You told us the project is urgent due to {{reason}}. Tell us more information about this.",
         "max_length": "Limit the details about why your project is urgent to 700 characters or fewer"
       }
     }

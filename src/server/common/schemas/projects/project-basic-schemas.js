@@ -1,11 +1,11 @@
 import Joi from 'joi'
-import { SIZE, VALIDATION_PATTERNS } from '../constants/common.js'
+import { SIZE, VALIDATION_PATTERNS } from '../../constants/common.js'
 import {
   PROJECT_INTERVENTION_TYPES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_TYPES,
   PROJECT_VALIDATION_MESSAGES
-} from '../constants/projects.js'
+} from '../../constants/projects.js'
 
 /**
  * Project reference number schema - for updates

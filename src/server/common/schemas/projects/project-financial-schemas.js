@@ -1,9 +1,9 @@
 import Joi from 'joi'
-import { SIZE } from '../constants/common.js'
+import { SIZE } from '../../constants/common.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_VALIDATION_MESSAGES
-} from '../constants/projects.js'
+} from '../../constants/projects.js'
 
 // Financial year constants
 const FINANCIAL_YEAR = {

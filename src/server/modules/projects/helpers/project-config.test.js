@@ -3,6 +3,7 @@ import {
   PROJECT_TYPES_CONFIG,
   FINANCIAL_YEAR_CONFIG,
   IMPORTANT_DATES_CONFIG,
+  GOALS_URGENCY_CONFIDENCE_CONFIG,
   PROJECT_PAYLOAD_LEVEL_FIELDS,
   interventionTypesLocalKeyPrefix,
   projectTypesLocalKeyPrefix,
@@ -486,6 +487,212 @@ describe('project-config', () => {
         PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH
       )
       expect(awardFields).toContain(PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_MONTH)
+    })
+
+    test('should have fields for APPROACH level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.APPROACH]
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.APPROACH
+      ])
+    })
+
+    test('should have fields for URGENCY_REASON level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.URGENCY_REASON]
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.URGENCY_REASON
+      ])
+    })
+
+    test('should have fields for URGENCY_DETAILS level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.URGENCY_DETAILS]
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.URGENCY_REASON,
+        PROJECT_PAYLOAD_FIELDS.URGENCY_DETAILS
+      ])
+    })
+
+    test('should have fields for CONFIDENCE_HOMES_BETTER_PROTECTED level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.CONFIDENCE_HOMES_BETTER_PROTECTED
+        ]
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BETTER_PROTECTED
+      ])
+    })
+
+    test('should have fields for CONFIDENCE_HOMES_BY_GATEWAY_FOUR level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR
+        ]
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR
+      ])
+    })
+
+    test('should have fields for CONFIDENCE_SECURED_PARTNERSHIP_FUNDING level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+        ]
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+      ])
+    })
+
+    test('should include reference number in all goals/urgency/confidence edit-level payloads', () => {
+      const levels = [
+        PROJECT_PAYLOAD_LEVELS.APPROACH,
+        PROJECT_PAYLOAD_LEVELS.URGENCY_REASON,
+        PROJECT_PAYLOAD_LEVELS.URGENCY_DETAILS,
+        PROJECT_PAYLOAD_LEVELS.CONFIDENCE_HOMES_BETTER_PROTECTED,
+        PROJECT_PAYLOAD_LEVELS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR,
+        PROJECT_PAYLOAD_LEVELS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+      ]
+
+      levels.forEach((level) => {
+        const fields = PROJECT_PAYLOAD_LEVEL_FIELDS[level]
+        expect(fields).toContain(PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER)
+      })
+    })
+  })
+
+  describe('GOALS_URGENCY_CONFIDENCE_CONFIG', () => {
+    test('should have configuration for PROJECT_GOALS step', () => {
+      const config =
+        GOALS_URGENCY_CONFIDENCE_CONFIG[PROJECT_STEPS.PROJECT_GOALS]
+      expect(config).toBeDefined()
+      expect(config.localKeyPrefix).toBe('projects.project_goals')
+      expect(config.backLinkOptions.conditionalRedirect).toBe(true)
+      expect(config.schema).toBeDefined()
+      expect(config.fieldName).toBe(PROJECT_PAYLOAD_FIELDS.APPROACH)
+      expect(config.fieldType).toBe('character-count')
+      expect(config.maxLength).toBe(700)
+    })
+
+    test('should have configuration for URGENCY_REASON step', () => {
+      const config =
+        GOALS_URGENCY_CONFIDENCE_CONFIG[PROJECT_STEPS.URGENCY_REASON]
+      expect(config).toBeDefined()
+      expect(config.localKeyPrefix).toBe(
+        'projects.project_urgency.urgency_reason'
+      )
+      expect(config.backLinkOptions.conditionalRedirect).toBe(true)
+      expect(config.schema).toBeDefined()
+      expect(config.fieldName).toBe(PROJECT_PAYLOAD_FIELDS.URGENCY_REASON)
+      expect(config.fieldType).toBe('radio')
+    })
+
+    test('should have configuration for URGENCY_DETAILS step', () => {
+      const config =
+        GOALS_URGENCY_CONFIDENCE_CONFIG[PROJECT_STEPS.URGENCY_DETAILS]
+      expect(config).toBeDefined()
+      expect(config.localKeyPrefix).toBe(
+        'projects.project_urgency.urgency_detail'
+      )
+      expect(config.backLinkOptions.conditionalRedirect).toBe(false)
+      expect(config.backLinkOptions.targetEditURL).toBe(
+        ROUTES.PROJECT.EDIT.URGENCY_REASON
+      )
+      expect(config.schema).toBeDefined()
+      expect(config.fieldName).toBe(PROJECT_PAYLOAD_FIELDS.URGENCY_DETAILS)
+      expect(config.fieldType).toBe('character-count')
+      expect(config.maxLength).toBe(700)
+    })
+
+    test('should have configuration for CONFIDENCE_HOMES_BETTER_PROTECTED step', () => {
+      const config =
+        GOALS_URGENCY_CONFIDENCE_CONFIG[
+          PROJECT_STEPS.CONFIDENCE_HOMES_BETTER_PROTECTED
+        ]
+      expect(config).toBeDefined()
+      expect(config.localKeyPrefix).toBe(
+        'projects.confidence_assessment.property_confidence'
+      )
+      expect(config.backLinkOptions.conditionalRedirect).toBe(true)
+      expect(config.schema).toBeDefined()
+      expect(config.fieldName).toBe(
+        PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BETTER_PROTECTED
+      )
+      expect(config.fieldType).toBe('radio')
+    })
+
+    test('should have configuration for CONFIDENCE_HOMES_BY_GATEWAY_FOUR step', () => {
+      const config =
+        GOALS_URGENCY_CONFIDENCE_CONFIG[
+          PROJECT_STEPS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR
+        ]
+      expect(config).toBeDefined()
+      expect(config.localKeyPrefix).toBe(
+        'projects.confidence_assessment.gateway_confidence'
+      )
+      expect(config.backLinkOptions.conditionalRedirect).toBe(false)
+      expect(config.backLinkOptions.targetEditURL).toBe(
+        ROUTES.PROJECT.EDIT.CONFIDENCE_HOMES_BETTER_PROTECTED
+      )
+      expect(config.schema).toBeDefined()
+      expect(config.fieldName).toBe(
+        PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR
+      )
+      expect(config.fieldType).toBe('radio')
+    })
+
+    test('should have configuration for CONFIDENCE_SECURED_PARTNERSHIP_FUNDING step', () => {
+      const config =
+        GOALS_URGENCY_CONFIDENCE_CONFIG[
+          PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+        ]
+      expect(config).toBeDefined()
+      expect(config.localKeyPrefix).toBe(
+        'projects.confidence_assessment.funding_confidence'
+      )
+      expect(config.backLinkOptions.conditionalRedirect).toBe(false)
+      expect(config.backLinkOptions.targetEditURL).toBe(
+        ROUTES.PROJECT.EDIT.CONFIDENCE_HOMES_BY_GATEWAY_FOUR
+      )
+      expect(config.schema).toBeDefined()
+      expect(config.fieldName).toBe(
+        PROJECT_PAYLOAD_FIELDS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+      )
+      expect(config.fieldType).toBe('radio')
+    })
+
+    test('should have all required fields in each config', () => {
+      Object.values(GOALS_URGENCY_CONFIDENCE_CONFIG).forEach((config) => {
+        expect(config.localKeyPrefix).toBeDefined()
+        expect(config.backLinkOptions).toBeDefined()
+        expect(config.schema).toBeDefined()
+        expect(config.fieldName).toBeDefined()
+        expect(config.fieldType).toBeDefined()
+      })
+    })
+
+    test('should have proper back link chains for sequential confidence steps', () => {
+      const gatewayConfig =
+        GOALS_URGENCY_CONFIDENCE_CONFIG[
+          PROJECT_STEPS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR
+        ]
+      expect(gatewayConfig.backLinkOptions.targetEditURL).toBe(
+        ROUTES.PROJECT.EDIT.CONFIDENCE_HOMES_BETTER_PROTECTED
+      )
+
+      const fundingConfig =
+        GOALS_URGENCY_CONFIDENCE_CONFIG[
+          PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+        ]
+      expect(fundingConfig.backLinkOptions.targetEditURL).toBe(
+        ROUTES.PROJECT.EDIT.CONFIDENCE_HOMES_BY_GATEWAY_FOUR
+      )
     })
   })
 })

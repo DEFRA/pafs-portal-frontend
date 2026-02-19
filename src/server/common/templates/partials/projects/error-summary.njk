@@ -429,39 +429,141 @@
 
 {# Risk and Properties - Property Affected Flooding errors #}
 {# Only show one error message for all property flooding fields to avoid duplicates #}
-  {# Link to the first field that has an error #}
-  {% if fieldErrors.maintainingExistingAssets or fieldErrors.reducingFloodRisk50Plus or fieldErrors.reducingFloodRiskLess50 or fieldErrors.increasingFloodResilience %}
-    {% set firstErrorField = "#maintainingExistingAssets" %}
-    {% if not fieldErrors.maintainingExistingAssets and fieldErrors.reducingFloodRisk50Plus %}
-      {% set firstErrorField = "#reducingFloodRisk50Plus" %}
-    {% elif not fieldErrors.maintainingExistingAssets and not fieldErrors.reducingFloodRisk50Plus and fieldErrors.reducingFloodRiskLess50 %}
-      {% set firstErrorField = "#reducingFloodRiskLess50" %}
-    {% elif not fieldErrors.maintainingExistingAssets and not fieldErrors.reducingFloodRisk50Plus and not fieldErrors.reducingFloodRiskLess50 and fieldErrors.increasingFloodResilience %}
-      {% set firstErrorField = "#increasingFloodResilience" %}
-    {% endif %}
-    {% set errorList = errorList.concat([
-      {
-        text: t('projects.risk_and_properties.property_affected_flooding.errors.invalid_value'),
-        href: firstErrorField
-      }
-    ]) %}
+{# Link to the first field that has an error #}
+{% if fieldErrors.maintainingExistingAssets or fieldErrors.reducingFloodRisk50Plus or fieldErrors.reducingFloodRiskLess50 or fieldErrors.increasingFloodResilience %}
+  {% set firstErrorField = "#maintainingExistingAssets" %}
+  {% if not fieldErrors.maintainingExistingAssets and fieldErrors.reducingFloodRisk50Plus %}
+    {% set firstErrorField = "#reducingFloodRisk50Plus" %}
+  {% elif not fieldErrors.maintainingExistingAssets and not fieldErrors.reducingFloodRisk50Plus and fieldErrors.reducingFloodRiskLess50 %}
+    {% set firstErrorField = "#reducingFloodRiskLess50" %}
+  {% elif not fieldErrors.maintainingExistingAssets and not fieldErrors.reducingFloodRisk50Plus and not fieldErrors.reducingFloodRiskLess50 and fieldErrors.increasingFloodResilience %}
+    {% set firstErrorField = "#increasingFloodResilience" %}
   {% endif %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.property_affected_flooding.errors.invalid_value'),
+      href: firstErrorField
+    }
+  ]) %}
+{% endif %}
 
-  {# Risk and Properties - Coastal Erosion errors #}
-  {# Only show one error message for all coastal erosion fields to avoid duplicates #}
-  {# Link to the first field that has an error #}
-  {% if fieldErrors.propertiesBenefitMaintainingAssetsCoastal or fieldErrors.propertiesBenefitInvestmentCoastalErosion %}
-    {% set firstErrorField = "#propertiesBenefitMaintainingAssetsCoastal" %}
-    {% if not fieldErrors.propertiesBenefitMaintainingAssetsCoastal and fieldErrors.propertiesBenefitInvestmentCoastalErosion %}
-      {% set firstErrorField = "#propertiesBenefitInvestmentCoastalErosion" %}
-    {% endif %}
-    {% set errorList = errorList.concat([
-      {
-        text: t('projects.risk_and_properties.property_affected_coastal_erosion.errors.invalid_value'),
-        href: firstErrorField
-      }
-    ]) %}
+{# Risk and Properties - Coastal Erosion errors #}
+{# Only show one error message for all coastal erosion fields to avoid duplicates #}
+{# Link to the first field that has an error #}
+{% if fieldErrors.propertiesBenefitMaintainingAssetsCoastal or fieldErrors.propertiesBenefitInvestmentCoastalErosion %}
+  {% set firstErrorField = "#propertiesBenefitMaintainingAssetsCoastal" %}
+  {% if not fieldErrors.propertiesBenefitMaintainingAssetsCoastal and fieldErrors.propertiesBenefitInvestmentCoastalErosion %}
+    {% set firstErrorField = "#propertiesBenefitInvestmentCoastalErosion" %}
   {% endif %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.risk_and_properties.property_affected_coastal_erosion.errors.invalid_value'),
+      href: firstErrorField
+    }
+  ]) %}
+{% endif %}
+
+{# Goals - Approach errors #}
+{% if fieldErrors.approach == ERROR_CODES.APPROACH_REQUIRED or errorCode == ERROR_CODES.APPROACH_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_goals.validation.required'),
+      href: "#approach"
+    }
+  ]) %}
+{% elif fieldErrors.approach == ERROR_CODES.APPROACH_MAX_LENGTH or errorCode == ERROR_CODES.APPROACH_MAX_LENGTH %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_goals.validation.max_length'),
+      href: "#approach"
+    }
+  ]) %}
+{% endif %}
+
+{# Urgency Reason errors #}
+{% if fieldErrors.urgencyReason == ERROR_CODES.URGENCY_REASON_REQUIRED or errorCode == ERROR_CODES.URGENCY_REASON_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_urgency.urgency_reason.validation.required'),
+      href: "#urgencyReason"
+    }
+  ]) %}
+{% elif fieldErrors.urgencyReason == ERROR_CODES.URGENCY_REASON_INVALID or errorCode == ERROR_CODES.URGENCY_REASON_INVALID %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_urgency.urgency_reason.validation.required'),
+      href: "#urgencyReason"
+    }
+  ]) %}
+{% endif %}
+
+{# Urgency Details errors #}
+{% if fieldErrors.urgencyDetails == ERROR_CODES.URGENCY_DETAILS_REQUIRED or errorCode == ERROR_CODES.URGENCY_DETAILS_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_urgency.urgency_detail.validation.required', validationContext or {}),
+      href: "#urgencyDetails"
+    }
+  ]) %}
+{% elif fieldErrors.urgencyDetails == ERROR_CODES.URGENCY_DETAILS_MAX_LENGTH or errorCode == ERROR_CODES.URGENCY_DETAILS_MAX_LENGTH %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_urgency.urgency_detail.validation.max_length'),
+      href: "#urgencyDetails"
+    }
+  ]) %}
+{% endif %}
+
+{# Confidence - Homes Better Protected errors #}
+{% if fieldErrors.confidenceHomesBetterProtected == ERROR_CODES.CONFIDENCE_HOMES_BETTER_PROTECTED_REQUIRED or errorCode == ERROR_CODES.CONFIDENCE_HOMES_BETTER_PROTECTED_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.confidence_assessment.property_confidence.validation.required'),
+      href: "#confidenceHomesBetterProtected"
+    }
+  ]) %}
+{% elif fieldErrors.confidenceHomesBetterProtected == ERROR_CODES.CONFIDENCE_HOMES_BETTER_PROTECTED_INVALID or errorCode == ERROR_CODES.CONFIDENCE_HOMES_BETTER_PROTECTED_INVALID %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.confidence_assessment.property_confidence.validation.required'),
+      href: "#confidenceHomesBetterProtected"
+    }
+  ]) %}
+{% endif %}
+
+{# Confidence - Homes By Gateway Four errors #}
+{% if fieldErrors.confidenceHomesByGatewayFour == ERROR_CODES.CONFIDENCE_HOMES_BY_GATEWAY_FOUR_REQUIRED or errorCode == ERROR_CODES.CONFIDENCE_HOMES_BY_GATEWAY_FOUR_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.confidence_assessment.gateway_confidence.validation.required'),
+      href: "#confidenceHomesByGatewayFour"
+    }
+  ]) %}
+{% elif fieldErrors.confidenceHomesByGatewayFour == ERROR_CODES.CONFIDENCE_HOMES_BY_GATEWAY_FOUR_INVALID or errorCode == ERROR_CODES.CONFIDENCE_HOMES_BY_GATEWAY_FOUR_INVALID %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.confidence_assessment.gateway_confidence.validation.required'),
+      href: "#confidenceHomesByGatewayFour"
+    }
+  ]) %}
+{% endif %}
+
+{# Confidence - Secured Partnership Funding errors #}
+{% if fieldErrors.confidenceSecuredPartnershipFunding == ERROR_CODES.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING_REQUIRED or errorCode == ERROR_CODES.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING_REQUIRED %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.confidence_assessment.funding_confidence.validation.required'),
+      href: "#confidenceSecuredPartnershipFunding"
+    }
+  ]) %}
+{% elif fieldErrors.confidenceSecuredPartnershipFunding == ERROR_CODES.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING_INVALID or errorCode == ERROR_CODES.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING_INVALID %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.confidence_assessment.funding_confidence.validation.required'),
+      href: "#confidenceSecuredPartnershipFunding"
+    }
+  ]) %}
+{% endif %}
 
 {# General errors #}
 {% if errorList.length == 0 and errorCode == ERROR_CODES.NETWORK_ERROR %}

@@ -43,7 +43,8 @@ export const PROJECT_VIEWS = {
   IMPORTANT_DATES: 'modules/projects/important-dates/index',
   BENEFIT_AREA: 'modules/projects/benefit-area/index',
   BENEFIT_AREA_DELETE: 'modules/projects/benefit-area/delete',
-  RISK_AND_PROPERTIES: 'modules/projects/risk-and-properties/index'
+  RISK_AND_PROPERTIES: 'modules/projects/risk-and-properties/index',
+  GOALS_URGENCY_CONFIDENCE: 'modules/projects/goals-urgency-confidence/index'
 }
 
 export const PROPOSAL_VIEWS = {
@@ -117,6 +118,7 @@ export const SIZE = {
   LENGTH_128: 128,
   LENGTH_254: 254,
   LENGTH_255: 255,
+  LENGTH_700: 700,
   LENGTH_2000: 2000,
   LENGTH_2100: 2100
 }
