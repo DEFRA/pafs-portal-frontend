@@ -624,5 +624,301 @@
         "max_length": "Limit the details about why your project is urgent to 700 characters or fewer"
       }
     }
+  },
+  "environmental_benefits": {
+    "environmental_benefits": {
+      "title": "Does the project include any environmental benefits?",
+      "heading": "Does the project include any environmental benefits?",
+      "hint": "na",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "intertidal_habitat": {
+      "title": "Will the project create or enhance an intertidal wetland habitat?",
+      "heading": "Will the project create or enhance an intertidal wetland habitat?",
+      "hint": "Intertidal wetland habitats are found between the high and low tide marks. The habitats most associated with FCERM works are salt marshes and mud flats.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_intertidal_habitat_created_or_enhanced": {
+      "title": "How many hectares of intertidal wetland habitat will the project create or enhance?",
+      "heading": "How many hectares of intertidal wetland habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "woodland": {
+      "title": "Will the project create or enhance a woodland habitat?",
+      "heading": "Will the project create or enhance a woodland habitat?",
+      "hint": "Woodlands are areas of vegetation dominated by trees that are more than 5m high when mature, which forms a canopy (areas of trees with a canopy greater than 20%). This includes felled, young or newly planted woodland.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_woodland_habitat_created_or_enhanced": {
+      "title": "How many hectares of woodland habitat will the project create or enhance?",
+      "heading": "How many hectares of woodland habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "wet_woodland": {
+      "title": "Will the project create or enhance a wet woodlands habitat?",
+      "heading": "Will the project create or enhance a wet woodlands habitat?",
+      "hint": "Wet woodland habitats have trees associated with wet soils such as alder, birch and willow.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_wet_woodland_habitat_created_or_enhanced": {
+      "title": "How many hectares of wet woodlands habitat will the project create or enhance?",
+      "heading": "How many hectares of wet woodlands habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "wetland_or_wet_grassland": {
+      "title": "Will the project create or enhance a wetland or wet grassland habitat?",
+      "heading": "Will the project create or enhance a wetland or wet grassland habitat?",
+      "hint": "Wetlands and wet grassland habitats include flood plains, wetlands mosaics, reed beds and bogs.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_wetland_or_wet_grassland_created_or_enhanced": {
+      "title": "How many hectares of wetland or wet grassland habitat will the project create or enhance?",
+      "heading": "How many hectares of wetland or wet grassland habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "grassland": {
+      "title": "Will the project create or enhance a grassland habitat?",
+      "heading": "Will the project create or enhance a grassland habitat?",
+      "hint": "Grassland habitats are dominated by grasses and wildflowers and have few or no trees.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_grassland_habitat_created_or_enhanced": {
+      "title": "How many hectares of grassland habitat will the project create or enhance?",
+      "heading": "How many hectares of grassland habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "heathland": {
+      "title": "Will the project create or enhance a heathland habitat?",
+      "heading": "Will the project create or enhance a heathland habitat?",
+      "hint": "This is habitat that covers the full altitudinal range of heathlands and has at least 25% cover of the heathers and other dwarf shrubs, or previously heathland in a degraded state below this.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_heathland_created_or_enhanced": {
+      "title": "How many hectares of heathland habitat will the project create or enhance?",
+      "heading": "How many hectares of heathland habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "ponds_lakes": {
+      "title": "Will the project create or enhance a pond and/or lake habitat?",
+      "heading": "Will the project create or enhance a pond and/or lake habitat?",
+      "hint": "Lakes are generally all bodies of water over 2 hectares in area. Ponds are all bodies of water up to 1 hectare.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_pond_or_lake_habitat_created_or_enhanced": {
+      "title": "How many hectares of pond and/or lake habitat will the project create or enhance?",
+      "heading": "How many hectares of pond and/or lake habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "arable_land": {
+      "title": "Will the project create or enhance an arable land habitat?",
+      "heading": "Will the project create or enhance an arable land habitat?",
+      "hint": "This is land under cultivation, it includes temporary grass leys.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_arable_land_lake_habitat_created_or_enhanced": {
+      "title": "How many hectares of arable land habitat will the project create or enhance?",
+      "heading": "How many hectares of arable land habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "comprehensive_restoration": {
+      "title": "Will the project include comprehensive restoration or creation of natural processes, habitats and/or removal of physical modifications?",
+      "heading": "Will the project include comprehensive restoration or creation of natural processes, habitats and/or removal of physical modifications?",
+      "hint": "This includes creating new channels with minor physical modifications that do not inhibit natural river processes.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "kilometres_of_watercourse_enhanced_or_created_comprehensive": {
+      "title": "How many kilometres of comprehensive river restoration will be enhanced or created?",
+      "heading": "How many kilometres of comprehensive river restoration will be enhanced or created?",
+      "suffix": "km",
+      "validation": {
+        "required": "You must include the number of kilometres your project will create.",
+        "invalid": "You must include the number of kilometres your project will create."
+      }
+    },
+    "partial_restoration": {
+      "title": "Will the project include partial restoration of natural processes, habitats and/or partial removal of physical modifications?",
+      "heading": "Will the project include partial restoration of natural processes, habitats and/or partial removal of physical modifications?",
+      "hint": "This includes creating new channels with some physical modifications and partial functioning of natural processes.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "kilometres_of_watercourse_enhanced_or_created_partial": {
+      "title": "How many kilometres of partial restoration will be enhanced or created?",
+      "heading": "How many kilometres of partial restoration will be enhanced or created?",
+      "suffix": "km",
+      "validation": {
+        "required": "You must include the number of kilometres your project will create.",
+        "invalid": "You must include the number of kilometres your project will create."
+      }
+    },
+    "create_habitat_watercourse": {
+      "title": "Will the project enhance or create a single major physical or habitat of watercourse?",
+      "heading": "Will the project enhance or create a single major physical or habitat of watercourse?",
+      "hint": "na",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "kilometres_of_watercourse_enhanced_or_created_single": {
+      "title": "How many kilometres of single major physical improvement the project will be enhanced or created?",
+      "heading": "How many kilometres of single major physical improvement the project will be enhanced or created?",
+      "suffix": "km",
+      "validation": {
+        "required": "You must include the number of kilometres your project will create.",
+        "invalid": "You must include the number of kilometres your project will create."
+      }
+    },
+    "footer": {
+      "html_text": "Find out more about <a class=\"govuk-link\" href=\"https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1026844/Partnership_funding_supporting_guidance_for_OM4.pdf\">partnership funding eligibility for environmental benefits (opens in new window or tab)</a>."
+    }
   }
 }
