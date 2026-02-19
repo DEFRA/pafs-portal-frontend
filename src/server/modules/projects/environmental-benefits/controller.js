@@ -163,7 +163,7 @@ const GATE_STEP_TO_ROUTE_MAP = {
 function _getFooterHtml(request) {
   const footerKey = 'projects.environmental_benefits.footer.html_text'
   const footerHtml = request.t(footerKey)
-  return footerHtml !== footerKey ? footerHtml : null
+  return footerHtml === footerKey ? null : footerHtml
 }
 
 /**
@@ -228,8 +228,9 @@ class EnvironmentalBenefitsController {
   }
 
   _getSuffix(request, config) {
-    const suffix = request.t(`${config.localKeyPrefix}.suffix`)
-    return suffix !== `${config.localKeyPrefix}.suffix` ? suffix : null
+    const suffixKey = `${config.localKeyPrefix}.suffix`
+    const suffix = request.t(suffixKey)
+    return suffix === suffixKey ? null : suffix
   }
 
   _normalizeFieldValue(fieldValue, fieldType) {
