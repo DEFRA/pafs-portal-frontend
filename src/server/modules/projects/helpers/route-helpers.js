@@ -45,19 +45,26 @@ export const createRoutePair = (
  * Create GET/POST route pair for edit-only routes (no creation path)
  * @param {string} editPath - Path for edit route
  * @param {Object} controller - Controller with getHandler and postHandler methods
+ * @param {Array} additionalPreHandlers - Optional additional pre-handlers to append after standard edit pre-handlers
  * @returns {Array} Array of 2 route configurations (GET/POST for edit)
  */
-export const createEditRoutePair = (editPath, controller) => {
+export const createEditRoutePair = (
+  editPath,
+  controller,
+  additionalPreHandlers = []
+) => {
+  const preHandlers = [...editPreHandlers, ...additionalPreHandlers]
+
   return [
     {
       method: 'GET',
       path: editPath,
-      options: { pre: editPreHandlers, handler: controller.getHandler }
+      options: { pre: preHandlers, handler: controller.getHandler }
     },
     {
       method: 'POST',
       path: editPath,
-      options: { pre: editPreHandlers, handler: controller.postHandler }
+      options: { pre: preHandlers, handler: controller.postHandler }
     }
   ]
 }

@@ -3,12 +3,14 @@ import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_STATUS
+  PROJECT_STATUS,
+  REFERENCE_NUMBER_PARAM
 } from '../../../common/constants/projects.js'
 import { AREAS_RESPONSIBILITIES_MAP } from '../../../common/constants/common.js'
 import {
   getSessionData,
   loggedInUserAreas,
+  navigateToProjectOverview,
   requiredInterventionTypesForProjectType
 } from './project-utils.js'
 import { getParentAreas } from '../../../common/helpers/areas/areas-helper.js'
@@ -218,6 +220,71 @@ export async function requireFinancialStartYearSet(request, h) {
   }
 
   return h.continue
+}
+
+/**
+ * Factory function to create a conditional pre-handler that requires a specific field value
+ * Used for conditional routing where access to a route depends on another field's value
+ *
+ * @param {string} fieldName - The field name to check in project data
+ * @param {*} expectedValue - The expected value (e.g., true for gate fields)
+ * @param {string} redirectRoute - Route to redirect to if condition not met (typically overview)
+ * @param {string} logMessage - Optional custom log message
+ * @returns {Function} Pre-handler function
+ *
+ * @example
+ * // Require environmentalBenefits to be true to access habitat questions
+ * const requireEnvironmentalBenefitsEnabled = createConditionalPreHandler(
+ *   'environmentalBenefits',
+ *   true,
+ *   ROUTES.PROJECT.OVERVIEW,
+ *   'Environmental benefits not enabled'
+ * )
+ */
+export function createConditionalPreHandler(
+  fieldName,
+  expectedValue,
+  redirectRoute,
+  logMessage = null
+) {
+  return async function conditionalPreHandler(request, h) {
+    const projectData = request.pre?.projectData
+    const sessionData = getSessionData(request)
+    const session = getAuthSession(request)
+    const { slug: referenceNumber } = sessionData
+
+    if (!projectData) {
+      request.server?.logger?.warn(
+        { userId: session?.user?.id },
+        'Project data not found for conditional pre-handler check'
+      )
+      return navigateToProjectOverview(referenceNumber, h)
+    }
+
+    const actualValue = sessionData[fieldName]
+
+    // Check if the field value matches the expected value
+    if (actualValue !== expectedValue) {
+      request.server?.logger?.warn(
+        {
+          userId: session?.user?.id,
+          projectId: projectData.id,
+          fieldName,
+          expectedValue,
+          actualValue
+        },
+        logMessage ||
+          `User attempted to access route requiring ${fieldName}=${expectedValue}, but value is ${actualValue}`
+      )
+      return h
+        .redirect(
+          redirectRoute.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
+        )
+        .takeover()
+    }
+
+    return h.continue
+  }
 }
 
 // ============================================================================

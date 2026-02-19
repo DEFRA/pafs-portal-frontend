@@ -62,7 +62,8 @@ export const router = {
         'important-dates',
         'benefit-area',
         'risk-and-properties',
-        'goals-urgency-confidence'
+        'goals-urgency-confidence',
+        'environmental-benefits'
       ])
 
       // Static assets

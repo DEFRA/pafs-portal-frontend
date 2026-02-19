@@ -28,5 +28,11 @@ export { RISK_AND_PROPERTIES_CONFIG } from './config/risk-properties.js'
 // Re-export goals, urgency, and confidence configuration
 export { GOALS_URGENCY_CONFIDENCE_CONFIG } from './config/goals-urgency-confidence.js'
 
+// Re-export environmental benefits configuration
+export {
+  ENVIRONMENTAL_BENEFITS_CONFIG,
+  ENVIRONMENTAL_BENEFITS_FIELD_PAIRS
+} from './config/environmental-benefits.js'
+
 // Re-export payload level fields
 export { PROJECT_PAYLOAD_LEVEL_FIELDS } from './config/payload-levels.js'

@@ -565,6 +565,17 @@
   ]) %}
 {% endif %}
 
+{# Environmental Benefits - Generic field errors #}
+{# Handle all environmental benefits fields dynamically using fieldName and localKeyPrefix #}
+{% if fieldErrors[fieldName] and localKeyPrefix and localKeyPrefix.startsWith('projects.environmental_benefits') %}
+  {% set errorList = errorList.concat([
+    {
+      text: t(localKeyPrefix + '.validation.required'),
+      href: "#" + fieldName
+    }
+  ]) %}
+{% endif %}
+
 {# General errors #}
 {% if errorList.length == 0 and errorCode == ERROR_CODES.NETWORK_ERROR %}
   {% set errorList = errorList.concat([

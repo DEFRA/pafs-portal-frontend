@@ -86,3 +86,30 @@ export {
   confidenceHomesByGatewayFourSchema,
   confidenceSecuredPartnershipFundingSchema
 } from './projects/project-goals-urgency-confidence-schemas.js'
+
+// Environmental benefits schemas
+export {
+  environmentalBenefitsSchema,
+  intertidalHabitatSchema,
+  hectaresOfIntertidalHabitatCreatedOrEnhancedSchema,
+  woodlandSchema,
+  hectaresOfWoodlandHabitatCreatedOrEnhancedSchema,
+  wetWoodlandSchema,
+  hectaresOfWetWoodlandHabitatCreatedOrEnhancedSchema,
+  wetlandOrWetGrasslandSchema,
+  hectaresOfWetlandOrWetGrasslandCreatedOrEnhancedSchema,
+  grasslandSchema,
+  hectaresOfGrasslandHabitatCreatedOrEnhancedSchema,
+  heathlandSchema,
+  hectaresOfHeathlandCreatedOrEnhancedSchema,
+  pondsLakesSchema,
+  hectaresOfPondOrLakeHabitatCreatedOrEnhancedSchema,
+  arableLandSchema,
+  hectaresOfArableLandLakeHabitatCreatedOrEnhancedSchema,
+  comprehensiveRestorationSchema,
+  kilometresOfWatercourseEnhancedOrCreatedComprehensiveSchema,
+  partialRestorationSchema,
+  kilometresOfWatercourseEnhancedOrCreatedPartialSchema,
+  createHabitatWatercourseSchema,
+  kilometresOfWatercourseEnhancedOrCreatedSingleSchema
+} from './projects/project-environmental-benefits-schemas.js'

@@ -1,0 +1,81 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block body %}
+  <form method="post" novalidate>
+    {% if fieldType == 'radio' %}
+      {# Radio field for yes/no gate questions #}
+      {% if fieldErrors and fieldErrors[fieldName] %}
+        {% set radioError = {
+          text: t(localKeyPrefix + '.validation.required')
+        } %}
+      {% else %}
+        {% set radioError = false %}
+      {% endif %}
+
+      {# Get hint text - only display if not 'na' #}
+      {% set hintText = t(localKeyPrefix + '.hint') %}
+      {% set displayHint = hintText != 'na' and hintText != (localKeyPrefix + '.hint') %}
+
+      {{ govukRadios({
+        id: fieldName,
+        name: fieldName,
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.heading'),
+            classes: "govuk-fieldset__legend--xl",
+            isPageHeading: true
+          }
+        },
+        hint: {
+          text: hintText
+        } if displayHint else false,
+        classes: "govuk-radios--inline",
+        items: radioItems,
+        errorMessage: radioError
+      }) }}
+
+    {% elif fieldType == 'input' %}
+      {# Input field for quantity questions #}
+      {% if fieldErrors and fieldErrors[fieldName] %}
+        {% set inputError = {
+          text: t(localKeyPrefix + '.validation.required')
+        } %}
+      {% else %}
+        {% set inputError = false %}
+      {% endif %}
+
+      {{ govukInput({
+        id: fieldName,
+        name: fieldName,
+        value: inputValue if inputValue != null else '',
+        type: "text",
+        inputmode: "decimal",
+        spellcheck: false,
+        classes: "govuk-input--width-10",
+        label: {
+          text: t(localKeyPrefix + '.heading'),
+          classes: "govuk-label--xl",
+          isPageHeading: true
+        },
+        suffix: {
+          text: suffix
+        } if suffix else false,
+        errorMessage: inputError
+      }) }}
+    {% endif %}
+
+    {{ govukButton({
+      text: t('common.buttons.save_and_continue')
+    }) }}
+
+    {# Display footer HTML if present #}
+    {% if footerHtml %}
+      <div class="govuk-body govuk-!-margin-top-2">
+        {{ footerHtml | safe }}
+      </div>
+    {% endif %}
+  </form>
+{% endblock %}

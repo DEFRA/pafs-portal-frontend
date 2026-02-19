@@ -12,13 +12,15 @@ import {
   canViewProposal,
   canEditProposal,
   requireViewPermission,
-  requireEditPermission
+  requireEditPermission,
+  createConditionalPreHandler
 } from './permissions.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import {
   getSessionData,
   loggedInUserAreas,
+  navigateToProjectOverview,
   requiredInterventionTypesForProjectType
 } from './project-utils.js'
 import { getParentAreas } from '../../../common/helpers/areas/areas-helper.js'
@@ -30,7 +32,12 @@ import {
 
 vi.mock('../../../common/helpers/auth/auth-middleware.js')
 vi.mock('../../../common/helpers/auth/session-manager.js')
-vi.mock('./project-utils.js')
+vi.mock('./project-utils.js', () => ({
+  getSessionData: vi.fn(),
+  loggedInUserAreas: vi.fn(),
+  navigateToProjectOverview: vi.fn(() => Symbol('overview-redirect')),
+  requiredInterventionTypesForProjectType: vi.fn()
+}))
 vi.mock('../../../common/helpers/areas/areas-helper.js')
 
 describe('permissions helper - comprehensive', () => {
@@ -700,6 +707,212 @@ describe('permissions helper - comprehensive', () => {
         { userId: '4', projectId: '1', projectStatus: PROJECT_STATUS.DRAFT },
         'User does not have permission to edit this project'
       )
+    })
+  })
+
+  describe('createConditionalPreHandler', () => {
+    test('should continue when field value matches expected value', async () => {
+      const preHandler = createConditionalPreHandler(
+        'environmentalBenefits',
+        true,
+        ROUTES.PROJECT.OVERVIEW
+      )
+
+      mockRequest.pre = { projectData: { id: '1' } }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        environmentalBenefits: true
+      })
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      const result = await preHandler(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('should redirect when field value does not match expected value', async () => {
+      const preHandler = createConditionalPreHandler(
+        'environmentalBenefits',
+        true,
+        ROUTES.PROJECT.EDIT.ENVIRONMENTAL_BENEFITS
+      )
+
+      mockRequest.pre = { projectData: { id: '1' } }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        environmentalBenefits: false
+      })
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      await preHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.ENVIRONMENTAL_BENEFITS.replace(
+          '{referenceNumber}',
+          'TEST-001'
+        )
+      )
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should redirect to overview when projectData not found', async () => {
+      const preHandler = createConditionalPreHandler(
+        'environmentalBenefits',
+        true,
+        ROUTES.PROJECT.EDIT.ENVIRONMENTAL_BENEFITS
+      )
+
+      mockRequest.pre = {}
+      getSessionData.mockReturnValue({ slug: 'TEST-001' })
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      const result = await preHandler(mockRequest, mockH)
+
+      expect(navigateToProjectOverview).toHaveBeenCalledWith('TEST-001', mockH)
+      expect(result).toBeDefined()
+    })
+
+    test('should check field value from sessionData not projectData', async () => {
+      const preHandler = createConditionalPreHandler(
+        'woodland',
+        true,
+        ROUTES.PROJECT.EDIT.WOODLAND
+      )
+
+      mockRequest.pre = { projectData: { woodland: false } }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        woodland: true
+      })
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      const result = await preHandler(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('should log warning when projectData not found', async () => {
+      const loggerWarnSpy = vi.fn()
+      mockRequest.server.logger = { warn: loggerWarnSpy }
+
+      const preHandler = createConditionalPreHandler(
+        'environmentalBenefits',
+        true,
+        ROUTES.PROJECT.EDIT.ENVIRONMENTAL_BENEFITS
+      )
+
+      mockRequest.pre = {}
+      getSessionData.mockReturnValue({ slug: 'TEST-001' })
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      await preHandler(mockRequest, mockH)
+
+      expect(loggerWarnSpy).toHaveBeenCalledWith(
+        { userId: '1' },
+        'Project data not found for conditional pre-handler check'
+      )
+    })
+
+    test('should log warning when field value does not match', async () => {
+      const loggerWarnSpy = vi.fn()
+      mockRequest.server.logger = { warn: loggerWarnSpy }
+
+      const preHandler = createConditionalPreHandler(
+        'intertidal_habitat',
+        true,
+        ROUTES.PROJECT.EDIT.INTERTIDAL_HABITAT,
+        'Custom log message'
+      )
+
+      mockRequest.pre = { projectData: { id: '1' } }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        intertidal_habitat: false
+      })
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      await preHandler(mockRequest, mockH)
+
+      expect(loggerWarnSpy).toHaveBeenCalledWith(
+        {
+          userId: '1',
+          projectId: '1',
+          fieldName: 'intertidal_habitat',
+          expectedValue: true,
+          actualValue: false
+        },
+        'Custom log message'
+      )
+    })
+
+    test('should use default log message when custom message not provided', async () => {
+      const loggerWarnSpy = vi.fn()
+      mockRequest.server.logger = { warn: loggerWarnSpy }
+
+      const preHandler = createConditionalPreHandler(
+        'woodland',
+        true,
+        ROUTES.PROJECT.EDIT.WOODLAND
+      )
+
+      mockRequest.pre = { projectData: { id: '1' } }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        woodland: false
+      })
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      await preHandler(mockRequest, mockH)
+
+      expect(loggerWarnSpy).toHaveBeenCalledWith(
+        {
+          userId: '1',
+          projectId: '1',
+          fieldName: 'woodland',
+          expectedValue: true,
+          actualValue: false
+        },
+        'User attempted to access route requiring woodland=true, but value is false'
+      )
+    })
+
+    test('should handle null field values', async () => {
+      const preHandler = createConditionalPreHandler(
+        'grassland',
+        true,
+        ROUTES.PROJECT.EDIT.GRASSLAND
+      )
+
+      mockRequest.pre = { projectData: { id: '1' } }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        grassland: null
+      })
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      await preHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalled()
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should handle undefined field values', async () => {
+      const preHandler = createConditionalPreHandler(
+        'heathland',
+        true,
+        ROUTES.PROJECT.EDIT.HEATHLAND
+      )
+
+      mockRequest.pre = { projectData: { id: '1' } }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001'
+      })
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      await preHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalled()
+      expect(mockH.takeover).toHaveBeenCalled()
     })
   })
 })

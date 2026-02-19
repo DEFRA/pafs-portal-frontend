@@ -21,7 +21,8 @@
       "archive": "Archive",
       "delete": "Delete",
       "not_submitted": "Not yet submitted",
-      "not_provided": "Not provided"
+      "not_provided": "Not provided",
+      "na": "N/A"
     },
     "proposal_details_summary_card": {
       "title": "Proposal details",
@@ -108,9 +109,22 @@
       "secured_partnership_funding": "Confidence in securing partnership funding",
       "not_added": "No confidence assessment added yet"
     },
-    "environmental_summary_card": {
+    "environmental_benefits_summary_card": {
       "title": "Environmental benefits",
-      "not_added": "No environmental benefits data added yet"
+      "not_added": "The project does not include any environmental benefits",
+      "intertidal_habitat": "Intertidal wetland habitat",
+      "woodland": "Woodland habitat",
+      "wet_woodland": "Wet woodland habitat",
+      "wetland_or_wet_grassland": "Wetland or wet grassland habitat",
+      "grassland": "Grassland habitat",
+      "heathland": "Heathland habitat",
+      "ponds_lakes": "Pond and/or lake habitat",
+      "arable_land": "Arable land habitat",
+      "comprehensive_restoration": "Comprehensive restoration",
+      "partial_restoration": "Partial restoration",
+      "create_habitat_watercourse": "Single major physical or habitat of watercourse",
+      "hectares": "hectares",
+      "kilometres": "kilometres"
     },
     "submission_info": "By submitting this proposal you confirm all the information provided is accurate and complete."
   },
@@ -918,7 +932,7 @@
       }
     },
     "footer": {
-      "html_text": "Find out more about <a class=\"govuk-link\" href=\"https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1026844/Partnership_funding_supporting_guidance_for_OM4.pdf\">partnership funding eligibility for environmental benefits (opens in new window or tab)</a>."
+      "html_text": "Find out more about <a class=\"govuk-link\" target=\"_blank\" href=\"https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1026844/Partnership_funding_supporting_guidance_for_OM4.pdf\">partnership funding eligibility for environmental benefits (opens in new window or tab)</a>."
     }
   }
 }

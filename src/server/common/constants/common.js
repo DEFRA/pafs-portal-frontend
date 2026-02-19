@@ -44,7 +44,8 @@ export const PROJECT_VIEWS = {
   BENEFIT_AREA: 'modules/projects/benefit-area/index',
   BENEFIT_AREA_DELETE: 'modules/projects/benefit-area/delete',
   RISK_AND_PROPERTIES: 'modules/projects/risk-and-properties/index',
-  GOALS_URGENCY_CONFIDENCE: 'modules/projects/goals-urgency-confidence/index'
+  GOALS_URGENCY_CONFIDENCE: 'modules/projects/goals-urgency-confidence/index',
+  ENVIRONMENTAL_BENEFITS: 'modules/projects/environmental-benefits/index'
 }
 
 export const PROPOSAL_VIEWS = {
@@ -195,4 +196,9 @@ export const RESPONSIBILITY_MAP = {
   EA: 'EA',
   PSO: 'PSO',
   RMA: 'RMA'
+}
+
+export const BOOLEAN_OPTION_VALUES = {
+  YES: 'yes',
+  NO: 'no'
 }
