@@ -759,7 +759,7 @@
     "grassland": {
       "title": "Will the project create or enhance a grassland habitat?",
       "heading": "Will the project create or enhance a grassland habitat?",
-      "hint": "Grassland habitats are dominated by grasses and wildflowers and have few or no trees.",
+      "hint": "This is land under permanent-natural or semi-natural grassland, dominated by grassland species with very little or no dwarf shrub, wetland or wooded species within the sward.",
       "options": {
         "yes": {
           "label": "Yes"
