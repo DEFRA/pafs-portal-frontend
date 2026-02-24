@@ -97,7 +97,7 @@ class DownloadRMAController {
           accessToken
         })
 
-        if (result && result.areas && result.areas.length > 0) {
+        if (result?.areas?.length > 0) {
           allRMAs = allRMAs.concat(result.areas)
           request.server.logger.debug(
             { pageRMAs: result.areas.length, totalSoFar: allRMAs.length },
@@ -107,8 +107,7 @@ class DownloadRMAController {
 
         // Check if there are more pages
         if (
-          result.pagination &&
-          result.pagination.page < result.pagination.totalPages
+          result?.pagination?.page < result?.pagination?.totalPages
         ) {
           currentPage++
         } else {
