@@ -4,6 +4,11 @@ import { getAuthSession } from '../../../../config/nunjucks/context/session-help
 import { createAreasService } from '../../../common/services/areas/areas-service.js'
 import { AREAS_RESPONSIBILITIES_MAP } from '../../../common/constants/common.js'
 import { statusCodes } from '../../../common/constants/status-codes.js'
+import {
+  EXCEL_COLORS,
+  EXCEL_DIMENSIONS,
+  CELL_BORDER_STYLE
+} from '../../../common/constants/excel-styles.js'
 
 /**
  * Download RMA Controller
@@ -157,14 +162,18 @@ class DownloadRMAController {
    */
   _styleHeaderRow(worksheet) {
     const headerRow = worksheet.getRow(1)
-    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 }
+    headerRow.font = {
+      bold: true,
+      color: { argb: EXCEL_COLORS.HEADER_TEXT },
+      size: 11
+    }
     headerRow.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'FF0B6623' } // Dark green
+      fgColor: { argb: EXCEL_COLORS.HEADER_BG }
     }
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' }
-    headerRow.height = 25
+    headerRow.height = EXCEL_DIMENSIONS.HEADER_HEIGHT
   }
 
   /**
@@ -175,7 +184,7 @@ class DownloadRMAController {
       row.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FFF5F5F5' } // Light gray
+        fgColor: { argb: EXCEL_COLORS.ROW_ALT_BG }
       }
     }
   }
@@ -210,24 +219,12 @@ class DownloadRMAController {
   }
 
   /**
-   * Style data row
-   */
-  _styleDataRow(row) {
-    this._applyAlternatingRowColor(row)
-  }
-
-  /**
    * Add borders and alignment to all cells
    */
   _addBordersAndAlignment(worksheet) {
     worksheet.eachRow((row, rowNumber) => {
       row.eachCell((cell) => {
-        cell.border = {
-          top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-          left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-          bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
-          right: { style: 'thin', color: { argb: 'FFCCCCCC' } }
-        }
+        cell.border = CELL_BORDER_STYLE
         if (rowNumber > 1) {
           cell.alignment = { vertical: 'middle', horizontal: 'left' }
         }
@@ -249,7 +246,7 @@ class DownloadRMAController {
     rmas.forEach((rma) => {
       const rowData = this._formatRMARowData(rma, areasCache)
       const row = worksheet.addRow(rowData)
-      this._styleDataRow(row)
+      this._applyAlternatingRowColor(row)
     })
 
     this._addBordersAndAlignment(worksheet)
