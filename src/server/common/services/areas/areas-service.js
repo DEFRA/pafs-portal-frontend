@@ -203,7 +203,9 @@ export class AreasService {
       if (!response.success || !response.data) {
         const errorMsg =
           response.errors?.[0]?.errorCode || 'Invalid response from upsert API'
-        throw new Error(errorMsg)
+        const error = new Error(errorMsg)
+        error.response = { data: response }
+        throw error
       }
 
       this.logger.info('Area upserted successfully - invalidating cache')
