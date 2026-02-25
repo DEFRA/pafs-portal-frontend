@@ -18,7 +18,8 @@ export const ADMIN_VIEWS = {
   ORGANISATIONS: 'modules/admin/organisations/listing/index',
   ORGANISATION_TYPE: 'modules/admin/organisations/type/index',
   ORGANISATION_MANAGE: 'modules/admin/organisations/manage/index',
-  PROJECTS: 'modules/admin/projects/listing/index'
+  PROJECTS: 'modules/admin/projects/listing/index',
+  PROJECT_MANAGE: 'modules/admin/projects/manage/index'
 }
 
 export const ACCOUNT_VIEWS = {

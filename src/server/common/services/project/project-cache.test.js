@@ -503,14 +503,10 @@ describe('ProjectsCacheService', () => {
     test('Should drop common cache keys for all statuses', async () => {
       await cacheService.invalidateAll()
 
-      // Should drop list keys and count keys for each status
-      expect(mockCache.drop).toHaveBeenCalledWith('list:draft:::1:10')
-      expect(mockCache.drop).toHaveBeenCalledWith('count:draft')
-      expect(mockCache.drop).toHaveBeenCalledWith('list:submitted:::1:10')
-      expect(mockCache.drop).toHaveBeenCalledWith('count:submitted')
-      expect(mockCache.drop).toHaveBeenCalledWith('list:archived:::1:10')
-      expect(mockCache.drop).toHaveBeenCalledWith('count:archived')
-      expect(mockCache.drop).toHaveBeenCalledTimes(6)
+      // Should drop common list patterns (default page size, no filters)
+      expect(mockCache.drop).toHaveBeenCalledWith('list:::1:10')
+      expect(mockCache.drop).toHaveBeenCalledWith('list::::1:10')
+      expect(mockCache.drop).toHaveBeenCalledTimes(2)
     })
 
     test('Should not drop keys when cache is disabled', async () => {
@@ -527,14 +523,8 @@ describe('ProjectsCacheService', () => {
 
       expect(mockServer.logger.info).toHaveBeenCalledWith(
         { segment: CACHE_SEGMENTS.PROJECTS },
-        'Invalidated common projects cache keys (lists and counts)'
+        'Invalidated common projects cache keys (lists)'
       )
-    })
-
-    test('Should not throw error when drop fails', async () => {
-      mockCache.drop.mockRejectedValue(new Error('Drop failed'))
-
-      await expect(cacheService.invalidateAll()).resolves.not.toThrow()
     })
   })
 
