@@ -68,6 +68,30 @@ export class ProjectsCacheService extends BaseCacheService {
   }
 
   /**
+   * Get a single cached project by reference number
+   *
+   * @param {string} referenceNumber - Project reference number (e.g., 'THC501E/000A/017A')
+   * @returns {Promise<Object|null>} Cached project or null
+   */
+  async getProjectByReferenceNumber(referenceNumber) {
+    if (!this.isProjectCacheEnabled()) {
+      return null
+    }
+
+    const refKey = this.generateProjectKey(referenceNumber)
+    const cachedValue = await this.getByKey(refKey)
+
+    // If it's a reference pointer (just an ID), look up the actual project
+    if (cachedValue && typeof cachedValue === 'object' && cachedValue._ref) {
+      const idKey = this.generateProjectKey(cachedValue._ref)
+      return this.getByKey(idKey)
+    }
+
+    // Otherwise return the value directly (for backward compatibility)
+    return cachedValue
+  }
+
+  /**
    * Cache a single project
    *
    * @param {number|string} id - Project ID
@@ -78,8 +102,17 @@ export class ProjectsCacheService extends BaseCacheService {
     if (!this.isProjectCacheEnabled()) {
       return
     }
-    const key = this.generateProjectKey(id)
-    await this.setByKey(key, project)
+
+    // Store the full project data under the ID key
+    const idKey = this.generateProjectKey(id)
+    await this.setByKey(idKey, project)
+
+    // If reference number exists and differs from ID, store a reference pointer
+    if (project.referenceNumber && project.referenceNumber !== String(id)) {
+      const refKey = this.generateProjectKey(project.referenceNumber)
+      // Store a lightweight reference object pointing to the ID
+      await this.setByKey(refKey, { _ref: id })
+    }
   }
 
   /**
@@ -178,7 +211,7 @@ export class ProjectsCacheService extends BaseCacheService {
 
   /**
    * Invalidate all projects cache
-   * Drops all known cache key patterns for projects, lists, and counts
+   * Drops common cache key patterns for lists
    * @returns {Promise<void>}
    */
   async invalidateAll() {
@@ -186,22 +219,28 @@ export class ProjectsCacheService extends BaseCacheService {
       return
     }
 
-    const defaultPageSize = getDefaultPageSize()
-    // Drop common list patterns for all statuses
-    const statusList = ['draft', 'submitted', 'archived']
-    const listPromises = statusList.flatMap((status) => [
-      // First page with default page size (most common)
-      this.dropByKey(`list:${status}:::1:${defaultPageSize}`),
-      // Count keys
-      this.dropByKey(`count:${status}`)
-    ])
+    try {
+      const defaultPageSize = getDefaultPageSize()
+      // Drop common list patterns (most frequently accessed combinations)
+      const listPromises = [
+        // Most common: no filters, page 1
+        this.dropByKey(`list:::1:${defaultPageSize}`),
+        // With empty search
+        this.dropByKey(`list::::1:${defaultPageSize}`)
+      ]
 
-    await Promise.all(listPromises)
+      await Promise.all(listPromises)
 
-    this.server.logger.info(
-      { segment: this.segment },
-      'Invalidated common projects cache keys (lists and counts)'
-    )
+      this.server.logger.info(
+        { segment: this.segment },
+        'Invalidated common projects cache keys (lists)'
+      )
+    } catch (error) {
+      this.server.logger.warn(
+        { error, segment: this.segment },
+        'Failed to invalidate projects cache'
+      )
+    }
   }
 }
 

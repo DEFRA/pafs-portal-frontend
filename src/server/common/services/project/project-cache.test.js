@@ -196,6 +196,98 @@ describe('ProjectsCacheService', () => {
     })
   })
 
+  describe('getProjectByReferenceNumber', () => {
+    test('Should retrieve project directly when stored by reference number', async () => {
+      const mockProject = {
+        id: 1,
+        referenceNumber: 'THC501E/000A/017A',
+        name: 'Test'
+      }
+      mockCache.get.mockResolvedValue(mockProject)
+
+      const result =
+        await cacheService.getProjectByReferenceNumber('THC501E/000A/017A')
+
+      expect(mockCache.get).toHaveBeenCalledWith('project:THC501E/000A/017A')
+      expect(result).toEqual(mockProject)
+    })
+
+    test('Should follow reference pointer to get actual project', async () => {
+      const referencePointer = { _ref: 123 }
+      const actualProject = {
+        id: 123,
+        referenceNumber: 'THC501E/000A/017A',
+        name: 'Test Project'
+      }
+
+      mockCache.get
+        .mockResolvedValueOnce(referencePointer)
+        .mockResolvedValueOnce(actualProject)
+
+      const result =
+        await cacheService.getProjectByReferenceNumber('THC501E/000A/017A')
+
+      expect(mockCache.get).toHaveBeenNthCalledWith(
+        1,
+        'project:THC501E/000A/017A'
+      )
+      expect(mockCache.get).toHaveBeenNthCalledWith(2, 'project:123')
+      expect(result).toEqual(actualProject)
+    })
+
+    test('Should return null when reference number not in cache', async () => {
+      mockCache.get.mockResolvedValue(null)
+
+      const result =
+        await cacheService.getProjectByReferenceNumber('NOTFOUND/001/002')
+
+      expect(result).toBeNull()
+    })
+
+    test('Should return null when project cache is disabled', async () => {
+      config.get.mockReturnValue('memory')
+      const disabledService = new ProjectsCacheService(mockServer)
+
+      const result =
+        await disabledService.getProjectByReferenceNumber('THC501E/000A/017A')
+
+      expect(result).toBeNull()
+      expect(mockCache.get).not.toHaveBeenCalled()
+    })
+
+    test('Should handle non-object cached values', async () => {
+      mockCache.get.mockResolvedValue('string value')
+
+      const result =
+        await cacheService.getProjectByReferenceNumber('TEST/001/002')
+
+      expect(result).toBe('string value')
+      expect(mockCache.get).toHaveBeenCalledTimes(1)
+    })
+
+    test('Should handle object without _ref property', async () => {
+      const projectWithoutRef = { id: 1, name: 'Test' }
+      mockCache.get.mockResolvedValue(projectWithoutRef)
+
+      const result =
+        await cacheService.getProjectByReferenceNumber('TEST/001/002')
+
+      expect(result).toEqual(projectWithoutRef)
+      expect(mockCache.get).toHaveBeenCalledTimes(1)
+    })
+
+    test('Should handle null _ref value', async () => {
+      const nullRefObject = { _ref: null }
+      mockCache.get.mockResolvedValue(nullRefObject)
+
+      const result =
+        await cacheService.getProjectByReferenceNumber('TEST/001/002')
+
+      expect(result).toEqual(nullRefObject)
+      expect(mockCache.get).toHaveBeenCalledTimes(1)
+    })
+  })
+
   describe('setProject', () => {
     test('Should cache project with numeric id', async () => {
       const mockProject = { id: 1, name: 'Test Project' }
@@ -228,6 +320,115 @@ describe('ProjectsCacheService', () => {
       await disabledService.setProject(1, { id: 1, name: 'Test' })
 
       expect(mockCache.set).not.toHaveBeenCalled()
+    })
+
+    test('Should store reference pointer when referenceNumber differs from id', async () => {
+      const mockProject = {
+        id: 123,
+        referenceNumber: 'THC501E/000A/017A',
+        name: 'Test Project'
+      }
+
+      await cacheService.setProject(123, mockProject)
+
+      expect(mockCache.set).toHaveBeenCalledTimes(2)
+      expect(mockCache.set).toHaveBeenNthCalledWith(
+        1,
+        'project:123',
+        mockProject,
+        DEFAULT_TTL
+      )
+      expect(mockCache.set).toHaveBeenNthCalledWith(
+        2,
+        'project:THC501E/000A/017A',
+        { _ref: 123 },
+        DEFAULT_TTL
+      )
+    })
+
+    test('Should not store reference pointer when referenceNumber equals id', async () => {
+      const mockProject = {
+        id: 'THC501E/000A/017A',
+        referenceNumber: 'THC501E/000A/017A',
+        name: 'Test Project'
+      }
+
+      await cacheService.setProject('THC501E/000A/017A', mockProject)
+
+      expect(mockCache.set).toHaveBeenCalledTimes(1)
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'project:THC501E/000A/017A',
+        mockProject,
+        DEFAULT_TTL
+      )
+    })
+
+    test('Should not store reference pointer when referenceNumber is missing', async () => {
+      const mockProject = {
+        id: 123,
+        name: 'Test Project'
+      }
+
+      await cacheService.setProject(123, mockProject)
+
+      expect(mockCache.set).toHaveBeenCalledTimes(1)
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'project:123',
+        mockProject,
+        DEFAULT_TTL
+      )
+    })
+
+    test('Should not store reference pointer when referenceNumber is null', async () => {
+      const mockProject = {
+        id: 123,
+        referenceNumber: null,
+        name: 'Test Project'
+      }
+
+      await cacheService.setProject(123, mockProject)
+
+      expect(mockCache.set).toHaveBeenCalledTimes(1)
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'project:123',
+        mockProject,
+        DEFAULT_TTL
+      )
+    })
+
+    test('Should not store reference pointer when referenceNumber is empty string', async () => {
+      const mockProject = {
+        id: 123,
+        referenceNumber: '',
+        name: 'Test Project'
+      }
+
+      await cacheService.setProject(123, mockProject)
+
+      expect(mockCache.set).toHaveBeenCalledTimes(1)
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'project:123',
+        mockProject,
+        DEFAULT_TTL
+      )
+    })
+
+    test('Should handle numeric id converted to string for comparison', async () => {
+      const mockProject = {
+        id: 123,
+        referenceNumber: '123',
+        name: 'Test Project'
+      }
+
+      await cacheService.setProject(123, mockProject)
+
+      // Should not create reference pointer since '123' === String(123)
+      expect(mockCache.set).toHaveBeenCalledTimes(1)
+      expect(mockCache.set).toHaveBeenCalledWith(
+        'project:123',
+        mockProject,
+        DEFAULT_TTL
+      )
     })
   })
 
@@ -389,6 +590,19 @@ describe('ProjectsCacheService', () => {
       expect(mockCache.set).not.toHaveBeenCalled()
     })
 
+    test('Should not cache when list cache feature is disabled', async () => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'cacheFeatures.projects.projectsList') return false
+        return null
+      })
+      const serviceWithDisabledFeature = new ProjectsCacheService(mockServer)
+
+      await serviceWithDisabledFeature.setListMetadata({}, [1, 2], {})
+
+      expect(mockCache.set).not.toHaveBeenCalled()
+    })
+
     test('Should include timestamp in metadata', async () => {
       const beforeTimestamp = Date.now()
 
@@ -453,6 +667,22 @@ describe('ProjectsCacheService', () => {
       expect(mockCache.get).not.toHaveBeenCalled()
     })
 
+    test('Should return null when list cache feature is disabled', async () => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'cacheFeatures.projects.projectsList') return false
+        return null
+      })
+      const serviceWithDisabledFeature = new ProjectsCacheService(mockServer)
+
+      const result = await serviceWithDisabledFeature.getListMetadata({
+        page: 1
+      })
+
+      expect(result).toBeNull()
+      expect(mockCache.get).not.toHaveBeenCalled()
+    })
+
     test('Should log cache miss when metadata is null', async () => {
       mockCache.get.mockResolvedValue(null)
 
@@ -480,6 +710,19 @@ describe('ProjectsCacheService', () => {
 
       expect(result).toBe(false)
     })
+
+    test('Should return false when feature flag is false', () => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'cacheFeatures.projects.project') return false
+        return null
+      })
+      const serviceWithDisabledFeature = new ProjectsCacheService(mockServer)
+
+      const result = serviceWithDisabledFeature.isProjectCacheEnabled()
+
+      expect(result).toBe(false)
+    })
   })
 
   describe('isListCacheEnabled', () => {
@@ -497,20 +740,29 @@ describe('ProjectsCacheService', () => {
 
       expect(result).toBe(false)
     })
+
+    test('Should return false when feature flag is false', () => {
+      config.get.mockImplementation((key) => {
+        if (key === 'session.cache.engine') return 'redis'
+        if (key === 'cacheFeatures.projects.projectsList') return false
+        return null
+      })
+      const serviceWithDisabledFeature = new ProjectsCacheService(mockServer)
+
+      const result = serviceWithDisabledFeature.isListCacheEnabled()
+
+      expect(result).toBe(false)
+    })
   })
 
   describe('invalidateAll', () => {
     test('Should drop common cache keys for all statuses', async () => {
       await cacheService.invalidateAll()
 
-      // Should drop list keys and count keys for each status
-      expect(mockCache.drop).toHaveBeenCalledWith('list:draft:::1:10')
-      expect(mockCache.drop).toHaveBeenCalledWith('count:draft')
-      expect(mockCache.drop).toHaveBeenCalledWith('list:submitted:::1:10')
-      expect(mockCache.drop).toHaveBeenCalledWith('count:submitted')
-      expect(mockCache.drop).toHaveBeenCalledWith('list:archived:::1:10')
-      expect(mockCache.drop).toHaveBeenCalledWith('count:archived')
-      expect(mockCache.drop).toHaveBeenCalledTimes(6)
+      // Should drop common list patterns (default page size, no filters)
+      expect(mockCache.drop).toHaveBeenCalledWith('list:::1:10')
+      expect(mockCache.drop).toHaveBeenCalledWith('list::::1:10')
+      expect(mockCache.drop).toHaveBeenCalledTimes(2)
     })
 
     test('Should not drop keys when cache is disabled', async () => {
@@ -527,14 +779,24 @@ describe('ProjectsCacheService', () => {
 
       expect(mockServer.logger.info).toHaveBeenCalledWith(
         { segment: CACHE_SEGMENTS.PROJECTS },
-        'Invalidated common projects cache keys (lists and counts)'
+        'Invalidated common projects cache keys (lists)'
       )
     })
 
-    test('Should not throw error when drop fails', async () => {
-      mockCache.drop.mockRejectedValue(new Error('Drop failed'))
+    test('Should handle unexpected errors during invalidation', async () => {
+      // Mock getDefaultPageSize to throw an error (simulating unexpected error)
+      const { getDefaultPageSize } =
+        await import('../../helpers/pagination/index.js')
+      getDefaultPageSize.mockImplementationOnce(() => {
+        throw new Error('Unexpected error')
+      })
 
-      await expect(cacheService.invalidateAll()).resolves.not.toThrow()
+      await cacheService.invalidateAll()
+
+      expect(mockServer.logger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({ segment: CACHE_SEGMENTS.PROJECTS }),
+        'Failed to invalidate projects cache'
+      )
     })
   })
 
