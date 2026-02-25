@@ -104,9 +104,7 @@ class DownloadRMAController {
             'Fetched RMA page'
           )
         }
-        if (
-          result?.pagination?.page < result?.pagination?.totalPages
-        ) {
+        if (result?.pagination?.page < result?.pagination?.totalPages) {
           currentPage++
         } else {
           hasMorePages = false
