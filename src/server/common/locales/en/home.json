@@ -5,6 +5,14 @@
   "labels": {
     "project": "Enter a project number or name"
   },
+  "new_proposal_guidance": {
+    "link_text": "Check the guidance on submitting a proposal before you enter any data into PAFS (opens in new window or tab).",
+    "link_url": "https://www.google.com/"
+  },
+  "pso_ea_block": {
+    "info_text_1": "To create a new EA-Led proposal please <a class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://aimspd.sharepoint.com/sites/pwa\">go to AMIS\/:PD</a>",
+    "info_text_2": "RMA-led projects are to be created by RAM, by logging into PAFS."
+  },
   "buttons": {
     "new_proposal": "Create a new proposal"
   }

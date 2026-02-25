@@ -7,6 +7,7 @@ import {
   buildListingViewModel,
   buildEmptyListingViewModel
 } from '../../admin/common/listing-helpers.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 
 // Mock dependencies
 vi.mock('../../../common/services/project/project-service.js', () => ({
@@ -27,6 +28,10 @@ vi.mock('../../admin/common/listing-helpers.js', () => ({
   buildEmptyListingViewModel: vi.fn()
 }))
 
+vi.mock('../../../common/helpers/auth/session-manager.js', () => ({
+  getAuthSession: vi.fn()
+}))
+
 describe('projectsListingController', () => {
   let mockRequest
   let mockH
@@ -38,9 +43,11 @@ describe('projectsListingController', () => {
     vi.clearAllMocks()
 
     mockSession = {
-      user: { id: 1, name: 'Test User' },
+      user: { id: 1, name: 'Test User', admin: false, isRma: false },
       accessToken: 'test-token-123'
     }
+
+    getAuthSession.mockReturnValue(mockSession)
 
     mockLogger = {
       info: vi.fn(),
@@ -806,10 +813,403 @@ describe('projectsListingController', () => {
         })
       )
     })
+
+    test('Should pass user proposals context when route is /', async () => {
+      mockRequest.route.path = '/'
+
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(getProjects).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: null
+        })
+      )
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pageTitle: 'home.title',
+          additionalData: expect.objectContaining({
+            pageHeading: 'home.heading',
+            isUserProjectListing: true,
+            isAdminProjectListing: false,
+            isSubmission: false,
+            isArchive: false
+          })
+        })
+      )
+    })
+
+    test('Should pass archive context and status when route is /archive', async () => {
+      mockRequest.route.path = '/archive'
+
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(getProjects).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'archived'
+        })
+      )
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pageTitle: 'projects.archived_proposals.title',
+          additionalData: expect.objectContaining({
+            pageHeading: 'projects.archived_proposals.heading',
+            isArchive: true,
+            isAdminProjectListing: false,
+            isUserProjectListing: false,
+            isSubmission: false
+          })
+        })
+      )
+    })
+
+    test('Should render error view with submissions context when fetch fails', async () => {
+      mockRequest.route.path = '/admin/submissions'
+
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: false,
+        errors: [{ errorCode: 'FETCH_FAILED' }]
+      })
+
+      buildEmptyListingViewModel.mockReturnValue({
+        error: 'projects.manage_projects.errors.fetch_failed'
+      })
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildEmptyListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pageTitle: 'projects.failed_submissions.title',
+          baseUrl: '/admin/submissions',
+          additionalData: expect.objectContaining({
+            pageHeading: 'projects.failed_submissions.heading',
+            isSubmission: true,
+            isAdminProjectListing: false
+          })
+        })
+      )
+    })
+
+    test('Should render error view with archive context on exception', async () => {
+      mockRequest.route.path = '/archive'
+
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockRejectedValue(new Error('Network error'))
+
+      buildEmptyListingViewModel.mockReturnValue({
+        error: 'projects.manage_projects.errors.fetch_failed'
+      })
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildEmptyListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pageTitle: 'projects.archived_proposals.title',
+          baseUrl: '/archive',
+          additionalData: expect.objectContaining({
+            isArchive: true,
+            isAdminProjectListing: false
+          })
+        })
+      )
+    })
+
+    test('Should handle getProjects throwing an exception', async () => {
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      const mockAreas = { RMA: [{ id: 1, name: 'EA' }] }
+      mockRequest.getAreas.mockResolvedValue(mockAreas)
+
+      const error = new Error('API timeout')
+      getProjects.mockRejectedValue(error)
+
+      buildEmptyListingViewModel.mockReturnValue({
+        error: 'projects.manage_projects.errors.fetch_failed'
+      })
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.objectContaining({ error }),
+        'Error loading projects page'
+      )
+      expect(buildEmptyListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            areas: expect.arrayContaining([
+              expect.objectContaining({ value: 1, text: 'EA' })
+            ])
+          })
+        })
+      )
+    })
+
+    test('Should forward notifications to error view when fetch fails', async () => {
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: 'Project created',
+        errorNotification: 'Something went wrong',
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: false,
+        errors: [{ errorCode: 'FETCH_FAILED' }]
+      })
+
+      buildEmptyListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildEmptyListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          successNotification: 'Project created',
+          errorNotification: 'Something went wrong'
+        })
+      )
+    })
+
+    test('Should pass filters to error view when fetch fails', async () => {
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: 'flood', areaId: '5' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: false,
+        errors: [{ errorCode: 'FETCH_FAILED' }]
+      })
+
+      buildEmptyListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildEmptyListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filters: { search: 'flood', areaId: '5' }
+        })
+      )
+    })
+
+    test('Should handle null session gracefully', async () => {
+      getAuthSession.mockReturnValue(null)
+
+      buildListingRequestContext.mockReturnValue({
+        session: null,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(getProjects).toHaveBeenCalledWith(
+        expect.objectContaining({
+          accessToken: undefined
+        })
+      )
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            isAdmin: false,
+            canCreateProjects: false
+          })
+        })
+      )
+    })
+
+    test('Should pass isAdmin true for admin user through handler', async () => {
+      getAuthSession.mockReturnValue({
+        user: { admin: true, isRma: false },
+        accessToken: 'admin-token'
+      })
+
+      buildListingRequestContext.mockReturnValue({
+        session: { user: { admin: true }, accessToken: 'admin-token' },
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            isAdmin: true,
+            canCreateProjects: false
+          })
+        })
+      )
+    })
+
+    test('Should pass canCreateProjects true for RMA user through handler', async () => {
+      getAuthSession.mockReturnValue({
+        user: { admin: false, isRma: true },
+        accessToken: 'rma-token'
+      })
+
+      buildListingRequestContext.mockReturnValue({
+        session: { user: { isRma: true }, accessToken: 'rma-token' },
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            isAdmin: false,
+            canCreateProjects: true
+          })
+        })
+      )
+    })
+
+    test('Should pass baseUrl and session to view model builders', async () => {
+      mockRequest.route.path = '/admin/submissions'
+
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          session: mockSession,
+          baseUrl: '/admin/submissions'
+        })
+      )
+    })
   })
 })
 
 describe('getListingContext', () => {
+  beforeEach(() => {
+    getAuthSession.mockReturnValue(null)
+  })
+
   test('Should return admin project listing context for /admin/projects', () => {
     const request = { route: { path: '/admin/projects' } }
     const context = getListingContext(request)
@@ -823,7 +1223,9 @@ describe('getListingContext', () => {
       isAdminProjectListing: true,
       isUserProjectListing: false,
       isSubmission: false,
-      isArchive: false
+      isArchive: false,
+      isAdmin: false,
+      canCreateProjects: false
     })
   })
 
@@ -840,7 +1242,9 @@ describe('getListingContext', () => {
       isAdminProjectListing: false,
       isUserProjectListing: false,
       isSubmission: true,
-      isArchive: false
+      isArchive: false,
+      isAdmin: false,
+      canCreateProjects: false
     })
   })
 
@@ -857,7 +1261,9 @@ describe('getListingContext', () => {
       isAdminProjectListing: false,
       isUserProjectListing: true,
       isSubmission: false,
-      isArchive: false
+      isArchive: false,
+      isAdmin: false,
+      canCreateProjects: false
     })
   })
 
@@ -874,7 +1280,9 @@ describe('getListingContext', () => {
       isAdminProjectListing: false,
       isUserProjectListing: false,
       isSubmission: false,
-      isArchive: true
+      isArchive: true,
+      isAdmin: false,
+      canCreateProjects: false
     })
   })
 
@@ -891,7 +1299,46 @@ describe('getListingContext', () => {
       isAdminProjectListing: false,
       isUserProjectListing: false,
       isSubmission: false,
-      isArchive: false
+      isArchive: false,
+      isAdmin: false,
+      canCreateProjects: false
+    })
+  })
+
+  test('Should return isAdmin true when user is admin', () => {
+    getAuthSession.mockReturnValue({
+      user: { admin: true, isRma: false }
+    })
+    const request = { route: { path: '/admin/projects' } }
+    const context = getListingContext(request)
+
+    expect(context).toMatchObject({
+      isAdmin: true,
+      canCreateProjects: false
+    })
+  })
+
+  test('Should return canCreateProjects true when user is RMA', () => {
+    getAuthSession.mockReturnValue({
+      user: { admin: false, isRma: true }
+    })
+    const request = { route: { path: '/' } }
+    const context = getListingContext(request)
+
+    expect(context).toMatchObject({
+      isAdmin: false,
+      canCreateProjects: true
+    })
+  })
+
+  test('Should return user proposals context for /proposals', () => {
+    const request = { route: { path: '/' } }
+    const context = getListingContext(request)
+
+    expect(context).toMatchObject({
+      isUserProjectListing: true,
+      titleKey: 'home.title',
+      headingKey: 'home.heading'
     })
   })
 })

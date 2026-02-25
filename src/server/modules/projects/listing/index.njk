@@ -16,7 +16,12 @@
     <div class="govuk-grid-column-two-thirds">
 
       {% if isUserProjectListing %}
-        <div class="govuk-inset-text govuk-!-margin-top-0">{{t('home.inset_text')}}</div>
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            <a href="{{ t('home.new_proposal_guidance.link_url') }}" class="govuk-link govuk-!-margin-bottom-3" target="_blank" rel="noopener noreferrer" data-testid="new-proposal-guidance">{{ t('home.new_proposal_guidance.link_text') }}</a>
+            <div class="govuk-inset-text govuk-!-margin-top-4">{{t('home.inset_text')}}</div>
+          </div>
+        </div>
       {% endif %}
 
       {% if isSubmission %}
@@ -56,9 +61,9 @@
 
           <div class="govuk-button-group">
             {{ govukButton({
-            text: t('projects.manage_projects.filters.filter_button'),
-            type: "submit"
-          }) }}
+              text: t('projects.manage_projects.filters.filter_button'),
+              type: "submit"
+            }) }}
             <a href="{{ baseUrl }}" class="govuk-link" data-testid="clear-filters">
               {{ t('projects.manage_projects.filters.clear_filters') }}
             </a>
@@ -76,6 +81,15 @@
           </div>
         </div>
       {% endif %}
+
+      {% if isUserProjectListing and isNotRMA %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            <p class="govuk-body">{{ t('home.pso_ea_block.info_text_1') | safe }}</p>
+            <p class="govuk-body">{{ t('home.pso_ea_block.info_text_2') }}</p>
+          </div>
+        </div>
+      {% endif %}
     </div>
   </div>
 
@@ -87,19 +101,19 @@
       {% if error %}
         <p class="govuk-body govuk-error-message" data-testid="projects-error">{{ error }}</p>
       {% elif projects | length > 0 %}
-        <table class="govuk-table app-table--responsive app-users-table" data-testid="projects-table">
+        <table class="govuk-table app-table--responsive app-users-table app-projects-table{% if isAdminProjectListing %} app-projects-table--admin{% elif isSubmission %} app-projects-table--submissions{% elif isUserProjectListing %} app-projects-table--user{% elif isArchive %} app-projects-table--archive{% endif %}" data-testid="projects-table">
           <caption class="govuk-visually-hidden">{{ t('projects.manage_projects.table.caption') }}</caption>
           <thead class="govuk-table__head">
             <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header{% if isAdminProjectListing %} govuk-!-width-one-quarter{% endif %}">{{ t('projects.manage_projects.table.project_number') }}</th>
-              <th scope="col" class="govuk-table__header{% if isAdminProjectListing or isUserProjectListing %} govuk-!-width-one-quarter{% endif %}">{{ t('projects.manage_projects.table.project_name') }}</th>
-              <th scope="col" class="govuk-table__header{% if isAdminProjectListing or isUserProjectListing %} govuk-!-width-one-quarter{% endif %}">{{ t('projects.manage_projects.table.last_updated') }}</th>
-              <th scope="col" class="govuk-table__header{% if isAdminProjectListing or isUserProjectListing or isArchive %} govuk-!-width-one-quarter{% endif %}">{{ t('projects.manage_projects.table.assigned_rma') }}</th>
+              <th scope="col" class="govuk-table__header app-projects-table__col--number">{{ t('projects.manage_projects.table.project_number') }}</th>
+              <th scope="col" class="govuk-table__header app-projects-table__col--name">{{ t('projects.manage_projects.table.project_name') }}</th>
+              <th scope="col" class="govuk-table__header app-projects-table__col--updated">{{ t('projects.manage_projects.table.last_updated') }}</th>
+              <th scope="col" class="govuk-table__header app-projects-table__col--rma">{{ t('projects.manage_projects.table.assigned_rma') }}</th>
               {% if not isArchive and not isSubmission %}
-                <th scope="col" class="govuk-table__header{% if isAdminProjectListing %} govuk-!-width-one-quarter{% endif %}">{{ t('projects.manage_projects.table.status.label') }}</th>
+                <th scope="col" class="govuk-table__header app-projects-table__col--status">{{ t('projects.manage_projects.table.status.label') }}</th>
               {% endif %}
               {% if isAdminProjectListing or isSubmission %}
-                <th scope="col" class="govuk-table__header{% if isAdminProjectListing %} govuk-!-width-one-quarter{% endif %}">
+                <th scope="col" class="govuk-table__header app-projects-table__col--actions">
                   <span class="govuk-visually-hidden">{{ t('projects.manage_projects.table.action') }}</span>
                 </th>
               {% endif %}
@@ -133,10 +147,10 @@
                     </a>
                   </td>
                 {% elif isSubmission %}
-                  <td class="govuk-table__cell" data-label="">
+                  <td class="govuk-table__cell govuk-!-white-space-nowrap" data-label="">
                     <a href="#" class="govuk-link" data-testid="resend-to-pol">{{ t('projects.failed_submissions.actions.resend_to_pol') }}</a>
-                  &nbsp;|&nbsp;
-                  <a href="#" class="govuk-link" data-testid="sent-to-pol">{{ t('projects.failed_submissions.actions.sent_to_pol') }}</a>
+                    &nbsp;|&nbsp;
+                    <a href="#" class="govuk-link" data-testid="sent-to-pol">{{ t('projects.failed_submissions.actions.sent_to_pol') }}</a>
                   </td>
                 {% endif %}
               </tr>
@@ -180,6 +194,15 @@
     </div>
   </div>
 
+  {# Archive footer - Back to proposals #}
+  {% if isArchive %}
+    <div class="govuk-grid-row govuk-!-margin-top-9">
+      <div class="govuk-grid-column-two-thirds">
+        <a href="/" class="govuk-link" data-testid="back-to-proposals">{{ t('common.back_to_proposals') }}</a>
+      </div>
+    </div>
+  {% endif %}
+
   {# Failed submissions footer - help section #}
   {% if isSubmission %}
     <div class="govuk-grid-row govuk-!-margin-top-9">
@@ -208,9 +231,9 @@
         {% endset %}
 
         {{ govukDetails({
-        summaryText: t('projects.failed_submissions.footer.label'),
-        html: detailsHtml
-      }) }}
+          summaryText: t('projects.failed_submissions.footer.label'),
+          html: detailsHtml
+        }) }}
       </div>
     </div>
   {% endif %}

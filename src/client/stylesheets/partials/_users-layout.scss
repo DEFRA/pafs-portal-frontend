@@ -95,6 +95,106 @@
   font-size: 1rem;
 }
 
+// ──────────────────────────────────────────────────
+// Projects table – per-screen column widths
+// ──────────────────────────────────────────────────
+.app-projects-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+// Admin listing – 6 columns
+.app-projects-table--admin {
+  .app-projects-table__col--number {
+    width: 19%;
+  }
+
+  .app-projects-table__col--name {
+    width: 25%;
+  }
+
+  .app-projects-table__col--updated {
+    width: 14%;
+  }
+
+  .app-projects-table__col--rma {
+    width: 20%;
+  }
+
+  .app-projects-table__col--status {
+    width: 13%;
+  }
+
+  .app-projects-table__col--actions {
+    width: 9%;
+  }
+}
+
+// Submissions – 5 columns (no status)
+.app-projects-table--submissions {
+  .app-projects-table__col--number {
+    width: 19%;
+  }
+
+  .app-projects-table__col--name {
+    width: 25%;
+  }
+
+  .app-projects-table__col--updated {
+    width: 14%;
+  }
+
+  .app-projects-table__col--rma {
+    width: 17%;
+  }
+
+  .app-projects-table__col--actions {
+    width: 25%;
+  }
+}
+
+// User listing – 5 columns (no actions)
+.app-projects-table--user {
+  .app-projects-table__col--number {
+    width: 19%;
+  }
+
+  .app-projects-table__col--name {
+    width: 27%;
+  }
+
+  .app-projects-table__col--updated {
+    width: 15%;
+  }
+
+  .app-projects-table__col--rma {
+    width: 29%;
+  }
+
+  .app-projects-table__col--status {
+    width: 10%;
+  }
+}
+
+// Archive – 4 columns (no status, no actions)
+.app-projects-table--archive {
+  .app-projects-table__col--number {
+    width: 20%;
+  }
+
+  .app-projects-table__col--name {
+    width: 30%;
+  }
+
+  .app-projects-table__col--updated {
+    width: 20%;
+  }
+
+  .app-projects-table__col--rma {
+    width: 30%;
+  }
+}
+
 // Users actions (add/download links) - flex row
 .app-users-actions {
   display: flex;

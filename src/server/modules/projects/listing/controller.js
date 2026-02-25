@@ -80,7 +80,8 @@ function getListingContext(request) {
     isSubmission,
     isArchive,
     isAdmin: user?.admin || false,
-    canCreateProjects: user?.isRma || false
+    canCreateProjects: user?.isRma || false,
+    isNotRMA: user?.admin || user?.isPso || user?.isEa || false
   }
 }
 
@@ -250,7 +251,8 @@ export const projectsListingController = {
       isSubmission,
       isArchive,
       isAdmin,
-      canCreateProjects
+      canCreateProjects,
+      isNotRMA
     } = getListingContext(request)
 
     const pageTitle = request.t(titleKey)
@@ -262,7 +264,8 @@ export const projectsListingController = {
       isSubmission,
       isArchive,
       isAdmin,
-      canCreateProjects
+      canCreateProjects,
+      isNotRMA
     }
 
     const sharedParams = {
