@@ -1,4 +1,4 @@
-import { projectsListingController } from './listing/controller.js'
+import { projectsListingController } from '../../projects/listing/controller.js'
 import { requireAdmin } from '../../../common/helpers/auth/auth-middleware.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 
@@ -10,6 +10,14 @@ export const projects = {
         {
           method: 'GET',
           path: ROUTES.ADMIN.PROJECTS,
+          options: {
+            pre: [{ method: requireAdmin }]
+          },
+          ...projectsListingController
+        },
+        {
+          method: 'GET',
+          path: ROUTES.ADMIN.SUBMISSIONS,
           options: {
             pre: [{ method: requireAdmin }]
           },

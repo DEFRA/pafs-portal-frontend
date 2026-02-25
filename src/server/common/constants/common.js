@@ -18,7 +18,7 @@ export const ADMIN_VIEWS = {
   ORGANISATIONS: 'modules/admin/organisations/listing/index',
   ORGANISATION_TYPE: 'modules/admin/organisations/type/index',
   ORGANISATION_MANAGE: 'modules/admin/organisations/manage/index',
-  PROJECTS: 'modules/admin/projects/listing/index'
+  PROJECTS: 'modules/projects/listing/index'
 }
 
 export const ACCOUNT_VIEWS = {
@@ -46,27 +46,6 @@ export const PROJECT_VIEWS = {
   RISK_AND_PROPERTIES: 'modules/projects/risk-and-properties/index',
   GOALS_URGENCY_CONFIDENCE: 'modules/projects/goals-urgency-confidence/index',
   ENVIRONMENTAL_BENEFITS: 'modules/projects/environmental-benefits/index'
-}
-
-export const PROPOSAL_VIEWS = {
-  START: 'modules/project-proposal/start-proposal/index',
-  PROJECT_NAME: 'modules/project-proposal/proposal-details/project-name/index',
-  RMA_SELECTION:
-    'modules/project-proposal/proposal-details/rma-selection/index',
-  PROJECT_TYPE: 'modules/project-proposal/proposal-details/project-type/index',
-  INTERVENTION_TYPE:
-    'modules/project-proposal/proposal-details/intervention-type/index',
-  PRIMARY_INTERVENTION_TYPE:
-    'modules/project-proposal/proposal-details/primary-intervention-type/index',
-  PROPOSAL_OVERVIEW: 'modules/project-proposal/proposal-overview/index',
-  FIRST_FINANCIAL_YEAR:
-    'modules/project-proposal/proposal-details/first-financial-year/index',
-  FIRST_FINANCIAL_YEAR_MANUAL:
-    'modules/project-proposal/proposal-details/first-financial-year/manual',
-  LAST_FINANCIAL_YEAR:
-    'modules/project-proposal/proposal-details/last-financial-year/index',
-  LAST_FINANCIAL_YEAR_MANUAL:
-    'modules/project-proposal/proposal-details/last-financial-year/manual'
 }
 
 export const GENERAL_VIEWS = {

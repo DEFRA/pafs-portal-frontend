@@ -239,7 +239,7 @@ describe('permissions helper - comprehensive', () => {
 
   describe('canViewProposal', () => {
     test('should allow admin to view', () => {
-      getAuthSession.mockReturnValue({ user: { id: '1', isAdmin: true } })
+      getAuthSession.mockReturnValue({ user: { id: '1', admin: true } })
       const result = canViewProposal(mockRequest, { areaId: '5' })
       expect(result).toBe(true)
     })
@@ -377,7 +377,7 @@ describe('permissions helper - comprehensive', () => {
     })
 
     test('should deny when proposal null', () => {
-      getAuthSession.mockReturnValue({ user: { id: '1', isAdmin: true } })
+      getAuthSession.mockReturnValue({ user: { id: '1', admin: true } })
       const result = canViewProposal(mockRequest, null)
       expect(result).toBe(false)
     })
@@ -393,7 +393,7 @@ describe('permissions helper - comprehensive', () => {
 
   describe('canEditProposal', () => {
     test('should deny non-DRAFT', () => {
-      getAuthSession.mockReturnValue({ user: { id: '1', isAdmin: true } })
+      getAuthSession.mockReturnValue({ user: { id: '1', admin: true } })
       const result = canEditProposal(mockRequest, {
         [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.SUBMITTED
       })
@@ -401,7 +401,7 @@ describe('permissions helper - comprehensive', () => {
     })
 
     test('should allow admin for DRAFT', () => {
-      getAuthSession.mockReturnValue({ user: { id: '1', isAdmin: true } })
+      getAuthSession.mockReturnValue({ user: { id: '1', admin: true } })
       const result = canEditProposal(mockRequest, {
         [PROJECT_PAYLOAD_FIELDS.AREA_ID]: '5',
         [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.DRAFT
@@ -537,7 +537,7 @@ describe('permissions helper - comprehensive', () => {
     })
 
     test('should deny when proposal null', () => {
-      getAuthSession.mockReturnValue({ user: { id: '1', isAdmin: true } })
+      getAuthSession.mockReturnValue({ user: { id: '1', admin: true } })
       const result = canEditProposal(mockRequest, null)
       expect(result).toBe(false)
     })
@@ -556,7 +556,7 @@ describe('permissions helper - comprehensive', () => {
 
   describe('requireViewPermission', () => {
     test('should continue when has permission', async () => {
-      getAuthSession.mockReturnValue({ user: { id: '1', isAdmin: true } })
+      getAuthSession.mockReturnValue({ user: { id: '1', admin: true } })
       mockRequest.pre = { projectData: { id: '1', areaId: '5' } }
       const result = await requireViewPermission(mockRequest, mockH)
       expect(result).toBe(mockH.continue)
@@ -617,7 +617,7 @@ describe('permissions helper - comprehensive', () => {
 
   describe('requireEditPermission', () => {
     test('should continue when has permission', async () => {
-      getAuthSession.mockReturnValue({ user: { id: '1', isAdmin: true } })
+      getAuthSession.mockReturnValue({ user: { id: '1', admin: true } })
       mockRequest.pre = {
         projectData: {
           id: '1',

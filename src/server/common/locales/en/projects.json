@@ -934,5 +934,31 @@
     "footer": {
       "html_text": "Find out more about <a class=\"govuk-link\" target=\"_blank\" href=\"https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1026844/Partnership_funding_supporting_guidance_for_OM4.pdf\">partnership funding eligibility for environmental benefits (opens in new window or tab)</a>."
     }
+  },
+  "failed_submissions": {
+    "title": "Failed PoL Submissions",
+    "heading": "Failed PoL Submissions",
+    "description": "The following submissions have not been flagged as received by PoL",
+    "actions": {
+      "resend_to_pol": "Resend to PoL",
+      "sent_to_pol": "Sent to PoL"
+    },
+    "footer": {
+      "label": "How to manage failed submissions",
+      "check_pol": "Check if the proposal has arrived in PoL",
+      "if_yes": "If YES, click on the 'Sent to PoL' link.",
+      "if_yes_result": "The proposal will disappear from the list, end of process.",
+      "if_no": "If NO, click on the 'Resend to PoL' link",
+      "if_no_success": "If displays successfully resubmitted, end of process.",
+      "if_no_failed": "If displays failed to resubmit, the resend was unsuccessful",
+      "contact_helpdesk": "For unsuccessful resends, please contact the Program Framework helpdesk",
+      "helpdesk_email": "helpdesk@programframework.com",
+      "copy_team": "Also copy into the email the Asset Management Business Systems Team",
+      "team_email": "AssetManagementTeam@environment-agency.gov.uk"
+    }
+  },
+  "archived_proposals": {
+    "title": "Archived Proposals",
+    "heading": "Archived Proposals"
   }
 }

@@ -1,27 +1,27 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
-import { projectsListingController } from './controller.js'
-import { getProjects } from '../../../../common/services/project/project-service.js'
-import { createProjectsCacheService } from '../../../../common/services/project/project-cache.js'
+import { projectsListingController, getListingContext } from './controller.js'
+import { getProjects } from '../../../common/services/project/project-service.js'
+import { createProjectsCacheService } from '../../../common/services/project/project-cache.js'
 import {
   buildListingRequestContext,
   buildListingViewModel,
   buildEmptyListingViewModel
-} from '../../common/listing-helpers.js'
+} from '../../admin/common/listing-helpers.js'
 
 // Mock dependencies
-vi.mock('../../../../common/services/project/project-service.js', () => ({
+vi.mock('../../../common/services/project/project-service.js', () => ({
   getProjects: vi.fn()
 }))
 
-vi.mock('../../../../common/services/project/project-cache.js', () => ({
+vi.mock('../../../common/services/project/project-cache.js', () => ({
   createProjectsCacheService: vi.fn()
 }))
 
-vi.mock('../../../../common/helpers/pagination/index.js', () => ({
+vi.mock('../../../common/helpers/pagination/index.js', () => ({
   getDefaultPageSize: vi.fn(() => 10)
 }))
 
-vi.mock('../../common/listing-helpers.js', () => ({
+vi.mock('../../admin/common/listing-helpers.js', () => ({
   buildListingRequestContext: vi.fn(),
   buildListingViewModel: vi.fn(),
   buildEmptyListingViewModel: vi.fn()
@@ -60,6 +60,9 @@ describe('projectsListingController', () => {
         page: 1,
         search: '',
         areaId: ''
+      },
+      route: {
+        path: '/admin/projects'
       },
       server: {
         logger: mockLogger
@@ -149,6 +152,7 @@ describe('projectsListingController', () => {
       expect(getProjects).toHaveBeenCalledWith({
         search: '',
         areaId: '',
+        status: null,
         page: 1,
         pageSize: 10,
         accessToken: mockSession.accessToken,
@@ -156,7 +160,7 @@ describe('projectsListingController', () => {
       })
       expect(buildListingViewModel).toHaveBeenCalled()
       expect(mockH.view).toHaveBeenCalledWith(
-        'modules/admin/projects/listing/index',
+        'modules/projects/listing/index',
         expect.any(Object)
       )
     })
@@ -276,7 +280,7 @@ describe('projectsListingController', () => {
         'Failed to fetch projects'
       )
       expect(mockH.view).toHaveBeenCalledWith(
-        'modules/admin/projects/listing/index',
+        'modules/projects/listing/index',
         expect.objectContaining({
           error: 'projects.manage_projects.errors.fetch_failed'
         })
@@ -350,7 +354,11 @@ describe('projectsListingController', () => {
                 value: 2,
                 text: 'Natural England'
               })
-            ])
+            ]),
+            isAdminProjectListing: true,
+            isUserProjectListing: false,
+            isSubmission: false,
+            isArchive: false
           })
         })
       )
@@ -389,7 +397,11 @@ describe('projectsListingController', () => {
                 value: '',
                 text: 'projects.manage_projects.filters.all_areas'
               })
-            ])
+            ]),
+            isAdminProjectListing: true,
+            isUserProjectListing: false,
+            isSubmission: false,
+            isArchive: false
           })
         })
       )
@@ -424,7 +436,11 @@ describe('projectsListingController', () => {
                 value: '',
                 text: 'projects.manage_projects.filters.all_areas'
               })
-            ]
+            ],
+            isAdminProjectListing: true,
+            isUserProjectListing: false,
+            isSubmission: false,
+            isArchive: false
           })
         })
       )
@@ -461,7 +477,11 @@ describe('projectsListingController', () => {
                 value: '',
                 text: 'projects.manage_projects.filters.all_areas'
               })
-            ]
+            ],
+            isAdminProjectListing: true,
+            isUserProjectListing: false,
+            isSubmission: false,
+            isArchive: false
           })
         })
       )
@@ -577,6 +597,77 @@ describe('projectsListingController', () => {
       )
     })
 
+    test('Should pass dynamic pageTitle and pageHeading for admin projects', async () => {
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pageTitle: 'projects.manage_projects.title',
+          additionalData: expect.objectContaining({
+            pageHeading: 'projects.manage_projects.heading'
+          })
+        })
+      )
+    })
+
+    test('Should pass dynamic pageTitle and pageHeading for submissions route', async () => {
+      mockRequest.route.path = '/admin/submissions'
+
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(getProjects).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'submitted'
+        })
+      )
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pageTitle: 'projects.failed_submissions.title',
+          additionalData: expect.objectContaining({
+            pageHeading: 'projects.failed_submissions.heading',
+            isSubmission: true,
+            isAdminProjectListing: false
+          })
+        })
+      )
+    })
+
     test('Should handle empty projects result', async () => {
       buildListingRequestContext.mockReturnValue({
         session: mockSession,
@@ -640,7 +731,11 @@ describe('projectsListingController', () => {
         expect.objectContaining({
           additionalData: expect.objectContaining({
             projects: [],
-            areas: expect.any(Array)
+            areas: expect.any(Array),
+            isAdminProjectListing: true,
+            isUserProjectListing: false,
+            isSubmission: false,
+            isArchive: false
           }),
           pagination: {}
         })
@@ -674,7 +769,8 @@ describe('projectsListingController', () => {
       expect(buildListingViewModel).toHaveBeenCalledWith(
         expect.objectContaining({
           additionalData: expect.objectContaining({
-            projects: []
+            projects: [],
+            isAdminProjectListing: true
           })
         })
       )
@@ -709,6 +805,93 @@ describe('projectsListingController', () => {
           pagination: {}
         })
       )
+    })
+  })
+})
+
+describe('getListingContext', () => {
+  test('Should return admin project listing context for /admin/projects', () => {
+    const request = { route: { path: '/admin/projects' } }
+    const context = getListingContext(request)
+
+    expect(context).toEqual({
+      viewTemplate: 'modules/projects/listing/index',
+      baseUrl: '/admin/projects',
+      titleKey: 'projects.manage_projects.title',
+      headingKey: 'projects.manage_projects.heading',
+      status: null,
+      isAdminProjectListing: true,
+      isUserProjectListing: false,
+      isSubmission: false,
+      isArchive: false
+    })
+  })
+
+  test('Should return submission context for /admin/submissions', () => {
+    const request = { route: { path: '/admin/submissions' } }
+    const context = getListingContext(request)
+
+    expect(context).toEqual({
+      viewTemplate: 'modules/projects/listing/index',
+      baseUrl: '/admin/submissions',
+      titleKey: 'projects.failed_submissions.title',
+      headingKey: 'projects.failed_submissions.heading',
+      status: 'submitted',
+      isAdminProjectListing: false,
+      isUserProjectListing: false,
+      isSubmission: true,
+      isArchive: false
+    })
+  })
+
+  test('Should return user project listing context for /', () => {
+    const request = { route: { path: '/' } }
+    const context = getListingContext(request)
+
+    expect(context).toEqual({
+      viewTemplate: 'modules/projects/listing/index',
+      baseUrl: '/',
+      titleKey: 'home.title',
+      headingKey: 'home.heading',
+      status: null,
+      isAdminProjectListing: false,
+      isUserProjectListing: true,
+      isSubmission: false,
+      isArchive: false
+    })
+  })
+
+  test('Should return archive context for /archive', () => {
+    const request = { route: { path: '/archive' } }
+    const context = getListingContext(request)
+
+    expect(context).toEqual({
+      viewTemplate: 'modules/projects/listing/index',
+      baseUrl: '/archive',
+      titleKey: 'projects.archived_proposals.title',
+      headingKey: 'projects.archived_proposals.heading',
+      status: 'archived',
+      isAdminProjectListing: false,
+      isUserProjectListing: false,
+      isSubmission: false,
+      isArchive: true
+    })
+  })
+
+  test('Should default to admin project keys for unknown route', () => {
+    const request = { route: { path: '/unknown' } }
+    const context = getListingContext(request)
+
+    expect(context).toEqual({
+      viewTemplate: 'modules/projects/listing/index',
+      baseUrl: '/unknown',
+      titleKey: 'projects.manage_projects.title',
+      headingKey: 'projects.manage_projects.heading',
+      status: null,
+      isAdminProjectListing: false,
+      isUserProjectListing: false,
+      isSubmission: false,
+      isArchive: false
     })
   })
 })

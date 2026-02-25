@@ -354,7 +354,7 @@ export function canViewProposal(request, proposal) {
   }
 
   // Admin can view any proposal
-  if (user.isAdmin) {
+  if (user.admin) {
     return true
   }
 
@@ -416,7 +416,7 @@ export function canEditProposal(request, proposal) {
   }
 
   // Admin can edit any DRAFT proposal
-  if (user.isAdmin) {
+  if (user.admin) {
     return true
   }
 
