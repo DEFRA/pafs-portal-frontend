@@ -60,7 +60,7 @@ class ProjectsManageController {
 
   async get(request, h) {
     const referenceNumberFromUrl = request.params?.referenceNumber
-    const referenceNumber = referenceNumberFromUrl?.replace(/-/g, '/')
+    const referenceNumber = referenceNumberFromUrl?.replaceAll('-', '/')
     const authSession = getAuthSession(request)
     const accessToken = authSession?.accessToken
 
@@ -161,7 +161,7 @@ class ProjectsManageController {
     return {
       level: 'PROJECT_AREA',
       payload: {
-        referenceNumber: referenceNumber?.replace(/-/g, '/'),
+        referenceNumber: referenceNumber?.replaceAll('-', '/'),
         areaId: Number(areaId)
       }
     }
