@@ -1225,7 +1225,8 @@ describe('getListingContext', () => {
       isSubmission: false,
       isArchive: false,
       isAdmin: false,
-      canCreateProjects: false
+      canCreateProjects: false,
+      isNotRMA: false
     })
   })
 
@@ -1244,7 +1245,8 @@ describe('getListingContext', () => {
       isSubmission: true,
       isArchive: false,
       isAdmin: false,
-      canCreateProjects: false
+      canCreateProjects: false,
+      isNotRMA: false
     })
   })
 
@@ -1263,7 +1265,8 @@ describe('getListingContext', () => {
       isSubmission: false,
       isArchive: false,
       isAdmin: false,
-      canCreateProjects: false
+      canCreateProjects: false,
+      isNotRMA: false
     })
   })
 
@@ -1282,7 +1285,8 @@ describe('getListingContext', () => {
       isSubmission: false,
       isArchive: true,
       isAdmin: false,
-      canCreateProjects: false
+      canCreateProjects: false,
+      isNotRMA: false
     })
   })
 
@@ -1301,7 +1305,8 @@ describe('getListingContext', () => {
       isSubmission: false,
       isArchive: false,
       isAdmin: false,
-      canCreateProjects: false
+      canCreateProjects: false,
+      isNotRMA: false
     })
   })
 
@@ -1314,7 +1319,8 @@ describe('getListingContext', () => {
 
     expect(context).toMatchObject({
       isAdmin: true,
-      canCreateProjects: false
+      canCreateProjects: false,
+      isNotRMA: true
     })
   })
 
@@ -1327,7 +1333,8 @@ describe('getListingContext', () => {
 
     expect(context).toMatchObject({
       isAdmin: false,
-      canCreateProjects: true
+      canCreateProjects: true,
+      isNotRMA: false
     })
   })
 

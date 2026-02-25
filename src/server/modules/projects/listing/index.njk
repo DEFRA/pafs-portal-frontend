@@ -15,6 +15,38 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
+      {# Success notification banner #}
+      {% if successNotification %}
+        {% set notificationHtml %}
+        <h3 class="govuk-notification-banner__heading">
+          {{ successNotification.title or t('projects.manage_projects.notifications.project_updated') }}
+        </h3>
+        <p class="govuk-body">{{ successNotification.message }}</p>
+        {% endset %}
+
+        {{ govukNotificationBanner({
+          html: notificationHtml,
+          type: "success"
+        }) }}
+      {% endif %}
+
+      {# Error notification banner #}
+      {% if errorNotification %}
+        {% set errorHtml %}
+        {% if errorNotification.title %}
+          <h3 class="govuk-notification-banner__heading">
+            {{ errorNotification.title }}
+          </h3>
+        {% endif %}
+        <p class="govuk-body">{{ errorNotification.message }}</p>
+        {% endset %}
+
+        {{ govukNotificationBanner({
+          html: errorHtml,
+          titleText: t('common.important')
+        }) }}
+      {% endif %}
+
       {% if isUserProjectListing %}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">

@@ -1,0 +1,65 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% if errorSummary %}
+        {{ govukErrorSummary({
+          titleText: t('common.error_summary_title'),
+          errorList: errorSummary
+        }) }}
+      {% endif %}
+
+      <h1 class="govuk-heading-xl">
+        {{ heading }}
+      </h1>
+
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third">
+          <h2 class="govuk-heading-m">{{ t('projects.manage_projects.edit_rma.name') }}</h2>
+          <p class="govuk-body">{{ data.projectName }}</p>
+        </div>
+        <div class="govuk-grid-column-one-third">
+          <h2 class="govuk-heading-m">{{ t('projects.manage_projects.edit_rma.project_number') }}</h2>
+          <p class="govuk-body">{{ data.referenceNumber }}</p>
+        </div>
+        <div class="govuk-grid-column-one-third">
+          <h2 class="govuk-heading-m">{{ t('projects.manage_projects.edit_rma.current_rma') }}</h2>
+          <p class="govuk-body">{{ data.rmaName }}</p>
+        </div>
+      </div>
+
+      <form method="post" novalidate>
+        <div class="govuk-form-group{% if fieldErrors.areaId %} govuk-form-group--error{% endif %}">
+          <label class="govuk-label govuk-label--m" for="areaId">
+            {{ t('projects.manage_projects.edit_rma.select_label') }}
+          </label>
+          {% if fieldErrors.areaId %}
+            <p id="areaId-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ fieldErrors.areaId }}
+            </p>
+          {% endif %}
+          <select class="govuk-select govuk-!-width-two-thirds{% if fieldErrors.areaId %} govuk-select--error{% endif %}" id="areaId" name="areaId"{% if fieldErrors.areaId %} aria-describedby="areaId-error"{% endif %}>
+            {% for area in rmaListOptions %}
+              <option value="{{ area.value }}"{% if area.value == data.areaId %} selected{% endif %}>{{ area.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="govuk-button-group">
+           {{ govukButton({
+              text: t('common.buttons.save')
+            }) }}
+          <a href="{{ cancelUrl }}" class="govuk-link">{{ t('common.cancel_link') }}</a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+{% endblock %}

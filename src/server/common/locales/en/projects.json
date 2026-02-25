@@ -487,7 +487,23 @@
     },
     "empty": "No projects found",
     "errors": {
-      "fetch_failed": "There was a problem loading projects. Please try again later."
+      "fetch_failed": "There was a problem loading projects. Please try again later.",
+      "same_rma": "You need to select a new RMA option to continue"
+    },
+    "notifications": {
+      "success_heading": "Success",
+      "project_updated": "Project RMA has been updated successfully",
+      "rma_changed": "RMA has been changed."
+    },
+    "edit_rma": {
+      "title": "Change project RMA",
+      "heading": "Change project RMA",
+      "name": "Project",
+      "project_number": "Project number",
+      "current_rma": "Current RMA",
+      "select_label": "Select new RMA",
+      "select_hint": "Select the new RMA for this project",
+      "select_area_label": "Select an RMA"
     }
   },
   "project_goals": {
