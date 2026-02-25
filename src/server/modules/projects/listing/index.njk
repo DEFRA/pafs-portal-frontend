@@ -157,10 +157,10 @@
                 <td class="govuk-table__cell" data-label="{{ t('projects.manage_projects.table.project_number') }}" data-testid="project-number">
                   {% if isUserProjectListing or isArchive %}
                     <a href="/project/{{ project.referenceNumberFormatted }}" class="govuk-link" data-testid="project-link">
-                      {{ project.referenceNumber }}
+                      <strong>{{ project.referenceNumber }}</strong>
                     </a>
                   {% else %}
-                    {{ project.referenceNumber }}
+                    <strong>{{ project.referenceNumber }}</strong>
                   {% endif %}
                 </td>
                 <td class="govuk-table__cell" data-label="{{ t('projects.manage_projects.table.project_name') }}" data-testid="project-name">{{ project.name }}</td>
