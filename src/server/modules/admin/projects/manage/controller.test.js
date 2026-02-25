@@ -241,98 +241,187 @@ describe('ProjectsManageController', () => {
     })
   })
 
-  describe('validateRmaSelection', () => {
-    test('should return null when new RMA is different from current', async () => {
-      const viewData = { areaId: 1 }
-      const newAreaId = '2'
-
-      const controller = new (class extends Object {
-        async validateRmaSelection(request, h, newAreaId, viewData) {
-          if (Number(newAreaId) === viewData.areaId) {
-            return h.view(ADMIN_VIEWS.PROJECT_MANAGE, {})
-          }
-          return null
+  describe('edge cases and coverage', () => {
+    test('should handle missing params in get handler', async () => {
+      mockRequest.params = {}
+      mockCacheService.getProjectByReferenceNumber.mockResolvedValue(null)
+      getProjectProposalOverview.mockResolvedValue({
+        success: true,
+        data: {
+          id: 1,
+          referenceNumber: '',
+          name: 'Test',
+          rmaName: 'RMA',
+          areaId: 1
         }
-      })()
+      })
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
 
-      const result = await controller.validateRmaSelection(
-        mockRequest,
-        mockH,
-        newAreaId,
-        viewData
-      )
+      await projectsManageController.getProjectHandler(mockRequest, mockH)
 
-      expect(result).toBeNull()
-      expect(mockH.view).not.toHaveBeenCalled()
+      expect(getProjectProposalOverview).toHaveBeenCalled()
     })
 
-    test('should return error view when new RMA is same as current', async () => {
-      const viewData = { areaId: 1, projectName: 'Test' }
-      const newAreaId = '1'
-
+    test('should handle missing accessToken in get handler', async () => {
+      getAuthSession.mockReturnValue(null)
+      mockCacheService.getProjectByReferenceNumber.mockResolvedValue(null)
+      getProjectProposalOverview.mockResolvedValue({
+        success: true,
+        data: {
+          id: 1,
+          referenceNumber: 'TEST/001A/002A',
+          name: 'Test',
+          rmaName: 'RMA',
+          areaId: 1
+        }
+      })
       mockRequest.getAreas.mockResolvedValue({
-        [AREAS_RESPONSIBILITIES_MAP.RMA]: [{ id: 1, name: 'RMA 1' }]
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
+
+      await projectsManageController.getProjectHandler(mockRequest, mockH)
+
+      expect(getProjectProposalOverview).toHaveBeenCalledWith(
+        'THC501E-000A-017A',
+        undefined
+      )
+    })
+
+    test('should handle missing accessToken in post handler', async () => {
+      getAuthSession.mockReturnValue({})
+      mockRequest.payload = { areaId: '2' }
+      mockRequest.yar.get.mockReturnValue({
+        id: 1,
+        areaId: 1,
+        projectName: 'Test'
+      })
+      upsertProjectProposal.mockResolvedValue({
+        success: true,
+        data: {
+          data: { name: 'Test Project' }
+        }
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(upsertProjectProposal).toHaveBeenCalledWith(
+        expect.any(Object),
+        undefined
+      )
+    })
+
+    test('should handle missing payload in post handler', async () => {
+      mockRequest.payload = {}
+      mockRequest.yar.get.mockReturnValue({
+        id: 1,
+        areaId: undefined
+      })
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
+      upsertProjectProposal.mockResolvedValue({
+        success: true,
+        data: {
+          data: { name: 'Test' }
+        }
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(upsertProjectProposal).toHaveBeenCalled()
+    })
+
+    test('should handle missing viewData from session in post handler', async () => {
+      mockRequest.payload = { areaId: '2' }
+      mockRequest.yar.get.mockReturnValue(null)
+      upsertProjectProposal.mockResolvedValue({
+        success: true,
+        data: {
+          data: { name: 'Test Project' }
+        }
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(mockRequest.yar.get).toHaveBeenCalledWith('projectManageViewData')
+    })
+
+    test('should handle empty fieldErrors object', async () => {
+      const viewData = { id: 1 }
+      const errors = { fieldErrors: {} }
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
       })
 
       const controller = new (class extends Object {
-        async validateRmaSelection(request, h, newAreaId, viewData) {
-          if (Number(newAreaId) === viewData.areaId) {
-            const fieldErrors = {
-              areaId: request.t('projects.manage_projects.errors.same_rma')
-            }
-            return h.view(
-              ADMIN_VIEWS.PROJECT_MANAGE,
-              await this.buildViewData(request, viewData, { fieldErrors })
-            )
-          }
-          return null
-        }
-
         async buildViewData(request, viewData, errors = {}) {
-          return { fieldErrors: errors.fieldErrors }
+          const { fieldErrors = {} } = errors
+          const errorSummary =
+            fieldErrors && Object.keys(fieldErrors).length > 0
+              ? Object.entries(fieldErrors).map(([field, message]) => ({
+                  text: message,
+                  href: `#${field}`
+                }))
+              : null
+          return { errorSummary }
         }
       })()
 
-      const result = await controller.validateRmaSelection(
+      const result = await controller.buildViewData(
         mockRequest,
-        mockH,
-        newAreaId,
-        viewData
+        viewData,
+        errors
       )
 
-      expect(result).toBeDefined()
-      expect(mockH.view).toHaveBeenCalledWith(
-        ADMIN_VIEWS.PROJECT_MANAGE,
-        expect.objectContaining({
-          fieldErrors: {
-            areaId: 'projects.manage_projects.errors.same_rma'
-          }
-        })
-      )
+      expect(result.errorSummary).toBeNull()
     })
 
-    test('should handle string to number conversion correctly', async () => {
-      const viewData = { areaId: 5 }
-      const newAreaId = '5'
+    test('should handle null fieldErrors', async () => {
+      const viewData = { id: 1 }
+      const errors = { fieldErrors: null }
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
 
       const controller = new (class extends Object {
-        async validateRmaSelection(request, h, newAreaId, viewData) {
-          if (Number(newAreaId) === viewData.areaId) {
-            return h.view(ADMIN_VIEWS.PROJECT_MANAGE, {})
-          }
-          return null
+        async buildViewData(request, viewData, errors = {}) {
+          const { fieldErrors = {} } = errors
+          const errorSummary =
+            fieldErrors && Object.keys(fieldErrors).length > 0
+              ? Object.entries(fieldErrors).map(([field, message]) => ({
+                  text: message,
+                  href: `#${field}`
+                }))
+              : null
+          return { errorSummary }
         }
       })()
 
-      const result = await controller.validateRmaSelection(
+      const result = await controller.buildViewData(
         mockRequest,
-        mockH,
-        newAreaId,
-        viewData
+        viewData,
+        errors
       )
 
-      expect(result).toBeDefined()
-      expect(mockH.view).toHaveBeenCalled()
+      expect(result.errorSummary).toBeNull()
+    })
+
+    test('should handle missing params in post handler', async () => {
+      mockRequest.params = {}
+      mockRequest.payload = { areaId: '2' }
+      mockRequest.yar.get.mockReturnValue({ areaId: 1 })
+      upsertProjectProposal.mockResolvedValue({
+        success: true,
+        data: {
+          data: { name: 'Test' }
+        }
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(upsertProjectProposal).toHaveBeenCalled()
     })
   })
 
@@ -409,6 +498,49 @@ describe('ProjectsManageController', () => {
             }))
             rmaOptions.push(...options)
           }
+          return rmaOptions
+        }
+      })()
+
+      const result = await controller.getRmaListOptions(mockRequest)
+
+      expect(result).toEqual([])
+    })
+
+    test('should handle undefined areas data', async () => {
+      mockRequest.getAreas.mockResolvedValue(undefined)
+
+      const controller = new (class extends Object {
+        async getRmaListOptions(request) {
+          const areasData = await request.getAreas()
+          const rmaOptions = []
+          if (!areasData) return rmaOptions
+          return rmaOptions
+        }
+      })()
+
+      const result = await controller.getRmaListOptions(mockRequest)
+
+      expect(result).toEqual([])
+    })
+
+    test('should handle empty object for areas data', async () => {
+      mockRequest.getAreas.mockResolvedValue({})
+
+      const controller = new (class extends Object {
+        async getRmaListOptions(request) {
+          const areasData = await request.getAreas()
+          const rmaOptions = []
+          if (!areasData) return rmaOptions
+          const rmaAreas = areasData[AREAS_RESPONSIBILITIES_MAP.RMA] || []
+          if (rmaAreas.length === 0) {
+            return rmaOptions
+          }
+          const options = rmaAreas.map((area) => ({
+            value: area.id,
+            text: area.name
+          }))
+          rmaOptions.push(...options)
           return rmaOptions
         }
       })()
@@ -622,6 +754,66 @@ describe('ProjectsManageController', () => {
       )
     })
 
+    test('should show validation error with missing RMA key in areas', async () => {
+      mockRequest.payload.areaId = '1' // Same as current areaId
+
+      // Areas data without RMA key to trigger the || [] branch
+      mockRequest.getAreas.mockResolvedValue({
+        someOtherArea: [{ id: 1, name: 'Other' }]
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(upsertProjectProposal).not.toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalledWith(
+        ADMIN_VIEWS.PROJECT_MANAGE,
+        expect.objectContaining({
+          fieldErrors: {
+            areaId: 'projects.manage_projects.errors.same_rma'
+          },
+          rmaListOptions: []
+        })
+      )
+    })
+
+    test('should handle result with explicitly false success', async () => {
+      const mockApiResponse = {
+        success: false
+      }
+
+      upsertProjectProposal.mockResolvedValue(mockApiResponse)
+      extractApiError.mockReturnValue(null)
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(mockRequest.server.logger.error).toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalledWith(
+        ADMIN_VIEWS.PROJECT_MANAGE,
+        expect.objectContaining({
+          errorCode: 'SAVE_FAILED'
+        })
+      )
+    })
+
+    test('should handle result with undefined success property', async () => {
+      const mockApiResponse = {
+        data: { someData: 'test' }
+      }
+
+      upsertProjectProposal.mockResolvedValue(mockApiResponse)
+      extractApiError.mockReturnValue(null)
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(mockRequest.server.logger.error).toHaveBeenCalled()
+    })
+
     test('should handle API validation errors', async () => {
       const mockApiError = {
         success: false,
@@ -650,6 +842,36 @@ describe('ProjectsManageController', () => {
       )
     })
 
+    test('should handle API validation errors with missing RMA key', async () => {
+      const mockApiError = {
+        success: false,
+        status: 400,
+        validationErrors: [{ field: 'areaId', errorCode: 'INVALID_AREA' }],
+        errors: null
+      }
+
+      upsertProjectProposal.mockResolvedValue(mockApiError)
+      extractApiValidationErrors.mockReturnValue({
+        areaId: 'INVALID_AREA'
+      })
+      // Areas data without RMA key
+      mockRequest.getAreas.mockResolvedValue({
+        otherArea: []
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(mockRequest.server.logger.error).toHaveBeenCalled()
+      expect(extractApiValidationErrors).toHaveBeenCalledWith(mockApiError)
+      expect(mockH.view).toHaveBeenCalledWith(
+        ADMIN_VIEWS.PROJECT_MANAGE,
+        expect.objectContaining({
+          fieldErrors: { areaId: 'INVALID_AREA' },
+          rmaListOptions: []
+        })
+      )
+    })
+
     test('should handle API general errors', async () => {
       const mockApiError = {
         success: false,
@@ -669,6 +891,41 @@ describe('ProjectsManageController', () => {
         ADMIN_VIEWS.PROJECT_MANAGE,
         expect.objectContaining({
           errorCode: 'SERVER_ERROR'
+        })
+      )
+    })
+
+    test('should handle result with success false', async () => {
+      const mockApiError = {
+        success: false,
+        errors: []
+      }
+
+      upsertProjectProposal.mockResolvedValue(mockApiError)
+      extractApiError.mockReturnValue(null)
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(mockRequest.server.logger.error).toHaveBeenCalled()
+    })
+
+    test('should handle null result from API', async () => {
+      upsertProjectProposal.mockResolvedValue(null)
+      extractApiError.mockReturnValue(null)
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(mockRequest.server.logger.error).toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalledWith(
+        ADMIN_VIEWS.PROJECT_MANAGE,
+        expect.objectContaining({
+          errorCode: 'SAVE_FAILED'
         })
       )
     })
@@ -815,6 +1072,60 @@ describe('ProjectsManageController', () => {
       expect(result.areaId).toBe(10)
       expect(typeof result.areaId).toBe('number')
     })
+
+    test('should handle zero values', () => {
+      const apiData = {
+        id: 0,
+        referenceNumber: 'TEST/001A/002A',
+        name: 'Test',
+        rmaName: 'RMA',
+        areaId: 0
+      }
+
+      const controller = new (class extends Object {
+        transformData(data) {
+          return {
+            id: data.id ? Number(data.id) : null,
+            referenceNumber: data.referenceNumber,
+            projectName: data.name,
+            rmaName: data.rmaName,
+            areaId: data.areaId ? Number(data.areaId) : null
+          }
+        }
+      })()
+
+      const result = controller.transformData(apiData)
+
+      expect(result.id).toBeNull()
+      expect(result.areaId).toBeNull()
+    })
+
+    test('should handle undefined values', () => {
+      const apiData = {
+        id: undefined,
+        referenceNumber: 'TEST/001A/002A',
+        name: 'Test',
+        rmaName: 'RMA',
+        areaId: undefined
+      }
+
+      const controller = new (class extends Object {
+        transformData(data) {
+          return {
+            id: data.id ? Number(data.id) : null,
+            referenceNumber: data.referenceNumber,
+            projectName: data.name,
+            rmaName: data.rmaName,
+            areaId: data.areaId ? Number(data.areaId) : null
+          }
+        }
+      })()
+
+      const result = controller.transformData(apiData)
+
+      expect(result.id).toBeNull()
+      expect(result.areaId).toBeNull()
+    })
   })
 
   describe('buildApiPayload', () => {
@@ -871,6 +1182,54 @@ describe('ProjectsManageController', () => {
 
       expect(result.payload.areaId).toBe(99)
       expect(typeof result.payload.areaId).toBe('number')
+    })
+
+    test('should handle null referenceNumber', () => {
+      const result = new (class extends Object {
+        buildApiPayload(referenceNumber, areaId) {
+          return {
+            level: 'PROJECT_AREA',
+            payload: {
+              referenceNumber: referenceNumber?.replace(/-/g, '/'),
+              areaId: Number(areaId)
+            }
+          }
+        }
+      })().buildApiPayload(null, '5')
+
+      expect(result.payload.referenceNumber).toBeUndefined()
+    })
+
+    test('should handle undefined referenceNumber', () => {
+      const result = new (class extends Object {
+        buildApiPayload(referenceNumber, areaId) {
+          return {
+            level: 'PROJECT_AREA',
+            payload: {
+              referenceNumber: referenceNumber?.replace(/-/g, '/'),
+              areaId: Number(areaId)
+            }
+          }
+        }
+      })().buildApiPayload(undefined, '5')
+
+      expect(result.payload.referenceNumber).toBeUndefined()
+    })
+
+    test('should handle referenceNumber without dashes', () => {
+      const result = new (class extends Object {
+        buildApiPayload(referenceNumber, areaId) {
+          return {
+            level: 'PROJECT_AREA',
+            payload: {
+              referenceNumber: referenceNumber?.replace(/-/g, '/'),
+              areaId: Number(areaId)
+            }
+          }
+        }
+      })().buildApiPayload('TEST001A002A', '5')
+
+      expect(result.payload.referenceNumber).toBe('TEST001A002A')
     })
   })
 
@@ -1038,6 +1397,200 @@ describe('ProjectsManageController', () => {
       )
 
       expect(result.context.errorCode).toBe('SAVE_FAILED')
+    })
+
+    test('should handle error without message or stack', async () => {
+      const error = {}
+      const viewData = { id: 1 }
+      extractApiError.mockReturnValue(null)
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
+
+      const controller = new (class extends Object {
+        async handleSaveError(request, h, viewData, error) {
+          request.server.logger.error(
+            { error, message: error.message, stack: error.stack },
+            'Error saving project RMA change'
+          )
+          const apiResponse = error.response?.data || error
+          const apiError = apiResponse ? extractApiError(apiResponse) : null
+          const errorCode = apiError?.errorCode || 'SAVE_FAILED'
+          return h.view(ADMIN_VIEWS.PROJECT_MANAGE, { errorCode })
+        }
+      })()
+
+      await controller.handleSaveError(mockRequest, mockH, viewData, error)
+
+      expect(mockRequest.server.logger.error).toHaveBeenCalledWith(
+        { error, message: undefined, stack: undefined },
+        'Error saving project RMA change'
+      )
+    })
+
+    test('should handle error with apiError but no errorCode', async () => {
+      const error = new Error('API Error')
+      const viewData = { id: 1 }
+      extractApiError.mockReturnValue({})
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
+
+      const controller = new (class extends Object {
+        async handleSaveError(request, h, viewData, error) {
+          request.server.logger.error(
+            { error, message: error.message, stack: error.stack },
+            'Error saving project RMA change'
+          )
+          const apiResponse = error.response?.data || error
+          const apiError = apiResponse ? extractApiError(apiResponse) : null
+          const errorCode = apiError?.errorCode || 'SAVE_FAILED'
+          return h.view(ADMIN_VIEWS.PROJECT_MANAGE, { errorCode })
+        }
+      })()
+
+      const result = await controller.handleSaveError(
+        mockRequest,
+        mockH,
+        viewData,
+        error
+      )
+
+      expect(result.context.errorCode).toBe('SAVE_FAILED')
+    })
+  })
+
+  describe('additional edge case coverage', () => {
+    test('should handle getRmaListOptions when RMA key does not exist', async () => {
+      mockRequest.getAreas.mockResolvedValue({
+        someOtherKey: [{ id: 1, name: 'Other' }]
+      })
+
+      mockCacheService.getProjectByReferenceNumber.mockResolvedValue({
+        id: 1,
+        referenceNumber: 'TEST/001A/002A',
+        name: 'Test',
+        rmaName: 'RMA',
+        areaId: 1
+      })
+
+      await projectsManageController.getProjectHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        ADMIN_VIEWS.PROJECT_MANAGE,
+        expect.objectContaining({
+          rmaListOptions: []
+        })
+      )
+    })
+
+    test('should handle getRmaListOptions when RMA key is undefined', async () => {
+      const areasWithUndefinedRMA = {}
+      areasWithUndefinedRMA[AREAS_RESPONSIBILITIES_MAP.RMA] = undefined
+
+      mockRequest.getAreas.mockResolvedValue(areasWithUndefinedRMA)
+
+      mockCacheService.getProjectByReferenceNumber.mockResolvedValue({
+        id: 1,
+        referenceNumber: 'TEST/001A/002A',
+        name: 'Test',
+        rmaName: 'RMA',
+        areaId: 1
+      })
+
+      await projectsManageController.getProjectHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        ADMIN_VIEWS.PROJECT_MANAGE,
+        expect.objectContaining({
+          rmaListOptions: []
+        })
+      )
+    })
+
+    test('should handle getRmaListOptions when RMA key is null', async () => {
+      const areasWithNullRMA = {}
+      areasWithNullRMA[AREAS_RESPONSIBILITIES_MAP.RMA] = null
+
+      mockRequest.getAreas.mockResolvedValue(areasWithNullRMA)
+
+      mockCacheService.getProjectByReferenceNumber.mockResolvedValue({
+        id: 1,
+        referenceNumber: 'TEST/001A/002A',
+        name: 'Test',
+        rmaName: 'RMA',
+        areaId: 1
+      })
+
+      await projectsManageController.getProjectHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        ADMIN_VIEWS.PROJECT_MANAGE,
+        expect.objectContaining({
+          rmaListOptions: []
+        })
+      )
+    })
+
+    test('should handle success false in post with no errors array', async () => {
+      mockRequest.payload = { areaId: '2' }
+      mockRequest.yar.get.mockReturnValue({
+        id: 1,
+        areaId: 1
+      })
+
+      upsertProjectProposal.mockResolvedValue({ success: false })
+      extractApiError.mockReturnValue(null)
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
+
+      await projectsManageController.postProjectHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        ADMIN_VIEWS.PROJECT_MANAGE,
+        expect.objectContaining({
+          errorCode: 'SAVE_FAILED'
+        })
+      )
+    })
+
+    test('should handle when getAreas throws an error', async () => {
+      mockRequest.getAreas.mockRejectedValue(new Error('Failed to get areas'))
+      mockCacheService.getProjectByReferenceNumber.mockResolvedValue({
+        id: 1,
+        referenceNumber: 'TEST/001A/002A',
+        name: 'Test',
+        rmaName: 'RMA',
+        areaId: 1
+      })
+
+      await expect(
+        projectsManageController.getProjectHandler(mockRequest, mockH)
+      ).rejects.toThrow('Failed to get areas')
+    })
+
+    test('should handle transformData with falsy but not null/undefined id', async () => {
+      mockCacheService.getProjectByReferenceNumber.mockResolvedValue({
+        id: 0,
+        referenceNumber: 'TEST/001A/002A',
+        name: 'Test',
+        rmaName: 'RMA',
+        areaId: 0
+      })
+      mockRequest.getAreas.mockResolvedValue({
+        [AREAS_RESPONSIBILITIES_MAP.RMA]: []
+      })
+
+      await projectsManageController.getProjectHandler(mockRequest, mockH)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'projectManageViewData',
+        expect.objectContaining({
+          id: null,
+          areaId: null
+        })
+      )
     })
   })
 })

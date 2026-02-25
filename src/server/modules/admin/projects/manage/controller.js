@@ -45,46 +45,17 @@ class ProjectsManageController {
   }
 
   /**
-   * Validate that the selected RMA is different from the current one
-   * @returns {Object|null} - Returns error view if validation fails, null if valid
-   */
-  async validateRmaSelection(request, h, newAreaId, viewData) {
-    if (Number(newAreaId) === viewData.areaId) {
-      const fieldErrors = {
-        areaId: request.t('projects.manage_projects.errors.same_rma')
-      }
-      return h.view(
-        ADMIN_VIEWS.PROJECT_MANAGE,
-        await this.buildViewData(request, viewData, { fieldErrors })
-      )
-    }
-    return null
-  }
-
-  /**
    * Get RMA area options for project RMA edit
    * Returns 'All RMAs' option plus RMA areas only
    */
   async getRmaListOptions(request) {
     const areasData = await request.getAreas()
+    const rmaAreas = areasData?.[AREAS_RESPONSIBILITIES_MAP.RMA] ?? []
 
-    const rmaOptions = []
-
-    if (!areasData) {
-      return rmaOptions
-    }
-
-    const rmaAreas = areasData[AREAS_RESPONSIBILITIES_MAP.RMA] || []
-
-    if (rmaAreas.length > 0) {
-      const options = rmaAreas.map((area) => ({
-        value: area.id,
-        text: area.name
-      }))
-      rmaOptions.push(...options)
-    }
-
-    return rmaOptions
+    return rmaAreas.map((area) => ({
+      value: area.id,
+      text: area.name
+    }))
   }
 
   async get(request, h) {
@@ -138,14 +109,14 @@ class ProjectsManageController {
     const viewData = request.yar.get('projectManageViewData') || {}
 
     // Validate that the selected RMA is different from the current one
-    const validationError = await this.validateRmaSelection(
-      request,
-      h,
-      newAreaId,
-      viewData
-    )
-    if (validationError) {
-      return validationError
+    if (Number(newAreaId) === viewData.areaId) {
+      const fieldErrors = {
+        areaId: request.t('projects.manage_projects.errors.same_rma')
+      }
+      return h.view(
+        ADMIN_VIEWS.PROJECT_MANAGE,
+        await this.buildViewData(request, viewData, { fieldErrors })
+      )
     }
 
     try {
@@ -162,7 +133,7 @@ class ProjectsManageController {
         'Upsert project RMA result'
       )
 
-      if (!result || !result.success) {
+      if (!result?.success) {
         // Create error with API response attached
         const error = new Error('API request failed')
         error.response = { data: result }
@@ -230,7 +201,7 @@ class ProjectsManageController {
     }
 
     // Handle API error code or unexpected errors
-    const apiError = apiResponse ? extractApiError(apiResponse) : null
+    const apiError = extractApiError(apiResponse)
     const errorCode = apiError?.errorCode || 'SAVE_FAILED'
 
     return h.view(
