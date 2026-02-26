@@ -84,6 +84,9 @@ export const ROUTES = {
 
   PROJECT: {
     OVERVIEW: '/project/{referenceNumber}',
+    ARCHIVE: '/project/{referenceNumber}/archive',
+    REVERT_TO_DRAFT: '/project/{referenceNumber}/revert-to-draft',
+    ARCHIVE_CONFIRMATION: '/project/{referenceNumber}/archive/confirmation',
     START: `/project/${PROJECT_STEPS.START}`,
     NAME: `/project/${PROJECT_STEPS.NAME}`,
     AREA: `/project/${PROJECT_STEPS.AREA}`,

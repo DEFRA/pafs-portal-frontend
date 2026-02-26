@@ -38,37 +38,58 @@
         {{govukTag({
           text: projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] | upper,
           classes: projectStateTag
-        })}} &nbsp; | &nbsp;<a class="govuk-link" href="#">{{ t('projects.overview.common.archive') }}</a>
+        })}}
+        {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'archived' %}
+          {% if user and(user.isRma or user.isPso or user.admin) %}
+            &nbsp; | &nbsp;
+            <form method="post" action="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/revert-to-draft" class="app-inline-form">
+              <button type="submit" class="govuk-link app-link-button" data-testid="revert-to-draft-link">
+                {{ t('projects.overview.common.revert_to_draft') }}
+              </button>
+            </form>
+          {% endif %}
+        {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'draft' or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'revise' %}
+          {% if user and(user.isRma or user.isPso or user.admin) %}
+            &nbsp; | &nbsp;
+            <form method="post" action="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/archive" class="app-inline-form">
+              <button type="submit" class="govuk-link app-link-button" data-testid="archive-link">
+                {{ t('projects.overview.common.archive') }}
+              </button>
+            </form>
+          {% endif %}
+        {% endif %}
       </dd>
     </div>
   </dl>
 
   <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
-  {{ proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t) }}
+  {{ proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t, isReadOnly) }}
 
-  {{ projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, formatFileSize, t) }}
+  {{ projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, formatFileSize, t, isReadOnly) }}
 
-  {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate) }}
+  {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate, isReadOnly) }}
 
-  {{ fundingSourcesAndSpendingSummaryCard(projectData, t) }}
+  {{ fundingSourcesAndSpendingSummaryCard(projectData, t, isReadOnly) }}
 
-  {{ riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t) }}
+  {{ riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t, isReadOnly) }}
 
-  {{ environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t) }}
+  {{ environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) }}
 
-  {{ goalsApproachSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t) }}
+  {{ goalsApproachSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) }}
 
-  {{ urgencyAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, URGENCY_REASONS, t) }}
+  {{ urgencyAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, URGENCY_REASONS, t, isReadOnly) }}
 
-  {{ confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, t) }}
+  {{ confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, t, isReadOnly) }}
 
-  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
+  {% if not isReadOnly %}
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
 
-  <p class="govuk-body">{{ t('projects.overview.submission_info') }}</p>
+    <p class="govuk-body">{{ t('projects.overview.submission_info') }}</p>
 
-  {{ govukButton({
-    text: t('common.buttons.submit_proposal')
-  }) }}
+    {{ govukButton({
+      text: t('common.buttons.submit_proposal')
+    }) }}
+  {% endif %}
 
 {% endblock %}

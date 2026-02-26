@@ -36,6 +36,7 @@ export const ACCOUNT_VIEWS = {
 
 export const PROJECT_VIEWS = {
   OVERVIEW: 'modules/projects/overview/index',
+  ARCHIVE_CONFIRMATION: 'modules/general/projects/archive/index',
   START: 'modules/projects/start/index',
   NAME: 'modules/projects/name/index',
   AREA: 'modules/projects/area/index',

@@ -19,6 +19,7 @@
       "draft": "Draft",
       "submitted": "Submitted",
       "archive": "Archive",
+      "revert_to_draft": "Revert to draft",
       "delete": "Delete",
       "not_submitted": "Not yet submitted",
       "not_provided": "Not provided",
@@ -976,5 +977,16 @@
   "archived_proposals": {
     "title": "Archived Proposals",
     "heading": "Archived Proposals"
+  },
+  "confirm_archive": {
+    "title": "Proposal has been archived",
+    "heading": "Proposal has been archived",
+    "what_happens_next": "What happens next?",
+    "moved_to_archive": "This proposal has moved to your <a href=\"/archive\" class=\"govuk-link\">archive</a> and is no longer visible in your proposals list.",
+    "cannot_edit": "Archived proposals cannot be edited or submitted.",
+    "need_to_change": "If you need to change your proposal",
+    "use_archive_link": "Use the archive link in the banner to see your archived proposals.",
+    "revert_instructions": "Return to the proposal overview page and click on the 'revert to draft' link.",
+    "will_reappear": "The proposal will reappear in your proposals and can then be edited."
   }
 }

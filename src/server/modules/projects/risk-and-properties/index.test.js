@@ -2,7 +2,10 @@ import { describe, test, expect, vi } from 'vitest'
 import { projectRiskAndProperties } from './index.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
-import { requireEditPermission } from '../helpers/permissions.js'
+import {
+  requireEditPermission,
+  requireEditableStatus
+} from '../helpers/permissions.js'
 import {
   fetchProjectForEdit,
   initializeEditSessionPreHandler
@@ -16,7 +19,7 @@ vi.mock('./controller.js')
 
 // Test constants
 const EXPECTED_ROUTE_COUNT = 18 // 9 steps x 2 methods (GET and POST)
-const PRE_HANDLER_INDEX_REQUIRE_EDIT = 3
+const PRE_HANDLER_INDEX_REQUIRE_EDIT = 4
 
 describe('projectRiskAndProperties plugin', () => {
   test('should have correct plugin name', () => {
@@ -145,10 +148,11 @@ describe('projectRiskAndProperties plugin', () => {
 
     routes.forEach((route) => {
       expect(route.options.pre).toBeDefined()
-      expect(route.options.pre).toHaveLength(4)
+      expect(route.options.pre).toHaveLength(5)
       expect(route.options.pre[0].method).toBe(requireAuth)
       expect(route.options.pre[1].method).toBe(fetchProjectForEdit)
       expect(route.options.pre[2].method).toBe(initializeEditSessionPreHandler)
+      expect(route.options.pre[3].method).toBe(requireEditableStatus)
       expect(route.options.pre[PRE_HANDLER_INDEX_REQUIRE_EDIT].method).toBe(
         requireEditPermission
       )

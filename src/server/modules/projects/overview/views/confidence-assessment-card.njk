@@ -1,19 +1,21 @@
-{% macro confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, t) %}
+{% macro confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, t, isReadOnly) %}
   {% set hasConfidence = projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BETTER_PROTECTED] %}
   <div class="govuk-summary-card">
     <div class="govuk-summary-card__title-wrapper">
       <h2 class="govuk-summary-card__title">{{ t('projects.overview.confidence_assessment_summary_card.title') }}</h2>
-      <ul class="govuk-summary-card__actions">
-        <li class="govuk-summary-card__action">
-          <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.CONFIDENCE_HOMES_BETTER_PROTECTED }}">
-            {% if hasConfidence %}{{ t('common.change') }}
-            {% else %}{{ t('common.add') }}
-            {% endif %}
-            <span class="govuk-visually-hidden">
-              {{ t('projects.overview.confidence_assessment_summary_card.title') | lower }}</span>
-          </a>
-        </li>
-      </ul>
+      {% if not isReadOnly %}
+        <ul class="govuk-summary-card__actions">
+          <li class="govuk-summary-card__action">
+            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.CONFIDENCE_HOMES_BETTER_PROTECTED }}">
+              {% if hasConfidence %}{{ t('common.change') }}
+              {% else %}{{ t('common.add') }}
+              {% endif %}
+              <span class="govuk-visually-hidden">
+                {{ t('projects.overview.confidence_assessment_summary_card.title') | lower }}</span>
+            </a>
+          </li>
+        </ul>
+      {% endif %}
     </div>
     <div class="govuk-summary-card__content">
       {% if hasConfidence %}

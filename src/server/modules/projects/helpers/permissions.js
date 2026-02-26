@@ -2,6 +2,7 @@ import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
+  EDITABLE_STATUSES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_STATUS,
   REFERENCE_NUMBER_PARAM
@@ -506,4 +507,87 @@ export async function requireEditPermission(request, h) {
   }
 
   return h.continue
+}
+
+/**
+ * Pre-handler that prevents access to project edit routes when project is
+ * not in an editable status (e.g. archived or submitted).
+ * Only projects in DRAFT or REVISE status are considered editable.
+ * Redirects to the project overview page.
+ * Expects request.pre.projectData (set by fetchProjectForEdit or similar pre-handler)
+ *
+ * @param {Object} request - Hapi request object
+ * @param {Object} h - Hapi response toolkit
+ * @returns {Object} h.continue if allowed, otherwise redirect
+ */
+export async function requireEditableStatus(request, h) {
+  const session = getAuthSession(request)
+  const projectData = request.pre?.projectData
+
+  if (!projectData) {
+    return h.redirect(ROUTES.GENERAL.HOME).takeover()
+  }
+
+  const projectState = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]
+
+  if (!EDITABLE_STATUSES.includes(projectState)) {
+    const referenceNumber =
+      request.params?.referenceNumber ||
+      projectData[PROJECT_PAYLOAD_FIELDS.SLUG]
+
+    request.server?.logger?.warn(
+      {
+        userId: session?.user?.id,
+        referenceNumber,
+        projectState
+      },
+      'User attempted to access edit route for non-editable project'
+    )
+
+    return h
+      .redirect(
+        ROUTES.PROJECT.OVERVIEW.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
+      )
+      .takeover()
+  }
+
+  return h.continue
+}
+
+/**
+ * Pre-handler that restricts archive/revert-to-draft actions to
+ * RMA, PSO, and Admin users. EA users are not permitted.
+ * Redirects to the project overview page if not allowed.
+ *
+ * @param {Object} request - Hapi request object
+ * @param {Object} h - Hapi response toolkit
+ * @returns {Object} h.continue if allowed, otherwise redirect
+ */
+export async function requireStatusManagePermission(request, h) {
+  const session = getAuthSession(request)
+  const user = session?.user
+
+  if (user?.admin || user?.isRma || user?.isPso) {
+    return h.continue
+  }
+
+  const referenceNumber = request.params?.referenceNumber
+
+  request.server?.logger?.warn(
+    {
+      userId: user?.id,
+      referenceNumber
+    },
+    'User without status manage permission attempted archive/revert action'
+  )
+
+  if (referenceNumber) {
+    return h
+      .redirect(
+        ROUTES.PROJECT.OVERVIEW.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
+      )
+      .takeover()
+  }
+
+  return h.redirect(ROUTES.GENERAL.HOME).takeover()
 }

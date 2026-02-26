@@ -1,4 +1,4 @@
-{% macro proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t) %}
+{% macro proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t, isReadOnly) %}
 
   <div class="govuk-summary-card">
     <div class="govuk-summary-card__title-wrapper">
@@ -13,13 +13,15 @@
           <dd class="govuk-summary-list__value">
             {{ projectData[PROJECT_PAYLOAD_FIELDS.NAME] or t('projects.overview.common.not_provided') }}
           </dd>
-          <dd class="govuk-summary-list__actions">
-            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.NAME }}">
-              {{ t('common.change') }}
-              <span class="govuk-visually-hidden">
-                {{ t('projects.overview.proposal_details_summary_card.project_name') }}</span>
-            </a>
-          </dd>
+          {% if not isReadOnly %}
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.NAME }}">
+                {{ t('common.change') }}
+                <span class="govuk-visually-hidden">
+                  {{ t('projects.overview.proposal_details_summary_card.project_name') }}</span>
+              </a>
+            </dd>
+          {% endif %}
         </div>
 
         <div class="govuk-summary-list__row">
@@ -54,13 +56,15 @@
             {% endif %}
             {{ projectTypeLabel or t('projects.overview.common.not_provided') }}
           </dd>
-          <dd class="govuk-summary-list__actions">
-            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.TYPE }}">
-              {{ t('common.change') }}
-              <span class="govuk-visually-hidden">
-                {{ t('projects.overview.proposal_details_summary_card.project_type') }}</span>
-            </a>
-          </dd>
+          {% if not isReadOnly %}
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.TYPE }}">
+                {{ t('common.change') }}
+                <span class="govuk-visually-hidden">
+                  {{ t('projects.overview.proposal_details_summary_card.project_type') }}</span>
+              </a>
+            </dd>
+          {% endif %}
         </div>
 
         {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.DEF or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REF or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REP %}
@@ -115,13 +119,15 @@
               {{ t('projects.overview.common.not_provided') }}
             {% endif %}
           </dd>
-          <dd class="govuk-summary-list__actions">
-            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.FINANCIAL_START_YEAR }}">
-              {{ t('common.change') }}
-              <span class="govuk-visually-hidden">
-                {{ t('projects.overview.proposal_details_summary_card.financial_year_start') }}</span>
-            </a>
-          </dd>
+          {% if not isReadOnly %}
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.FINANCIAL_START_YEAR }}">
+                {{ t('common.change') }}
+                <span class="govuk-visually-hidden">
+                  {{ t('projects.overview.proposal_details_summary_card.financial_year_start') }}</span>
+              </a>
+            </dd>
+          {% endif %}
         </div>
 
         <div class="govuk-summary-list__row">
@@ -135,13 +141,15 @@
               {{ t('projects.overview.common.not_provided') }}
             {% endif %}
           </dd>
-          <dd class="govuk-summary-list__actions">
-            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.FINANCIAL_END_YEAR }}">
-              {{ t('common.change') }}
-              <span class="govuk-visually-hidden">
-                {{ t('projects.overview.proposal_details_summary_card.financial_year_end') }}</span>
-            </a>
-          </dd>
+          {% if not isReadOnly %}
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.FINANCIAL_END_YEAR }}">
+                {{ t('common.change') }}
+                <span class="govuk-visually-hidden">
+                  {{ t('projects.overview.proposal_details_summary_card.financial_year_end') }}</span>
+              </a>
+            </dd>
+          {% endif %}
         </div>
       </dl>
     </div>

@@ -384,8 +384,11 @@ export const CONFIDENCE_LEVELS = {
 }
 
 export const PROJECT_STATUS = {
+  REVISE: 'revise',
   DRAFT: 'draft',
   SUBMITTED: 'submitted',
   COMPLETED: 'completed',
   ARCHIVED: 'archived'
 }
+
+export const EDITABLE_STATUSES = [PROJECT_STATUS.DRAFT, PROJECT_STATUS.REVISE]

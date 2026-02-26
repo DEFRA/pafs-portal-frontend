@@ -7,6 +7,7 @@ import {
   requireFinancialStartYearSet,
   requirePrimaryInterventionTypeSet,
   requireEditPermission,
+  requireEditableStatus,
   noEditSessionRequired
 } from '../helpers/permissions.js'
 import {
@@ -177,6 +178,7 @@ describe('projectFinancialYear plugin', () => {
         { method: requireAuth },
         { method: fetchProjectForEdit },
         { method: initializeEditSessionPreHandler },
+        { method: requireEditableStatus },
         { method: requireEditPermission }
       ])
       expect(route.options.handler).toBe(financialYearController.getHandler)
@@ -211,6 +213,7 @@ describe('projectFinancialYear plugin', () => {
         { method: requireAuth },
         { method: fetchProjectForEdit },
         { method: initializeEditSessionPreHandler },
+        { method: requireEditableStatus },
         { method: requireEditPermission }
       ])
     })

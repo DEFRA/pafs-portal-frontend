@@ -1,19 +1,21 @@
-{% macro riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t) %}
+{% macro riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t, isReadOnly) %}
   {% set hasRisks = projectData[PROJECT_PAYLOAD_FIELDS.RISKS] and projectData[PROJECT_PAYLOAD_FIELDS.RISKS].length > 0 %}
   <div class="govuk-summary-card">
     <div class="govuk-summary-card__title-wrapper">
       <h2 class="govuk-summary-card__title">{{ t('projects.overview.risk_and_properties_summary_card.title') }}</h2>
-      <ul class="govuk-summary-card__actions">
-        <li class="govuk-summary-card__action">
-          <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.RISK }}">
-            {% if hasRisks %}{{ t('common.change') }}
-            {% else %}{{ t('common.add') }}
-            {% endif %}
-            <span class="govuk-visually-hidden">
-              {{ t('projects.overview.risk_and_properties_summary_card.title') | lower }}</span>
-          </a>
-        </li>
-      </ul>
+      {% if not isReadOnly %}
+        <ul class="govuk-summary-card__actions">
+          <li class="govuk-summary-card__action">
+            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.RISK }}">
+              {% if hasRisks %}{{ t('common.change') }}
+              {% else %}{{ t('common.add') }}
+              {% endif %}
+              <span class="govuk-visually-hidden">
+                {{ t('projects.overview.risk_and_properties_summary_card.title') | lower }}</span>
+            </a>
+          </li>
+        </ul>
+      {% endif %}
     </div>
     <div class="govuk-summary-card__content">
       {% if hasRisks %}

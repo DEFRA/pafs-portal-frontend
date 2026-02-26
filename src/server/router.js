@@ -46,9 +46,9 @@ export const router = {
       await loadModules(server, join(dirName, 'modules/general'), [
         'home',
         'download',
-        'archive',
         'accounts',
-        'static'
+        'static',
+        'projects/archive'
       ])
 
       // Project routes

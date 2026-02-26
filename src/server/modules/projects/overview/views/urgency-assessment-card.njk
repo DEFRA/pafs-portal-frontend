@@ -1,19 +1,21 @@
-{% macro urgencyAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, URGENCY_REASONS, t) %}
+{% macro urgencyAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, URGENCY_REASONS, t, isReadOnly) %}
   {% set hasUrgency = projectData[PROJECT_PAYLOAD_FIELDS.URGENCY_REASON] %}
   <div class="govuk-summary-card">
     <div class="govuk-summary-card__title-wrapper">
       <h2 class="govuk-summary-card__title">{{ t('projects.overview.urgency_assessment_summary_card.title') }}</h2>
-      <ul class="govuk-summary-card__actions">
-        <li class="govuk-summary-card__action">
-          <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.URGENCY_REASON }}">
-            {% if hasUrgency %}{{ t('common.change') }}
-            {% else %}{{ t('common.add') }}
-            {% endif %}
-            <span class="govuk-visually-hidden">
-              {{ t('projects.overview.urgency_assessment_summary_card.title') | lower }}</span>
-          </a>
-        </li>
-      </ul>
+      {% if not isReadOnly %}
+        <ul class="govuk-summary-card__actions">
+          <li class="govuk-summary-card__action">
+            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.URGENCY_REASON }}">
+              {% if hasUrgency %}{{ t('common.change') }}
+              {% else %}{{ t('common.add') }}
+              {% endif %}
+              <span class="govuk-visually-hidden">
+                {{ t('projects.overview.urgency_assessment_summary_card.title') | lower }}</span>
+            </a>
+          </li>
+        </ul>
+      {% endif %}
     </div>
     <div class="govuk-summary-card__content">
       {% if hasUrgency %}

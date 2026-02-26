@@ -1,5 +1,6 @@
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
+  EDITABLE_STATUSES,
   PROJECT_INTERVENTION_TYPES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_RISK_TYPES,
@@ -24,20 +25,25 @@ import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
 class OverviewController {
   _getProjectStateTag(projectState) {
-    if (projectState === PROJECT_STATUS.DRAFT) {
+    if (EDITABLE_STATUSES.includes(projectState)) {
       return 'govuk-tag--light-blue'
+    }
+    if (projectState === PROJECT_STATUS.ARCHIVED) {
+      return 'govuk-tag--orange'
     }
     return 'govuk-tag--grey'
   }
 
   _getProjectViewData(request, options = {}) {
     const { backLink, projectData } = options
+    const isReadOnly = !EDITABLE_STATUSES.includes(projectData.projectState)
     return {
       pageTitle: request.t('projects.overview.heading'),
       backLinkURL: backLink.href,
       backLinkText: backLink.text,
       projectData,
       projectStateTag: this._getProjectStateTag(projectData.projectState),
+      isReadOnly,
       ERROR_CODES: PROJECT_VIEW_ERROR_CODES,
       fieldErrors: {},
       errorCode: '',

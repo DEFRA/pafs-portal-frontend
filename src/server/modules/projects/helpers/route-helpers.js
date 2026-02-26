@@ -3,12 +3,13 @@ import {
   fetchProjectForEdit,
   initializeEditSessionPreHandler
 } from './project-edit-session.js'
-import { requireEditPermission } from './permissions.js'
+import { requireEditPermission, requireEditableStatus } from './permissions.js'
 
 const editPreHandlers = [
   { method: requireAuth },
   { method: fetchProjectForEdit },
   { method: initializeEditSessionPreHandler },
+  { method: requireEditableStatus },
   { method: requireEditPermission }
 ]
 

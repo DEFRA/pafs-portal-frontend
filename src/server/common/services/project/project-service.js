@@ -174,3 +174,24 @@ export async function deleteProject(referenceNumber, accessToken) {
     headers
   })
 }
+
+/**
+ * Update a project's status
+ * @param {string} referenceNumber - The project reference number
+ * @param {string} status - The new status value
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} API response
+ */
+export async function updateProjectStatus(
+  referenceNumber,
+  status,
+  accessToken
+) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(`/api/v1/project/${referenceNumber}/status`, {
+    method: 'PUT',
+    body: JSON.stringify({ status }),
+    headers
+  })
+}

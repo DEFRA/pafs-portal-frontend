@@ -3,7 +3,8 @@ import { ROUTES } from '../../../common/constants/routes.js'
 
 vi.mock('../helpers/permissions.js', () => ({
   createConditionalPreHandler: vi.fn(() => vi.fn()),
-  requireEditPermission: vi.fn()
+  requireEditPermission: vi.fn(),
+  requireEditableStatus: vi.fn()
 }))
 
 vi.mock('../helpers/route-helpers.js', async (importOriginal) => {

@@ -13,6 +13,8 @@ import {
   canEditProposal,
   requireViewPermission,
   requireEditPermission,
+  requireEditableStatus,
+  requireStatusManagePermission,
   createConditionalPreHandler
 } from './permissions.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
@@ -913,6 +915,258 @@ describe('permissions helper - comprehensive', () => {
 
       expect(mockH.redirect).toHaveBeenCalled()
       expect(mockH.takeover).toHaveBeenCalled()
+    })
+  })
+
+  describe('requireEditableStatus', () => {
+    test('should continue when project is draft', async () => {
+      mockRequest.pre = {
+        projectData: {
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.DRAFT
+        }
+      }
+      mockRequest.params = { referenceNumber: 'REF123' }
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      const result = await requireEditableStatus(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('should continue when project is revise', async () => {
+      mockRequest.pre = {
+        projectData: {
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.REVISE
+        }
+      }
+      mockRequest.params = { referenceNumber: 'REF123' }
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      const result = await requireEditableStatus(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('should redirect to overview when project is archived', async () => {
+      mockRequest.pre = {
+        projectData: {
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.ARCHIVED,
+          [PROJECT_PAYLOAD_FIELDS.SLUG]: 'REF123'
+        }
+      }
+      mockRequest.params = { referenceNumber: 'REF123' }
+      mockRequest.server = { logger: { warn: vi.fn() } }
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      await requireEditableStatus(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'REF123')
+      )
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should redirect to overview when project is submitted', async () => {
+      mockRequest.pre = {
+        projectData: {
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.SUBMITTED,
+          [PROJECT_PAYLOAD_FIELDS.SLUG]: 'REF123'
+        }
+      }
+      mockRequest.params = { referenceNumber: 'REF123' }
+      mockRequest.server = { logger: { warn: vi.fn() } }
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      await requireEditableStatus(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'REF123')
+      )
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should log warning when non-editable project edit attempted', async () => {
+      const mockWarn = vi.fn()
+      mockRequest.pre = {
+        projectData: {
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.ARCHIVED,
+          [PROJECT_PAYLOAD_FIELDS.SLUG]: 'REF123'
+        }
+      }
+      mockRequest.params = { referenceNumber: 'REF123' }
+      mockRequest.server = { logger: { warn: mockWarn } }
+      getAuthSession.mockReturnValue({ user: { id: 'user-1' } })
+
+      await requireEditableStatus(mockRequest, mockH)
+
+      expect(mockWarn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'user-1',
+          referenceNumber: 'REF123',
+          projectState: PROJECT_STATUS.ARCHIVED
+        }),
+        'User attempted to access edit route for non-editable project'
+      )
+    })
+
+    test('should log warning for submitted project edit attempt', async () => {
+      const mockWarn = vi.fn()
+      mockRequest.pre = {
+        projectData: {
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.SUBMITTED,
+          [PROJECT_PAYLOAD_FIELDS.SLUG]: 'REF123'
+        }
+      }
+      mockRequest.params = { referenceNumber: 'REF123' }
+      mockRequest.server = { logger: { warn: mockWarn } }
+      getAuthSession.mockReturnValue({ user: { id: 'user-1' } })
+
+      await requireEditableStatus(mockRequest, mockH)
+
+      expect(mockWarn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'user-1',
+          referenceNumber: 'REF123',
+          projectState: PROJECT_STATUS.SUBMITTED
+        }),
+        'User attempted to access edit route for non-editable project'
+      )
+    })
+
+    test('should redirect to home when projectData is missing', async () => {
+      mockRequest.pre = {}
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      await requireEditableStatus(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.GENERAL.HOME)
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should use slug as fallback when referenceNumber not in params', async () => {
+      mockRequest.pre = {
+        projectData: {
+          [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.ARCHIVED,
+          [PROJECT_PAYLOAD_FIELDS.SLUG]: 'SLUG-456'
+        }
+      }
+      mockRequest.params = {}
+      mockRequest.server = { logger: { warn: vi.fn() } }
+      getAuthSession.mockReturnValue({ user: { id: '1' } })
+
+      await requireEditableStatus(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'SLUG-456')
+      )
+    })
+  })
+
+  describe('requireStatusManagePermission', () => {
+    beforeEach(() => {
+      mockH = {
+        continue: Symbol('continue'),
+        redirect: vi.fn().mockReturnThis(),
+        takeover: vi.fn().mockReturnThis()
+      }
+    })
+
+    test('should allow RMA users', async () => {
+      getAuthSession.mockReturnValue({
+        user: { id: '1', isRma: true }
+      })
+
+      const result = await requireStatusManagePermission(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('should allow PSO users', async () => {
+      getAuthSession.mockReturnValue({
+        user: { id: '1', isPso: true }
+      })
+
+      const result = await requireStatusManagePermission(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('should allow Admin users', async () => {
+      getAuthSession.mockReturnValue({
+        user: { id: '1', admin: true }
+      })
+
+      const result = await requireStatusManagePermission(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('should block EA users and redirect to overview', async () => {
+      getAuthSession.mockReturnValue({
+        user: { id: '1', isEa: true }
+      })
+      mockRequest.params = { referenceNumber: 'REF-123' }
+
+      await requireStatusManagePermission(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'REF-123')
+      )
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should block users with no roles and redirect to overview', async () => {
+      getAuthSession.mockReturnValue({
+        user: { id: '1' }
+      })
+      mockRequest.params = { referenceNumber: 'REF-123' }
+
+      await requireStatusManagePermission(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'REF-123')
+      )
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should redirect to home when no referenceNumber available', async () => {
+      getAuthSession.mockReturnValue({
+        user: { id: '1', isEa: true }
+      })
+      mockRequest.params = {}
+
+      await requireStatusManagePermission(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.GENERAL.HOME)
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should redirect to home when no session user', async () => {
+      getAuthSession.mockReturnValue({})
+      mockRequest.params = {}
+
+      await requireStatusManagePermission(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.GENERAL.HOME)
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should log warning when user is blocked', async () => {
+      getAuthSession.mockReturnValue({
+        user: { id: 'ea-user-1', isEa: true }
+      })
+      mockRequest.params = { referenceNumber: 'REF-123' }
+      mockRequest.server = { logger: { warn: vi.fn() } }
+
+      await requireStatusManagePermission(mockRequest, mockH)
+
+      expect(mockRequest.server.logger.warn).toHaveBeenCalledWith(
+        {
+          userId: 'ea-user-1',
+          referenceNumber: 'REF-123'
+        },
+        'User without status manage permission attempted archive/revert action'
+      )
     })
   })
 })

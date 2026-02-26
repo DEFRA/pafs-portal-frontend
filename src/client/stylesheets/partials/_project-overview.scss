@@ -10,3 +10,31 @@
     }
   }
 }
+
+.app-inline-form {
+  display: inline;
+}
+
+.app-link-button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  color: #1d70b8;
+
+  &:hover {
+    color: #003078;
+  }
+
+  &:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    color: #0b0c0c;
+    text-decoration: none;
+  }
+}

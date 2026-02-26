@@ -1,7 +1,7 @@
 import { describe, test, expect, vi } from 'vitest'
 import { createRoutePair, createEditRoutePair } from './route-helpers.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
-import { requireEditPermission } from './permissions.js'
+import { requireEditPermission, requireEditableStatus } from './permissions.js'
 import {
   fetchProjectForEdit,
   initializeEditSessionPreHandler
@@ -20,6 +20,7 @@ const expectedEditPreHandlers = [
   { method: requireAuth },
   { method: fetchProjectForEdit },
   { method: initializeEditSessionPreHandler },
+  { method: requireEditableStatus },
   { method: requireEditPermission }
 ]
 
