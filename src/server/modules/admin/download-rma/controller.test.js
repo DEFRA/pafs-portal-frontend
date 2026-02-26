@@ -6,6 +6,7 @@ vi.mock('../../../../config/nunjucks/context/session-helper.js')
 vi.mock('../../../common/services/areas/areas-service.js')
 vi.mock('../../../common/constants/common.js', () => ({
   AREAS_RESPONSIBILITIES_MAP: {
+    AUTHORITY: 'Authority',
     RMA: 'RMA',
     PSO: 'PSO Area',
     EA: 'EA Area'
@@ -88,6 +89,10 @@ describe('DownloadRMAController', () => {
         'EA Area': [
           { id: '20', name: 'Wessex' },
           { id: '21', name: 'Thames' }
+        ],
+        Authority: [
+          { id: 'auth1', identifier: 'AUTH001', name: 'RMA' },
+          { id: 'auth2', identifier: 'AUTH002', name: 'RMA' }
         ]
       }
 
@@ -199,7 +204,8 @@ describe('DownloadRMAController', () => {
 
       mockAreasService.getAreasByType.mockResolvedValue({
         'PSO Area': [{ id: '10', name: 'PSO West', parent_id: '20' }],
-        'EA Area': [{ id: '20', name: 'Wessex' }]
+        'EA Area': [{ id: '20', name: 'Wessex' }],
+        Authority: []
       })
 
       mockAreasService.getAreasByList
@@ -234,7 +240,8 @@ describe('DownloadRMAController', () => {
       const mockAreas = {
         RMA: [],
         'PSO Area': [{ id: '10', name: 'PSO West', parent_id: '20' }],
-        'EA Area': [{ id: '20', name: 'Wessex' }]
+        'EA Area': [{ id: '20', name: 'Wessex' }],
+        Authority: [{ id: 'auth1', identifier: 'AUTH001', name: 'RMA' }]
       }
 
       mockAreasService.getAreasByType.mockResolvedValue(mockAreas)
@@ -269,7 +276,8 @@ describe('DownloadRMAController', () => {
       const mockAreas = {
         RMA: [],
         'PSO Area': [],
-        'EA Area': []
+        'EA Area': [],
+        Authority: []
       }
 
       mockAreasService.getAreasByType.mockResolvedValue(mockAreas)
@@ -301,7 +309,8 @@ describe('DownloadRMAController', () => {
     test('handles camelCase field names', async () => {
       const mockAreas = {
         'PSO Area': [{ id: '10', name: 'PSO West', parent_id: '20' }],
-        'EA Area': [{ id: '20', name: 'Wessex' }]
+        'EA Area': [{ id: '20', name: 'Wessex' }],
+        Authority: [{ id: 'auth1', identifier: 'AUTH001', name: 'RMA' }]
       }
 
       mockAreasService.getAreasByType.mockResolvedValue(mockAreas)

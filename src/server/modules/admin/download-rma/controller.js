@@ -202,9 +202,15 @@ class DownloadRMAController {
     )
     const areaName = eaArea?.name || ''
 
+    // Get Authority type from areasCache using sub_type as identifier
+    const authority = areasCache[AREAS_RESPONSIBILITIES_MAP.AUTHORITY]?.find(
+      (data) => data.identifier === (rma.sub_type || rma.subType)
+    )
+    const authorityType = authority?.name || ''
+
     return {
       identifier: rma.identifier || '',
-      type: rma.area_type || rma.areaType || 'RMA',
+      type: authorityType,
       name: rma.name || '',
       code: rma.sub_type || rma.subType || '', // Authority Code
       psoTeam: psoName,
