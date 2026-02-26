@@ -20,10 +20,15 @@
       "submitted": "Submitted",
       "archive": "Archive",
       "revert_to_draft": "Revert to draft",
+      "download": "Download",
       "delete": "Delete",
       "not_submitted": "Not yet submitted",
       "not_provided": "Not provided",
-      "na": "N/A"
+      "na": "N/A",
+      "legacy_banner_title": "Important",
+      "legacy_banner_draft": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. Please review and complete any empty sections before submitting your proposal.",
+      "legacy_banner_submitted": "This proposal was originally submitted in the previous system. Following the 2025 policy reforms, some sections have been updated. Certain sections may appear empty as the information was not collected under the previous system.",
+      "legacy_banner_archived": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. To make changes, you will need to revert this proposal to draft status first."
     },
     "proposal_details_summary_card": {
       "title": "Proposal details",

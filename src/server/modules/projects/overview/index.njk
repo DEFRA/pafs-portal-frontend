@@ -2,6 +2,7 @@
 
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "views/proposal-details-card.njk" import proposalDetailsSummaryCard %}
 {% from "views/project-benefit-area-card.njk" import projectBenefitAreaCard %}
 {% from "views/important-dates-card.njk" import importantDatesSummaryCard %}
@@ -13,6 +14,23 @@
 {% from "views/confidence-assessment-card.njk" import confidenceAssessmentSummaryCard %}
 
 {% block body %}
+
+  {% if isLegacy %}
+    {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'archived' %}
+      {% set legacyBannerMessage = t('projects.overview.common.legacy_banner_archived') %}
+    {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'submitted' %}
+      {% set legacyBannerMessage = t('projects.overview.common.legacy_banner_submitted') %}
+    {% else %}
+      {% set legacyBannerMessage = t('projects.overview.common.legacy_banner_draft') %}
+    {% endif %}
+
+    {% call govukNotificationBanner({
+      titleText: t('projects.overview.common.legacy_banner_title'),
+      classes: 'app-notification-banner--full-width'
+    }) %}
+    <p class="govuk-body">{{ legacyBannerMessage }}</p>
+    {% endcall %}
+  {% endif %}
 
   <h1 class="govuk-heading-xl">{{ t('projects.overview.heading') }}</h1>
 
@@ -58,6 +76,8 @@
             </form>
           {% endif %}
         {% endif %}
+        &nbsp; | &nbsp;
+        <a class="govuk-link" href="#" data-testid="download-link">{{ t('projects.overview.common.download') }}</a>
       </dd>
     </div>
   </dl>

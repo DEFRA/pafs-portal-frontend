@@ -231,6 +231,53 @@ describe('OverviewController', () => {
       )
     })
 
+    test('should set isLegacy to true when project is legacy', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT,
+        isLegacy: true
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isLegacy: true
+        })
+      )
+    })
+
+    test('should set isLegacy to false when project is not legacy', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT,
+        isLegacy: false
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isLegacy: false
+        })
+      )
+    })
+
+    test('should set isLegacy to false when isLegacy field is absent', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isLegacy: false
+        })
+      )
+    })
+
     test('should include empty fieldErrors', async () => {
       await overviewController.getHandler(mockRequest, mockH)
 

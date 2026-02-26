@@ -37,6 +37,7 @@ class OverviewController {
   _getProjectViewData(request, options = {}) {
     const { backLink, projectData } = options
     const isReadOnly = !EDITABLE_STATUSES.includes(projectData.projectState)
+    const isLegacy = Boolean(projectData.isLegacy)
     return {
       pageTitle: request.t('projects.overview.heading'),
       backLinkURL: backLink.href,
@@ -44,6 +45,7 @@ class OverviewController {
       projectData,
       projectStateTag: this._getProjectStateTag(projectData.projectState),
       isReadOnly,
+      isLegacy,
       ERROR_CODES: PROJECT_VIEW_ERROR_CODES,
       fieldErrors: {},
       errorCode: '',
