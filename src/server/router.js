@@ -39,7 +39,8 @@ export const router = {
         'journey-selection',
         'accounts',
         'organisations',
-        'projects'
+        'projects',
+        'download-rma'
       ])
 
       // General user routes
