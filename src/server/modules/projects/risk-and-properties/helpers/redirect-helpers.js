@@ -168,9 +168,9 @@ export function handlePropertyAffectedFloodingRedirect(
  * @param {object} h - Hapi response toolkit
  * @param {object} sessionData - Session data
  * @param {string} referenceNumber - Project reference number
- * @returns {object|null} Redirect response or null if using static sequence
+ * @returns {Promise<object>|object|null} Redirect response or null if using static sequence
  */
-export async function handleConditionalRedirect(
+export function handleConditionalRedirect(
   step,
   request,
   h,
@@ -181,6 +181,7 @@ export async function handleConditionalRedirect(
 
   switch (step) {
     case PROJECT_STEPS.RISK:
+      // Only this case returns a Promise and needs to be awaited by caller
       return handleRiskStepRedirect(request, h, sessionData, referenceNumber)
 
     case PROJECT_STEPS.MAIN_RISK:

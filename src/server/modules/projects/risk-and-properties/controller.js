@@ -153,14 +153,9 @@ class RiskAndPropertiesController {
     const { slug: referenceNumber } = sessionData
     const step = getProjectStep(request)
 
-    // Handle conditional redirects (await required for async helper functions)
-    // eslint-disable-next-line
-    const conditionalRedirect = await handleConditionalRedirect(
-      step,
-      request,
-      h,
-      sessionData,
-      referenceNumber
+    // Handle conditional redirects (RISK step returns Promise, others return synchronous values)
+    const conditionalRedirect = await Promise.resolve(
+      handleConditionalRedirect(step, request, h, sessionData, referenceNumber)
     )
 
     if (conditionalRedirect) {
