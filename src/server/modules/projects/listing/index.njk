@@ -180,9 +180,9 @@
                   </td>
                 {% elif isSubmission %}
                   <td class="govuk-table__cell govuk-!-white-space-nowrap" data-label="">
-                    <a href="#" class="govuk-link" data-testid="resend-to-pol">{{ t('projects.failed_submissions.actions.resend_to_pol') }}</a>
+                    <a href="#" class="govuk-link" data-testid="resend-to-aims-pd">{{ t('projects.failed_submissions.actions.resend_to_aims_pd') }}</a>
                     &nbsp;|&nbsp;
-                    <a href="#" class="govuk-link" data-testid="sent-to-pol">{{ t('projects.failed_submissions.actions.sent_to_pol') }}</a>
+                    <a href="#" class="govuk-link" data-testid="proposal-in-aims-pd">{{ t('projects.failed_submissions.actions.proposal_in_aims_pd') }}</a>
                   </td>
                 {% endif %}
               </tr>
@@ -240,7 +240,7 @@
     <div class="govuk-grid-row govuk-!-margin-top-9">
       <div class="govuk-grid-column-two-thirds">
         {% set detailsHtml %}
-        <p class="govuk-body">{{ t('projects.failed_submissions.footer.check_pol') }}</p>
+        <p class="govuk-body">{{ t('projects.failed_submissions.footer.check_aims_pd') }}</p>
         <ul class="govuk-list govuk-list--bullet">
           <li>{{ t('projects.failed_submissions.footer.if_yes') }}
             {{ t('projects.failed_submissions.footer.if_yes_result') }}</li>

@@ -22,6 +22,8 @@ import { PROJECT_PAYLOAD_FIELDS } from '../../../common/constants/projects.js'
  */
 
 export const validateStartOutlineBusinessCase = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: Joi.number().optional(),
   [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]:
     startOutlineBusinessCaseMonthSchema,
   [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]:
@@ -31,6 +33,12 @@ export const validateStartOutlineBusinessCase = Joi.object({
   .label('Start Outline Business Case')
 
 export const validateCompleteOutlineBusinessCase = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]:
+    Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]:
+    Joi.number().optional(),
   [PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH]:
     completeOutlineBusinessCaseMonthSchema,
   [PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR]:
@@ -40,6 +48,12 @@ export const validateCompleteOutlineBusinessCase = Joi.object({
   .label('Complete Outline Business Case')
 
 export const validateAwardMainContract = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH]:
+    Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR]:
+    Joi.number().optional(),
   [PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_MONTH]: awardContractMonthSchema,
   [PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_YEAR]: awardContractYearSchema
 })
@@ -47,6 +61,10 @@ export const validateAwardMainContract = Joi.object({
   .label('Award Main Contract')
 
 export const validateStartWork = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_MONTH]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_YEAR]: Joi.number().optional(),
   [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]:
     startConstructionMonthSchema,
   [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]: startConstructionYearSchema
@@ -55,6 +73,10 @@ export const validateStartWork = Joi.object({
   .label('Start Work')
 
 export const validateStartBenefits = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]: Joi.number().optional(),
   [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]: readyForServiceMonthSchema,
   [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: readyForServiceYearSchema
 })
@@ -68,6 +90,10 @@ export const validateCouldStartEarlier = Joi.object({
   .label('Could Start Earlier')
 
 export const validateEarliestStartDate = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]:
+    Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]:
+    Joi.number().optional(),
   [PROJECT_PAYLOAD_FIELDS.COULD_START_EARLY]: Joi.any(),
   [PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH]: earliestWithGiaMonthSchema,
   [PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_YEAR]: earliestWithGiaYearSchema

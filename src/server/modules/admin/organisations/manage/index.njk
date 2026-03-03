@@ -42,7 +42,7 @@
               href: "#identifier"
             }
           ]) %}
-        {% elif fieldErrors.identifier == ERROR_CODES.DUPLICATE_IDENTIFIER %}
+        {% elif fieldErrors.identifier == ERROR_CODES.DUPLICATE_IDENTIFIER or errorCode == ERROR_CODES.DUPLICATE_IDENTIFIER %}
           {% set errorList = errorList.concat([
             {
               text: t('organisations.validation.DUPLICATE_AREA_IDENTIFIER'),
@@ -75,7 +75,7 @@
               href: "#name"
             }
           ]) %}
-        {% elif fieldErrors.name == ERROR_CODES.DUPLICATE_NAME %}
+        {% elif fieldErrors.name == ERROR_CODES.DUPLICATE_NAME or errorCode == ERROR_CODES.DUPLICATE_NAME %}
           {% set errorList = errorList.concat([
             {
               text: t('organisations.validation.DUPLICATE_AREA_NAME'),
@@ -107,7 +107,7 @@
               href: "#name"
             }
           ]) %}
-        {% elif fieldErrors.name == ERROR_CODES.DUPLICATE_NAME %}
+        {% elif fieldErrors.name == ERROR_CODES.DUPLICATE_NAME or errorCode == ERROR_CODES.DUPLICATE_NAME %}
           {% set errorList = errorList.concat([
             {
               text: t('organisations.validation.DUPLICATE_AREA_NAME'),
@@ -133,7 +133,7 @@
               href: "#identifier"
             }
           ]) %}
-        {% elif fieldErrors.identifier == ERROR_CODES.DUPLICATE_IDENTIFIER %}
+        {% elif fieldErrors.identifier == ERROR_CODES.DUPLICATE_IDENTIFIER or errorCode == ERROR_CODES.DUPLICATE_IDENTIFIER %}
           {% set errorList = errorList.concat([
             {
               text: t('organisations.validation.DUPLICATE_AREA_IDENTIFIER'),
@@ -232,7 +232,7 @@
             {% set authorityTypeError = {
               text: t('organisations.validation.VALIDATION_AUTHORITY_TYPE_TOO_LONG')
             } %}
-          {% elif fieldErrors.name == ERROR_CODES.DUPLICATE_NAME %}
+          {% elif fieldErrors.name == ERROR_CODES.DUPLICATE_NAME or errorCode == ERROR_CODES.DUPLICATE_NAME %}
             {% set authorityTypeError = {
               text: t('organisations.validation.DUPLICATE_AREA_NAME')
             } %}
@@ -254,7 +254,7 @@
             {% set nameError = {
               text: t('organisations.validation.VALIDATION_AREA_NAME_TOO_LONG')
             } %}
-          {% elif fieldErrors.name == ERROR_CODES.DUPLICATE_NAME %}
+          {% elif fieldErrors.name == ERROR_CODES.DUPLICATE_NAME or errorCode == ERROR_CODES.DUPLICATE_NAME %}
             {% set nameError = {
               text: t('organisations.validation.DUPLICATE_AREA_NAME')
             } %}
@@ -272,7 +272,7 @@
             {% set authorityCode = {
               text: t('organisations.validation.VALIDATION_AUTHORITY_CODE_TOO_LONG')
             } %}
-          {% elif fieldErrors.identifier == ERROR_CODES.DUPLICATE_IDENTIFIER %}
+          {% elif fieldErrors.identifier == ERROR_CODES.DUPLICATE_IDENTIFIER or errorCode == ERROR_CODES.DUPLICATE_IDENTIFIER %}
             {% set authorityCode = {
               text: t('organisations.validation.DUPLICATE_AREA_IDENTIFIER')
             } %}
@@ -290,7 +290,7 @@
             {% set identifierError = {
               text: t('organisations.validation.VALIDATION_AREA_IDENTIFIER_TOO_LONG')
             } %}
-          {% elif fieldErrors.identifier == ERROR_CODES.DUPLICATE_IDENTIFIER %}
+          {% elif fieldErrors.identifier == ERROR_CODES.DUPLICATE_IDENTIFIER or errorCode == ERROR_CODES.DUPLICATE_IDENTIFIER %}
             {% set identifierError = {
               text: t('organisations.validation.DUPLICATE_AREA_IDENTIFIER')
             } %}

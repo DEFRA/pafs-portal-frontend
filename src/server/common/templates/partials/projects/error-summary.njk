@@ -162,17 +162,10 @@
       href: "#startOutlineBusinessCaseMonth"
     }
   ]) %}
-{% elif fieldErrors.startOutlineBusinessCaseMonth and(fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.DATE_IN_PAST) %}
+{% elif fieldErrors.startOutlineBusinessCaseMonth and(fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.in_past', {placeholder: t('projects.important_dates.start_outline_business_case.placeholder')}),
-      href: "#startOutlineBusinessCaseMonth"
-    }
-  ]) %}
-{% elif fieldErrors.startOutlineBusinessCaseMonth and(fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.DATE_AFTER_FINANCIAL_END) %}
-  {% set errorList = errorList.concat([
-    {
-      text: t('projects.important_dates.validation.financial_year_range', {
+      text: t('projects.important_dates.validation.outside_financial_range', {
         placeholder: t('projects.important_dates.start_outline_business_case.placeholder'),
         financialYearStart: financialYearStart or '',
         financialYearEnd: financialYearEnd or ''
@@ -197,13 +190,6 @@
       href: "#completeOutlineBusinessCaseMonth"
     }
   ]) %}
-{% elif fieldErrors.completeOutlineBusinessCaseMonth and(fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.DATE_IN_PAST) %}
-  {% set errorList = errorList.concat([
-    {
-      text: t('projects.important_dates.validation.in_past', {placeholder: t('projects.important_dates.complete_outline_business_case.placeholder')}),
-      href: "#completeOutlineBusinessCaseMonth"
-    }
-  ]) %}
 {% elif fieldErrors.completeOutlineBusinessCaseMonth and(fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or errorCode == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE) %}
   {% set errorList = errorList.concat([
     {
@@ -215,10 +201,10 @@
       href: "#completeOutlineBusinessCaseMonth"
     }
   ]) %}
-{% elif fieldErrors.completeOutlineBusinessCaseMonth and(fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.DATE_AFTER_FINANCIAL_END or errorCode == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or errorCode == ERROR_CODES.DATE_AFTER_FINANCIAL_END) %}
+{% elif fieldErrors.completeOutlineBusinessCaseMonth and(fieldErrors.completeOutlineBusinessCaseMonth == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE or fieldErrors.completeOutlineBusinessCaseYear == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.financial_year_range', {
+      text: t('projects.important_dates.validation.outside_financial_range', {
         placeholder: t('projects.important_dates.complete_outline_business_case.placeholder'),
         financialYearStart: financialYearStart or '',
         financialYearEnd: financialYearEnd or ''
@@ -243,13 +229,6 @@
       href: "#awardContractMonth"
     }
   ]) %}
-{% elif fieldErrors.awardContractMonth and(fieldErrors.awardContractMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.awardContractYear == ERROR_CODES.DATE_IN_PAST) %}
-  {% set errorList = errorList.concat([
-    {
-      text: t('projects.important_dates.validation.in_past', {placeholder: t('projects.important_dates.award_main_contract.placeholder')}),
-      href: "#awardContractMonth"
-    }
-  ]) %}
 {% elif fieldErrors.awardContractMonth and(fieldErrors.awardContractMonth == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or fieldErrors.awardContractYear == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or errorCode == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE) %}
   {% set errorList = errorList.concat([
     {
@@ -261,10 +240,10 @@
       href: "#awardContractMonth"
     }
   ]) %}
-{% elif fieldErrors.awardContractMonth and(fieldErrors.awardContractMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.awardContractYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.awardContractMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors.awardContractYear == ERROR_CODES.DATE_AFTER_FINANCIAL_END or errorCode == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or errorCode == ERROR_CODES.DATE_AFTER_FINANCIAL_END) %}
+{% elif fieldErrors.awardContractMonth and(fieldErrors.awardContractMonth == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE or fieldErrors.awardContractYear == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.financial_year_range', {
+      text: t('projects.important_dates.validation.outside_financial_range', {
         placeholder: t('projects.important_dates.award_main_contract.placeholder'),
         financialYearStart: financialYearStart or '',
         financialYearEnd: financialYearEnd or ''
@@ -289,13 +268,6 @@
       href: "#startConstructionMonth"
     }
   ]) %}
-{% elif fieldErrors.startConstructionMonth and(fieldErrors.startConstructionMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.startConstructionYear == ERROR_CODES.DATE_IN_PAST) %}
-  {% set errorList = errorList.concat([
-    {
-      text: t('projects.important_dates.validation.in_past', {placeholder: t('projects.important_dates.expect_to_start_the_work.placeholder')}),
-      href: "#startConstructionMonth"
-    }
-  ]) %}
 {% elif fieldErrors.startConstructionMonth and(fieldErrors.startConstructionMonth == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or fieldErrors.startConstructionYear == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or errorCode == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE) %}
   {% set errorList = errorList.concat([
     {
@@ -307,10 +279,10 @@
       href: "#startConstructionMonth"
     }
   ]) %}
-{% elif fieldErrors.startConstructionMonth and(fieldErrors.startConstructionMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.startConstructionYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.startConstructionMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors.startConstructionYear == ERROR_CODES.DATE_AFTER_FINANCIAL_END or errorCode == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or errorCode == ERROR_CODES.DATE_AFTER_FINANCIAL_END) %}
+{% elif fieldErrors.startConstructionMonth and(fieldErrors.startConstructionMonth == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE or fieldErrors.startConstructionYear == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.financial_year_range', {
+      text: t('projects.important_dates.validation.outside_financial_range', {
         placeholder: t('projects.important_dates.expect_to_start_the_work.placeholder'),
         financialYearStart: financialYearStart or '',
         financialYearEnd: financialYearEnd or ''
@@ -335,13 +307,6 @@
       href: "#readyForServiceMonth"
     }
   ]) %}
-{% elif fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.readyForServiceYear == ERROR_CODES.DATE_IN_PAST) %}
-  {% set errorList = errorList.concat([
-    {
-      text: t('projects.important_dates.validation.in_past', {placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder')}),
-      href: "#readyForServiceMonth"
-    }
-  ]) %}
 {% elif fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or fieldErrors.readyForServiceYear == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or errorCode == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE) %}
   {% set errorList = errorList.concat([
     {
@@ -353,10 +318,10 @@
       href: "#readyForServiceMonth"
     }
   ]) %}
-{% elif fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.readyForServiceYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.readyForServiceMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors.readyForServiceYear == ERROR_CODES.DATE_AFTER_FINANCIAL_END or errorCode == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or errorCode == ERROR_CODES.DATE_AFTER_FINANCIAL_END) %}
+{% elif fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE or fieldErrors.readyForServiceYear == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.financial_year_range', {
+      text: t('projects.important_dates.validation.outside_financial_range', {
         placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder'),
         financialYearStart: financialYearStart or '',
         financialYearEnd: financialYearEnd or ''
@@ -391,17 +356,19 @@
       href: "#earliestWithGiaMonth"
     }
   ]) %}
-{% elif fieldErrors.earliestWithGiaMonth and(fieldErrors.earliestWithGiaMonth == ERROR_CODES.DATE_IN_PAST or fieldErrors.earliestWithGiaYear == ERROR_CODES.DATE_IN_PAST) %}
+{% elif fieldErrors.earliestWithGiaMonth and(fieldErrors.earliestWithGiaMonth == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors.earliestWithGiaYear == ERROR_CODES.DATE_BEFORE_FINANCIAL_START) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.earliest_date_in_past'),
+      text: t('projects.important_dates.validation.earliest_date_before_financial_start', {financialYearStart: currentFinancialYearStart or ''}),
       href: "#earliestWithGiaMonth"
     }
   ]) %}
-{% elif fieldErrors.earliestWithGiaMonth and(fieldErrors.earliestWithGiaMonth == ERROR_CODES.DATE_AFTER_FINANCIAL_START or fieldErrors.earliestWithGiaYear == ERROR_CODES.DATE_AFTER_FINANCIAL_START) %}
+{% elif fieldErrors.earliestWithGiaMonth and(fieldErrors.earliestWithGiaMonth == ERROR_CODES.DATE_AFTER_OBC_START or fieldErrors.earliestWithGiaYear == ERROR_CODES.DATE_AFTER_OBC_START) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.earliest_date_after_financial_start', {financialYearStart: financialYearStart or ''}),
+      text: t('projects.important_dates.validation.earliest_date_after_obc_start', {
+        obcStartDate: obcStartDateFormatted or (formData.startOutlineBusinessCaseMonth + '/' + formData.startOutlineBusinessCaseYear)
+      }),
       href: "#earliestWithGiaMonth"
     }
   ]) %}

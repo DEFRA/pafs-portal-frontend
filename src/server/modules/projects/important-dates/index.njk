@@ -7,6 +7,21 @@
 
 {% block body %}
   <form method="post" novalidate>
+    {# Hidden context fields for validation #}
+    {% if fieldType == 'date' %}
+      {% if monthField != 'earliestWithGiaMonth' %}
+        {# Financial year context for all timeline dates #}
+        <input type="hidden" name="financialStartYear" value="{{ formData.financialStartYear }}"/>
+        <input type="hidden" name="financialEndYear" value="{{ formData.financialEndYear }}"/>
+      {% endif %}
+
+      {# For earliest date, include OBC start date context #}
+      {% if monthField == 'earliestWithGiaMonth' %}
+        <input type="hidden" name="startOutlineBusinessCaseMonth" value="{{ formData.startOutlineBusinessCaseMonth }}"/>
+        <input type="hidden" name="startOutlineBusinessCaseYear" value="{{ formData.startOutlineBusinessCaseYear }}"/>
+      {% endif %}
+    {% endif %}
+
     {% if fieldType == 'date' %}
       {# Date field (month and year only) #}
       {% if fieldErrors and(fieldErrors[monthField] or fieldErrors[yearField]) %}
@@ -19,7 +34,7 @@
               previousStageDate: previousStageDate or ''
             })
           } %}
-        {% elif errorKey == 'financial_year_range' %}
+        {% elif errorKey == 'outside_financial_range' %}
           {% set dateError = {
             text: t('projects.important_dates.validation.' + errorKey, {
               placeholder: t(localKeyPrefix + '.placeholder'),
@@ -27,9 +42,15 @@
               financialYearEnd: financialYearEnd
             })
           } %}
-        {% elif errorKey == 'earliest_date_after_financial_start' %}
+        {% elif errorKey == 'earliest_date_before_financial_start' %}
           {% set dateError = {
-            text: t('projects.important_dates.validation.' + errorKey, {financialYearStart: financialYearStart})
+            text: t('projects.important_dates.validation.' + errorKey, {financialYearStart: currentFinancialYearStart})
+          } %}
+        {% elif errorKey == 'earliest_date_after_obc_start' %}
+          {% set dateError = {
+            text: t('projects.important_dates.validation.' + errorKey, {
+              obcStartDate: obcStartDateFormatted
+            })
           } %}
         {% elif monthField == 'earliestWithGiaMonth' %}
           {% set dateError = {

@@ -93,19 +93,41 @@ class ImportantDatesController {
       sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]
     const financialEndYear =
       sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]
-    const finalFinancialEndYear =
-      financialStartYear === financialEndYear
-        ? financialStartYear + 1
-        : financialEndYear
 
+    // Financial year ends in March of the NEXT year
+    // e.g., FY 2030 runs from April 2030 to March 2031
     return {
       financialYearStart: financialStartYear
         ? formatDate('4', financialStartYear)
         : '',
       financialYearEnd: financialEndYear
-        ? formatDate('3', finalFinancialEndYear)
+        ? formatDate('3', Number(financialEndYear) + 1)
         : ''
     }
+  }
+
+  _getObcStartDate(sessionData) {
+    const month = sessionData.startOutlineBusinessCaseMonth
+    const year = sessionData.startOutlineBusinessCaseYear
+
+    if (!month || !year) {
+      return null
+    }
+
+    return formatDate(month, year)
+  }
+
+  _getCurrentFinancialYearStart() {
+    const now = new Date()
+    const currentMonth = now.getMonth() + 1
+    const currentYear = now.getFullYear()
+
+    // If we're before April (months 1-3), we're in the previous financial year
+    const currentFinancialYear =
+      currentMonth < 4 ? currentYear - 1 : currentYear
+
+    // Financial year starts in April
+    return formatDate('4', currentFinancialYear)
   }
 
   _getViewData(request) {
@@ -124,6 +146,8 @@ class ImportantDatesController {
     const previousStageDate = this._getPreviousStageData(step, sessionData)
     const { financialYearStart, financialYearEnd } =
       this._getFinancialYearDates(sessionData)
+    const obcStartDate = this._getObcStartDate(sessionData)
+    const currentFinancialYearStart = this._getCurrentFinancialYearStart()
 
     const additionalData = {
       step,
@@ -136,7 +160,9 @@ class ImportantDatesController {
       dateHint: request.t('projects.common.date_hint'),
       previousStageDate: previousStageDate || '',
       financialYearStart: financialYearStart || '',
-      financialYearEnd: financialYearEnd || ''
+      financialYearEnd: financialYearEnd || '',
+      obcStartDateFormatted: obcStartDate || '',
+      currentFinancialYearStart: currentFinancialYearStart || ''
     }
 
     return buildViewData(request, {

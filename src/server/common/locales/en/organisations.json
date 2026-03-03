@@ -104,7 +104,7 @@
     "VALIDATION_AUTHORITY_CODE_OPTION_REQUIRED": "Select an authority code",
     "VALIDATION_ASSOCIATED_PSO_REQUIRED": "Select an associated PSO",
     "VALIDATION_AREA_DATE_INVALID": "Enter a valid end date",
-    "DUPLICATE_AREA_NAME": "An area with this name already exists for this organisation type",
-    "DUPLICATE_AREA_IDENTIFIER": "An area with this code already exists for this organisation type"
+    "DUPLICATE_AREA_NAME": "An organisation with this name already exists",
+    "DUPLICATE_AREA_IDENTIFIER": "An organisation with this code already exists"
   }
 }

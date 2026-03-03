@@ -89,6 +89,7 @@ export const SESSION = {
  */
 export const SIZE = {
   LENGTH_1: 1,
+  LENGTH_3: 3,
   LENGTH_4: 4,
   LENGTH_6: 6,
   LENGTH_8: 8,

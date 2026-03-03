@@ -290,13 +290,15 @@
       "required": "Enter the date you expect {{placeholder}}",
       "invalid": "Enter a valid date for when you expect {{placeholder}}",
       "in_past": "You cannot enter a date in the past for when you expect {{placeholder}}",
+      "outside_financial_range": "The date you expect {{placeholder}} must be within the financial year selected for the project {{financialYearStart}} to {{financialYearEnd}}",
       "financial_year_range": "The date you expect {{placeholder}} must be within the financial year selected for the project {{financialYearStart}} to {{financialYearEnd}}",
       "before_previous_stage": "You expect {{previousStagePlaceholder}} on {{previousStageDate}}. The date you expect {{placeholder}} must come after this date",
       "could_start_earlier_required": "Tell us if the project can start earlier",
       "earliest_date_required": "Tell us the earliest date the project can start",
       "earliest_date_invalid": "Enter a valid earliest date the project can start",
       "earliest_date_in_past": "You cannot enter a date in the past for the earliest date the project can start",
-      "earliest_date_after_financial_start": "The earliest date the project can start must be before the financial year start date selected for the project {{financialYearStart}}"
+      "earliest_date_before_financial_start": "The earliest date the project can start must be after {{financialYearStart}}",
+      "earliest_date_after_obc_start": "The earliest date the project can start must be before or on {{obcStartDate}}"
     }
   },
   "project_benefit_area": {
@@ -958,19 +960,19 @@
     }
   },
   "failed_submissions": {
-    "title": "Failed PoL Submissions",
-    "heading": "Failed PoL Submissions",
-    "description": "The following submissions have not been flagged as received by PoL",
+    "title": "Failed AIMS PD Submissions",
+    "heading": "Failed AIMS PD Submissions",
+    "description": "The following submissions have not been flagged as received by AIMS PD",
     "actions": {
-      "resend_to_pol": "Resend to PoL",
-      "sent_to_pol": "Sent to PoL"
+      "resend_to_aims_pd": "Resend to AIMS PD",
+      "proposal_in_aims_pd": "Proposal in AIMS PD"
     },
     "footer": {
       "label": "How to manage failed submissions",
-      "check_pol": "Check if the proposal has arrived in PoL",
-      "if_yes": "If YES, click on the 'Sent to PoL' link.",
+      "check_aims_pd": "Check if the proposal has arrived in AIMS PD",
+      "if_yes": "If YES, click on the 'Proposal in AIMS PD' link.",
       "if_yes_result": "The proposal will disappear from the list, end of process.",
-      "if_no": "If NO, click on the 'Resend to PoL' link",
+      "if_no": "If NO, click on the 'Resend to AIMS PD' link",
       "if_no_success": "If displays successfully resubmitted, end of process.",
       "if_no_failed": "If displays failed to resubmit, the resend was unsuccessful",
       "contact_helpdesk": "For unsuccessful resends, please contact the Program Framework helpdesk",
