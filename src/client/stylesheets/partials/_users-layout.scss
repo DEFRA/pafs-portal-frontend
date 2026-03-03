@@ -1,4 +1,4 @@
-@use "govuk-frontend/dist/govuk/base" as govuk with ($govuk-new-typography-scale: true);
+@use "../govuk-base" as govuk;
 
 // Users layout page styles
 // Used by pending and active users pages
@@ -25,7 +25,7 @@
   padding: govuk.govuk-spacing(2) govuk.govuk-spacing(4);
   text-decoration: none;
   color: govuk.govuk-colour("black");
-  background-color: govuk.govuk-colour("light-grey");
+  background-color: govuk.govuk-colour("black", $variant: "tint-95");
 
   &:link,
   &:visited {
@@ -34,7 +34,7 @@
   }
 
   &:hover {
-    background-color: govuk.govuk-colour("mid-grey");
+    background-color: govuk.govuk-colour("black", $variant: "tint-80");
     text-decoration: none;
     color: govuk.govuk-colour("black");
   }

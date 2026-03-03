@@ -11,7 +11,9 @@
   "switch_to_user": "Switch to User journey",
   "error_summary_title": "There is a problem",
   "header_navigation_label": "Profile",
+  "header_navigation_menu_button_label": "Show or hide Profile menu",
   "service_navigation_menu_button_text": "Menu",
+  "service_navigation_menu_button_label": "Show or hide service navigation menu",
   "back_to_sign_in": "Back to sign in",
   "return_to_sign_in": "Return to sign in",
   "important": "Important",
@@ -57,7 +59,7 @@
     "upload_and_continue": "Upload and continue"
   },
   "footer": {
-    "contact_html": "Any issues contact the Defra IT Service Desk on <a href=\"tel:08008766458\" class=\"govuk-footer__link\">0800 8766458</a> or email <a href=\"mailto:pafs-support@environment-agency.gov.uk\" class=\"govuk-footer__link\">pafs-support@environment-agency.gov.uk</a>",
+    "contact_html": "Any issues contact the Defra IT Service Desk on <a href=\"tel:08008766458\" class=\"govuk-footer__link\">0800 8766458</a> or <br/> email <a href=\"mailto:pafs-support@environment-agency.gov.uk\" class=\"govuk-footer__link\">pafs-support@environment-agency.gov.uk</a>",
     "links": {
       "privacy": {
         "text": "Privacy",

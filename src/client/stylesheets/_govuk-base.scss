@@ -1,0 +1,5 @@
+// Forward govuk-frontend base with configured assets path
+// Use this in partial files instead of importing govuk-frontend/dist/govuk/base directly
+@forward "govuk-frontend/dist/govuk/base" with (
+  $govuk-assets-path: "/public/assets/"
+);
