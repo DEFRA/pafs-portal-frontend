@@ -1,0 +1,143 @@
+import { describe, test, expect } from 'vitest'
+import { handleConditionalRedirect } from './redirect-helpers.js'
+import { PROJECT_STEPS } from '../../../../common/constants/projects.js'
+
+describe('NFM Redirect Helpers', () => {
+  const mockRequest = {}
+  const mockH = {
+    redirect: (path) => ({
+      takeover: () => ({ redirected: true, path })
+    })
+  }
+
+  describe('handleConditionalRedirect - NFM_RIVER_RESTORATION', () => {
+    test('should redirect to leaky barriers when selected', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration,leaky_barriers'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_RIVER_RESTORATION,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('leaky-barriers')
+      expect(result.path).toContain('TEST-001')
+    })
+
+    test('should redirect to overview when leaky barriers not selected', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_RIVER_RESTORATION,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001')
+    })
+
+    test('should redirect to overview when no measures selected', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: ''
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_RIVER_RESTORATION,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001')
+    })
+
+    test('should redirect to overview when selected measures is undefined', async () => {
+      const sessionData = {}
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_RIVER_RESTORATION,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_LEAKY_BARRIERS', () => {
+    test('should redirect to overview after leaky barriers', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration,leaky_barriers'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_LEAKY_BARRIERS,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_SELECTED_MEASURES', () => {
+    test('should return null for selected measures step', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_SELECTED_MEASURES,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBe(null)
+    })
+  })
+
+  describe('handleConditionalRedirect - Unknown step', () => {
+    test('should return null for unknown step', async () => {
+      const sessionData = {}
+
+      const result = await handleConditionalRedirect(
+        'UNKNOWN_STEP',
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBe(null)
+    })
+  })
+})

@@ -1,5 +1,6 @@
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
+  NFM_MEASURES,
   PROJECT_INTERVENTION_TYPES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_RISK_TYPES,
@@ -45,6 +46,7 @@ class OverviewController {
       PROJECT_RISK_TYPES,
       PROJECT_PAYLOAD_FIELDS,
       PROJECT_STEPS,
+      NFM_MEASURES,
       buildFinancialYearLabel,
       formatDate,
       formatFileSize

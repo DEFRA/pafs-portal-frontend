@@ -95,6 +95,20 @@
       "title": "Approach",
       "not_added": "No approach added yet"
     },
+    "nfm_summary_card": {
+      "title": "Natural Flood Management",
+      "not_added": "No natural flood management measures added yet",
+      "selected_measures": "Selected NFM measures",
+      "measures_details": "Measure details",
+      "table": {
+        "measure_type": "Measure type",
+        "area": "Area",
+        "volume": "Storage volume",
+        "length": "Length",
+        "width": "Width",
+        "actions": "Actions"
+      }
+    },
     "environmental_summary_card": {
       "title": "Environmental benefits",
       "not_added": "No environmental benefits data added yet"
@@ -425,6 +439,48 @@
       },
       "errors": {
         "required": "Select a coastal erosion risk level"
+      }
+    }
+  },
+  "nfm": {
+    "selected_measures": {
+      "title": "Which natural flood management measures are in your project?",
+      "heading": "Which natural flood management measures are in your project?",
+      "hint": "Select all that apply",
+      "error": "Select at least one natural flood management measure",
+      "options": {
+        "river_floodplain_restoration": "River and floodplain restoration",
+        "leaky_barriers": "Leaky barriers and in-channel storage",
+        "leaky_barriers_in_channel_storage": "Leaky barriers and in-channel storage",
+        "offline_storage": "Offline storage areas",
+        "woodland": "Woodland",
+        "headwater_drainage": "Headwater drainage management",
+        "runoff_management": "Runoff attenuation or management",
+        "saltmarsh_management": "Saltmarsh or mudflat management",
+        "sand_dune_management": "Sand dune management"
+      }
+    },
+    "river_restoration": {
+      "title": "Details of new river and floodplain restoration",
+      "area": {
+        "label": "Area"
+      },
+      "volume": {
+        "label": "Design storage volume",
+        "hint": "If known"
+      }
+    },
+    "leaky_barriers": {
+      "title": "Details of Leaky barriers and in-channel storage",
+      "volume": {
+        "label": "Design storage volume",
+        "hint": "If known"
+      },
+      "length": {
+        "label": "Length"
+      },
+      "width": {
+        "label": "Typical width"
       }
     }
   },

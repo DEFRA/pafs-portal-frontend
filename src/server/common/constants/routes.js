@@ -121,7 +121,12 @@ export const ROUTES = {
       FORTY_PERCENT_DEPRIVED: `/project/{referenceNumber}/${PROJECT_STEPS.FORTY_PERCENT_DEPRIVED}`,
       CURRENT_FLOOD_RISK: `/project/{referenceNumber}/${PROJECT_STEPS.CURRENT_FLOOD_RISK}`,
       CURRENT_FLOOD_SURFACE_WATER_RISK: `/project/{referenceNumber}/${PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK}`,
-      CURRENT_COASTAL_EROSION_RISK: `/project/{referenceNumber}/${PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK}`
+      CURRENT_COASTAL_EROSION_RISK: `/project/{referenceNumber}/${PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK}`,
+      NFM: {
+        SELECTED_MEASURES: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_SELECTED_MEASURES}`,
+        RIVER_RESTORATION: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_RIVER_RESTORATION}`,
+        LEAKY_BARRIERS: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_LEAKY_BARRIERS}`
+      }
     }
   },
 

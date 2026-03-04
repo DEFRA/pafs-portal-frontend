@@ -44,7 +44,10 @@ export const PROJECT_VIEWS = {
   IMPORTANT_DATES: 'modules/projects/important-dates/index',
   BENEFIT_AREA: 'modules/projects/benefit-area/index',
   BENEFIT_AREA_DELETE: 'modules/projects/benefit-area/delete',
-  RISK_AND_PROPERTIES: 'modules/projects/risk-and-properties/index'
+  RISK_AND_PROPERTIES: 'modules/projects/risk-and-properties/index',
+  NFM: 'modules/projects/nfm/index',
+  NFM_RIVER_RESTORATION: 'modules/projects/nfm/river-restoration',
+  NFM_LEAKY_BARRIERS: 'modules/projects/nfm/leaky-barriers'
 }
 
 export const PROPOSAL_VIEWS = {

@@ -153,7 +153,6 @@ class RiskAndPropertiesController {
     const step = getProjectStep(request)
 
     // Handle conditional redirects (await required for async helper functions)
-    // eslint-disable-next-line
     const conditionalRedirect = await handleConditionalRedirect(
       step,
       request,

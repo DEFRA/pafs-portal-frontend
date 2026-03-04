@@ -27,6 +27,9 @@ import {
   validateCurrentFloodSurfaceWaterRisk,
   validateCurrentCoastalErosionRisk
 } from '../schema.js'
+import { nfmSelectedMeasuresSchema } from '../nfm/schema.js'
+import { nfmRiverRestorationSchema } from '../nfm/river-restoration-schema.js'
+import { nfmLeakyBarriersSchema } from '../nfm/leaky-barriers-schema.js'
 
 export const interventionTypesLocalKeyPrefix = 'projects.intervention_type'
 export const projectTypesLocalKeyPrefix = 'projects.project_type'
@@ -321,6 +324,21 @@ export const PROJECT_PAYLOAD_LEVEL_FIELDS = {
   [PROJECT_PAYLOAD_LEVELS.CURRENT_COASTAL_EROSION_RISK]: [
     PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
     PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK
+  ],
+  [PROJECT_PAYLOAD_LEVELS.NFM_SELECTED_MEASURES]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES
+  ],
+  [PROJECT_PAYLOAD_LEVELS.NFM_RIVER_RESTORATION]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA,
+    PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME
+  ],
+  [PROJECT_PAYLOAD_LEVELS.NFM_LEAKY_BARRIERS]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME,
+    PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH,
+    PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH
   ]
 }
 
@@ -419,4 +437,38 @@ export const RISK_AND_PROPERTIES_CONFIG = {
     schema: validateCurrentCoastalErosionRisk,
     fieldType: 'radio'
   }
+}
+
+/**
+ * Configuration for NFM (Natural Flood Management) related steps
+ */
+export const NFM_CONFIG = {
+  [PROJECT_STEPS.NFM_SELECTED_MEASURES]: {
+    localKeyPrefix: 'projects.nfm.selected_measures',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.OVERVIEW,
+      conditionalRedirect: true
+    },
+    schema: nfmSelectedMeasuresSchema,
+    fieldType: 'checkbox'
+  },
+  [PROJECT_STEPS.NFM_RIVER_RESTORATION]: {
+    localKeyPrefix: 'projects.nfm.river_restoration',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+      conditionalRedirect: false
+    },
+    schema: nfmRiverRestorationSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: {
+    localKeyPrefix: 'projects.nfm.leaky_barriers',
+    backLinkOptions: {
+      targetURL: ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
+      conditionalRedirect: false
+    },
+    schema: nfmLeakyBarriersSchema,
+    fieldType: 'input'
+  }
+  // Add more NFM steps here as needed
 }

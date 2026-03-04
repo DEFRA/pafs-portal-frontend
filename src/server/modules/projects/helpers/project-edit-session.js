@@ -6,8 +6,60 @@
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { getProjectProposalOverview } from '../../../common/services/project/project-service.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { PROJECT_SESSION_KEY } from '../../../common/constants/projects.js'
+import {
+  PROJECT_SESSION_KEY,
+  PROJECT_PAYLOAD_FIELDS
+} from '../../../common/constants/projects.js'
 import { getSessionData } from './project-utils.js'
+
+/**
+ * Map NFM measures array from backend to individual fields for frontend
+ * @param {Array} nfmMeasures - Array of NFM measure objects from backend
+ * @returns {Object} - Mapped NFM fields
+ */
+function mapNfmMeasuresToFields(nfmMeasures) {
+  const mappedFields = {}
+
+  if (!nfmMeasures || !Array.isArray(nfmMeasures)) {
+    return mappedFields
+  }
+
+  nfmMeasures.forEach((measure) => {
+    const { measureType, areaHectares, storageVolumeM3, lengthKm, widthM } =
+      measure
+
+    switch (measureType) {
+      case 'river_floodplain_restoration':
+        if (areaHectares !== null && areaHectares !== undefined) {
+          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA] =
+            areaHectares
+        }
+        if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
+          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME] =
+            storageVolumeM3
+        }
+        break
+      case 'leaky_barriers_in_channel_storage':
+        if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
+          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME] =
+            storageVolumeM3
+        }
+        if (lengthKm !== null && lengthKm !== undefined) {
+          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH] =
+            lengthKm
+        }
+        if (widthM !== null && widthM !== undefined) {
+          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH] = widthM
+        }
+        break
+      // Add more measure types here as they are implemented
+      default:
+        break
+    }
+  })
+
+  return mappedFields
+}
 
 /**
  * Compare two values for equality, handling arrays, strings, and numbers
@@ -45,13 +97,18 @@ function areValuesEqual(value1, value2) {
  * @returns {Object} Session data
  */
 export function initializeEditSession(request, projectData) {
+  // Map NFM measures from backend format to frontend fields
+  const nfmFields = mapNfmMeasuresToFields(projectData.pafs_core_nfm_measures)
+
   const sessionData = {
     ...projectData,
+    ...nfmFields, // Merge the mapped NFM fields
     journeyStarted: true,
     isEdit: true,
     referenceNumber: projectData.referenceNumber,
     originalData: {
-      ...projectData
+      ...projectData,
+      ...nfmFields // Store mapped NFM fields in originalData too
     }
   }
 

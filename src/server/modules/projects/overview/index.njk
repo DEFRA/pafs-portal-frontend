@@ -10,6 +10,7 @@
 {% from "views/approach-card.njk" import approachSummaryCard %}
 {% from "views/environmental-benefits-card.njk" import environmentalBenefitsSummaryCard %}
 {% from "views/urgency-card.njk" import urgencySummaryCard %}
+{% from "views/nfm-card.njk" import nfmSummaryCard %}
 
 {% block body %}
 
@@ -53,6 +54,8 @@
   {{ fundingSourcesAndSpendingSummaryCard(projectData, t) }}
 
   {{ riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t) }}
+
+  {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, t) }}
 
   {{ approachSummaryCard(projectData, t) }}
 

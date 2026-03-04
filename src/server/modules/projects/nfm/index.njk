@@ -1,0 +1,67 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block body %}
+  {% if errors and errors.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.errors.error_summary_title'),
+      errorList: errors
+    }) }}
+  {% endif %}
+
+  <form method="POST" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+    
+    <div class="govuk-form-group {% if fieldErrors.nfmSelectedMeasures %}govuk-form-group--error{% endif %}">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+          <h1 class="govuk-fieldset__heading">
+            {{ t('projects.nfm.selected_measures.title') }}
+          </h1>
+        </legend>
+
+        {% if t('projects.nfm.selected_measures.hint') %}
+          <div class="govuk-hint">
+            {{ t('projects.nfm.selected_measures.hint') }}
+          </div>
+        {% endif %}
+
+        {% if fieldErrors.nfmSelectedMeasures %}
+          <p id="nfm-selected-measures-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">{{ t('common.error') }}:</span>
+            {{ t('projects.nfm.selected_measures.error') }}
+          </p>
+        {% endif %}
+
+        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+          {%- set selectedMeasures = formData.nfmSelectedMeasures.split(',') if formData.nfmSelectedMeasures else [] -%}
+          {% for option in nfmMeasureOptions %}
+            <div class="govuk-checkboxes__item">
+              <input 
+                class="govuk-checkboxes__input" 
+                id="nfm-measure-{{ loop.index }}" 
+                name="nfmSelectedMeasures" 
+                type="checkbox" 
+                value="{{ option.value }}"
+                {% if option.value in selectedMeasures %}checked{% endif %}
+                {% if fieldErrors.nfmSelectedMeasures %}aria-describedby="nfm-selected-measures-error"{% endif %}
+              >
+              <label class="govuk-label govuk-checkboxes__label" for="nfm-measure-{{ loop.index }}">
+                {{ option.text }}
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+  </form>
+{% endblock %}

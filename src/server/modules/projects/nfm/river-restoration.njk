@@ -1,0 +1,67 @@
+{% extends "layouts/projects.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}{{ t('projects.nfm.river_restoration.title') }}{% endblock %}
+
+{% block body %}
+  {% if errors and errors.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.errors.error_summary_title'),
+      errorList: errors
+    }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <div class="govuk-form-group {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA] or fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME] %}govuk-form-group--error{% endif %}">
+      <h1 class="govuk-heading-l">{{ t('projects.nfm.river_restoration.title') }}</h1>
+      
+      {{ govukInput({
+        label: {
+          text: t('projects.nfm.river_restoration.area.label'),
+          classes: "govuk-label--m",
+          isPageHeading: false
+        },
+        id: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA,
+        name: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA,
+        value: formData.nfmRiverRestorationArea if formData.nfmRiverRestorationArea else '',
+        suffix: {
+          text: "hectares"
+        },
+        classes: "govuk-input--width-10",
+        errorMessage: {
+          text: fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]
+        } if fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA] else undefined
+      }) }}
+
+      {{ govukInput({
+        label: {
+          text: t('projects.nfm.river_restoration.volume.label'),
+          classes: "govuk-label--m",
+          isPageHeading: false
+        },
+        hint: {
+          text: t('projects.nfm.river_restoration.volume.hint')
+        },
+        id: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME,
+        name: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME,
+        value: formData.nfmRiverRestorationVolume if formData.nfmRiverRestorationVolume else '',
+        suffix: {
+          text: "m³"
+        },
+        classes: "govuk-input--width-10",
+        errorMessage: {
+          text: fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]
+        } if fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME] else undefined
+      }) }}
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+
+  </form>
+{% endblock %}
