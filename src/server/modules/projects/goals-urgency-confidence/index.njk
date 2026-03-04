@@ -1,0 +1,96 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block body %}
+  <form method="post" novalidate>
+    {% if fieldType == 'character-count' %}
+      {# Character count textarea field #}
+      {% if fieldErrors and fieldErrors[fieldName] %}
+        {% set charCountError = {
+          text: t(localKeyPrefix + '.validation.' + validationMessageKey, validationContext or {})
+        } %}
+      {% else %}
+        {% set charCountError = false %}
+      {% endif %}
+
+      {% set hintText = t(localKeyPrefix + '.hint') %}
+
+      {# Build example content for project goals #}
+      {% if step == PROJECT_STEPS.PROJECT_GOALS %}
+        {% set exampleText = t(localKeyPrefix + '.goals.example') %}
+        {% set exampleItems = t(localKeyPrefix + '.goals.example_items', {returnObjects: true}) %}
+        {% set hintHtml %}
+        <p class="govuk-body">{{ exampleText }}</p>
+        <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-5">
+          {% for item in exampleItems %}
+            <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+        <p class="govuk-hint">{{ hintText }}</p>
+        {% endset %}
+      {% endif %}
+
+      {% if step == PROJECT_STEPS.URGENCY_DETAILS %}
+        <input type="hidden" name="urgencyReason" value="{{ formData[PROJECT_PAYLOAD_FIELDS.URGENCY_REASON] }}">
+      {% endif %}
+
+      {# Dynamic heading for urgency details based on urgency reason #}
+      {% if dynamicHeading %}
+        {% set headingText = dynamicHeading %}
+      {% else %}
+        {% set headingText = t(localKeyPrefix + '.heading') %}
+      {% endif %}
+
+      {{ govukCharacterCount({
+        id: fieldName,
+        name: fieldName,
+        maxlength: maxLength,
+        value: formData[fieldName] or '',
+        label: {
+          text: headingText,
+          classes: "govuk-label--xl",
+          isPageHeading: true
+        },
+        hint: {
+          html: hintHtml
+        } if hintHtml else ({
+          text: hintText
+        } if hintText and hintText != (localKeyPrefix + '.hint') else false),
+        errorMessage: charCountError
+      }) }}
+
+    {% elif fieldType == 'radio' %}
+      {# Radio field #}
+      {% if fieldErrors and fieldErrors[fieldName] %}
+        {% set radioError = {
+          text: t(localKeyPrefix + '.validation.required')
+        } %}
+      {% else %}
+        {% set radioError = false %}
+      {% endif %}
+
+      {{ govukRadios({
+        id: fieldName,
+        name: fieldName,
+        fieldset: {
+          legend: {
+            text: t(localKeyPrefix + '.heading'),
+            classes: "govuk-fieldset__legend--xl",
+            isPageHeading: true
+          }
+        },
+        hint: {
+          text: t(localKeyPrefix + '.hint')
+        } if step == PROJECT_STEPS.URGENCY_REASON else false,
+        items: radioItems,
+        errorMessage: radioError
+      }) }}
+    {% endif %}
+
+    {{ govukButton({
+      text: t('common.buttons.save_and_continue')
+    }) }}
+  </form>
+{% endblock %}

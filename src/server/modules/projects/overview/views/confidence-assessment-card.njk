@@ -1,0 +1,59 @@
+{% macro confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, t, isReadOnly) %}
+  {% set hasConfidence = projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BETTER_PROTECTED] %}
+  <div class="govuk-summary-card">
+    <div class="govuk-summary-card__title-wrapper">
+      <h2 class="govuk-summary-card__title">{{ t('projects.overview.confidence_assessment_summary_card.title') }}</h2>
+      {% if not isReadOnly %}
+        <ul class="govuk-summary-card__actions">
+          <li class="govuk-summary-card__action">
+            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.CONFIDENCE_HOMES_BETTER_PROTECTED }}">
+              {% if hasConfidence %}{{ t('common.change') }}
+              {% else %}{{ t('common.add') }}
+              {% endif %}
+              <span class="govuk-visually-hidden">
+                {{ t('projects.overview.confidence_assessment_summary_card.title') | lower }}</span>
+            </a>
+          </li>
+        </ul>
+      {% endif %}
+    </div>
+    <div class="govuk-summary-card__content">
+      {% if hasConfidence %}
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.confidence_assessment_summary_card.homes_better_protected') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BETTER_PROTECTED] %}
+                {{ t('projects.confidence_assessment.property_confidence.options.' + projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BETTER_PROTECTED] + '.label') }}
+              {% else %}
+                {{ t('projects.overview.common.not_provided') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.confidence_assessment_summary_card.homes_by_gateway_four') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR] %}
+                {{ t('projects.confidence_assessment.gateway_confidence.options.' + projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR] + '.label') }}
+              {% else %}
+                {{ t('projects.overview.common.not_provided') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.confidence_assessment_summary_card.secured_partnership_funding') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING] %}
+                {{ t('projects.confidence_assessment.funding_confidence.options.' + projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING] + '.label') }}
+              {% else %}
+                {{ t('projects.overview.common.not_provided') }}
+              {% endif %}
+            </dd>
+          </div>
+        </dl>
+      {% else %}
+        <p class="govuk-body">{{ t('projects.overview.confidence_assessment_summary_card.not_added') }}</p>
+      {% endif %}
+    </div>
+  </div>
+{% endmacro %}

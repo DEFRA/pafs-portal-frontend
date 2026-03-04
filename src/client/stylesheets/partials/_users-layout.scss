@@ -1,4 +1,4 @@
-@use "govuk-frontend/dist/govuk/base" as govuk with ($govuk-new-typography-scale: true);
+@use "../govuk-base" as govuk;
 
 // Users layout page styles
 // Used by pending and active users pages
@@ -25,7 +25,7 @@
   padding: govuk.govuk-spacing(2) govuk.govuk-spacing(4);
   text-decoration: none;
   color: govuk.govuk-colour("black");
-  background-color: govuk.govuk-colour("light-grey");
+  background-color: govuk.govuk-colour("black", $variant: "tint-95");
 
   &:link,
   &:visited {
@@ -34,7 +34,7 @@
   }
 
   &:hover {
-    background-color: govuk.govuk-colour("mid-grey");
+    background-color: govuk.govuk-colour("black", $variant: "tint-80");
     text-decoration: none;
     color: govuk.govuk-colour("black");
   }
@@ -93,6 +93,106 @@
 .app-users-table {
   margin-top: govuk.govuk-spacing(4);
   font-size: 1rem;
+}
+
+// ──────────────────────────────────────────────────
+// Projects table – per-screen column widths
+// ──────────────────────────────────────────────────
+.app-projects-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+// Admin listing – 6 columns
+.app-projects-table--admin {
+  .app-projects-table__col--number {
+    width: 20%;
+  }
+
+  .app-projects-table__col--name {
+    width: 25%;
+  }
+
+  .app-projects-table__col--updated {
+    width: 14%;
+  }
+
+  .app-projects-table__col--rma {
+    width: 20%;
+  }
+
+  .app-projects-table__col--status {
+    width: 13%;
+  }
+
+  .app-projects-table__col--actions {
+    width: 9%;
+  }
+}
+
+// Submissions – 5 columns (no status)
+.app-projects-table--submissions {
+  .app-projects-table__col--number {
+    width: 19%;
+  }
+
+  .app-projects-table__col--name {
+    width: 20%;
+  }
+
+  .app-projects-table__col--updated {
+    width: 12%;
+  }
+
+  .app-projects-table__col--rma {
+    width: 15%;
+  }
+
+  .app-projects-table__col--actions {
+    width: 33%;
+  }
+}
+
+// User listing – 5 columns (no actions)
+.app-projects-table--user {
+  .app-projects-table__col--number {
+    width: 19%;
+  }
+
+  .app-projects-table__col--name {
+    width: 27%;
+  }
+
+  .app-projects-table__col--updated {
+    width: 15%;
+  }
+
+  .app-projects-table__col--rma {
+    width: 29%;
+  }
+
+  .app-projects-table__col--status {
+    width: 10%;
+  }
+}
+
+// Archive – 4 columns (no status, no actions)
+.app-projects-table--archive {
+  .app-projects-table__col--number {
+    width: 20%;
+  }
+
+  .app-projects-table__col--name {
+    width: 30%;
+  }
+
+  .app-projects-table__col--updated {
+    width: 20%;
+  }
+
+  .app-projects-table__col--rma {
+    width: 30%;
+  }
 }
 
 // Users actions (add/download links) - flex row

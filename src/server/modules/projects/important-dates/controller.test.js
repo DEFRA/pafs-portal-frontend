@@ -128,7 +128,7 @@ describe('ImportantDatesController', () => {
       await importantDatesController.getHandler(mockRequest, mockH)
 
       expect(formatDate).toHaveBeenCalledWith('4', '2025')
-      expect(formatDate).toHaveBeenCalledWith('3', '2026')
+      expect(formatDate).toHaveBeenCalledWith('3', 2027) // financialEndYear (2026) + 1
       expect(buildViewData).toHaveBeenCalledWith(
         mockRequest,
         expect.objectContaining({

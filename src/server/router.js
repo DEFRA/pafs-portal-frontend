@@ -47,9 +47,9 @@ export const router = {
       await loadModules(server, join(dirName, 'modules/general'), [
         'home',
         'download',
-        'archive',
         'accounts',
-        'static'
+        'static',
+        'projects/archive'
       ])
 
       // Project routes
@@ -62,7 +62,9 @@ export const router = {
         'financial-year',
         'important-dates',
         'benefit-area',
-        'risk-and-properties'
+        'risk-and-properties',
+        'goals-urgency-confidence',
+        'environmental-benefits'
       ])
 
       // Static assets

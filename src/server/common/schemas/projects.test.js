@@ -610,19 +610,25 @@ describe('Project Schemas', () => {
     })
 
     describe('Start Outline Business Case date validation', () => {
-      test('should reject date in the past', () => {
+      test('should reject date outside financial year range', () => {
         const schema = Joi.object({
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: Joi.number(),
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: Joi.number(),
           [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]:
             startOutlineBusinessCaseMonthSchema,
           [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]:
             startOutlineBusinessCaseYearSchema
         })
         const { error } = schema.validate({
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2025,
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: 2030,
           [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]: 4,
           [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]: 2024
         })
         expect(error).toBeDefined()
-        expect(error.details[0].type).toBe('date.past')
+        expect(error.details[0].type).toBe(
+          'custom.date_outside_financial_range'
+        )
       })
 
       test('should allow current month', () => {
@@ -673,7 +679,9 @@ describe('Project Schemas', () => {
           [PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR]: 2024
         })
         expect(error).toBeDefined()
-        expect(error.details[0].type).toBe('date.sequential')
+        expect(error.details[0].type).toBe(
+          'custom.date_not_after_previous_stage'
+        )
       })
 
       test('should allow date after start date', () => {
@@ -714,7 +722,9 @@ describe('Project Schemas', () => {
           [PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR]: 2024
         })
         expect(error).toBeDefined()
-        expect(error.details[0].type).toBe('date.sequential')
+        expect(error.details[0].type).toBe(
+          'custom.date_not_after_previous_stage'
+        )
       })
     })
 
@@ -755,7 +765,9 @@ describe('Project Schemas', () => {
           [PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_YEAR]: 2024
         })
         expect(error).toBeDefined()
-        expect(error.details[0].type).toBe('date.sequential')
+        expect(error.details[0].type).toBe(
+          'custom.date_not_after_previous_stage'
+        )
       })
     })
 
@@ -778,19 +790,25 @@ describe('Project Schemas', () => {
         expect(error).toBeUndefined()
       })
 
-      test('should reject date in the past', () => {
+      test('should reject date outside financial year range', () => {
         const schema = Joi.object({
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: Joi.number(),
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: Joi.number(),
           [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]:
             startConstructionMonthSchema,
           [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]:
             startConstructionYearSchema
         })
         const { error } = schema.validate({
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2025,
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: 2030,
           [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]: 4,
           [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]: 2024
         })
         expect(error).toBeDefined()
-        expect(error.details[0].type).toBe('date.past')
+        expect(error.details[0].type).toBe(
+          'custom.date_outside_financial_range'
+        )
       })
     })
 
@@ -829,7 +847,9 @@ describe('Project Schemas', () => {
           [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: 2024
         })
         expect(error).toBeDefined()
-        expect(error.details[0].type).toBe('date.sequential')
+        expect(error.details[0].type).toBe(
+          'custom.date_not_after_previous_stage'
+        )
       })
     })
   })

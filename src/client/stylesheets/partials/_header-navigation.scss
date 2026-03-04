@@ -1,0 +1,184 @@
+@use "../govuk-base" as govuk;
+
+// Custom header navigation styles (v5-style navigation in v6)
+// These were removed in v6 but we need them for our custom design
+
+// Make header container flexbox to position navigation at the end
+.govuk-header__container {
+  @include govuk.govuk-media-query($from: desktop) {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  @include govuk.govuk-media-query($until: tablet) {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.govuk-header__navigation {
+  @include govuk.govuk-responsive-margin(2, "bottom");
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.govuk-header__navigation--end {
+  @include govuk.govuk-media-query($from: desktop) {
+    margin: 0;
+    padding: govuk.govuk-spacing(1) 0;
+    text-align: right;
+  }
+}
+
+.govuk-header__navigation-list-wrapper {
+  @include govuk.govuk-media-query($until: tablet) {
+    display: none;
+    background-color: govuk.govuk-colour("blue");
+    padding: 0 govuk.govuk-spacing(3);
+
+    &--open {
+      display: block;
+    }
+  }
+
+  @include govuk.govuk-media-query($from: tablet) {
+    display: none;
+  }
+}
+
+.govuk-header__navigation-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.govuk-header__navigation-list--desktop {
+  @include govuk.govuk-media-query($until: tablet) {
+    display: none;
+  }
+
+  @include govuk.govuk-media-query($from: tablet) {
+    display: flex;
+  }
+}
+
+.govuk-header__navigation-list--mobile {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.govuk-header__navigation-item {
+  padding: govuk.govuk-spacing(2) 0;
+
+  // Only anchor links (not spans) get hover styles
+  a {
+    &:link,
+    &:visited,
+    &:active {
+      color: govuk.govuk-colour("white");
+    }
+
+    &:hover {
+      color: govuk.govuk-colour("white");
+      text-decoration: underline solid govuk.govuk-colour("white") 3px;
+      text-underline-offset: govuk.govuk-spacing(1);
+    }
+
+    &:focus {
+      color: govuk.$govuk-focus-text-colour;
+    }
+  }
+}
+
+.govuk-header__link {
+  @include govuk.govuk-font($size: 16);
+  display: inline-block;
+  white-space: nowrap;
+  color: govuk.govuk-colour("white");
+  text-decoration: none;
+
+  &:focus {
+    @include govuk.govuk-focused-text;
+  }
+}
+
+@include govuk.govuk-media-query($until: tablet) {
+  .govuk-header__menu-button {
+    display: block;
+    padding: govuk.govuk-spacing(2) 0;
+    border: 0;
+    color: govuk.govuk-colour("white");
+    background: none;
+    cursor: pointer;
+    text-align: right;
+    width: auto;
+    font-size: 16px;
+
+    &:hover {
+      text-decoration: underline solid govuk.govuk-colour("white") 3px;
+      text-underline-offset: govuk.govuk-spacing(1);
+    }
+
+    &:focus {
+      @include govuk.govuk-focused-text;
+    }
+
+    &::after {
+      @include govuk.govuk-shape-arrow($direction: down, $base: 10px, $display: inline-block);
+      content: "";
+      margin-left: govuk.govuk-spacing(1);
+    }
+
+    &[aria-expanded="true"]::after {
+      @include govuk.govuk-shape-arrow($direction: up, $base: 10px, $display: inline-block);
+    }
+  }
+
+  .govuk-header__navigation-item {
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid govuk.govuk-colour("white");
+    text-align: left;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  .govuk-header__link {
+    padding: govuk.govuk-spacing(2) 0;
+    display: block;
+  }
+}
+
+@include govuk.govuk-media-query($from: tablet) {
+  .govuk-header__menu-button {
+    display: none;
+  }
+
+  .govuk-header__navigation-list {
+    display: flex;
+  }
+
+  .govuk-header__navigation-item {
+    padding: govuk.govuk-spacing(1) 0;
+    margin-right: govuk.govuk-spacing(3);
+    border: 0;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  .govuk-header__link {
+    padding-top: govuk.govuk-spacing(1);
+    padding-bottom: govuk.govuk-spacing(1);
+  }
+}

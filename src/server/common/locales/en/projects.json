@@ -19,9 +19,16 @@
       "draft": "Draft",
       "submitted": "Submitted",
       "archive": "Archive",
+      "revert_to_draft": "Revert to draft",
+      "download": "Download",
       "delete": "Delete",
       "not_submitted": "Not yet submitted",
-      "not_provided": "Not provided"
+      "not_provided": "Not provided",
+      "na": "N/A",
+      "legacy_banner_title": "Important",
+      "legacy_banner_draft": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. Please review and complete any empty sections before submitting your proposal.",
+      "legacy_banner_submitted": "This proposal was originally submitted in the previous system. Following the 2025 policy reforms, some sections have been updated. Certain sections may appear empty as the information was not collected under the previous system.",
+      "legacy_banner_archived": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. To make changes, you will need to revert this proposal to draft status first."
     },
     "proposal_details_summary_card": {
       "title": "Proposal details",
@@ -77,7 +84,7 @@
       "reducing_coastal_erosion": "Reducing coastal erosion risk",
       "percent_properties_20_deprived": "Percentage of properties in 20% most deprived areas",
       "percent_properties_40_deprived": "Percentage of properties in 40% most deprived areas",
-      "current_flood_risk": "Current flood risk (fluvial and coastal)",
+      "current_flood_fluvial_risk": "Current flood risk (fluvial and coastal)",
       "current_flood_surface_water_risk": "Current flood risk (surface water)",
       "current_coastal_erosion_risk": "Current coastal erosion risk",
       "flood_risk": {
@@ -91,17 +98,39 @@
         "longer_term": "Longer term loss (>30 years)"
       }
     },
-    "approach_summary_card": {
-      "title": "Approach",
-      "not_added": "No approach added yet"
+    "goals_approach_summary_card": {
+      "title": "Project goals and approach",
+      "not_added": "No project goals or approach added yet"
     },
-    "environmental_summary_card": {
-      "title": "Environmental benefits",
-      "not_added": "No environmental benefits data added yet"
-    },
-    "urgency_summary_card": {
-      "title": "Urgency",
+    "urgency_assessment_summary_card": {
+      "title": "Project Urgency",
+      "urgency_reason": "Urgency reason",
+      "urgency_details": "Urgency details",
       "not_added": "No urgency data added yet"
+    },
+    "confidence_assessment_summary_card": {
+      "title": "Confidence assessment",
+      "homes_better_protected": "Confidence in number of homes better protected",
+      "homes_by_gateway_four": "Confidence in number of homes by gateway 4",
+      "secured_partnership_funding": "Confidence in securing partnership funding",
+      "not_added": "No confidence assessment added yet"
+    },
+    "environmental_benefits_summary_card": {
+      "title": "Environmental benefits",
+      "not_added": "The project does not include any environmental benefits",
+      "intertidal_habitat": "Intertidal wetland habitat",
+      "woodland": "Woodland habitat",
+      "wet_woodland": "Wet woodland habitat",
+      "wetland_or_wet_grassland": "Wetland or wet grassland habitat",
+      "grassland": "Grassland habitat",
+      "heathland": "Heathland habitat",
+      "ponds_lakes": "Pond and/or lake habitat",
+      "arable_land": "Arable land habitat",
+      "comprehensive_restoration": "Comprehensive restoration",
+      "partial_restoration": "Partial restoration",
+      "create_habitat_watercourse": "Single major physical or habitat of watercourse",
+      "hectares": "hectares",
+      "kilometres": "kilometres"
     },
     "submission_info": "By submitting this proposal you confirm all the information provided is accurate and complete."
   },
@@ -261,13 +290,15 @@
       "required": "Enter the date you expect {{placeholder}}",
       "invalid": "Enter a valid date for when you expect {{placeholder}}",
       "in_past": "You cannot enter a date in the past for when you expect {{placeholder}}",
+      "outside_financial_range": "The date you expect {{placeholder}} must be within the financial year selected for the project {{financialYearStart}} to {{financialYearEnd}}",
       "financial_year_range": "The date you expect {{placeholder}} must be within the financial year selected for the project {{financialYearStart}} to {{financialYearEnd}}",
       "before_previous_stage": "You expect {{previousStagePlaceholder}} on {{previousStageDate}}. The date you expect {{placeholder}} must come after this date",
       "could_start_earlier_required": "Tell us if the project can start earlier",
       "earliest_date_required": "Tell us the earliest date the project can start",
       "earliest_date_invalid": "Enter a valid earliest date the project can start",
       "earliest_date_in_past": "You cannot enter a date in the past for the earliest date the project can start",
-      "earliest_date_after_financial_start": "The earliest date the project can start must be before the financial year start date selected for the project {{financialYearStart}}"
+      "earliest_date_before_financial_start": "The earliest date the project can start must be after {{financialYearStart}}",
+      "earliest_date_after_obc_start": "The earliest date the project can start must be before or on {{obcStartDate}}"
     }
   },
   "project_benefit_area": {
@@ -387,7 +418,7 @@
         "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places"
       }
     },
-    "current_flood_risk": {
+    "current_flood_fluvial_risk": {
       "title": "Current flood risk",
       "heading": "What is the current flood risk (fluvial and coastal) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
@@ -482,5 +513,487 @@
       "select_hint": "Select the new RMA for this project",
       "select_area_label": "Select an RMA"
     }
+  },
+  "project_goals": {
+    "title": "What work does the project plan to do to achieve its benefits?",
+    "heading": "What work does the project plan to do to achieve its benefits?",
+    "goals": {
+      "example": "For example, the project will improve the standard of protection to 500 properties by:",
+      "example_items": [
+        "constructing an upstream storage area",
+        "replacing an existing culvert to increase capacity"
+      ]
+    },
+    "hint": "Limit your answer to 700 characters or fewer",
+    "validation": {
+      "required": "Tell us about the work the project plans to do to achieve its benefits.",
+      "max_length": "Limit the work the project plans to do to achieve its benefits to 700 characters or fewer"
+    }
+  },
+  "confidence_assessment": {
+    "property_confidence": {
+      "title": "Confidence in number of properties benefiting by this project",
+      "heading": "Confidence in number of properties benefiting by this project",
+      "options": {
+        "high": {
+          "label": "High",
+          "hint": "In Construction/Scheme complete and properties delivered"
+        },
+        "medium_high": {
+          "label": "Medium High",
+          "hint": "Number of properties verified in approved business case"
+        },
+        "medium_low": {
+          "label": "Medium Low",
+          "hint": "Initial modelling carried out"
+        },
+        "low": {
+          "label": "Low",
+          "hint": "Based on Shapefile / Estimate"
+        },
+        "not_applicable": {
+          "label": "N/A",
+          "hint": "No properties benefitting from this project"
+        }
+      },
+      "validation": {
+        "required": "Select the confidence level"
+      }
+    },
+    "gateway_confidence": {
+      "title": "Confidence in achieving the project's forecast Gateway 4 (readiness for service) date",
+      "heading": "Confidence in achieving the project's forecast Gateway 4 (readiness for service) date",
+      "options": {
+        "high": {
+          "label": "High",
+          "hint": "High confidence in completing by specified Gateway 4 date / Scheme complete and properties delivered"
+        },
+        "medium_high": {
+          "label": "Medium High",
+          "hint": "Low level concerns in completing by specified Gateway 4 date or profile of properties benefitting"
+        },
+        "medium_low": {
+          "label": "Medium Low",
+          "hint": "Moderate concerns in completing by specified Gateway 4 date or profile of properties benefitting"
+        },
+        "low": {
+          "label": "Low",
+          "hint": "Significant concerns in completing by specified Gateway 4 date or profile of properties benefitting"
+        },
+        "not_applicable": {
+          "label": "N/A",
+          "hint": "No property benefits being provided by the project"
+        }
+      },
+      "validation": {
+        "required": "Select the confidence level"
+      }
+    },
+    "funding_confidence": {
+      "title": "Confidence in securing contributions",
+      "heading": "Confidence in securing contributions",
+      "options": {
+        "high": {
+          "label": "High",
+          "hint": "Secured, or heads of terms in place / scheme complete with funding secured"
+        },
+        "medium_high": {
+          "label": "Medium High",
+          "hint": "Expected that contributions will be received. Some issues to overcome but confidence in contributions being achieved"
+        },
+        "medium_low": {
+          "label": "Medium Low",
+          "hint": "Optimistic contributions will be secured but contribution not known and/or concerns over those identified"
+        },
+        "low": {
+          "label": "Low",
+          "hint": "Low confidence contributions will be secured"
+        },
+        "not_applicable": {
+          "label": "N/A",
+          "hint": "Schema to be fully funded through Grant in Aid"
+        }
+      },
+      "validation": {
+        "required": "Select the confidence level"
+      }
+    }
+  },
+  "project_urgency": {
+    "urgency_reason": {
+      "title": "Is the project urgent for any of the following reasons?",
+      "heading": "Is the project urgent for any of the following reasons?",
+      "hint": "Urgency proposals must be agreed with your local Partnership and Strategic Overview (PSO) officer before submission.",
+      "options": {
+        "not_urgent": {
+          "label": "The project is not urgent"
+        },
+        "divider": "or",
+        "statutory_need": {
+          "label": "There is a business critical statutory need"
+        },
+        "legal_need": {
+          "label": "There is a business critical legal need"
+        },
+        "health_and_safety": {
+          "label": "There is a health and safety issue"
+        },
+        "emergency_works": {
+          "label": "There is an emergency"
+        },
+        "time_limited": {
+          "label": "There is a specific aspect of the project that has a time limit"
+        }
+      },
+      "validation": {
+        "required": "If your project is urgent, select a reason. If it isn't urgent, select the first option."
+      }
+    },
+    "urgency_detail": {
+      "title": "Why is your project urgent?",
+      "statutory_need_heading": "What is the business critical statutory need?",
+      "legal_need_heading": "What is the business critical legal need?",
+      "health_and_safety_heading": "What is the health and safety issue?",
+      "emergency_works_heading": "What is the emergency?",
+      "time_limited_heading": "What is the specific aspect of the project that has a time limit?",
+      "hint": "Limit your answer to 700 characters or fewer",
+      "validation": {
+        "required": "You told us the project is urgent due to {{reason}}. Tell us more information about this.",
+        "max_length": "Limit the details about why your project is urgent to 700 characters or fewer"
+      }
+    }
+  },
+  "environmental_benefits": {
+    "environmental_benefits": {
+      "title": "Does the project include any environmental benefits?",
+      "heading": "Does the project include any environmental benefits?",
+      "hint": "na",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "intertidal_habitat": {
+      "title": "Will the project create or enhance an intertidal wetland habitat?",
+      "heading": "Will the project create or enhance an intertidal wetland habitat?",
+      "hint": "Intertidal wetland habitats are found between the high and low tide marks. The habitats most associated with FCERM works are salt marshes and mud flats.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_intertidal_habitat_created_or_enhanced": {
+      "title": "How many hectares of intertidal wetland habitat will the project create or enhance?",
+      "heading": "How many hectares of intertidal wetland habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "woodland": {
+      "title": "Will the project create or enhance a woodland habitat?",
+      "heading": "Will the project create or enhance a woodland habitat?",
+      "hint": "Woodlands are areas of vegetation dominated by trees that are more than 5m high when mature, which forms a canopy (areas of trees with a canopy greater than 20%). This includes felled, young or newly planted woodland.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_woodland_habitat_created_or_enhanced": {
+      "title": "How many hectares of woodland habitat will the project create or enhance?",
+      "heading": "How many hectares of woodland habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "wet_woodland": {
+      "title": "Will the project create or enhance a wet woodlands habitat?",
+      "heading": "Will the project create or enhance a wet woodlands habitat?",
+      "hint": "Wet woodland habitats have trees associated with wet soils such as alder, birch and willow.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_wet_woodland_habitat_created_or_enhanced": {
+      "title": "How many hectares of wet woodlands habitat will the project create or enhance?",
+      "heading": "How many hectares of wet woodlands habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "wetland_or_wet_grassland": {
+      "title": "Will the project create or enhance a wetland or wet grassland habitat?",
+      "heading": "Will the project create or enhance a wetland or wet grassland habitat?",
+      "hint": "Wetlands and wet grassland habitats include flood plains, wetlands mosaics, reed beds and bogs.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_wetland_or_wet_grassland_created_or_enhanced": {
+      "title": "How many hectares of wetland or wet grassland habitat will the project create or enhance?",
+      "heading": "How many hectares of wetland or wet grassland habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "grassland": {
+      "title": "Will the project create or enhance a grassland habitat?",
+      "heading": "Will the project create or enhance a grassland habitat?",
+      "hint": "This is land under permanent-natural or semi-natural grassland, dominated by grassland species with very little or no dwarf shrub, wetland or wooded species within the sward.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_grassland_habitat_created_or_enhanced": {
+      "title": "How many hectares of grassland habitat will the project create or enhance?",
+      "heading": "How many hectares of grassland habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "heathland": {
+      "title": "Will the project create or enhance a heathland habitat?",
+      "heading": "Will the project create or enhance a heathland habitat?",
+      "hint": "This is habitat that covers the full altitudinal range of heathlands and has at least 25% cover of the heathers and other dwarf shrubs, or previously heathland in a degraded state below this.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_heathland_created_or_enhanced": {
+      "title": "How many hectares of heathland habitat will the project create or enhance?",
+      "heading": "How many hectares of heathland habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "ponds_lakes": {
+      "title": "Will the project create or enhance a pond and/or lake habitat?",
+      "heading": "Will the project create or enhance a pond and/or lake habitat?",
+      "hint": "Lakes are generally all bodies of water over 2 hectares in area. Ponds are all bodies of water up to 1 hectare.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_pond_or_lake_habitat_created_or_enhanced": {
+      "title": "How many hectares of pond and/or lake habitat will the project create or enhance?",
+      "heading": "How many hectares of pond and/or lake habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "arable_land": {
+      "title": "Will the project create or enhance an arable land habitat?",
+      "heading": "Will the project create or enhance an arable land habitat?",
+      "hint": "This is land under cultivation, it includes temporary grass leys.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "hectares_of_arable_land_lake_habitat_created_or_enhanced": {
+      "title": "How many hectares of arable land habitat will the project create or enhance?",
+      "heading": "How many hectares of arable land habitat will the project create or enhance?",
+      "suffix": "ha",
+      "validation": {
+        "required": "You must include the number of hectares your project will create.",
+        "invalid": "You must include the number of hectares your project will create."
+      }
+    },
+    "comprehensive_restoration": {
+      "title": "Will the project include comprehensive restoration or creation of natural processes, habitats and/or removal of physical modifications?",
+      "heading": "Will the project include comprehensive restoration or creation of natural processes, habitats and/or removal of physical modifications?",
+      "hint": "This includes creating new channels with minor physical modifications that do not inhibit natural river processes.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "kilometres_of_watercourse_enhanced_or_created_comprehensive": {
+      "title": "How many kilometres of comprehensive river restoration will be enhanced or created?",
+      "heading": "How many kilometres of comprehensive river restoration will be enhanced or created?",
+      "suffix": "km",
+      "validation": {
+        "required": "You must include the number of kilometres your project will create.",
+        "invalid": "You must include the number of kilometres your project will create."
+      }
+    },
+    "partial_restoration": {
+      "title": "Will the project include partial restoration of natural processes, habitats and/or partial removal of physical modifications?",
+      "heading": "Will the project include partial restoration of natural processes, habitats and/or partial removal of physical modifications?",
+      "hint": "This includes creating new channels with some physical modifications and partial functioning of natural processes.",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "kilometres_of_watercourse_enhanced_or_created_partial": {
+      "title": "How many kilometres of partial restoration will be enhanced or created?",
+      "heading": "How many kilometres of partial restoration will be enhanced or created?",
+      "suffix": "km",
+      "validation": {
+        "required": "You must include the number of kilometres your project will create.",
+        "invalid": "You must include the number of kilometres your project will create."
+      }
+    },
+    "create_habitat_watercourse": {
+      "title": "Will the project enhance or create a single major physical or habitat of watercourse?",
+      "heading": "Will the project enhance or create a single major physical or habitat of watercourse?",
+      "hint": "na",
+      "options": {
+        "yes": {
+          "label": "Yes"
+        },
+        "no": {
+          "label": "No"
+        }
+      },
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
+    "kilometres_of_watercourse_enhanced_or_created_single": {
+      "title": "How many kilometres of single major physical improvement the project will be enhanced or created?",
+      "heading": "How many kilometres of single major physical improvement the project will be enhanced or created?",
+      "suffix": "km",
+      "validation": {
+        "required": "You must include the number of kilometres your project will create.",
+        "invalid": "You must include the number of kilometres your project will create."
+      }
+    },
+    "footer": {
+      "html_text": "Find out more about <a class=\"govuk-link\" target=\"_blank\" href=\"https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1026844/Partnership_funding_supporting_guidance_for_OM4.pdf\">partnership funding eligibility for environmental benefits (opens in new window or tab)</a>."
+    }
+  },
+  "failed_submissions": {
+    "title": "Failed AIMS PD Submissions",
+    "heading": "Failed AIMS PD Submissions",
+    "description": "The following submissions have not been flagged as received by AIMS PD",
+    "actions": {
+      "resend_to_aims_pd": "Resend to AIMS PD",
+      "proposal_in_aims_pd": "Proposal in AIMS PD"
+    },
+    "footer": {
+      "label": "How to manage failed submissions",
+      "check_aims_pd": "Check if the proposal has arrived in AIMS PD",
+      "if_yes": "If YES, click on the 'Proposal in AIMS PD' link.",
+      "if_yes_result": "The proposal will disappear from the list, end of process.",
+      "if_no": "If NO, click on the 'Resend to AIMS PD' link",
+      "if_no_success": "If displays successfully resubmitted, end of process.",
+      "if_no_failed": "If displays failed to resubmit, the resend was unsuccessful",
+      "contact_helpdesk": "For unsuccessful resends, please contact the Program Framework helpdesk",
+      "helpdesk_email": "helpdesk@programframework.com",
+      "copy_team": "Also copy into the email the Asset Management Business Systems Team",
+      "team_email": "AssetManagementTeam@environment-agency.gov.uk"
+    }
+  },
+  "archived_proposals": {
+    "title": "Archived Proposals",
+    "heading": "Archived Proposals"
+  },
+  "confirm_archive": {
+    "title": "Proposal has been archived",
+    "heading": "Proposal has been archived",
+    "what_happens_next": "What happens next?",
+    "moved_to_archive": "This proposal has moved to your <a href=\"/archive\" class=\"govuk-link\">archive</a> and is no longer visible in your proposals list.",
+    "cannot_edit": "Archived proposals cannot be edited or submitted.",
+    "need_to_change": "If you need to change your proposal",
+    "use_archive_link": "Use the archive link in the banner to see your archived proposals.",
+    "revert_instructions": "Return to the proposal overview page and click on the 'revert to draft' link.",
+    "will_reappear": "The proposal will reappear in your proposals and can then be edited."
   }
 }

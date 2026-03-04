@@ -1,295 +1,76 @@
-import Joi from 'joi'
-import {
-  projectAreaIdSchema,
-  projectFinancialEndYearSchema,
-  projectFinancialStartYearSchema,
-  projectInterventionTypeSchema,
-  projectMainInterventionTypeSchema,
-  projectNameSchema,
-  projectTypeSchema,
-  startOutlineBusinessCaseMonthSchema,
-  startOutlineBusinessCaseYearSchema,
-  completeOutlineBusinessCaseMonthSchema,
-  completeOutlineBusinessCaseYearSchema,
-  awardContractMonthSchema,
-  awardContractYearSchema,
-  startConstructionMonthSchema,
-  startConstructionYearSchema,
-  readyForServiceMonthSchema,
-  readyForServiceYearSchema,
-  couldStartEarlySchema,
-  earliestWithGiaMonthSchema,
-  earliestWithGiaYearSchema,
-  risksSchema,
-  mainRiskSchema,
-  noPropertiesAtRiskSchema,
-  maintainingExistingAssetsSchema,
-  reducingFloodRisk50PlusSchema,
-  reducingFloodRiskLess50Schema,
-  increasingFloodResilienceSchema,
-  noPropertiesAtCoastalErosionRiskSchema,
-  propertiesBenefitMaintainingAssetsCoastalSchema,
-  propertiesBenefitInvestmentCoastalErosionSchema,
-  percentProperties20PercentDeprivedSchema,
-  percentProperties40PercentDeprivedSchema,
-  currentFloodRiskSchema,
-  currentFloodSurfaceWaterRiskSchema,
-  currentCoastalErosionRiskSchema
-} from '../../common/schemas/projects.js'
-import { PROJECT_PAYLOAD_FIELDS } from '../../common/constants/projects.js'
-
 /**
- * Validate project name schema
+ * Project Validation Schemas - Backward Compatible Entry Point
+ *
+ * This file maintains backward compatibility by re-exporting from the modular structure.
+ * The actual validation schemas are now organized in separate files by feature area
+ * to keep each file under SonarQube's 500-line limit.
+ *
+ * All existing imports will continue to work without changes.
  */
-export const validateProjectName = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.NAME]: projectNameSchema
-})
-  .options({ abortEarly: false })
-  .label('Project Name')
 
-/**
- * Validate area ID schema
- */
-export const validateAreaId = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.AREA_ID]: projectAreaIdSchema
-})
-  .options({ abortEarly: false })
-  .label('Area ID')
+export {
+  validateProjectName,
+  validateAreaId,
+  validateProjectType,
+  validateProjectInterventionTypes,
+  validateMainInterventionType,
+  validateFinancialStartYear,
+  validateFinancialEndYear
+} from './schemas/core-schemas.js'
 
-export const validateProjectType = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: projectTypeSchema
-})
-  .options({ abortEarly: false })
-  .label('Project Type')
+export {
+  validateStartOutlineBusinessCase,
+  validateCompleteOutlineBusinessCase,
+  validateAwardMainContract,
+  validateStartWork,
+  validateStartBenefits,
+  validateCouldStartEarlier,
+  validateEarliestStartDate
+} from './schemas/important-dates-schemas.js'
 
-export const validateProjectInterventionTypes = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: projectTypeSchema,
-  [PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]:
-    projectInterventionTypeSchema
-})
-  .options({ abortEarly: false })
-  .label('Project Intervention Types')
+export {
+  validateRisks,
+  validateMainRisk,
+  validatePropertyAffectedFlooding,
+  validatePropertyAffectedCoastalErosion,
+  validateTwentyPercentDeprived,
+  validateFortyPercentDeprived,
+  validateCurrentFloodFluvialRisk,
+  validateCurrentFloodSurfaceWaterRisk,
+  validateCurrentCoastalErosionRisk
+} from './schemas/risk-properties-schemas.js'
 
-export const validateMainInterventionType = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: projectTypeSchema,
-  [PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]:
-    projectInterventionTypeSchema,
-  [PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE]:
-    projectMainInterventionTypeSchema
-})
-  .options({ abortEarly: false })
-  .label('Main Intervention Type')
+export {
+  validateProjectGoals,
+  validateUrgencyReason,
+  validateUrgencyDetails,
+  validateConfidenceHomesBetterProtected,
+  validateConfidenceHomesByGatewayFour,
+  validateConfidenceSecuredPartnershipFunding
+} from './schemas/goals-confidence-schemas.js'
 
-export const validateFinancialStartYear = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]:
-    projectFinancialStartYearSchema,
-  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: projectFinancialEndYearSchema
-    .optional()
-    .allow(null, '')
-})
-  .unknown(true)
-  .options({ abortEarly: false })
-  .label('Financial Start Year')
-
-export const validateFinancialEndYear = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]:
-    projectFinancialStartYearSchema,
-  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: projectFinancialEndYearSchema
-})
-  .options({ abortEarly: false })
-  .label('Financial End Year')
-
-/**
- * Validate important dates schemas
- */
-export const validateStartOutlineBusinessCase = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]:
-    startOutlineBusinessCaseMonthSchema,
-  [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]:
-    startOutlineBusinessCaseYearSchema
-})
-  .options({ abortEarly: false })
-  .label('Start Outline Business Case')
-
-export const validateCompleteOutlineBusinessCase = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH]:
-    completeOutlineBusinessCaseMonthSchema,
-  [PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR]:
-    completeOutlineBusinessCaseYearSchema
-})
-  .options({ abortEarly: false })
-  .label('Complete Outline Business Case')
-
-export const validateAwardMainContract = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_MONTH]: awardContractMonthSchema,
-  [PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_YEAR]: awardContractYearSchema
-})
-  .options({ abortEarly: false })
-  .label('Award Main Contract')
-
-export const validateStartWork = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]:
-    startConstructionMonthSchema,
-  [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]: startConstructionYearSchema
-})
-  .options({ abortEarly: false })
-  .label('Start Work')
-
-export const validateStartBenefits = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]: readyForServiceMonthSchema,
-  [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: readyForServiceYearSchema
-})
-  .options({ abortEarly: false })
-  .label('Start Benefits')
-
-export const validateCouldStartEarlier = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.COULD_START_EARLY]: couldStartEarlySchema
-})
-  .options({ abortEarly: false })
-  .label('Could Start Earlier')
-
-export const validateEarliestStartDate = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.COULD_START_EARLY]: Joi.any(),
-  [PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH]: earliestWithGiaMonthSchema,
-  [PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_YEAR]: earliestWithGiaYearSchema
-})
-  .options({ abortEarly: false })
-  .label('Earliest Start Date')
-
-/**
- * Validate risk selection
- */
-export const validateRisks = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.RISKS]: risksSchema
-})
-  .unknown(true)
-  .options({ abortEarly: false })
-  .label('Risks')
-
-/**
- * Validate main risk selection
- * Note: risks field is already validated in previous step, only validate mainRisk here
- */
-export const validateMainRisk = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.MAIN_RISK]: mainRiskSchema
-})
-  .unknown(true)
-  .options({ abortEarly: false })
-  .label('Main Risk')
-
-/**
- * Validate property affected flooding
- */
-export const validatePropertyAffectedFlooding = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK]: noPropertiesAtRiskSchema,
-  [PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS]: Joi.when(
-    Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK),
-    {
-      is: Joi.valid('true', true),
-      then: Joi.any().optional().allow(''),
-      otherwise: maintainingExistingAssetsSchema
-    }
-  ),
-  [PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS]: Joi.when(
-    Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK),
-    {
-      is: Joi.valid('true', true),
-      then: Joi.any().optional().allow(''),
-      otherwise: reducingFloodRisk50PlusSchema
-    }
-  ),
-  [PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50]: Joi.when(
-    Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK),
-    {
-      is: Joi.valid('true', true),
-      then: Joi.any().optional().allow(''),
-      otherwise: reducingFloodRiskLess50Schema
-    }
-  ),
-  [PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE]: Joi.when(
-    Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_RISK),
-    {
-      is: Joi.valid('true', true),
-      then: Joi.any().optional().allow(''),
-      otherwise: increasingFloodResilienceSchema
-    }
-  )
-})
-  .options({ abortEarly: false })
-  .label('Property Affected Flooding')
-
-/**
- * Validate property affected coastal erosion schema
- */
-export const validatePropertyAffectedCoastalErosion = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK]:
-    noPropertiesAtCoastalErosionRiskSchema,
-  [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL]:
-    Joi.when(
-      Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK),
-      {
-        is: Joi.valid('true', true),
-        then: Joi.any().optional().allow(''),
-        otherwise: propertiesBenefitMaintainingAssetsCoastalSchema
-      }
-    ),
-  [PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION]:
-    Joi.when(
-      Joi.ref(PROJECT_PAYLOAD_FIELDS.NO_PROPERTIES_AT_COASTAL_EROSION_RISK),
-      {
-        is: Joi.valid('true', true),
-        then: Joi.any().optional().allow(''),
-        otherwise: propertiesBenefitInvestmentCoastalErosionSchema
-      }
-    )
-})
-  .options({ abortEarly: false })
-  .label('Property Affected Coastal Erosion')
-/**
- * Validate twenty percent deprived schema
- */
-export const validateTwentyPercentDeprived = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED]:
-    percentProperties20PercentDeprivedSchema
-})
-  .options({ abortEarly: false })
-  .label('Twenty Percent Deprived')
-
-/**
- * Validate forty percent deprived schema
- */
-export const validateFortyPercentDeprived = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED]:
-    percentProperties40PercentDeprivedSchema
-})
-  .options({ abortEarly: false })
-  .label('Forty Percent Deprived')
-
-/**
- * Validate current flood risk schema
- */
-export const validateCurrentFloodRisk = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK]: currentFloodRiskSchema
-})
-  .options({ abortEarly: false })
-  .label('Current Flood Risk')
-
-/**
- * Validate current flood surface water risk schema
- */
-export const validateCurrentFloodSurfaceWaterRisk = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK]:
-    currentFloodSurfaceWaterRiskSchema
-})
-  .options({ abortEarly: false })
-  .label('Current Flood Surface Water Risk')
-
-/**
- * Validate current coastal erosion risk schema
- */
-export const validateCurrentCoastalErosionRisk = Joi.object({
-  [PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK]:
-    currentCoastalErosionRiskSchema
-})
-  .options({ abortEarly: false })
-  .label('Current Coastal Erosion Risk')
+export {
+  validateEnvironmentalBenefits,
+  validateIntertidalHabitat,
+  validateHectaresOfIntertidalHabitatCreatedOrEnhanced,
+  validateWoodland,
+  validateHectaresOfWoodlandHabitatCreatedOrEnhanced,
+  validateWetWoodland,
+  validateHectaresOfWetWoodlandHabitatCreatedOrEnhanced,
+  validateWetlandOrWetGrassland,
+  validateHectaresOfWetlandOrWetGrasslandCreatedOrEnhanced,
+  validateGrassland,
+  validateHectaresOfGrasslandHabitatCreatedOrEnhanced,
+  validateHeathland,
+  validateHectaresOfHeathlandCreatedOrEnhanced,
+  validatePondsLakes,
+  validateHectaresOfPondOrLakeHabitatCreatedOrEnhanced,
+  validateArableLand,
+  validateHectaresOfArableLandLakeHabitatCreatedOrEnhanced,
+  validateComprehensiveRestoration,
+  validateKilometresOfWatercourseEnhancedOrCreatedComprehensive,
+  validatePartialRestoration,
+  validateKilometresOfWatercourseEnhancedOrCreatedPartial,
+  validateCreateHabitatWatercourse,
+  validateKilometresOfWatercourseEnhancedOrCreatedSingle
+} from './schemas/environmental-benefits-schemas.js'

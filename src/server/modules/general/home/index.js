@@ -1,6 +1,6 @@
-import { homeController } from './controller.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
 import { ROUTES } from '../../../common/constants/routes.js'
+import { projectsListingController } from '../../projects/listing/controller.js'
 
 /**
  * Sets up the routes used in the home page.
@@ -17,7 +17,7 @@ export const home = {
           options: {
             pre: [{ method: requireAuth }]
           },
-          ...homeController
+          ...projectsListingController
         }
       ])
     }

@@ -5,7 +5,8 @@ import {
   upsertProjectProposal,
   getProjectBenefitAreaDownloadUrl,
   deleteProject,
-  getProjects
+  getProjects,
+  updateProjectStatus
 } from './project-service.js'
 import { apiRequest } from '../../helpers/api-client/index.js'
 
@@ -1106,6 +1107,146 @@ describe('project-service', () => {
         '/api/v1/project/PROJ-2024-001/benefit-area-file',
         expect.objectContaining({
           method: 'DELETE'
+        })
+      )
+    })
+  })
+
+  describe('updateProjectStatus', () => {
+    test('Should call apiRequest with correct endpoint and method', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await updateProjectStatus('REF123', 'archived', 'mock-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/status',
+        expect.objectContaining({
+          method: 'PUT'
+        })
+      )
+    })
+
+    test('Should send status in JSON body', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await updateProjectStatus('REF123', 'archived', 'mock-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/status',
+        expect.objectContaining({
+          body: JSON.stringify({ status: 'archived' })
+        })
+      )
+    })
+
+    test('Should include Authorization header when accessToken is provided', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await updateProjectStatus('REF456', 'draft', 'test-token-123')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF456/status',
+        expect.objectContaining({
+          headers: {
+            Authorization: 'Bearer test-token-123'
+          }
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is not provided', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await updateProjectStatus('REF123', 'draft')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/status',
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is null', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await updateProjectStatus('REF123', 'archived', null)
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/status',
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is empty string', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await updateProjectStatus('REF123', 'draft', '')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/status',
+        expect.objectContaining({
+          headers: {}
+        })
+      )
+    })
+
+    test('Should return API response', async () => {
+      const mockResponse = {
+        data: {
+          success: true,
+          data: { referenceNumber: 'REF123', status: 'archived' }
+        }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await updateProjectStatus('REF123', 'archived', 'token')
+
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('Should handle API errors', async () => {
+      const mockError = new Error('API Error')
+      apiRequest.mockRejectedValue(mockError)
+
+      await expect(
+        updateProjectStatus('REF123', 'archived', 'token')
+      ).rejects.toThrow('API Error')
+    })
+
+    test('Should handle network errors', async () => {
+      const networkError = new Error('Network connection failed')
+      apiRequest.mockRejectedValue(networkError)
+
+      await expect(
+        updateProjectStatus('REF123', 'draft', 'token')
+      ).rejects.toThrow('Network connection failed')
+    })
+
+    test('Should handle different status values', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await updateProjectStatus('REF123', 'submitted', 'token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF123/status',
+        expect.objectContaining({
+          body: JSON.stringify({ status: 'submitted' })
+        })
+      )
+    })
+
+    test('Should handle different reference number formats', async () => {
+      apiRequest.mockResolvedValue({ data: { success: true } })
+
+      await updateProjectStatus('PROJ-2024-001', 'archived', 'token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/PROJ-2024-001/status',
+        expect.objectContaining({
+          method: 'PUT'
         })
       )
     })

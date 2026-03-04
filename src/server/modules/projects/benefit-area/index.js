@@ -1,6 +1,9 @@
 import { ROUTES } from '../../../common/constants/routes.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
-import { requireEditPermission } from '../helpers/permissions.js'
+import {
+  requireEditPermission,
+  requireEditableStatus
+} from '../helpers/permissions.js'
 import {
   fetchProjectForEdit,
   initializeEditSessionPreHandler
@@ -20,6 +23,7 @@ export const projectBenefitArea = {
               { method: requireAuth },
               { method: fetchProjectForEdit },
               { method: initializeEditSessionPreHandler },
+              { method: requireEditableStatus },
               { method: requireEditPermission }
             ],
             handler: benefitAreaController.getHandler
@@ -33,6 +37,7 @@ export const projectBenefitArea = {
               { method: requireAuth },
               { method: fetchProjectForEdit },
               { method: initializeEditSessionPreHandler },
+              { method: requireEditableStatus },
               { method: requireEditPermission }
             ],
             handler: benefitAreaController.uploadStatusHandler
@@ -46,6 +51,7 @@ export const projectBenefitArea = {
               { method: requireAuth },
               { method: fetchProjectForEdit },
               { method: initializeEditSessionPreHandler },
+              { method: requireEditableStatus },
               { method: requireEditPermission }
             ],
             handler: benefitAreaController.getDeleteHandler
@@ -59,6 +65,7 @@ export const projectBenefitArea = {
               { method: requireAuth },
               { method: fetchProjectForEdit },
               { method: initializeEditSessionPreHandler },
+              { method: requireEditableStatus },
               { method: requireEditPermission }
             ],
             handler: benefitAreaController.postDeleteHandler

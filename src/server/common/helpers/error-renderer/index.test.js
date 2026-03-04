@@ -44,6 +44,48 @@ describe('error-renderer', () => {
         email: 'VALIDATION_EMAIL_REQUIRED'
       })
     })
+
+    test('keeps first error when same field has multiple errors', () => {
+      const err = {
+        details: [
+          {
+            context: { label: 'email' },
+            message: 'VALIDATION_EMAIL_REQUIRED',
+            path: ['email']
+          },
+          {
+            context: { label: 'email' },
+            message: 'VALIDATION_EMAIL_FORMAT',
+            path: ['email']
+          }
+        ]
+      }
+      const result = extractJoiErrors(err)
+      expect(result).toEqual({
+        email: 'VALIDATION_EMAIL_REQUIRED'
+      })
+    })
+
+    test('skips details with no label and no path', () => {
+      const err = {
+        details: [
+          {
+            context: {},
+            message: 'Some error',
+            path: []
+          },
+          {
+            context: { label: 'name' },
+            message: 'VALIDATION_NAME_REQUIRED',
+            path: ['name']
+          }
+        ]
+      }
+      const result = extractJoiErrors(err)
+      expect(result).toEqual({
+        name: 'VALIDATION_NAME_REQUIRED'
+      })
+    })
   })
 
   describe('extractApiValidationErrors', () => {

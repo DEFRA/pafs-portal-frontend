@@ -2,13 +2,15 @@ import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
+  EDITABLE_STATUSES,
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_STATUS
+  REFERENCE_NUMBER_PARAM
 } from '../../../common/constants/projects.js'
 import { AREAS_RESPONSIBILITIES_MAP } from '../../../common/constants/common.js'
 import {
   getSessionData,
   loggedInUserAreas,
+  navigateToProjectOverview,
   requiredInterventionTypesForProjectType
 } from './project-utils.js'
 import { getParentAreas } from '../../../common/helpers/areas/areas-helper.js'
@@ -220,6 +222,71 @@ export async function requireFinancialStartYearSet(request, h) {
   return h.continue
 }
 
+/**
+ * Factory function to create a conditional pre-handler that requires a specific field value
+ * Used for conditional routing where access to a route depends on another field's value
+ *
+ * @param {string} fieldName - The field name to check in project data
+ * @param {*} expectedValue - The expected value (e.g., true for gate fields)
+ * @param {string} redirectRoute - Route to redirect to if condition not met (typically overview)
+ * @param {string} logMessage - Optional custom log message
+ * @returns {Function} Pre-handler function
+ *
+ * @example
+ * // Require environmentalBenefits to be true to access habitat questions
+ * const requireEnvironmentalBenefitsEnabled = createConditionalPreHandler(
+ *   'environmentalBenefits',
+ *   true,
+ *   ROUTES.PROJECT.OVERVIEW,
+ *   'Environmental benefits not enabled'
+ * )
+ */
+export function createConditionalPreHandler(
+  fieldName,
+  expectedValue,
+  redirectRoute,
+  logMessage = null
+) {
+  return async function conditionalPreHandler(request, h) {
+    const projectData = request.pre?.projectData
+    const sessionData = getSessionData(request)
+    const session = getAuthSession(request)
+    const { slug: referenceNumber } = sessionData
+
+    if (!projectData) {
+      request.server?.logger?.warn(
+        { userId: session?.user?.id },
+        'Project data not found for conditional pre-handler check'
+      )
+      return navigateToProjectOverview(referenceNumber, h)
+    }
+
+    const actualValue = sessionData[fieldName]
+
+    // Check if the field value matches the expected value
+    if (actualValue !== expectedValue) {
+      request.server?.logger?.warn(
+        {
+          userId: session?.user?.id,
+          projectId: projectData.id,
+          fieldName,
+          expectedValue,
+          actualValue
+        },
+        logMessage ||
+          `User attempted to access route requiring ${fieldName}=${expectedValue}, but value is ${actualValue}`
+      )
+      return h
+        .redirect(
+          redirectRoute.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
+        )
+        .takeover()
+    }
+
+    return h.continue
+  }
+}
+
 // ============================================================================
 // PROJECT VIEW AND EDIT PERMISSIONS
 // ============================================================================
@@ -287,7 +354,7 @@ export function canViewProposal(request, proposal) {
   }
 
   // Admin can view any proposal
-  if (user.isAdmin) {
+  if (user.admin) {
     return true
   }
 
@@ -343,13 +410,15 @@ export function canEditProposal(request, proposal) {
     return false
   }
 
-  // Only DRAFT proposals can be edited
-  if (proposal[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] !== PROJECT_STATUS.DRAFT) {
+  const projectState = proposal[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]
+
+  // Only DRAFT & REVISE proposals can be edited
+  if (!EDITABLE_STATUSES.includes(projectState)) {
     return false
   }
 
   // Admin can edit any DRAFT proposal
-  if (user.isAdmin) {
+  if (user.admin) {
     return true
   }
 
@@ -439,4 +508,87 @@ export async function requireEditPermission(request, h) {
   }
 
   return h.continue
+}
+
+/**
+ * Pre-handler that prevents access to project edit routes when project is
+ * not in an editable status (e.g. archived or submitted).
+ * Only projects in DRAFT or REVISE status are considered editable.
+ * Redirects to the project overview page.
+ * Expects request.pre.projectData (set by fetchProjectForEdit or similar pre-handler)
+ *
+ * @param {Object} request - Hapi request object
+ * @param {Object} h - Hapi response toolkit
+ * @returns {Object} h.continue if allowed, otherwise redirect
+ */
+export async function requireEditableStatus(request, h) {
+  const session = getAuthSession(request)
+  const projectData = request.pre?.projectData
+
+  if (!projectData) {
+    return h.redirect(ROUTES.GENERAL.HOME).takeover()
+  }
+
+  const projectState = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]
+
+  if (!EDITABLE_STATUSES.includes(projectState)) {
+    const referenceNumber =
+      request.params?.referenceNumber ||
+      projectData[PROJECT_PAYLOAD_FIELDS.SLUG]
+
+    request.server?.logger?.warn(
+      {
+        userId: session?.user?.id,
+        referenceNumber,
+        projectState
+      },
+      'User attempted to access edit route for non-editable project'
+    )
+
+    return h
+      .redirect(
+        ROUTES.PROJECT.OVERVIEW.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
+      )
+      .takeover()
+  }
+
+  return h.continue
+}
+
+/**
+ * Pre-handler that restricts archive/revert-to-draft actions to
+ * RMA, PSO, and Admin users. EA users are not permitted.
+ * Redirects to the project overview page if not allowed.
+ *
+ * @param {Object} request - Hapi request object
+ * @param {Object} h - Hapi response toolkit
+ * @returns {Object} h.continue if allowed, otherwise redirect
+ */
+export async function requireStatusManagePermission(request, h) {
+  const session = getAuthSession(request)
+  const user = session?.user
+
+  if (user?.admin || user?.isRma || user?.isPso) {
+    return h.continue
+  }
+
+  const referenceNumber = request.params?.referenceNumber
+
+  request.server?.logger?.warn(
+    {
+      userId: user?.id,
+      referenceNumber
+    },
+    'User without status manage permission attempted archive/revert action'
+  )
+
+  if (referenceNumber) {
+    return h
+      .redirect(
+        ROUTES.PROJECT.OVERVIEW.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
+      )
+      .takeover()
+  }
+
+  return h.redirect(ROUTES.GENERAL.HOME).takeover()
 }
