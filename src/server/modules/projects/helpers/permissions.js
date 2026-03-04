@@ -4,7 +4,6 @@ import { ROUTES } from '../../../common/constants/routes.js'
 import {
   EDITABLE_STATUSES,
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_STATUS,
   REFERENCE_NUMBER_PARAM
 } from '../../../common/constants/projects.js'
 import { AREAS_RESPONSIBILITIES_MAP } from '../../../common/constants/common.js'
@@ -411,8 +410,10 @@ export function canEditProposal(request, proposal) {
     return false
   }
 
-  // Only DRAFT proposals can be edited
-  if (proposal[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] !== PROJECT_STATUS.DRAFT) {
+  const projectState = proposal[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]
+
+  // Only DRAFT & REVISE proposals can be edited
+  if (!EDITABLE_STATUSES.includes(projectState)) {
     return false
   }
 

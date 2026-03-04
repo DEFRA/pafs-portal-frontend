@@ -1,23 +1,6 @@
-import {
-  createAll,
-  Button,
-  CharacterCount,
-  Checkboxes,
-  ErrorSummary,
-  PasswordInput,
-  Radios,
-  ServiceNavigation,
-  SkipLink
-} from 'govuk-frontend'
+import { initAll } from 'govuk-frontend'
 
-createAll(Button)
-createAll(CharacterCount)
-createAll(Checkboxes)
-createAll(ErrorSummary)
-createAll(PasswordInput)
-createAll(Radios)
-createAll(ServiceNavigation)
-createAll(SkipLink)
+initAll()
 
 // Custom header navigation toggle for mobile (v5-style navigation in v6)
 const ARIA_EXPANDED = 'aria-expanded'
