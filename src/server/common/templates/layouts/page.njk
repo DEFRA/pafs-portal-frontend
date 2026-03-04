@@ -17,7 +17,8 @@
   .startsWith('/admin') %}
 {% set currentServiceName = t('common.service_name_admin')if isAdminPath else 
   t('common.service_name') %}
-{% set serviceUrl = '/admin/users' if isAdminPath else '/' %}
+{% set serviceUrl = '/admin/users' if isAdminPath else 
+  '/' %}
 
 {% block head %}
   <link href="{{ getAssetPath('stylesheets/application.scss') }}" rel="stylesheet">
@@ -135,6 +136,18 @@
     menuButtonLabel: t('common.service_navigation_menu_button_label'),
     navigationId: "service-nav"
   }) }}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {{ govukPhaseBanner({
+          tag: {
+            text: t('common.phase_banner.tag_text')
+          },
+          html: t('common.phase_banner.html_text')
+        }) }}
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block pageTitle %}
@@ -147,22 +160,6 @@
       items: breadcrumbs
     }) }}
   {% endif %}
-{% endblock %}
-
-{% block main %}
-  <div class="govuk-width-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full">
-        {{ govukPhaseBanner({
-        tag: {
-          text: t('common.phase_banner.tag_text')
-        },
-        html: t('common.phase_banner.html_text')
-      }) }}
-        {{ super() }}
-      </div>
-    </div>
-  </div>
 {% endblock %}
 
 {% block content %}{% endblock %}

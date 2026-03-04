@@ -228,7 +228,7 @@
 
   {# Archive footer - Back to proposals #}
   {% if isArchive %}
-    <div class="govuk-grid-row govuk-!-margin-top-9">
+    <div class="govuk-grid-row govuk-!-margin-top-6">
       <div class="govuk-grid-column-two-thirds">
         <a href="/" class="govuk-link" data-testid="back-to-proposals">{{ t('common.back_to_proposals') }}</a>
       </div>
@@ -237,7 +237,7 @@
 
   {# Failed submissions footer - help section #}
   {% if isSubmission %}
-    <div class="govuk-grid-row govuk-!-margin-top-9">
+    <div class="govuk-grid-row govuk-!-margin-top-6">
       <div class="govuk-grid-column-two-thirds">
         {% set detailsHtml %}
         <p class="govuk-body">{{ t('projects.failed_submissions.footer.check_aims_pd') }}</p>
