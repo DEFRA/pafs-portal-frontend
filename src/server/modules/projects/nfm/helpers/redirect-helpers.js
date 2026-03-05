@@ -49,8 +49,23 @@ export async function handleConditionalRedirect(
   referenceNumber
 ) {
   switch (step) {
-    case PROJECT_STEPS.NFM_RIVER_RESTORATION:
-      // After river restoration, check if leaky barriers is selected
+    case PROJECT_STEPS.NFM_SELECTED_MEASURES:
+      // After selecting measures, go to the first selected measure's page
+      if (
+        isMeasureSelected(
+          sessionData,
+          NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+        )
+      ) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
       if (isMeasureSelected(sessionData, NFM_MEASURES.LEAKY_BARRIERS)) {
         return h
           .redirect(
@@ -61,18 +76,162 @@ export async function handleConditionalRedirect(
           )
           .takeover()
       }
+      if (isMeasureSelected(sessionData, NFM_MEASURES.OFFLINE_STORAGE)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      if (isMeasureSelected(sessionData, NFM_MEASURES.WOODLAND)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.WOODLAND.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      if (isMeasureSelected(sessionData, NFM_MEASURES.HEADWATER_DRAINAGE)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      // No measures selected, go to overview
+      return navigateToProjectOverview(referenceNumber, h)
+
+    case PROJECT_STEPS.NFM_RIVER_RESTORATION:
+      // After river restoration, check next selected measures in order
+      if (isMeasureSelected(sessionData, NFM_MEASURES.LEAKY_BARRIERS)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      if (isMeasureSelected(sessionData, NFM_MEASURES.OFFLINE_STORAGE)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      if (isMeasureSelected(sessionData, NFM_MEASURES.WOODLAND)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.WOODLAND.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      if (isMeasureSelected(sessionData, NFM_MEASURES.HEADWATER_DRAINAGE)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
       // No more measure pages, go to overview
       return navigateToProjectOverview(referenceNumber, h)
 
     case PROJECT_STEPS.NFM_LEAKY_BARRIERS:
-      // After leaky barriers, check for next measure
-      // TODO: Add routing to offline storage or other measures when implemented
-      // For now, go to overview
+      // After leaky barriers, check for remaining selected measures
+      if (isMeasureSelected(sessionData, NFM_MEASURES.OFFLINE_STORAGE)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      if (isMeasureSelected(sessionData, NFM_MEASURES.WOODLAND)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.WOODLAND.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      if (isMeasureSelected(sessionData, NFM_MEASURES.HEADWATER_DRAINAGE)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      // No more measures, go to overview
       return navigateToProjectOverview(referenceNumber, h)
 
-    case PROJECT_STEPS.NFM_SELECTED_MEASURES:
-      // No conditional redirects for this step - always goes to first measure
-      return null
+    case PROJECT_STEPS.NFM_OFFLINE_STORAGE:
+      // After offline storage, check for woodland and headwater drainage
+      if (isMeasureSelected(sessionData, NFM_MEASURES.WOODLAND)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.WOODLAND.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      if (isMeasureSelected(sessionData, NFM_MEASURES.HEADWATER_DRAINAGE)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      // No more measures, go to overview
+      return navigateToProjectOverview(referenceNumber, h)
+
+    case PROJECT_STEPS.NFM_WOODLAND:
+      // After woodland, check for headwater drainage
+      if (isMeasureSelected(sessionData, NFM_MEASURES.HEADWATER_DRAINAGE)) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      // No more measures, go to overview
+      return navigateToProjectOverview(referenceNumber, h)
+
+    case PROJECT_STEPS.NFM_HEADWATER_DRAINAGE:
+      // After headwater drainage, go to overview (or check for next measure when implemented)
+      return navigateToProjectOverview(referenceNumber, h)
 
     default:
       return null

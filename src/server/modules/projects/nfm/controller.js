@@ -28,7 +28,12 @@ const PAYLOAD_LEVEL_MAP = {
     PROJECT_PAYLOAD_LEVELS.NFM_SELECTED_MEASURES,
   [PROJECT_STEPS.NFM_RIVER_RESTORATION]:
     PROJECT_PAYLOAD_LEVELS.NFM_RIVER_RESTORATION,
-  [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: PROJECT_PAYLOAD_LEVELS.NFM_LEAKY_BARRIERS
+  [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: PROJECT_PAYLOAD_LEVELS.NFM_LEAKY_BARRIERS,
+  [PROJECT_STEPS.NFM_OFFLINE_STORAGE]:
+    PROJECT_PAYLOAD_LEVELS.NFM_OFFLINE_STORAGE,
+  [PROJECT_STEPS.NFM_WOODLAND]: PROJECT_PAYLOAD_LEVELS.NFM_WOODLAND,
+  [PROJECT_STEPS.NFM_HEADWATER_DRAINAGE]:
+    PROJECT_PAYLOAD_LEVELS.NFM_HEADWATER_DRAINAGE
   // Add more NFM steps here as needed
 }
 
@@ -151,6 +156,12 @@ class NfmController {
         return PROJECT_VIEWS.NFM_RIVER_RESTORATION
       case PROJECT_STEPS.NFM_LEAKY_BARRIERS:
         return PROJECT_VIEWS.NFM_LEAKY_BARRIERS
+      case PROJECT_STEPS.NFM_OFFLINE_STORAGE:
+        return PROJECT_VIEWS.NFM_OFFLINE_STORAGE
+      case PROJECT_STEPS.NFM_WOODLAND:
+        return PROJECT_VIEWS.NFM_WOODLAND
+      case PROJECT_STEPS.NFM_HEADWATER_DRAINAGE:
+        return PROJECT_VIEWS.NFM_HEADWATER_DRAINAGE
       default:
         return PROJECT_VIEWS.NFM
     }
@@ -176,8 +187,20 @@ class NfmController {
     const config = this._getConfig(step)
     const { schema } = config
     const template = this._getViewTemplate(step)
+    const sessionData = getSessionData(request)
 
     try {
+      // Normalize nfmSelectedMeasures to array BEFORE validation (HTML forms send single checkbox as string)
+      if (
+        step === PROJECT_STEPS.NFM_SELECTED_MEASURES &&
+        request.payload.nfmSelectedMeasures &&
+        !Array.isArray(request.payload.nfmSelectedMeasures)
+      ) {
+        request.payload.nfmSelectedMeasures = [
+          request.payload.nfmSelectedMeasures
+        ]
+      }
+
       // Validate payload BEFORE processing (validate array format)
       const validationError = validatePayload(request, h, {
         template,
@@ -189,7 +212,8 @@ class NfmController {
       }
 
       // Process and normalize payload (convert array to string for session/API)
-      processPayload(step, request.payload)
+      // Pass sessionData for NFM_SELECTED_MEASURES to detect changes
+      processPayload(step, request.payload, sessionData)
 
       // Save form data to session
       updateSessionData(request, request.payload)

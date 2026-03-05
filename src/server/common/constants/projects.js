@@ -28,7 +28,10 @@ export const PROJECT_STEPS = {
   CURRENT_COASTAL_EROSION_RISK: 'current-coastal-erosion-risk',
   NFM_SELECTED_MEASURES: 'nfm-selected-measures',
   NFM_RIVER_RESTORATION: 'nfm-river-restoration',
-  NFM_LEAKY_BARRIERS: 'nfm-leaky-barriers'
+  NFM_LEAKY_BARRIERS: 'nfm-leaky-barriers',
+  NFM_OFFLINE_STORAGE: 'nfm-offline-storage',
+  NFM_WOODLAND: 'nfm-woodland',
+  NFM_HEADWATER_DRAINAGE: 'nfm-headwater-drainage'
 }
 
 export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'
@@ -91,7 +94,11 @@ export const PROJECT_PAYLOAD_FIELDS = {
   NFM_RIVER_RESTORATION_VOLUME: 'nfmRiverRestorationVolume',
   NFM_LEAKY_BARRIERS_VOLUME: 'nfmLeakyBarriersVolume',
   NFM_LEAKY_BARRIERS_LENGTH: 'nfmLeakyBarriersLength',
-  NFM_LEAKY_BARRIERS_WIDTH: 'nfmLeakyBarriersWidth'
+  NFM_LEAKY_BARRIERS_WIDTH: 'nfmLeakyBarriersWidth',
+  NFM_OFFLINE_STORAGE_AREA: 'nfmOfflineStorageArea',
+  NFM_OFFLINE_STORAGE_VOLUME: 'nfmOfflineStorageVolume',
+  NFM_WOODLAND_AREA: 'nfmWoodlandArea',
+  NFM_HEADWATER_DRAINAGE_AREA: 'nfmHeadwaterDrainageArea'
 }
 
 export const PROJECT_PAYLOAD_LEVELS = {
@@ -119,7 +126,10 @@ export const PROJECT_PAYLOAD_LEVELS = {
   CURRENT_COASTAL_EROSION_RISK: 'CURRENT_COASTAL_EROSION_RISK',
   NFM_SELECTED_MEASURES: 'NFM_SELECTED_MEASURES',
   NFM_RIVER_RESTORATION: 'NFM_RIVER_RESTORATION',
-  NFM_LEAKY_BARRIERS: 'NFM_LEAKY_BARRIERS'
+  NFM_LEAKY_BARRIERS: 'NFM_LEAKY_BARRIERS',
+  NFM_OFFLINE_STORAGE: 'NFM_OFFLINE_STORAGE',
+  NFM_WOODLAND: 'NFM_WOODLAND',
+  NFM_HEADWATER_DRAINAGE: 'NFM_HEADWATER_DRAINAGE'
 }
 
 export const PROJECT_TYPES = {

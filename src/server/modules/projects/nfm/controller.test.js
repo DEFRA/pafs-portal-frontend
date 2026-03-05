@@ -91,8 +91,8 @@ describe('NFM Controller', () => {
         expect(buildViewData).toHaveBeenCalledWith(mockRequest, {
           localKeyPrefix: 'projects.nfm.selected_measures',
           backLinkOptions: {
-            targetURL: '/project/{referenceNumber}',
-            conditionalRedirect: true
+            targetEditURL: '/project/{referenceNumber}',
+            conditionalRedirect: false
           },
           additionalData: {
             step: PROJECT_STEPS.NFM_SELECTED_MEASURES,
@@ -191,6 +191,32 @@ describe('NFM Controller', () => {
         )
       })
     })
+
+    describe('NFM Offline Storage', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_OFFLINE_STORAGE)
+      })
+
+      test('should render NFM_OFFLINE_STORAGE view', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_OFFLINE_STORAGE,
+          expect.any(Object)
+        )
+      })
+
+      test('should build view data with correct localKeyPrefix', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            localKeyPrefix: 'projects.nfm.offline_storage'
+          })
+        )
+      })
+    })
   })
 
   describe('postHandler', () => {
@@ -234,7 +260,11 @@ describe('NFM Controller', () => {
 
         expect(processPayload).toHaveBeenCalledWith(
           PROJECT_STEPS.NFM_SELECTED_MEASURES,
-          mockRequest.payload
+          mockRequest.payload,
+          {
+            slug: 'TEST-001',
+            nfmSelectedMeasures: 'river_floodplain_restoration,leaky_barriers'
+          }
         )
       })
 
@@ -419,8 +449,71 @@ describe('NFM Controller', () => {
           mockH
         )
       })
+
+      test('should handle errors and re-render form', async () => {
+        const error = new Error('Save failed')
+        saveProjectWithErrorHandling.mockRejectedValue(error)
+        extractApiError.mockReturnValue('Save error')
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_LEAKY_BARRIERS,
+          expect.objectContaining({
+            error: 'Save error'
+          })
+        )
+      })
     })
 
+    describe('NFM Offline Storage', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_OFFLINE_STORAGE)
+        mockRequest.payload = {
+          nfmOfflineStorageArea: '1.5',
+          nfmOfflineStorageVolume: '100'
+        }
+      })
+
+      test('should save with correct payload level', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          PROJECT_PAYLOAD_LEVELS.NFM_OFFLINE_STORAGE,
+          expect.any(Object),
+          PROJECT_VIEWS.NFM_OFFLINE_STORAGE
+        )
+      })
+
+      test('should handle conditional redirect to overview', async () => {
+        const overviewRedirect = mockH.redirect('/project/TEST-001').takeover()
+        handleConditionalRedirect.mockResolvedValue(overviewRedirect)
+
+        const result = await nfmController.postHandler(mockRequest, mockH)
+
+        expect(result).toBe(overviewRedirect)
+      })
+
+      test('should handle errors and re-render form', async () => {
+        const error = new Error('Save failed')
+        saveProjectWithErrorHandling.mockRejectedValue(error)
+        extractApiError.mockReturnValue('Save error')
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_OFFLINE_STORAGE,
+          expect.objectContaining({
+            error: 'Save error'
+          })
+        )
+      })
+    })
+  })
+
+  describe('Error Handling', () => {
     describe('Edge Cases', () => {
       test('should handle empty payload gracefully', async () => {
         getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_SELECTED_MEASURES)
@@ -430,7 +523,11 @@ describe('NFM Controller', () => {
 
         expect(processPayload).toHaveBeenCalledWith(
           PROJECT_STEPS.NFM_SELECTED_MEASURES,
-          {}
+          {},
+          {
+            slug: 'TEST-001',
+            nfmSelectedMeasures: 'river_floodplain_restoration,leaky_barriers'
+          }
         )
         expect(updateSessionData).toHaveBeenCalledWith(mockRequest, {})
       })

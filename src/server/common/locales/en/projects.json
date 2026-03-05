@@ -455,6 +455,7 @@
         "offline_storage": "Offline storage areas",
         "woodland": "Woodland",
         "headwater_drainage": "Headwater drainage management",
+        "headwater_drainage_management": "Headwater drainage management",
         "runoff_management": "Runoff attenuation or management",
         "saltmarsh_management": "Saltmarsh or mudflat management",
         "sand_dune_management": "Sand dune management"
@@ -481,6 +482,32 @@
       },
       "width": {
         "label": "Typical width"
+      }
+    },
+    "offline_storage": {
+      "title": "Details of new offline storage areas",
+      "area": {
+        "label": "Area"
+      },
+      "volume": {
+        "label": "Design storage volume",
+        "hint": "If known"
+      }
+    },
+    "woodland": {
+      "title": "Details of new woodland",
+      "area": {
+        "label": "Area",
+        "hint": "Enter the area in hectares",
+        "suffix": "hectares"
+      }
+    },
+    "headwater_drainage": {
+      "title": "Details of new headwater drainage management",
+      "area": {
+        "label": "Area",
+        "hint": "Enter the area in hectares",
+        "suffix": "hectares"
       }
     }
   },

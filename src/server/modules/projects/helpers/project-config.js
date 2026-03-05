@@ -30,6 +30,9 @@ import {
 import { nfmSelectedMeasuresSchema } from '../nfm/schema.js'
 import { nfmRiverRestorationSchema } from '../nfm/river-restoration-schema.js'
 import { nfmLeakyBarriersSchema } from '../nfm/leaky-barriers-schema.js'
+import { nfmOfflineStorageSchema } from '../nfm/offline-storage-schema.js'
+import { nfmWoodlandSchema } from '../nfm/woodland-schema.js'
+import { nfmHeadwaterDrainageSchema } from '../nfm/headwater-drainage-schema.js'
 
 export const interventionTypesLocalKeyPrefix = 'projects.intervention_type'
 export const projectTypesLocalKeyPrefix = 'projects.project_type'
@@ -327,7 +330,17 @@ export const PROJECT_PAYLOAD_LEVEL_FIELDS = {
   ],
   [PROJECT_PAYLOAD_LEVELS.NFM_SELECTED_MEASURES]: [
     PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
-    PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES
+    PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES,
+    // Include all measure data fields so they can be cleared when measures are unselected
+    PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA,
+    PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME,
+    PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME,
+    PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH,
+    PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH,
+    PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA,
+    PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME,
+    PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA,
+    PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA
   ],
   [PROJECT_PAYLOAD_LEVELS.NFM_RIVER_RESTORATION]: [
     PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
@@ -339,6 +352,19 @@ export const PROJECT_PAYLOAD_LEVEL_FIELDS = {
     PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME,
     PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH,
     PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH
+  ],
+  [PROJECT_PAYLOAD_LEVELS.NFM_OFFLINE_STORAGE]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA,
+    PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME
+  ],
+  [PROJECT_PAYLOAD_LEVELS.NFM_WOODLAND]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA
+  ],
+  [PROJECT_PAYLOAD_LEVELS.NFM_HEADWATER_DRAINAGE]: [
+    PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+    PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA
   ]
 }
 
@@ -446,8 +472,8 @@ export const NFM_CONFIG = {
   [PROJECT_STEPS.NFM_SELECTED_MEASURES]: {
     localKeyPrefix: 'projects.nfm.selected_measures',
     backLinkOptions: {
-      targetURL: ROUTES.PROJECT.OVERVIEW,
-      conditionalRedirect: true
+      targetEditURL: ROUTES.PROJECT.OVERVIEW,
+      conditionalRedirect: false
     },
     schema: nfmSelectedMeasuresSchema,
     fieldType: 'checkbox'
@@ -455,7 +481,7 @@ export const NFM_CONFIG = {
   [PROJECT_STEPS.NFM_RIVER_RESTORATION]: {
     localKeyPrefix: 'projects.nfm.river_restoration',
     backLinkOptions: {
-      targetURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
       conditionalRedirect: false
     },
     schema: nfmRiverRestorationSchema,
@@ -464,10 +490,37 @@ export const NFM_CONFIG = {
   [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: {
     localKeyPrefix: 'projects.nfm.leaky_barriers',
     backLinkOptions: {
-      targetURL: ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
       conditionalRedirect: false
     },
     schema: nfmLeakyBarriersSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_OFFLINE_STORAGE]: {
+    localKeyPrefix: 'projects.nfm.offline_storage',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
+      conditionalRedirect: false
+    },
+    schema: nfmOfflineStorageSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_WOODLAND]: {
+    localKeyPrefix: 'projects.nfm.woodland',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
+      conditionalRedirect: false
+    },
+    schema: nfmWoodlandSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_HEADWATER_DRAINAGE]: {
+    localKeyPrefix: 'projects.nfm.headwater_drainage',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.WOODLAND,
+      conditionalRedirect: false
+    },
+    schema: nfmHeadwaterDrainageSchema,
     fieldType: 'input'
   }
   // Add more NFM steps here as needed

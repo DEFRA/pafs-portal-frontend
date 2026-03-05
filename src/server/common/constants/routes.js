@@ -125,7 +125,10 @@ export const ROUTES = {
       NFM: {
         SELECTED_MEASURES: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_SELECTED_MEASURES}`,
         RIVER_RESTORATION: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_RIVER_RESTORATION}`,
-        LEAKY_BARRIERS: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_LEAKY_BARRIERS}`
+        LEAKY_BARRIERS: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_LEAKY_BARRIERS}`,
+        OFFLINE_STORAGE: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_OFFLINE_STORAGE}`,
+        WOODLAND: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_WOODLAND}`,
+        HEADWATER_DRAINAGE: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_HEADWATER_DRAINAGE}`
       }
     }
   },

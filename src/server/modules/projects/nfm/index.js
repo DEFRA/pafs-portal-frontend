@@ -5,6 +5,7 @@ import {
   fetchProjectForEdit,
   initializeEditSessionPreHandler
 } from '../helpers/project-edit-session.js'
+import { requireSelectedMeasure } from './helpers/measure-guard.js'
 import { nfmController } from './controller.js'
 
 // Helper function to create route pair (GET and POST)
@@ -38,6 +39,15 @@ export const projectNfm = {
         { method: requireNfmOrSudIntervention }
       ]
 
+      // Pre-handlers for measure-specific pages (includes measure selection check)
+      const measureEditPreHandlers = [
+        { method: requireAuth },
+        { method: fetchProjectForEdit },
+        { method: initializeEditSessionPreHandler },
+        { method: requireNfmOrSudIntervention },
+        { method: requireSelectedMeasure }
+      ]
+
       server.route([
         ...createRoutePair(
           ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
@@ -46,12 +56,27 @@ export const projectNfm = {
         ),
         ...createRoutePair(
           ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
-          editPreHandlers,
+          measureEditPreHandlers,
           nfmController
         ),
         ...createRoutePair(
           ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
-          editPreHandlers,
+          measureEditPreHandlers,
+          nfmController
+        ),
+        ...createRoutePair(
+          ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
+          measureEditPreHandlers,
+          nfmController
+        ),
+        ...createRoutePair(
+          ROUTES.PROJECT.EDIT.NFM.WOODLAND,
+          measureEditPreHandlers,
+          nfmController
+        ),
+        ...createRoutePair(
+          ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE,
+          measureEditPreHandlers,
           nfmController
         )
       ])

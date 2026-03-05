@@ -1,0 +1,36 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block body %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    <h1 class="govuk-heading-l">{{ t('projects.nfm.woodland.title') }}</h1>
+
+    {{ govukInput({
+      id: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA,
+      name: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA,
+      label: {
+        text: t('projects.nfm.woodland.area.label')
+      },
+      suffix: {
+        text: "hectares"
+      },
+      classes: "govuk-input--width-10",
+      value: formData[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA],
+      errorMessage: fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA] and {
+        text: fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]
+      }
+    }) }}
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+
+  </form>
+{% endblock %}

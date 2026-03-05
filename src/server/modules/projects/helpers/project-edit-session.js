@@ -52,6 +52,27 @@ function mapNfmMeasuresToFields(nfmMeasures) {
           mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH] = widthM
         }
         break
+      case 'offline_storage':
+        if (areaHectares !== null && areaHectares !== undefined) {
+          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA] =
+            areaHectares
+        }
+        if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
+          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME] =
+            storageVolumeM3
+        }
+        break
+      case 'woodland':
+        if (areaHectares !== null && areaHectares !== undefined) {
+          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA] = areaHectares
+        }
+        break
+      case 'headwater_drainage_management':
+        if (areaHectares !== null && areaHectares !== undefined) {
+          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA] =
+            areaHectares
+        }
+        break
       // Add more measure types here as they are implemented
       default:
         break

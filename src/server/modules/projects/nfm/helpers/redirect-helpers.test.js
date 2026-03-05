@@ -1,6 +1,9 @@
 import { describe, test, expect } from 'vitest'
 import { handleConditionalRedirect } from './redirect-helpers.js'
-import { PROJECT_STEPS } from '../../../../common/constants/projects.js'
+import {
+  PROJECT_STEPS,
+  PROJECT_PAYLOAD_FIELDS
+} from '../../../../common/constants/projects.js'
 
 describe('NFM Redirect Helpers', () => {
   const mockRequest = {}
@@ -107,7 +110,7 @@ describe('NFM Redirect Helpers', () => {
   })
 
   describe('handleConditionalRedirect - NFM_SELECTED_MEASURES', () => {
-    test('should return null for selected measures step', async () => {
+    test('should redirect to first selected measure (river restoration)', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'river_floodplain_restoration'
@@ -121,7 +124,10 @@ describe('NFM Redirect Helpers', () => {
         'TEST-001'
       )
 
-      expect(result).toBe(null)
+      expect(result).toEqual({
+        redirected: true,
+        path: '/project/TEST-001/nfm-river-restoration'
+      })
     })
   })
 

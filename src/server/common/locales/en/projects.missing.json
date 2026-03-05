@@ -12,7 +12,8 @@
     },
     "selected_measures": {
       "options": {
-        "leaky_barriers_in_channel_storage": "nfm.selected_measures.options.leaky_barriers_in_channel_storage"
+        "leaky_barriers_in_channel_storage": "nfm.selected_measures.options.leaky_barriers_in_channel_storage",
+        "headwater_drainage_management": "nfm.selected_measures.options.headwater_drainage_management"
       }
     }
   },
