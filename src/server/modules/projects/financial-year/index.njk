@@ -51,6 +51,7 @@
       {{ govukInput({
         id: fieldName,
         name: fieldName,
+        inputmode: "numeric",
         label: {
           text: t(localKeyPrefix + '.label')
         },
@@ -59,7 +60,10 @@
         },
         classes: "govuk-!-width-full",
         value: formData[fieldName],
-        errorMessage: financialYearError
+        errorMessage: financialYearError,
+        attributes: {
+          maxlength: 4
+        }
       }) }}
     {% endif %}
 

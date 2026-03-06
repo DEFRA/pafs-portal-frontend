@@ -1,15 +1,17 @@
-{% macro fundingSourcesAndSpendingSummaryCard(values, t) %}
+{% macro fundingSourcesAndSpendingSummaryCard(values, t, isReadOnly) %}
 
 <div class="govuk-summary-card">
   <div class="govuk-summary-card__title-wrapper">
     <h2 class="govuk-summary-card__title">Funding sources and spending</h2>
-    <ul class="govuk-summary-card__actions">
-      <li class="govuk-summary-card__action">
-        <a class="govuk-link" href="/proposal/create-proposal/funding-sources">
-          {% if fundingSectionStarted %}Change{% else %}Add{% endif %}<span class="govuk-visually-hidden"> the funding sources and spending details</span>
-        </a>
-      </li>
-    </ul>
+    {% if not isReadOnly %}
+      <ul class="govuk-summary-card__actions">
+        <li class="govuk-summary-card__action">
+          <a class="govuk-link" href="/proposal/create-proposal/funding-sources">
+            {% if fundingSectionStarted %}Change{% else %}Add{% endif %}<span class="govuk-visually-hidden"> the funding sources and spending details</span>
+          </a>
+        </li>
+      </ul>
+    {% endif %}
   </div>
   <div class="govuk-summary-card__content">
     {% if fundingSectionStarted %}

@@ -18,7 +18,7 @@
         {% set riskError = false %}
       {% endif %}
 
-      {% set checkedRisks = formData[PROJECT_PAYLOAD_FIELDS.RISKS] or [] %}
+      {% set checkedRisks = formData[PROJECT_PAYLOAD_FIELDS.RISKS] or[] %}
       {% set riskItems = [] %}
       {% for option in riskOptions %}
         {% set itemConfig = {
@@ -43,10 +43,10 @@
         errorMessage: riskError
       }) }}
 
-    {# MAIN RISK PAGE - Radio selection of main risk #}
+      {# MAIN RISK PAGE - Radio selection of main risk #}
     {% elif step == projectSteps.MAIN_RISK %}
       <input type="hidden" name="{{PROJECT_PAYLOAD_FIELDS.RISKS}}" value="{{ formData[PROJECT_PAYLOAD_FIELDS.RISKS] | join(',') }}">
-      
+
       {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.MAIN_RISK] %}
         {% set mainRiskError = {
           text: t(localKeyPrefix + '.errors.required')
@@ -70,10 +70,10 @@
         errorMessage: mainRiskError
       }) }}
 
-    {# PROPERTY AFFECTED FLOODING PAGE - Table with inputs #}
+      {# PROPERTY AFFECTED FLOODING PAGE - Table with inputs #}
     {% elif step == projectSteps.PROPERTY_AFFECTED_FLOODING %}
       <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
-      
+
       <p class="govuk-body-s">{{ t(localKeyPrefix + '.description') }}</p>
 
       {# Checkbox for "My project does not benefit any properties at risk of flooding" #}
@@ -91,8 +91,8 @@
 
       {# Property values table #}
       <div class="govuk-form-group {% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] or fieldErrors[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE]) %}govuk-form-group--error{% endif %}">
-        
-        {% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] or fieldErrors[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE]) %}
+
+        {% if fieldErrors and(fieldErrors[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] or fieldErrors[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE]) %}
           <span class="govuk-error-message">
             <span class="govuk-visually-hidden">Error:</span>
             {{ t(localKeyPrefix + '.errors.invalid_value') }}
@@ -161,10 +161,10 @@
         </table>
       </div>
 
-    {# PROPERTY AFFECTED COASTAL EROSION PAGE - Table with inputs #}
+      {# PROPERTY AFFECTED COASTAL EROSION PAGE - Table with inputs #}
     {% elif step == projectSteps.PROPERTY_AFFECTED_COASTAL_EROSION %}
       <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
-      
+
       <p class="govuk-body">{{ t(localKeyPrefix + '.description') }}</p>
 
       {# Checkbox for "My project does not benefit any properties at risk of coastal erosion" #}
@@ -182,8 +182,8 @@
 
       {# Property values table #}
       <div class="govuk-form-group {% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] or fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION]) %}govuk-form-group--error{% endif %}">
-        
-        {% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] or fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION]) %}
+
+        {% if fieldErrors and(fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] or fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION]) %}
           <span class="govuk-error-message">
             <span class="govuk-visually-hidden">Error:</span>
             {{ t(localKeyPrefix + '.errors.invalid_value') }}
@@ -228,7 +228,7 @@
         </table>
       </div>
 
-    {# TWENTY PERCENT DEPRIVED PAGE #}
+      {# TWENTY PERCENT DEPRIVED PAGE #}
     {% elif step == projectSteps.TWENTY_PERCENT_DEPRIVED %}
       {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] %}
         {% set percentError20 = {
@@ -259,7 +259,7 @@
         inputmode: "decimal"
       }) }}
 
-    {# FORTY PERCENT DEPRIVED PAGE #}
+      {# FORTY PERCENT DEPRIVED PAGE #}
     {% elif step == projectSteps.FORTY_PERCENT_DEPRIVED %}
       {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] %}
         {% set percentError40 = {
@@ -290,48 +290,48 @@
         inputmode: "decimal"
       }) }}
 
-    {# CURRENT FLOOD RISK PAGE (for fluvial, tidal, sea) #}
-    {% elif step == projectSteps.CURRENT_FLOOD_RISK %}
-      {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] %}
-        {% set currentFloodRiskError = {
+      {# CURRENT FLOOD RISK PAGE (for fluvial, tidal, sea) #}
+    {% elif step == projectSteps.CURRENT_FLOOD_FLUVIAL_RISK %}
+      {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK] %}
+        {% set currentFloodFluvialRiskError = {
           text: t(localKeyPrefix + '.errors.required')
         } %}
       {% else %}
-        {% set currentFloodRiskError = false %}
+        {% set currentFloodFluvialRiskError = false %}
       {% endif %}
 
       <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
       <p class="govuk-body">{{ t(localKeyPrefix + '.hint') }}</p>
 
       {{ govukRadios({
-        id: PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK,
-        name: PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK,
+        id: PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK,
+        name: PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK,
         items: [
           {
             text: t(localKeyPrefix + '.options.high'),
             value: 'high',
-            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] == 'high'
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK] == 'high'
           },
           {
             text: t(localKeyPrefix + '.options.medium'),
             value: 'medium',
-            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] == 'medium'
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK] == 'medium'
           },
           {
             text: t(localKeyPrefix + '.options.low'),
             value: 'low',
-            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] == 'low'
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK] == 'low'
           },
           {
             text: t(localKeyPrefix + '.options.very_low'),
             value: 'very_low',
-            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_RISK] == 'very_low'
+            checked: formData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK] == 'very_low'
           }
         ],
-        errorMessage: currentFloodRiskError
+        errorMessage: currentFloodFluvialRiskError
       }) }}
 
-    {# CURRENT SURFACE WATER FLOOD RISK PAGE #}
+      {# CURRENT SURFACE WATER FLOOD RISK PAGE #}
     {% elif step == projectSteps.CURRENT_FLOOD_SURFACE_WATER_RISK %}
       {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK] %}
         {% set currentSurfaceWaterRiskError = {
@@ -372,7 +372,7 @@
         errorMessage: currentSurfaceWaterRiskError
       }) }}
 
-    {# CURRENT COASTAL EROSION RISK PAGE #}
+      {# CURRENT COASTAL EROSION RISK PAGE #}
     {% elif step == projectSteps.CURRENT_COASTAL_EROSION_RISK %}
       {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK] %}
         {% set currentCoastalErosionRiskError = {

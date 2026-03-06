@@ -4,6 +4,7 @@ import {
   noEditSessionRequired,
   requireEditPermission,
   requireJourneyStarted,
+  requireEditableStatus,
   requireRmaUser
 } from '../helpers/permissions.js'
 import {
@@ -49,6 +50,7 @@ export const projectName = {
               { method: requireAuth },
               { method: fetchProjectForEdit },
               { method: initializeEditSessionPreHandler },
+              { method: requireEditableStatus },
               { method: requireEditPermission }
             ],
             handler: nameController.getHandler
@@ -62,6 +64,7 @@ export const projectName = {
               { method: requireAuth },
               { method: fetchProjectForEdit },
               { method: initializeEditSessionPreHandler },
+              { method: requireEditableStatus },
               { method: requireEditPermission }
             ],
             handler: nameController.postHandler

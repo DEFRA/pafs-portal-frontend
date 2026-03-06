@@ -32,7 +32,8 @@ const PAYLOAD_LEVEL_MAP = {
     PROJECT_PAYLOAD_LEVELS.TWENTY_PERCENT_DEPRIVED,
   [PROJECT_STEPS.FORTY_PERCENT_DEPRIVED]:
     PROJECT_PAYLOAD_LEVELS.FORTY_PERCENT_DEPRIVED,
-  [PROJECT_STEPS.CURRENT_FLOOD_RISK]: PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_RISK,
+  [PROJECT_STEPS.CURRENT_FLOOD_FLUVIAL_RISK]:
+    PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_FLUVIAL_RISK,
   [PROJECT_STEPS.CURRENT_FLOOD_SURFACE_WATER_RISK]:
     PROJECT_PAYLOAD_LEVELS.CURRENT_FLOOD_SURFACE_WATER_RISK,
   [PROJECT_STEPS.CURRENT_COASTAL_EROSION_RISK]:
@@ -152,13 +153,9 @@ class RiskAndPropertiesController {
     const { slug: referenceNumber } = sessionData
     const step = getProjectStep(request)
 
-    // Handle conditional redirects (await required for async helper functions)
-    const conditionalRedirect = await handleConditionalRedirect(
-      step,
-      request,
-      h,
-      sessionData,
-      referenceNumber
+    // Handle conditional redirects (RISK step returns Promise, others return synchronous values)
+    const conditionalRedirect = await Promise.resolve(
+      handleConditionalRedirect(step, request, h, sessionData, referenceNumber)
     )
 
     if (conditionalRedirect) {

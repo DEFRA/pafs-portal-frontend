@@ -111,6 +111,21 @@ describe('OverviewController', () => {
       )
     })
 
+    test('should set light blue tag for REVISE status', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.REVISE
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          projectStateTag: 'govuk-tag--light-blue'
+        })
+      )
+    })
+
     test('should set grey tag for non-DRAFT status', async () => {
       getSessionData.mockReturnValue({
         projectState: PROJECT_STATUS.SUBMITTED
@@ -137,6 +152,128 @@ describe('OverviewController', () => {
         expect.any(String),
         expect.objectContaining({
           projectStateTag: 'govuk-tag--grey'
+        })
+      )
+    })
+
+    test('should set orange tag for ARCHIVED status', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.ARCHIVED
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          projectStateTag: 'govuk-tag--orange'
+        })
+      )
+    })
+
+    test('should set isReadOnly to true for archived projects', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.ARCHIVED
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isReadOnly: true
+        })
+      )
+    })
+
+    test('should set isReadOnly to true for submitted projects', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.SUBMITTED
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isReadOnly: true
+        })
+      )
+    })
+
+    test('should set isReadOnly to false for draft projects', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isReadOnly: false
+        })
+      )
+    })
+
+    test('should set isReadOnly to false for revise projects', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.REVISE
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isReadOnly: false
+        })
+      )
+    })
+
+    test('should set isLegacy to true when project is legacy', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT,
+        isLegacy: true
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isLegacy: true
+        })
+      )
+    })
+
+    test('should set isLegacy to false when project is not legacy', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT,
+        isLegacy: false
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isLegacy: false
+        })
+      )
+    })
+
+    test('should set isLegacy to false when isLegacy field is absent', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isLegacy: false
         })
       )
     })
@@ -341,6 +478,17 @@ describe('OverviewController', () => {
 
       const call = mockH.view.mock.calls[0]
       expect(call[1].projectStateTag).toBe('govuk-tag--grey')
+    })
+
+    test('should return orange for ARCHIVED', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.ARCHIVED
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const call = mockH.view.mock.calls[0]
+      expect(call[1].projectStateTag).toBe('govuk-tag--orange')
     })
 
     test('should return grey for undefined status', async () => {

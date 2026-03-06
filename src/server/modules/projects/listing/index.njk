@@ -1,0 +1,272 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% block content %}
+  {{ appHeading({
+    text: pageHeading
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {# Success notification banner #}
+      {% if successNotification %}
+        {% set notificationHtml %}
+        <h3 class="govuk-notification-banner__heading">
+          {{ successNotification.title or t('projects.manage_projects.notifications.project_updated') }}
+        </h3>
+        <p class="govuk-body">{{ successNotification.message }}</p>
+        {% endset %}
+
+        {{ govukNotificationBanner({
+          html: notificationHtml,
+          type: "success"
+        }) }}
+      {% endif %}
+
+      {# Error notification banner #}
+      {% if errorNotification %}
+        {% set errorHtml %}
+        {% if errorNotification.title %}
+          <h3 class="govuk-notification-banner__heading">
+            {{ errorNotification.title }}
+          </h3>
+        {% endif %}
+        <p class="govuk-body">{{ errorNotification.message }}</p>
+        {% endset %}
+
+        {{ govukNotificationBanner({
+          html: errorHtml,
+          titleText: t('common.important')
+        }) }}
+      {% endif %}
+
+      {% if isUserProjectListing %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            <a href="{{ t('home.new_proposal_guidance.link_url') }}" class="govuk-link govuk-!-margin-bottom-3" target="_blank" rel="noopener noreferrer" data-testid="new-proposal-guidance">{{ t('home.new_proposal_guidance.link_text') }}</a>
+            <div class="govuk-inset-text govuk-!-margin-top-4">{{t('home.inset_text')}}</div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if isSubmission %}
+        <div class="govuk-body govuk-!-margin-top-6">{{t('projects.failed_submissions.description')}}</div>
+      {% endif %}
+
+      {% if isAdminProjectListing or isUserProjectListing %}
+        {# Filter form #}
+        <form action="{{ baseUrl }}" method="get" role="search" aria-label="{{ t('projects.manage_projects.filters.aria_label') }}" data-testid="projects-filter-form">
+          <span id="search-hint" class="govuk-visually-hidden">{{ t('projects.manage_projects.filters.search_hint') }}</span>
+          {{ govukInput({
+            label: {
+              text: t('projects.manage_projects.filters.search_label'),
+              classes: "govuk-label"
+            },
+            id: "search",
+            name: "search",
+            value: filters.search,
+            classes: "govuk-!-width-two-thirds",
+            attributes: {
+              "aria-describedby": "search-hint"
+            }
+          }) }}
+
+          {% if isAdmin %}
+            <div class="govuk-form-group">
+              <label class="govuk-label" for="area-filter">
+                {{ t('projects.manage_projects.filters.area_label') }}
+              </label>
+              <select class="govuk-select govuk-!-width-two-thirds" id="area-filter" name="areaId">
+                {% for area in areas %}
+                  <option value="{{ area.value }}"{% if area.value == filters.areaId %} selected{% endif %}>{{ area.text }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          {% endif %}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: t('projects.manage_projects.filters.filter_button'),
+              type: "submit"
+            }) }}
+            <a href="{{ baseUrl }}" class="govuk-link" data-testid="clear-filters">
+              {{ t('projects.manage_projects.filters.clear_filters') }}
+            </a>
+          </div>
+        </form>
+      {% endif %}
+
+      {% if isUserProjectListing and canCreateProjects %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            <a href="/project/start" role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-3"
+              data-module="govuk-button">
+              {{t('home.buttons.new_proposal')}}
+            </a>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if isUserProjectListing and isNotRMA %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            <p class="govuk-body">{{ t('home.pso_ea_block.info_text_1') | safe }}</p>
+            <p class="govuk-body">{{ t('home.pso_ea_block.info_text_2') }}</p>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true">
+      {# Projects table #}
+      {% if error %}
+        <p class="govuk-body govuk-error-message" data-testid="projects-error">{{ error }}</p>
+      {% elif projects | length > 0 %}
+        <table class="govuk-table app-table--responsive app-users-table app-projects-table{% if isAdminProjectListing %} app-projects-table--admin{% elif isSubmission %} app-projects-table--submissions{% elif isUserProjectListing %} app-projects-table--user{% elif isArchive %} app-projects-table--archive{% endif %}" data-testid="projects-table">
+          <caption class="govuk-visually-hidden">{{ t('projects.manage_projects.table.caption') }}</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header app-projects-table__col--number">{{ t('projects.manage_projects.table.project_number') }}</th>
+              <th scope="col" class="govuk-table__header app-projects-table__col--name">{{ t('projects.manage_projects.table.project_name') }}</th>
+              <th scope="col" class="govuk-table__header app-projects-table__col--updated">{{ t('projects.manage_projects.table.last_updated') }}</th>
+              <th scope="col" class="govuk-table__header app-projects-table__col--rma">{{ t('projects.manage_projects.table.assigned_rma') }}</th>
+              {% if not isArchive and not isSubmission %}
+                <th scope="col" class="govuk-table__header app-projects-table__col--status">{{ t('projects.manage_projects.table.status.label') }}</th>
+              {% endif %}
+              {% if isAdminProjectListing or isSubmission %}
+                <th scope="col" class="govuk-table__header app-projects-table__col--actions">
+                  <span class="govuk-visually-hidden">{{ t('projects.manage_projects.table.action') }}</span>
+                </th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for project in projects %}
+              <tr class="govuk-table__row" data-testid="projects-table-row">
+                <td class="govuk-table__cell" data-label="{{ t('projects.manage_projects.table.project_number') }}" data-testid="project-number">
+                  {% if isUserProjectListing or isArchive %}
+                    <a href="/project/{{ project.referenceNumberFormatted }}" class="govuk-link" data-testid="project-link">
+                      <strong>{{ project.referenceNumber }}</strong>
+                    </a>
+                  {% else %}
+                    <strong>{{ project.referenceNumber }}</strong>
+                  {% endif %}
+                </td>
+                <td class="govuk-table__cell" data-label="{{ t('projects.manage_projects.table.project_name') }}" data-testid="project-name">{{ project.name }}</td>
+                <td class="govuk-table__cell govuk-!-white-space-nowrap" data-label="{{ t('projects.manage_projects.table.last_updated') }}" data-testid="last-updated">
+                  {{ project.updatedAt | formatDate('d MMM yyyy') }}&nbsp;
+                </td>
+                <td class="govuk-table__cell" data-label="{{ t('projects.manage_projects.table.assigned_rma') }}" data-testid="assigned-rma">{{ project.rmaName | default('-') }}</td>
+                {% if not isArchive and not isSubmission %}
+                  <td class="govuk-table__cell" data-label="{{ t('projects.manage_projects.table.status.label') }}" data-testid="status">{{ project.status | capitalize }}</td>
+                {% endif %}
+                {% if isAdminProjectListing %}
+                  <td class="govuk-table__cell" data-label="">
+                    <a href="/admin/projects/{{ project.referenceNumberFormatted }}" class="govuk-link" data-testid="project-edit-link">
+                      {{ t('projects.manage_projects.table.edit') }}
+                      <span class="govuk-visually-hidden">{{ project.referenceNumber }}</span>
+                    </a>
+                  </td>
+                {% elif isSubmission %}
+                  <td class="govuk-table__cell govuk-!-white-space-nowrap" data-label="">
+                    <a href="#" class="govuk-link" data-testid="resend-to-aims-pd">{{ t('projects.failed_submissions.actions.resend_to_aims_pd') }}</a>
+                    &nbsp;|&nbsp;
+                    <a href="#" class="govuk-link" data-testid="proposal-in-aims-pd">{{ t('projects.failed_submissions.actions.proposal_in_aims_pd') }}</a>
+                  </td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="govuk-body" data-testid="projects-empty">{{ t('projects.manage_projects.empty') }}</p>
+      {% endif %}
+
+      {# Pagination row with summary and navigation #}
+      {% if pagination.summary or pagination.items or pagination.previous or pagination.next %}
+        <div class="app-pagination-row govuk-!-margin-top-6">
+          {# Pagination summary #}
+          {% if pagination.summary %}
+            <p class="govuk-body app-pagination-row__summary" data-testid="pagination-summary">
+              {{ t('projects.manage_projects.pagination.showing') }}
+              <strong>{{ pagination.summary.startItem }}</strong>
+              {{ t('projects.manage_projects.pagination.to') }}
+              <strong>{{ pagination.summary.endItem }}</strong>
+              {{ t('projects.manage_projects.pagination.of') }}
+              <strong>{{ pagination.summary.totalItems }}</strong>
+              {{ t('projects.manage_projects.pagination.projects') }}
+            </p>
+          {% endif %}
+
+          {# GOV.UK Pagination #}
+          {% if pagination.items or pagination.previous or pagination.next %}
+            <div class="app-pagination-row__nav">
+              {{ govukPagination({
+                items: pagination.items,
+                previous: pagination.previous,
+                next: pagination.next,
+                landmarkLabel: t('projects.manage_projects.pagination.aria_label')
+              }) }}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  {# Archive footer - Back to proposals #}
+  {% if isArchive %}
+    <div class="govuk-grid-row govuk-!-margin-top-6">
+      <div class="govuk-grid-column-two-thirds">
+        <a href="/" class="govuk-link" data-testid="back-to-proposals">{{ t('common.back_to_proposals') }}</a>
+      </div>
+    </div>
+  {% endif %}
+
+  {# Failed submissions footer - help section #}
+  {% if isSubmission %}
+    <div class="govuk-grid-row govuk-!-margin-top-6">
+      <div class="govuk-grid-column-two-thirds">
+        {% set detailsHtml %}
+        <p class="govuk-body">{{ t('projects.failed_submissions.footer.check_aims_pd') }}</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ t('projects.failed_submissions.footer.if_yes') }}
+            {{ t('projects.failed_submissions.footer.if_yes_result') }}</li>
+          <li>{{ t('projects.failed_submissions.footer.if_no') }}
+            <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('projects.failed_submissions.footer.if_no_success') }}</li>
+              <li>{{ t('projects.failed_submissions.footer.if_no_failed') }}
+                <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('projects.failed_submissions.footer.contact_helpdesk') }}
+                    <a href="mailto:{{ t('projects.failed_submissions.footer.helpdesk_email') }}" class="govuk-link">{{ t('projects.failed_submissions.footer.helpdesk_email') }}</a>
+                  </li>
+                  <li>{{ t('projects.failed_submissions.footer.copy_team') }}
+                    <a href="mailto:{{ t('projects.failed_submissions.footer.team_email') }}" class="govuk-link">{{ t('projects.failed_submissions.footer.team_email') }}</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        {% endset %}
+
+        {{ govukDetails({
+          summaryText: t('projects.failed_submissions.footer.label'),
+          html: detailsHtml
+        }) }}
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

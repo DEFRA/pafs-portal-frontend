@@ -15,18 +15,14 @@
       {%- else -%}
         invalid
       {%- endif -%}
-    {%- elif fieldErrors[monthField] == ERROR_CODES.DATE_IN_PAST or fieldErrors[yearField] == ERROR_CODES.DATE_IN_PAST -%}
-      {%- if isEarliestDate -%}
-        earliest_date_in_past
-      {%- else -%}
-        in_past
-      {%- endif -%}
+    {%- elif fieldErrors[monthField] == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE or fieldErrors[yearField] == ERROR_CODES.DATE_OUTSIDE_FINANCIAL_RANGE -%}
+      outside_financial_range
     {%- elif fieldErrors[monthField] == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE or fieldErrors[yearField] == ERROR_CODES.DATE_BEFORE_PREVIOUS_STAGE -%}
       before_previous_stage
-    {%- elif fieldErrors[monthField] == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors[yearField] == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors[monthField] == ERROR_CODES.DATE_AFTER_FINANCIAL_END or fieldErrors[yearField] == ERROR_CODES.DATE_AFTER_FINANCIAL_END -%}
-      financial_year_range
-    {%- elif fieldErrors[monthField] == ERROR_CODES.DATE_AFTER_FINANCIAL_START or fieldErrors[yearField] == ERROR_CODES.DATE_AFTER_FINANCIAL_START -%}
-      earliest_date_after_financial_start
+    {%- elif fieldErrors[monthField] == ERROR_CODES.DATE_BEFORE_FINANCIAL_START or fieldErrors[yearField] == ERROR_CODES.DATE_BEFORE_FINANCIAL_START -%}
+      earliest_date_before_financial_start
+    {%- elif fieldErrors[monthField] == ERROR_CODES.DATE_AFTER_OBC_START or fieldErrors[yearField] == ERROR_CODES.DATE_AFTER_OBC_START -%}
+      earliest_date_after_obc_start
     {%- endif -%}
   {%- endif -%}
 {% endmacro %}

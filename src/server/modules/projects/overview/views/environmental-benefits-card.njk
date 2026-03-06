@@ -1,47 +1,150 @@
-{% macro environmentalBenefitsSummaryCard(values, t) %}
-
-<div class="govuk-summary-card">
-  <div class="govuk-summary-card__title-wrapper">
-    <h2 class="govuk-summary-card__title">Environmental benefits</h2>
-    <ul class="govuk-summary-card__actions">
-      <li class="govuk-summary-card__action">
-        <a class="govuk-link" href="/proposal/create-proposal/any-environmental-benefits">
-          {% if data['any-environmental-benefits'] %}Change{% else %}Add{% endif %}<span class="govuk-visually-hidden"> environmental benefits</span>
-        </a>
-      </li>
-    </ul>
+{% macro environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) %}
+  {% set hasEnvironmentalBenefits = projectData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENTAL_BENEFITS] %}
+  <div class="govuk-summary-card">
+    <div class="govuk-summary-card__title-wrapper">
+      <h2 class="govuk-summary-card__title">{{ t('projects.overview.environmental_benefits_summary_card.title') }}</h2>
+      {% if not isReadOnly %}
+        <ul class="govuk-summary-card__actions">
+          <li class="govuk-summary-card__action">
+            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.ENVIRONMENTAL_BENEFITS }}">
+              {% if hasEnvironmentalBenefits %}{{ t('common.change') }}
+              {% else %}{{ t('common.add') }}
+              {% endif %}
+              <span class="govuk-visually-hidden">
+                {{ t('projects.overview.environmental_benefits_summary_card.title') | lower }}</span>
+            </a>
+          </li>
+        </ul>
+      {% endif %}
+    </div>
+    <div class="govuk-summary-card__content">
+      {% if hasEnvironmentalBenefits %}
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.intertidal_habitat') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.woodland') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.wet_woodland') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WET_WOODLAND_HABITAT_CREATED_OR_ENHANCED] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WET_WOODLAND_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.wetland_or_wet_grassland') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WETLAND_OR_WET_GRASSLAND_CREATED_OR_ENHANCED] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WETLAND_OR_WET_GRASSLAND_CREATED_OR_ENHANCED] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.grassland') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_GRASSLAND_HABITAT_CREATED_OR_ENHANCED] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_GRASSLAND_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.heathland') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_HEATHLAND_CREATED_OR_ENHANCED] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_HEATHLAND_CREATED_OR_ENHANCED] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.ponds_lakes') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_POND_OR_LAKE_HABITAT_CREATED_OR_ENHANCED] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_POND_OR_LAKE_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.arable_land') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_ARABLE_LAND_LAKE_HABITAT_CREATED_OR_ENHANCED] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_ARABLE_LAND_LAKE_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.comprehensive_restoration') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_COMPREHENSIVE] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_COMPREHENSIVE] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.kilometres') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.partial_restoration') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_PARTIAL] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_PARTIAL] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.kilometres') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.create_habitat_watercourse') }}</dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_SINGLE] %}
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_SINGLE] }}
+                {{ t('projects.overview.environmental_benefits_summary_card.kilometres') }}
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
+        </dl>
+      {% else %}
+        <p class="govuk-body">{{ t('projects.overview.environmental_benefits_summary_card.not_added') }}</p>
+      {% endif %}
+    </div>
   </div>
-  <div class="govuk-summary-card__content">
-    {% if data['any-environmental-benefits'] == 'yes' %}
-      <dl class="govuk-summary-list">
-        {% for benefit in environmentalBenefits %}
-          {% if data[benefit.id] == 'yes' %}
-            <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">
-                {% if benefit.id == 'intertidal-habitat' %}Intertidal wetland habitat
-                {% elif benefit.id == 'woodland-habitat' %}Woodland habitat
-                {% elif benefit.id == 'wet-woodland-habitat' %}Wet woodland habitat
-                {% elif benefit.id == 'wetland-or-wet-grassland-habitat' %}Wetland or wet grassland habitat
-                {% elif benefit.id == 'grassland-habitat' %}Grassland habitat
-                {% elif benefit.id == 'heathland-habitat' %}Heathland habitat
-                {% elif benefit.id == 'ponds-lakes-habitat' %}Pond and/or lake habitat
-                {% elif benefit.id == 'arable-land-habitat' %}Arable land habitat
-                {% elif benefit.id == 'comprehensive-restoration' %}Comprehensive restoration
-                {% elif benefit.id == 'partial-restoration' %}Partial restoration
-                {% elif benefit.id == 'create-habitat-watercourse' %}Single major physical or habitat of watercourse
-                {% endif %}
-              </dt>
-              <dd class="govuk-summary-list__value">{{ data[benefit.id + '-amount'] }} {{ benefit.unit }}</dd>
-            </div>
-          {% endif %}
-        {% endfor %}
-      </dl>
-    {% elif data['any-environmental-benefits'] == 'no' %}
-      <p class="govuk-body">No environmental benefits</p>
-    {% else %}
-      <p class="govuk-body">No environmental benefits data added yet</p>
-    {% endif %}
-  </div>
-</div>
-
 {% endmacro %}

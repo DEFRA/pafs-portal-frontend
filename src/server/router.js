@@ -39,16 +39,17 @@ export const router = {
         'journey-selection',
         'accounts',
         'organisations',
-        'projects'
+        'projects',
+        'download-rma'
       ])
 
       // General user routes
       await loadModules(server, join(dirName, 'modules/general'), [
         'home',
         'download',
-        'archive',
         'accounts',
-        'static'
+        'static',
+        'projects/archive'
       ])
 
       // Project routes
@@ -62,6 +63,8 @@ export const router = {
         'important-dates',
         'benefit-area',
         'risk-and-properties',
+        'goals-urgency-confidence',
+        'environmental-benefits',
         'nfm'
       ])
 

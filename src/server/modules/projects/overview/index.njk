@@ -2,17 +2,36 @@
 
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "views/proposal-details-card.njk" import proposalDetailsSummaryCard %}
 {% from "views/project-benefit-area-card.njk" import projectBenefitAreaCard %}
 {% from "views/important-dates-card.njk" import importantDatesSummaryCard %}
 {% from "views/funding-sources-and-spending-card.njk" import fundingSourcesAndSpendingSummaryCard %}
 {% from "views/risk-and-properties-benefitting-card.njk" import riskAndPropertiesBenefittingSummaryCard %}
-{% from "views/approach-card.njk" import approachSummaryCard %}
 {% from "views/environmental-benefits-card.njk" import environmentalBenefitsSummaryCard %}
-{% from "views/urgency-card.njk" import urgencySummaryCard %}
+{% from "views/goals-approach-card.njk" import goalsApproachSummaryCard %}
+{% from "views/urgency-assessment-card.njk" import urgencyAssessmentSummaryCard %}
+{% from "views/confidence-assessment-card.njk" import confidenceAssessmentSummaryCard %}
 {% from "views/nfm-card.njk" import nfmSummaryCard %}
 
 {% block body %}
+
+  {% if isLegacy %}
+    {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'archived' %}
+      {% set legacyBannerMessage = t('projects.overview.common.legacy_banner_archived') %}
+    {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'submitted' %}
+      {% set legacyBannerMessage = t('projects.overview.common.legacy_banner_submitted') %}
+    {% else %}
+      {% set legacyBannerMessage = t('projects.overview.common.legacy_banner_draft') %}
+    {% endif %}
+
+    {% call govukNotificationBanner({
+      titleText: t('projects.overview.common.legacy_banner_title'),
+      classes: 'app-notification-banner--full-width'
+    }) %}
+    <p class="govuk-body">{{ legacyBannerMessage }}</p>
+    {% endcall %}
+  {% endif %}
 
   <h1 class="govuk-heading-xl">{{ t('projects.overview.heading') }}</h1>
 
@@ -26,7 +45,7 @@
       <dd class="govuk-summary-list__value govuk-body-m">
         {% if projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] %}
           {{ projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] | formatDate('d MMM yyyy') }}&nbsp;
-              <span class="govuk-hint govuk-!-font-size-16">{{ projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] | formatDate('HH:mm') }}</span>
+            <span class="govuk-hint govuk-!-font-size-16">{{ projectData[PROJECT_PAYLOAD_FIELDS.UPDATED_AT] | formatDate('HH:mm') }}</span>
         {% else %}
           {{ t('projects.overview.common.not_submitted') }}
         {% endif %}
@@ -38,37 +57,62 @@
         {{govukTag({
           text: projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] | upper,
           classes: projectStateTag
-        })}} &nbsp; | &nbsp;<a class="govuk-link" href="#">{{ t('projects.overview.common.archive') }}</a> &nbsp; | &nbsp;<a class="govuk-link" href="#">{{ t('projects.overview.common.delete') }}</a>
+        })}}
+        {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'archived' %}
+          {% if user and(user.isRma or user.isPso or user.admin) %}
+            &nbsp; | &nbsp;
+            <form method="post" action="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/revert-to-draft" class="app-inline-form">
+              <button type="submit" class="govuk-link app-link-button" data-testid="revert-to-draft-link">
+                {{ t('projects.overview.common.revert_to_draft') }}
+              </button>
+            </form>
+          {% endif %}
+        {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'draft' or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'revise' %}
+          {% if user and(user.isRma or user.isPso or user.admin) %}
+            &nbsp; | &nbsp;
+            <form method="post" action="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/archive" class="app-inline-form">
+              <button type="submit" class="govuk-link app-link-button" data-testid="archive-link">
+                {{ t('projects.overview.common.archive') }}
+              </button>
+            </form>
+          {% endif %}
+        {% endif %}
+        &nbsp; | &nbsp;
+        <a class="govuk-link" href="#" data-testid="download-link">{{ t('projects.overview.common.download') }}</a>
       </dd>
     </div>
   </dl>
 
   <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
-  {{ proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t) }}
+  {{ proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t, isReadOnly) }}
 
-  {{ projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, formatFileSize, t) }}
+  {{ projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, formatFileSize, t, isReadOnly) }}
 
-  {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate) }}
+  {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate, isReadOnly) }}
 
-  {{ fundingSourcesAndSpendingSummaryCard(projectData, t) }}
+  {{ fundingSourcesAndSpendingSummaryCard(projectData, t, isReadOnly) }}
 
-  {{ riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t) }}
+  {{ riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t, isReadOnly) }}
+
+  {{ environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) }}
+
+  {{ goalsApproachSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) }}
+
+  {{ urgencyAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, URGENCY_REASONS, t, isReadOnly) }}
+
+  {{ confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, t, isReadOnly) }}
 
   {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, t) }}
 
-  {{ approachSummaryCard(projectData, t) }}
+  {% if not isReadOnly %}
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
 
-  {{ environmentalBenefitsSummaryCard(projectData, t) }}
+    <p class="govuk-body">{{ t('projects.overview.submission_info') }}</p>
 
-  {{ urgencySummaryCard(projectData, t) }}
-
-  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
-
-  <p class="govuk-body">{{ t('projects.overview.submission_info') }}</p>
-
-  {{ govukButton({
-    text: t('common.buttons.submit_proposal')
-  }) }}
+    {{ govukButton({
+      text: t('common.buttons.submit_proposal')
+    }) }}
+  {% endif %}
 
 {% endblock %}

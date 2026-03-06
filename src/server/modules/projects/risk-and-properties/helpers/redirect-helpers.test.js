@@ -373,10 +373,10 @@ describe('redirect-helpers', () => {
       )
 
       expect(result).not.toBeNull()
-      expect(result.redirectTo).toContain('current-flood-risk')
+      expect(result.redirectTo).toContain('current-flood-fluvial-risk')
     })
 
-    it('should handle CURRENT_FLOOD_RISK step', async () => {
+    it('should handle CURRENT_FLOOD_FLUVIAL_RISK step', async () => {
       const mockH = createMockH()
       const mockRequest = {}
       const sessionData = {
@@ -385,7 +385,7 @@ describe('redirect-helpers', () => {
       }
 
       const result = await handleConditionalRedirect(
-        PROJECT_STEPS.CURRENT_FLOOD_RISK,
+        PROJECT_STEPS.CURRENT_FLOOD_FLUVIAL_RISK,
         mockRequest,
         mockH,
         sessionData,
