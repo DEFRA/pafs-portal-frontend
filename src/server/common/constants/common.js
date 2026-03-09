@@ -48,7 +48,12 @@ export const PROJECT_VIEWS = {
   RISK_AND_PROPERTIES: 'modules/projects/risk-and-properties/index',
   GOALS_URGENCY_CONFIDENCE: 'modules/projects/goals-urgency-confidence/index',
   ENVIRONMENTAL_BENEFITS: 'modules/projects/environmental-benefits/index',
-  NFM: 'modules/projects/nfm/index'
+  NFM: 'modules/projects/nfm/index',
+  NFM_RIVER_RESTORATION: 'modules/projects/nfm/river-restoration',
+  NFM_LEAKY_BARRIERS: 'modules/projects/nfm/leaky-barriers',
+  NFM_OFFLINE_STORAGE: 'modules/projects/nfm/offline-storage',
+  NFM_WOODLAND: 'modules/projects/nfm/woodland',
+  NFM_HEADWATER_DRAINAGE: 'modules/projects/nfm/headwater-drainage'
 }
 
 export const GENERAL_VIEWS = {

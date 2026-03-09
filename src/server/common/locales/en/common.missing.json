@@ -1,9 +1,0 @@
-{
-  "save_and_continue": "save_and_continue",
-  "cancel": "cancel",
-  "error": "error",
-  "errors": {
-    "something_went_wrong": "errors.something_went_wrong",
-    "error_summary_title": "errors.error_summary_title"
-  }
-}

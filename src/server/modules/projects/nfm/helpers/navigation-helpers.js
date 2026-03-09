@@ -36,6 +36,56 @@ function isMeasureSelected(sessionData, measureValue) {
   return selectedMeasures.includes(measureValue)
 }
 
+const MEASURE_TO_ROUTE = {
+  [NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION]:
+    ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
+  [NFM_MEASURES.LEAKY_BARRIERS]: ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
+  [NFM_MEASURES.OFFLINE_STORAGE]: ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
+  [NFM_MEASURES.WOODLAND]: ROUTES.PROJECT.EDIT.NFM.WOODLAND
+}
+
+const STEP_PREVIOUS_MEASURES = {
+  [PROJECT_STEPS.NFM_RIVER_RESTORATION]: [],
+  [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: [
+    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+  ],
+  [PROJECT_STEPS.NFM_OFFLINE_STORAGE]: [
+    NFM_MEASURES.LEAKY_BARRIERS,
+    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+  ],
+  [PROJECT_STEPS.NFM_WOODLAND]: [
+    NFM_MEASURES.OFFLINE_STORAGE,
+    NFM_MEASURES.LEAKY_BARRIERS,
+    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+  ],
+  [PROJECT_STEPS.NFM_HEADWATER_DRAINAGE]: [
+    NFM_MEASURES.WOODLAND,
+    NFM_MEASURES.OFFLINE_STORAGE,
+    NFM_MEASURES.LEAKY_BARRIERS,
+    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+  ]
+}
+
+function selectedMeasuresBackLink() {
+  return {
+    targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+    conditionalRedirect: false
+  }
+}
+
+function getMeasureBackLink(sessionData, previousMeasures) {
+  for (const measure of previousMeasures) {
+    if (isMeasureSelected(sessionData, measure)) {
+      return {
+        targetEditURL: MEASURE_TO_ROUTE[measure],
+        conditionalRedirect: false
+      }
+    }
+  }
+
+  return selectedMeasuresBackLink()
+}
+
 /**
  * Step sequence for NFM section
  * Maps each step to the next step's route
@@ -43,7 +93,7 @@ function isMeasureSelected(sessionData, measureValue) {
  */
 export const NFM_STEP_SEQUENCE = {
   [PROJECT_STEPS.NFM_SELECTED_MEASURES]:
-    ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION, // Always goes to river restoration first
+    ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION, // Default next route (conditional redirect takes priority)
   [PROJECT_STEPS.NFM_RIVER_RESTORATION]: null, // Conditional - next measure or overview
   [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: null, // Conditional - next measure or overview
   [PROJECT_STEPS.NFM_OFFLINE_STORAGE]: null, // Conditional - next measure or overview
@@ -65,124 +115,9 @@ export function getDynamicBackLink(step, sessionData) {
     return null
   }
 
-  // For measure pages, find the previous selected measure
-  switch (step) {
-    case PROJECT_STEPS.NFM_RIVER_RESTORATION:
-      // Always go back to selected measures page
-      return {
-        targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
-        conditionalRedirect: false
-      }
-
-    case PROJECT_STEPS.NFM_LEAKY_BARRIERS:
-      // Go back to river restoration if selected, otherwise selected measures
-      if (
-        isMeasureSelected(
-          sessionData,
-          NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-        )
-      ) {
-        return {
-          targetEditURL: ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
-          conditionalRedirect: false
-        }
-      }
-      return {
-        targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
-        conditionalRedirect: false
-      }
-
-    case PROJECT_STEPS.NFM_OFFLINE_STORAGE:
-      // Go back to leaky barriers if selected, else river restoration if selected, else selected measures
-      if (isMeasureSelected(sessionData, NFM_MEASURES.LEAKY_BARRIERS)) {
-        return {
-          targetEditURL: ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
-          conditionalRedirect: false
-        }
-      }
-      if (
-        isMeasureSelected(
-          sessionData,
-          NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-        )
-      ) {
-        return {
-          targetEditURL: ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
-          conditionalRedirect: false
-        }
-      }
-      return {
-        targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
-        conditionalRedirect: false
-      }
-
-    case PROJECT_STEPS.NFM_WOODLAND:
-      // Go back to offline storage if selected, else leaky barriers if selected, else river restoration if selected, else selected measures
-      if (isMeasureSelected(sessionData, NFM_MEASURES.OFFLINE_STORAGE)) {
-        return {
-          targetEditURL: ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
-          conditionalRedirect: false
-        }
-      }
-      if (isMeasureSelected(sessionData, NFM_MEASURES.LEAKY_BARRIERS)) {
-        return {
-          targetEditURL: ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
-          conditionalRedirect: false
-        }
-      }
-      if (
-        isMeasureSelected(
-          sessionData,
-          NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-        )
-      ) {
-        return {
-          targetEditURL: ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
-          conditionalRedirect: false
-        }
-      }
-      return {
-        targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
-        conditionalRedirect: false
-      }
-
-    case PROJECT_STEPS.NFM_HEADWATER_DRAINAGE:
-      // Go back to woodland if selected, else offline storage if selected, else leaky barriers if selected, else river restoration if selected, else selected measures
-      if (isMeasureSelected(sessionData, NFM_MEASURES.WOODLAND)) {
-        return {
-          targetEditURL: ROUTES.PROJECT.EDIT.NFM.WOODLAND,
-          conditionalRedirect: false
-        }
-      }
-      if (isMeasureSelected(sessionData, NFM_MEASURES.OFFLINE_STORAGE)) {
-        return {
-          targetEditURL: ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
-          conditionalRedirect: false
-        }
-      }
-      if (isMeasureSelected(sessionData, NFM_MEASURES.LEAKY_BARRIERS)) {
-        return {
-          targetEditURL: ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
-          conditionalRedirect: false
-        }
-      }
-      if (
-        isMeasureSelected(
-          sessionData,
-          NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-        )
-      ) {
-        return {
-          targetEditURL: ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
-          conditionalRedirect: false
-        }
-      }
-      return {
-        targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
-        conditionalRedirect: false
-      }
-
-    default:
-      return null
+  if (!(step in STEP_PREVIOUS_MEASURES)) {
+    return null
   }
+
+  return getMeasureBackLink(sessionData, STEP_PREVIOUS_MEASURES[step])
 }

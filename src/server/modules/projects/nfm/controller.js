@@ -139,9 +139,11 @@ class NfmController {
     // For all other cases, move to the next step in sequence
     const nextRoute = NFM_STEP_SEQUENCE[step]
     if (nextRoute) {
-      return h
-        .redirect(nextRoute.replace('{referenceNumber}', referenceNumber))
-        .takeover()
+      const redirectUrl = nextRoute.replace(
+        '{referenceNumber}',
+        referenceNumber
+      )
+      return h.redirect(redirectUrl).takeover()
     }
 
     // Fallback to overview

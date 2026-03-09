@@ -74,3 +74,12 @@ export {
   validateCreateHabitatWatercourse,
   validateKilometresOfWatercourseEnhancedOrCreatedSingle
 } from './schemas/environmental-benefits-schemas.js'
+
+export {
+  nfmSelectedMeasuresSchema,
+  nfmRiverRestorationSchema,
+  nfmLeakyBarriersSchema,
+  nfmOfflineStorageSchema,
+  nfmWoodlandSchema,
+  nfmHeadwaterDrainageSchema
+} from './schemas/nfm-schemas.js'

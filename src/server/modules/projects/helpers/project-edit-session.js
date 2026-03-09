@@ -13,6 +13,59 @@ import {
 import { getSessionData } from './project-utils.js'
 
 /**
+ * Map a single NFM measure to frontend fields
+ * @param {Object} measure - NFM measure object from backend
+ * @returns {Object} - Mapped fields for this measure
+ */
+function mapSingleNfmMeasure(measure) {
+  const mappedFields = {}
+  const { measureType, areaHectares, storageVolumeM3, lengthKm, widthM } =
+    measure
+
+  if (measureType === 'river_floodplain_restoration') {
+    if (areaHectares !== null && areaHectares !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA] =
+        areaHectares
+    }
+    if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME] =
+        storageVolumeM3
+    }
+  } else if (measureType === 'leaky_barriers_in_channel_storage') {
+    if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME] =
+        storageVolumeM3
+    }
+    if (lengthKm !== null && lengthKm !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH] = lengthKm
+    }
+    if (widthM !== null && widthM !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH] = widthM
+    }
+  } else if (measureType === 'offline_storage') {
+    if (areaHectares !== null && areaHectares !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA] =
+        areaHectares
+    }
+    if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME] =
+        storageVolumeM3
+    }
+  } else if (measureType === 'woodland') {
+    if (areaHectares !== null && areaHectares !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA] = areaHectares
+    }
+  } else if (measureType === 'headwater_drainage_management') {
+    if (areaHectares !== null && areaHectares !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA] =
+        areaHectares
+    }
+  }
+
+  return mappedFields
+}
+
+/**
  * Map NFM measures array from backend to individual fields for frontend
  * @param {Array} nfmMeasures - Array of NFM measure objects from backend
  * @returns {Object} - Mapped NFM fields
@@ -25,58 +78,8 @@ function mapNfmMeasuresToFields(nfmMeasures) {
   }
 
   nfmMeasures.forEach((measure) => {
-    const { measureType, areaHectares, storageVolumeM3, lengthKm, widthM } =
-      measure
-
-    switch (measureType) {
-      case 'river_floodplain_restoration':
-        if (areaHectares !== null && areaHectares !== undefined) {
-          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA] =
-            areaHectares
-        }
-        if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
-          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME] =
-            storageVolumeM3
-        }
-        break
-      case 'leaky_barriers_in_channel_storage':
-        if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
-          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME] =
-            storageVolumeM3
-        }
-        if (lengthKm !== null && lengthKm !== undefined) {
-          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH] =
-            lengthKm
-        }
-        if (widthM !== null && widthM !== undefined) {
-          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH] = widthM
-        }
-        break
-      case 'offline_storage':
-        if (areaHectares !== null && areaHectares !== undefined) {
-          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA] =
-            areaHectares
-        }
-        if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
-          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME] =
-            storageVolumeM3
-        }
-        break
-      case 'woodland':
-        if (areaHectares !== null && areaHectares !== undefined) {
-          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA] = areaHectares
-        }
-        break
-      case 'headwater_drainage_management':
-        if (areaHectares !== null && areaHectares !== undefined) {
-          mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA] =
-            areaHectares
-        }
-        break
-      // Add more measure types here as they are implemented
-      default:
-        break
-    }
+    const singleMeasureFields = mapSingleNfmMeasure(measure)
+    Object.assign(mappedFields, singleMeasureFields)
   })
 
   return mappedFields

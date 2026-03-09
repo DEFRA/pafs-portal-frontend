@@ -7,7 +7,7 @@ import {
   nfmRiverRestorationSchema,
   nfmSelectedMeasuresSchema,
   nfmWoodlandSchema
-} from '../../nfm/schema.js'
+} from '../../schema.js'
 
 /**
  * Configuration for NFM (Natural Flood Management) related steps

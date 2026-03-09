@@ -208,6 +208,160 @@ describe('NFM Payload Helpers', () => {
     })
   })
 
+  describe('processPayload - NFM_OFFLINE_STORAGE', () => {
+    test('should convert area and volume strings to floats', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: '12.75',
+        [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: '350.5'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_OFFLINE_STORAGE, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]).toBe(
+        12.75
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]).toBe(
+        350.5
+      )
+    })
+
+    test('should convert empty offline storage volume to null', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: '12.75',
+        [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: ''
+      }
+
+      processPayload(PROJECT_STEPS.NFM_OFFLINE_STORAGE, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]).toBe(
+        12.75
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]).toBe(
+        null
+      )
+    })
+  })
+
+  describe('processPayload - NFM_WOODLAND', () => {
+    test('should convert woodland area string to float', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]: '7.25'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_WOODLAND, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]).toBe(7.25)
+    })
+  })
+
+  describe('processPayload - selected measures change cleanup', () => {
+    test('should clear removed measure fields when selected measures change', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: [
+          'offline_storage',
+          'woodland'
+        ],
+        [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 10,
+        [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: 100,
+        [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: 200,
+        [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]: 2,
+        [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]: 3,
+        [PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA]: 4
+      }
+
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration,leaky_barriers,offline_storage,woodland,headwater_drainage'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SELECTED_MEASURES, payload, sessionData)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]).toBe(
+        'offline_storage,woodland'
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]).toBe(
+        null
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]).toBe(
+        null
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]).toBe(
+        null
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]).toBe(
+        null
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]).toBe(
+        null
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA]).toBe(
+        null
+      )
+    })
+
+    test('should handle selected measures provided as comma-separated string', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'woodland,headwater_drainage'
+      }
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'woodland,headwater_drainage'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SELECTED_MEASURES, payload, sessionData)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]).toBe(
+        'woodland,headwater_drainage'
+      )
+    })
+
+    test('should clear offline storage and woodland fields when those measures are removed', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: [
+          'river_floodplain_restoration'
+        ],
+        [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: 9,
+        [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: 90,
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]: 8
+      }
+
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration,offline_storage,woodland'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SELECTED_MEASURES, payload, sessionData)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]).toBe(
+        'river_floodplain_restoration'
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]).toBe(
+        null
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]).toBe(
+        null
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]).toBe(null)
+    })
+
+    test('should ignore unknown removed measures and normalize unsupported payload type', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: {
+          unexpected: true
+        }
+      }
+
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'unknown_measure'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SELECTED_MEASURES, payload, sessionData)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]).toBe('')
+    })
+  })
+
   describe('processPayload - Unknown step', () => {
     test('should not modify payload for unknown step', () => {
       const payload = {
