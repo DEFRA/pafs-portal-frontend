@@ -160,7 +160,10 @@ export const ROUTES = {
         LEAKY_BARRIERS: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_LEAKY_BARRIERS}`,
         OFFLINE_STORAGE: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_OFFLINE_STORAGE}`,
         WOODLAND: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_WOODLAND}`,
-        HEADWATER_DRAINAGE: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_HEADWATER_DRAINAGE}`
+        HEADWATER_DRAINAGE: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_HEADWATER_DRAINAGE}`,
+        RUNOFF_MANAGEMENT: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT}`,
+        SALTMARSH: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_SALTMARSH}`,
+        SAND_DUNE: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_SAND_DUNE}`
       }
     }
   },

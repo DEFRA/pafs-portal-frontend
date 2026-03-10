@@ -3,6 +3,7 @@ import { nfmController } from './controller.js'
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
   NFM_MEASURES,
+  PROJECT_PAYLOAD_FIELDS,
   PROJECT_PAYLOAD_LEVELS,
   PROJECT_STEPS
 } from '../../../common/constants/projects.js'
@@ -213,6 +214,84 @@ describe('NFM Controller', () => {
           mockRequest,
           expect.objectContaining({
             localKeyPrefix: 'projects.nfm.offline_storage'
+          })
+        )
+      })
+    })
+
+    describe('NFM Runoff Management', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT)
+      })
+
+      test('should render NFM_RUNOFF_MANAGEMENT view', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_RUNOFF_MANAGEMENT,
+          expect.any(Object)
+        )
+      })
+
+      test('should build view data with correct localKeyPrefix', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            localKeyPrefix: 'projects.nfm.runoff_management'
+          })
+        )
+      })
+    })
+
+    describe('NFM Saltmarsh', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_SALTMARSH)
+      })
+
+      test('should render NFM_SALTMARSH view', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_SALTMARSH,
+          expect.any(Object)
+        )
+      })
+
+      test('should build view data with correct localKeyPrefix', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            localKeyPrefix: 'projects.nfm.saltmarsh'
+          })
+        )
+      })
+    })
+
+    describe('NFM Sand Dune', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_SAND_DUNE)
+      })
+
+      test('should render NFM_SAND_DUNE view', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_SAND_DUNE,
+          expect.any(Object)
+        )
+      })
+
+      test('should build view data with correct localKeyPrefix', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            localKeyPrefix: 'projects.nfm.sand_dune'
           })
         )
       })
@@ -508,6 +587,139 @@ describe('NFM Controller', () => {
           expect.objectContaining({
             error: 'Save error'
           })
+        )
+      })
+    })
+
+    describe('NFM Runoff Management', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT)
+        mockRequest.payload = {
+          [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: '15.5',
+          [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: '750'
+        }
+      })
+
+      test('should save runoff management data with correct payload level', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          PROJECT_PAYLOAD_LEVELS.NFM_RUNOFF_MANAGEMENT,
+          expect.any(Object),
+          PROJECT_VIEWS.NFM_RUNOFF_MANAGEMENT
+        )
+      })
+
+      test('should handle conditional redirect', async () => {
+        const redirect = mockH.redirect('/next-step').takeover()
+        handleConditionalRedirect.mockResolvedValue(redirect)
+
+        const result = await nfmController.postHandler(mockRequest, mockH)
+
+        expect(result).toBe(redirect)
+      })
+
+      test('should handle validation errors', async () => {
+        const validationError = { error: 'validation failed' }
+        validatePayload.mockReturnValue(validationError)
+
+        const result = await nfmController.postHandler(mockRequest, mockH)
+
+        expect(result).toBe(validationError)
+        expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('NFM Saltmarsh', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_SALTMARSH)
+        mockRequest.payload = {
+          [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: '20.5',
+          [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: '3.75'
+        }
+      })
+
+      test('should save saltmarsh data with correct payload level', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          PROJECT_PAYLOAD_LEVELS.NFM_SALTMARSH,
+          expect.any(Object),
+          PROJECT_VIEWS.NFM_SALTMARSH
+        )
+      })
+
+      test('should handle optional length field as null', async () => {
+        mockRequest.payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH] = null
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(processPayload).toHaveBeenCalledWith(
+          PROJECT_STEPS.NFM_SALTMARSH,
+          expect.any(Object),
+          expect.any(Object)
+        )
+      })
+
+      test('should handle save errors gracefully', async () => {
+        const error = new Error('Save failed')
+        saveProjectWithErrorHandling.mockRejectedValue(error)
+        extractApiError.mockReturnValue('Saltmarsh save error')
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(mockRequest.logger.error).toHaveBeenCalledWith(
+          'Error NFM POST',
+          error
+        )
+      })
+    })
+
+    describe('NFM Sand Dune', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_SAND_DUNE)
+        mockRequest.payload = {
+          [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: '25.5',
+          [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: '4.25'
+        }
+      })
+
+      test('should save sand dune data with correct payload level', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          PROJECT_PAYLOAD_LEVELS.NFM_SAND_DUNE,
+          expect.any(Object),
+          PROJECT_VIEWS.NFM_SAND_DUNE
+        )
+      })
+
+      test('should handle empty length as null', async () => {
+        mockRequest.payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH] = ''
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(processPayload).toHaveBeenCalledWith(
+          PROJECT_STEPS.NFM_SAND_DUNE,
+          expect.any(Object),
+          expect.any(Object)
+        )
+      })
+
+      test('should redirect to overview as final step', async () => {
+        handleConditionalRedirect.mockResolvedValue(null)
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(navigateToProjectOverview).toHaveBeenCalledWith(
+          'TEST-001',
+          mockH
         )
       })
     })

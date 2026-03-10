@@ -72,7 +72,10 @@ export const PROJECT_STEPS = {
   NFM_LEAKY_BARRIERS: 'nfm-leaky-barriers',
   NFM_OFFLINE_STORAGE: 'nfm-offline-storage',
   NFM_WOODLAND: 'nfm-woodland',
-  NFM_HEADWATER_DRAINAGE: 'nfm-headwater-drainage'
+  NFM_HEADWATER_DRAINAGE: 'nfm-headwater-drainage',
+  NFM_RUNOFF_MANAGEMENT: 'nfm-runoff-management',
+  NFM_SALTMARSH: 'nfm-saltmarsh',
+  NFM_SAND_DUNE: 'nfm-sand-dune'
 }
 
 export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'
@@ -179,7 +182,13 @@ export const PROJECT_PAYLOAD_FIELDS = {
   NFM_OFFLINE_STORAGE_AREA: 'nfmOfflineStorageArea',
   NFM_OFFLINE_STORAGE_VOLUME: 'nfmOfflineStorageVolume',
   NFM_WOODLAND_AREA: 'nfmWoodlandArea',
-  NFM_HEADWATER_DRAINAGE_AREA: 'nfmHeadwaterDrainageArea'
+  NFM_HEADWATER_DRAINAGE_AREA: 'nfmHeadwaterDrainageArea',
+  NFM_RUNOFF_MANAGEMENT_AREA: 'nfmRunoffManagementArea',
+  NFM_RUNOFF_MANAGEMENT_VOLUME: 'nfmRunoffManagementVolume',
+  NFM_SALTMARSH_AREA: 'nfmSaltmarshArea',
+  NFM_SALTMARSH_LENGTH: 'nfmSaltmarshLength',
+  NFM_SAND_DUNE_AREA: 'nfmSandDuneArea',
+  NFM_SAND_DUNE_LENGTH: 'nfmSandDuneLength'
 }
 
 export const PROJECT_PAYLOAD_LEVELS = {
@@ -251,7 +260,10 @@ export const PROJECT_PAYLOAD_LEVELS = {
   NFM_LEAKY_BARRIERS: 'NFM_LEAKY_BARRIERS',
   NFM_OFFLINE_STORAGE: 'NFM_OFFLINE_STORAGE',
   NFM_WOODLAND: 'NFM_WOODLAND',
-  NFM_HEADWATER_DRAINAGE: 'NFM_HEADWATER_DRAINAGE'
+  NFM_HEADWATER_DRAINAGE: 'NFM_HEADWATER_DRAINAGE',
+  NFM_RUNOFF_MANAGEMENT: 'NFM_RUNOFF_MANAGEMENT',
+  NFM_SALTMARSH: 'NFM_SALTMARSH',
+  NFM_SAND_DUNE: 'NFM_SAND_DUNE'
 }
 
 export const PROJECT_TYPES = {

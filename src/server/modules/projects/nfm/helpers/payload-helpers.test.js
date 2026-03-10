@@ -362,6 +362,132 @@ describe('NFM Payload Helpers', () => {
     })
   })
 
+  describe('processPayload - NFM_RUNOFF_MANAGEMENT', () => {
+    test('should convert string values to floats', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: '15.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: '750.25'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]).toBe(
+        15.5
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]).toBe(
+        750.25
+      )
+    })
+
+    test('should convert empty string to null for optional volume', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: '15.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: ''
+      }
+
+      processPayload(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]).toBe(
+        15.5
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]).toBe(
+        null
+      )
+    })
+
+    test('should preserve null values', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: '15.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: null
+      }
+
+      processPayload(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]).toBe(
+        15.5
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]).toBe(
+        null
+      )
+    })
+  })
+
+  describe('processPayload - NFM_SALTMARSH', () => {
+    test('should convert string values to floats', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: '20.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: '3.75'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SALTMARSH, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe(20.5)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(3.75)
+    })
+
+    test('should convert empty string to null for optional length', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: '20.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: ''
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SALTMARSH, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe(20.5)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(null)
+    })
+
+    test('should preserve null values', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: '20.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: null
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SALTMARSH, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe(20.5)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(null)
+    })
+  })
+
+  describe('processPayload - NFM_SAND_DUNE', () => {
+    test('should convert string values to floats', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: '25.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: '4.25'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SAND_DUNE, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(25.5)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(4.25)
+    })
+
+    test('should convert empty string to null for optional length', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: '25.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: ''
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SAND_DUNE, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(25.5)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(null)
+    })
+
+    test('should preserve null values', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: '25.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: null
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SAND_DUNE, payload)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(25.5)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(null)
+    })
+  })
+
   describe('processPayload - Unknown step', () => {
     test('should not modify payload for unknown step', () => {
       const payload = {

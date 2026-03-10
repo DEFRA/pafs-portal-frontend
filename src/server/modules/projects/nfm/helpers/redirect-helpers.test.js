@@ -131,6 +131,108 @@ describe('NFM Redirect Helpers', () => {
     })
   })
 
+  describe('handleConditionalRedirect - NFM_RUNOFF_MANAGEMENT', () => {
+    test('should redirect to saltmarsh when selected', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'leaky_barriers,runoff_management,saltmarsh_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('saltmarsh')
+      expect(result.path).toContain('TEST-001')
+    })
+
+    test('should redirect to overview when saltmarsh not selected', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'leaky_barriers,runoff_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_SALTMARSH', () => {
+    test('should redirect to sand dune when selected', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'saltmarsh_management,sand_dune_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_SALTMARSH,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('sand-dune')
+      expect(result.path).toContain('TEST-001')
+    })
+
+    test('should redirect to overview when sand dune not selected', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'saltmarsh_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_SALTMARSH,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_SAND_DUNE', () => {
+    test('should redirect to project overview after sand dune', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'saltmarsh_management,sand_dune_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_SAND_DUNE,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001')
+    })
+  })
+
   describe('handleConditionalRedirect - Unknown step', () => {
     test('should return null for unknown step', async () => {
       const sessionData = {}

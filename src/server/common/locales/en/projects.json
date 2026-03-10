@@ -495,6 +495,7 @@
         "headwater_drainage": "Headwater drainage management",
         "headwater_drainage_management": "Headwater drainage management",
         "runoff_management": "Runoff attenuation or management",
+        "runoff_attenuation_management": "Runoff attenuation or management",
         "saltmarsh_management": "Saltmarsh or mudflat management",
         "sand_dune_management": "Sand dune management"
       }
@@ -546,6 +547,36 @@
         "label": "Area",
         "hint": "Enter the area in hectares",
         "suffix": "hectares"
+      }
+    },
+    "runoff_management": {
+      "title": "Details of new runoff attenuation or management",
+      "area": {
+        "label": "Area"
+      },
+      "volume": {
+        "label": "Design storage volume",
+        "hint": "If known"
+      }
+    },
+    "saltmarsh": {
+      "title": "Details of new Saltmarsh or mudflat management",
+      "area": {
+        "label": "Area"
+      },
+      "length": {
+        "label": "Length",
+        "hint": "If known"
+      }
+    },
+    "sand_dune": {
+      "title": "Details of new Sand dune management",
+      "area": {
+        "label": "Area"
+      },
+      "length": {
+        "label": "Length",
+        "hint": "If known"
       }
     }
   },

@@ -5,6 +5,9 @@ import {
   nfmLeakyBarriersSchema,
   nfmOfflineStorageSchema,
   nfmRiverRestorationSchema,
+  nfmRunoffManagementSchema,
+  nfmSaltmarshSchema,
+  nfmSandDuneSchema,
   nfmSelectedMeasuresSchema,
   nfmWoodlandSchema
 } from '../../schema.js'
@@ -65,6 +68,33 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmHeadwaterDrainageSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]: {
+    localKeyPrefix: 'projects.nfm.runoff_management',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE,
+      conditionalRedirect: false
+    },
+    schema: nfmRunoffManagementSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_SALTMARSH]: {
+    localKeyPrefix: 'projects.nfm.saltmarsh',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.RUNOFF_MANAGEMENT,
+      conditionalRedirect: false
+    },
+    schema: nfmSaltmarshSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_SAND_DUNE]: {
+    localKeyPrefix: 'projects.nfm.sand_dune',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SALTMARSH,
+      conditionalRedirect: false
+    },
+    schema: nfmSandDuneSchema,
     fieldType: 'input'
   }
   // Add more NFM steps here as needed

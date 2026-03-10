@@ -60,6 +60,29 @@ function mapSingleNfmMeasure(measure) {
       mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA] =
         areaHectares
     }
+  } else if (measureType === 'runoff_attenuation_management') {
+    if (areaHectares !== null && areaHectares !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA] =
+        areaHectares
+    }
+    if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME] =
+        storageVolumeM3
+    }
+  } else if (measureType === 'saltmarsh_management') {
+    if (areaHectares !== null && areaHectares !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA] = areaHectares
+    }
+    if (lengthKm !== null && lengthKm !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH] = lengthKm
+    }
+  } else if (measureType === 'sand_dune_management') {
+    if (areaHectares !== null && areaHectares !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA] = areaHectares
+    }
+    if (lengthKm !== null && lengthKm !== undefined) {
+      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH] = lengthKm
+    }
   }
 
   return mappedFields

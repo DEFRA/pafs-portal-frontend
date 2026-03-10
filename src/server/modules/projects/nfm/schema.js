@@ -7,4 +7,14 @@
  * All existing imports from this file will continue to work without changes.
  */
 
-export { nfmSelectedMeasuresSchema } from '../schemas/nfm-schemas.js'
+export {
+  nfmSelectedMeasuresSchema,
+  nfmRiverRestorationSchema,
+  nfmLeakyBarriersSchema,
+  nfmOfflineStorageSchema,
+  nfmWoodlandSchema,
+  nfmHeadwaterDrainageSchema,
+  nfmRunoffManagementSchema,
+  nfmSaltmarshSchema,
+  nfmSandDuneSchema
+} from '../schemas/nfm-schemas.js'

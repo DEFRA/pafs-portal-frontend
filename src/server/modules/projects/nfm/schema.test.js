@@ -1,5 +1,15 @@
 import { describe, test, expect } from 'vitest'
-import { nfmSelectedMeasuresSchema } from './schema.js'
+import {
+  nfmSelectedMeasuresSchema,
+  nfmRiverRestorationSchema,
+  nfmLeakyBarriersSchema,
+  nfmOfflineStorageSchema,
+  nfmWoodlandSchema,
+  nfmHeadwaterDrainageSchema,
+  nfmRunoffManagementSchema,
+  nfmSaltmarshSchema,
+  nfmSandDuneSchema
+} from './schema.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
   NFM_MEASURES
@@ -86,5 +96,119 @@ describe('NFM Selected Measures Schema', () => {
       })
       expect(result.error).toBeUndefined()
     })
+  })
+})
+
+describe('NFM Measure Schemas', () => {
+  test('validates river restoration with 2 decimal places and optional empty volume', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 45.67,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: ''
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects river restoration area with more than 2 decimal places', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 45.678,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: 10.5
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
+  })
+
+  test('requires leaky barriers length and width', () => {
+    const result = nfmLeakyBarriersSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: 4.5
+    })
+
+    expect(result.error).toBeDefined()
+  })
+
+  test('validates leaky barriers with 2 decimal places', () => {
+    const result = nfmLeakyBarriersSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: 4.5,
+      [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]: 1.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]: 3.5
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects runoff management volume with more than 2 decimal places', () => {
+    const result = nfmRunoffManagementSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: 20.5,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: 100.123
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
+  })
+
+  test('validates offline storage with null optional volume', () => {
+    const result = nfmOfflineStorageSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: 8.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: null
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects woodland area when negative', () => {
+    const result = nfmWoodlandSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]: -1
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.positive')
+  })
+
+  test('rejects headwater drainage area with more than 2 decimal places', () => {
+    const result = nfmHeadwaterDrainageSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA]: 3.456
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
+  })
+
+  test('validates saltmarsh with optional null length', () => {
+    const result = nfmSaltmarshSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: 12.34,
+      [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: null
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects sand dune area with more than 2 decimal places', () => {
+    const result = nfmSandDuneSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: 9.999,
+      [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: 1.5
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
+  })
+
+  test('allows unknown fields on measure schemas', () => {
+    const result = nfmSandDuneSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: 9.99,
+      [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: 1.5,
+      crumb: 'csrf-token'
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('allows explicitly undefined optional values', () => {
+    const result = nfmRunoffManagementSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: 10.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: undefined
+    })
+
+    expect(result.error).toBeUndefined()
   })
 })

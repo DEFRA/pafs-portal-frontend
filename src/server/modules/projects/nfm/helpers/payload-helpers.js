@@ -67,6 +67,33 @@ function clearHeadwaterDrainageData(payload) {
 }
 
 /**
+ * Clear runoff management data from payload
+ * @param {Object} payload - Request payload
+ */
+function clearRunoffManagementData(payload) {
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA] = null
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME] = null
+}
+
+/**
+ * Clear saltmarsh data from payload
+ * @param {Object} payload - Request payload
+ */
+function clearSaltmarshData(payload) {
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA] = null
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH] = null
+}
+
+/**
+ * Clear sand dune data from payload
+ * @param {Object} payload - Request payload
+ */
+function clearSandDuneData(payload) {
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA] = null
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH] = null
+}
+
+/**
  * Normalize NFM measures payload - convert to array if needed
  * @param {string|Array} measures - Measures as string or array
  * @returns {Array} Normalized array of measures
@@ -114,6 +141,15 @@ function processNfmMeasureChanges(previousMeasures, newMeasures, payload) {
         break
       case NFM_MEASURES.HEADWATER_DRAINAGE:
         clearHeadwaterDrainageData(payload)
+        break
+      case NFM_MEASURES.RUNOFF_MANAGEMENT:
+        clearRunoffManagementData(payload)
+        break
+      case NFM_MEASURES.SALTMARSH_MANAGEMENT:
+        clearSaltmarshData(payload)
+        break
+      case NFM_MEASURES.SAND_DUNE_MANAGEMENT:
+        clearSandDuneData(payload)
         break
       default:
         break
@@ -197,6 +233,42 @@ function processWoodland(payload) {
 }
 
 /**
+ * Process runoff management payload
+ * @param {Object} payload - Request payload
+ */
+function processRunoffManagement(payload) {
+  payload.nfmRunoffManagementVolume = convertEmptyToNull(
+    payload.nfmRunoffManagementVolume
+  )
+  payload.nfmRunoffManagementArea = parseToFloat(
+    payload.nfmRunoffManagementArea
+  )
+  payload.nfmRunoffManagementVolume = parseToFloat(
+    payload.nfmRunoffManagementVolume
+  )
+}
+
+/**
+ * Process saltmarsh payload
+ * @param {Object} payload - Request payload
+ */
+function processSaltmarsh(payload) {
+  payload.nfmSaltmarshLength = convertEmptyToNull(payload.nfmSaltmarshLength)
+  payload.nfmSaltmarshArea = parseToFloat(payload.nfmSaltmarshArea)
+  payload.nfmSaltmarshLength = parseToFloat(payload.nfmSaltmarshLength)
+}
+
+/**
+ * Process sand dune payload
+ * @param {Object} payload - Request payload
+ */
+function processSandDune(payload) {
+  payload.nfmSandDuneLength = convertEmptyToNull(payload.nfmSandDuneLength)
+  payload.nfmSandDuneArea = parseToFloat(payload.nfmSandDuneArea)
+  payload.nfmSandDuneLength = parseToFloat(payload.nfmSandDuneLength)
+}
+
+/**
  * Process and normalize payload based on step
  * @param {string} step - Current project step
  * @param {Object} payload - Request payload
@@ -222,6 +294,18 @@ export function processPayload(step, payload, sessionData) {
 
     case PROJECT_STEPS.NFM_WOODLAND:
       processWoodland(payload)
+      break
+
+    case PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT:
+      processRunoffManagement(payload)
+      break
+
+    case PROJECT_STEPS.NFM_SALTMARSH:
+      processSaltmarsh(payload)
+      break
+
+    case PROJECT_STEPS.NFM_SAND_DUNE:
+      processSandDune(payload)
       break
 
     // Add more cases for other NFM steps here

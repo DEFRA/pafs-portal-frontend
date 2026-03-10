@@ -75,4 +75,91 @@ describe('nfm measure guard', () => {
     const result = requireSelectedMeasure(request, h)
     expect(result).toEqual({ redirected: true, path: '/project/TEST-001' })
   })
+
+  test('allows access when runoff management measure is selected', () => {
+    getSessionData.mockReturnValue({
+      nfmSelectedMeasures: 'headwater_drainage,runoff_management'
+    })
+
+    const request = {
+      route: { path: '/project/{referenceNumber}/nfm-runoff-management' },
+      params: { referenceNumber: 'TEST-001' }
+    }
+
+    const result = requireSelectedMeasure(request, h)
+    expect(result).toBe(h.continue)
+    expect(navigateToProjectOverview).not.toHaveBeenCalled()
+  })
+
+  test('redirects to overview when runoff management is not selected', () => {
+    getSessionData.mockReturnValue({
+      nfmSelectedMeasures: 'headwater_drainage,woodland'
+    })
+
+    const request = {
+      route: { path: '/project/{referenceNumber}/nfm-runoff-management' },
+      params: { referenceNumber: 'TEST-001' }
+    }
+
+    const result = requireSelectedMeasure(request, h)
+    expect(result).toEqual({ redirected: true, path: '/project/TEST-001' })
+  })
+
+  test('allows access when saltmarsh management measure is selected', () => {
+    getSessionData.mockReturnValue({
+      nfmSelectedMeasures: 'runoff_management,saltmarsh_management'
+    })
+
+    const request = {
+      route: { path: '/project/{referenceNumber}/nfm-saltmarsh' },
+      params: { referenceNumber: 'TEST-001' }
+    }
+
+    const result = requireSelectedMeasure(request, h)
+    expect(result).toBe(h.continue)
+    expect(navigateToProjectOverview).not.toHaveBeenCalled()
+  })
+
+  test('redirects to overview when saltmarsh management is not selected', () => {
+    getSessionData.mockReturnValue({
+      nfmSelectedMeasures: 'runoff_management'
+    })
+
+    const request = {
+      route: { path: '/project/{referenceNumber}/nfm-saltmarsh' },
+      params: { referenceNumber: 'TEST-001' }
+    }
+
+    const result = requireSelectedMeasure(request, h)
+    expect(result).toEqual({ redirected: true, path: '/project/TEST-001' })
+  })
+
+  test('allows access when sand dune management measure is selected', () => {
+    getSessionData.mockReturnValue({
+      nfmSelectedMeasures: 'saltmarsh_management,sand_dune_management'
+    })
+
+    const request = {
+      route: { path: '/project/{referenceNumber}/nfm-sand-dune' },
+      params: { referenceNumber: 'TEST-001' }
+    }
+
+    const result = requireSelectedMeasure(request, h)
+    expect(result).toBe(h.continue)
+    expect(navigateToProjectOverview).not.toHaveBeenCalled()
+  })
+
+  test('redirects to overview when sand dune management is not selected', () => {
+    getSessionData.mockReturnValue({
+      nfmSelectedMeasures: 'saltmarsh_management'
+    })
+
+    const request = {
+      route: { path: '/project/{referenceNumber}/nfm-sand-dune' },
+      params: { referenceNumber: 'TEST-001' }
+    }
+
+    const result = requireSelectedMeasure(request, h)
+    expect(result).toEqual({ redirected: true, path: '/project/TEST-001' })
+  })
 })

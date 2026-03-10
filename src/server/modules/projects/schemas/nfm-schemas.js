@@ -13,6 +13,17 @@ import {
   PROJECT_VALIDATION_MESSAGES
 } from '../../../common/constants/projects.js'
 
+const maxTwoDecimalPlaces = (value, helpers) => {
+  if (value === null || value === '' || value === undefined) {
+    return value
+  }
+
+  const scaled = value * 100
+  const hasMaxTwoDecimals = Math.abs(scaled - Math.trunc(scaled)) < 1e-8
+
+  return hasMaxTwoDecimals ? value : helpers.error('number.precision')
+}
+
 /**
  * NFM Selected Measures Schema
  * Validates natural flood management measures selection
@@ -41,7 +52,7 @@ export const nfmSelectedMeasuresSchema = Joi.object({
 export const nfmRiverRestorationSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: Joi.number()
     .positive()
-    .precision(2)
+    .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
       'number.base':
@@ -53,7 +64,7 @@ export const nfmRiverRestorationSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: Joi.number()
     .positive()
-    .precision(2)
+    .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .optional()
     .messages({
@@ -72,7 +83,7 @@ export const nfmRiverRestorationSchema = Joi.object({
 export const nfmLeakyBarriersSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: Joi.number()
     .positive()
-    .precision(2)
+    .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .optional()
     .messages({
@@ -84,7 +95,7 @@ export const nfmLeakyBarriersSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]: Joi.number()
     .positive()
-    .precision(2)
+    .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
       'number.base':
@@ -96,7 +107,7 @@ export const nfmLeakyBarriersSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]: Joi.number()
     .positive()
-    .precision(2)
+    .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
       'number.base':
@@ -115,20 +126,22 @@ export const nfmLeakyBarriersSchema = Joi.object({
 export const nfmOfflineStorageSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: Joi.number()
     .positive()
-    .precision(2)
+    .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
       'number.base': 'Enter an area',
       'number.positive': 'Area must be a positive number',
+      'number.precision': 'Area must have up to 2 decimal places',
       'any.required': 'Enter an area'
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: Joi.number()
     .positive()
-    .precision(2)
+    .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .messages({
       'number.base': 'Volume must be a number',
-      'number.positive': 'Volume must be a positive number'
+      'number.positive': 'Volume must be a positive number',
+      'number.precision': 'Volume must have up to 2 decimal places'
     })
 }).unknown(true)
 
@@ -139,11 +152,12 @@ export const nfmOfflineStorageSchema = Joi.object({
 export const nfmWoodlandSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]: Joi.number()
     .positive()
-    .precision(2)
+    .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
       'number.base': 'Enter an area',
       'number.positive': 'Area must be a positive number',
+      'number.precision': 'Area must have up to 2 decimal places',
       'any.required': 'Enter an area'
     })
 }).unknown(true)
@@ -155,7 +169,7 @@ export const nfmWoodlandSchema = Joi.object({
 export const nfmHeadwaterDrainageSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA]: Joi.number()
     .positive()
-    .precision(2)
+    .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
       'number.base':
@@ -164,5 +178,83 @@ export const nfmHeadwaterDrainageSchema = Joi.object({
         'Area must be a positive number with up to 2 decimal places',
       'number.precision': 'Area must have up to 2 decimal places',
       'any.required': 'Enter the area in hectares'
+    })
+}).unknown(true)
+
+/**
+ * NFM Runoff Management Schema
+ * Validates area (hectares) and volume (m³) for runoff attenuation or management
+ */
+export const nfmRunoffManagementSchema = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: Joi.number()
+    .positive()
+    .custom(maxTwoDecimalPlaces)
+    .required()
+    .messages({
+      'number.base': 'Enter an area',
+      'number.positive': 'Area must be a positive number',
+      'number.precision': 'Area must have up to 2 decimal places',
+      'any.required': 'Enter an area'
+    }),
+  [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: Joi.number()
+    .positive()
+    .custom(maxTwoDecimalPlaces)
+    .allow(null, '')
+    .messages({
+      'number.base': 'Volume must be a number',
+      'number.positive': 'Volume must be a positive number',
+      'number.precision': 'Volume must have up to 2 decimal places'
+    })
+}).unknown(true)
+
+/**
+ * NFM Saltmarsh Schema
+ * Validates area (hectares) and length (km) for saltmarsh or mudflat management
+ */
+export const nfmSaltmarshSchema = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: Joi.number()
+    .positive()
+    .custom(maxTwoDecimalPlaces)
+    .required()
+    .messages({
+      'number.base': 'Enter an area',
+      'number.positive': 'Area must be a positive number',
+      'number.precision': 'Area must have up to 2 decimal places',
+      'any.required': 'Enter an area'
+    }),
+  [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: Joi.number()
+    .positive()
+    .custom(maxTwoDecimalPlaces)
+    .allow(null, '')
+    .messages({
+      'number.base': 'Length must be a number',
+      'number.positive': 'Length must be a positive number',
+      'number.precision': 'Length must have up to 2 decimal places'
+    })
+}).unknown(true)
+
+/**
+ * NFM Sand Dune Schema
+ * Validates area (hectares) and length (km) for sand dune management
+ */
+export const nfmSandDuneSchema = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: Joi.number()
+    .positive()
+    .custom(maxTwoDecimalPlaces)
+    .required()
+    .messages({
+      'number.base': 'Enter an area',
+      'number.positive': 'Area must be a positive number',
+      'number.precision': 'Area must have up to 2 decimal places',
+      'any.required': 'Enter an area'
+    }),
+  [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: Joi.number()
+    .positive()
+    .custom(maxTwoDecimalPlaces)
+    .allow(null, '')
+    .messages({
+      'number.base': 'Length must be a number',
+      'number.positive': 'Length must be a positive number',
+      'number.precision': 'Length must have up to 2 decimal places'
     })
 }).unknown(true)

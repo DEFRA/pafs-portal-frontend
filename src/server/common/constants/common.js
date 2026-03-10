@@ -53,7 +53,10 @@ export const PROJECT_VIEWS = {
   NFM_LEAKY_BARRIERS: 'modules/projects/nfm/leaky-barriers',
   NFM_OFFLINE_STORAGE: 'modules/projects/nfm/offline-storage',
   NFM_WOODLAND: 'modules/projects/nfm/woodland',
-  NFM_HEADWATER_DRAINAGE: 'modules/projects/nfm/headwater-drainage'
+  NFM_HEADWATER_DRAINAGE: 'modules/projects/nfm/headwater-drainage',
+  NFM_RUNOFF_MANAGEMENT: 'modules/projects/nfm/runoff-management',
+  NFM_SALTMARSH: 'modules/projects/nfm/saltmarsh',
+  NFM_SAND_DUNE: 'modules/projects/nfm/sand-dune'
 }
 
 export const GENERAL_VIEWS = {

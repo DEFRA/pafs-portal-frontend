@@ -1,0 +1,69 @@
+{% extends "layouts/projects.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}{{ t('projects.nfm.runoff_management.title') }}{% endblock %}
+
+{% block body %}
+  {% if errors and errors.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.errors.error_summary_title'),
+      errorList: errors
+    }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+    
+    <div class="govuk-form-group {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA] or fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME] %}govuk-form-group--error{% endif %}">
+      <h1 class="govuk-heading-l">{{ t('projects.nfm.runoff_management.title') }}</h1>
+      
+      {{ govukInput({
+        label: {
+          text: t('projects.nfm.runoff_management.area.label'),
+          classes: "govuk-label--m",
+          isPageHeading: false
+        },
+        id: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA,
+        name: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA,
+        value: formData[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA],
+        suffix: {
+          text: "hectares"
+        },
+        classes: "govuk-input--width-10",
+        errorMessage: fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA] and {
+          text: fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]
+        }
+      }) }}
+
+      {{ govukInput({
+        label: {
+          text: t('projects.nfm.runoff_management.volume.label'),
+          classes: "govuk-label--m",
+          isPageHeading: false
+        },
+        hint: {
+          text: t('projects.nfm.runoff_management.volume.hint')
+        },
+        id: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME,
+        name: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME,
+        value: formData[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME],
+        suffix: {
+          text: "m³"
+        },
+        classes: "govuk-input--width-10",
+        errorMessage: fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME] and {
+          text: fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]
+        }
+      }) }}
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+
+  </form>
+{% endblock %}

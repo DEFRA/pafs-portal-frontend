@@ -81,5 +81,8 @@ export {
   nfmLeakyBarriersSchema,
   nfmOfflineStorageSchema,
   nfmWoodlandSchema,
-  nfmHeadwaterDrainageSchema
+  nfmHeadwaterDrainageSchema,
+  nfmRunoffManagementSchema,
+  nfmSaltmarshSchema,
+  nfmSandDuneSchema
 } from './schemas/nfm-schemas.js'

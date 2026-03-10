@@ -115,4 +115,73 @@ describe('nfm navigation helpers', () => {
       conditionalRedirect: false
     })
   })
+
+  test('runoff management prefers headwater drainage as back link', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+        'headwater_drainage,runoff_management'
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE,
+      conditionalRedirect: false
+    })
+  })
+
+  test('runoff management falls back to selected measures when no previous measure selected', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'runoff_management'
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+      conditionalRedirect: false
+    })
+  })
+
+  test('saltmarsh prefers runoff management as back link', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_SALTMARSH, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+        'runoff_management,saltmarsh_management'
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.RUNOFF_MANAGEMENT,
+      conditionalRedirect: false
+    })
+  })
+
+  test('saltmarsh falls back to selected measures when no previous measure selected', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_SALTMARSH, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'saltmarsh_management'
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+      conditionalRedirect: false
+    })
+  })
+
+  test('sand dune prefers saltmarsh as back link', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_SAND_DUNE, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+        'saltmarsh_management,sand_dune_management'
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SALTMARSH,
+      conditionalRedirect: false
+    })
+  })
+
+  test('sand dune falls back to selected measures when no previous measure selected', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_SAND_DUNE, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'sand_dune_management'
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+      conditionalRedirect: false
+    })
+  })
 })

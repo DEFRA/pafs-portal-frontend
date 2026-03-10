@@ -43,39 +43,47 @@
           
           {# NFM Measures Details Table #}
           {% if projectData.pafs_core_nfm_measures and projectData.pafs_core_nfm_measures.length > 0 %}
-            <h3 class="govuk-heading-s govuk-!-margin-top-6">{{ t('projects.overview.nfm_summary_card.measures_details') }}</h3>
-            <table class="govuk-table">
-              <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                  <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.measure_type') }}</th>
-                  <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.area') }}</th>
-                  <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.volume') }}</th>
-                  <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.length') }}</th>
-                  <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.width') }}</th>
-                </tr>
-              </thead>
-              <tbody class="govuk-table__body">
-                {% for measure in projectData.pafs_core_nfm_measures %}
-                  <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header">
-                      {{ t('projects.nfm.selected_measures.options.' + measure.measureType) }}
-                    </th>
-                    <td class="govuk-table__cell">
-                      {% if measure.areaHectares %}{{ measure.areaHectares }} ha{% else %}-{% endif %}
-                    </td>
-                    <td class="govuk-table__cell">
-                      {% if measure.storageVolumeM3 %}{{ measure.storageVolumeM3 }} m³{% else %}-{% endif %}
-                    </td>
-                    <td class="govuk-table__cell">
-                      {% if measure.lengthKm %}{{ measure.lengthKm }} km{% else %}-{% endif %}
-                    </td>
-                    <td class="govuk-table__cell">
-                      {% if measure.widthM %}{{ measure.widthM }} m{% else %}-{% endif %}
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+            <details class="govuk-details govuk-!-margin-top-6">
+              <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                  Selected Measures ({{ projectData.pafs_core_nfm_measures.length }})
+                </span>
+              </summary>
+              <div class="govuk-details__text">
+                <table class="govuk-table">
+                  <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.measure_type') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.area') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.volume') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.length') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.width') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="govuk-table__body">
+                    {% for measure in projectData.pafs_core_nfm_measures %}
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">
+                          {{ t('projects.nfm.selected_measures.options.' + measure.measureType) }}
+                        </th>
+                        <td class="govuk-table__cell">
+                          {% if measure.areaHectares %}{{ measure.areaHectares }} ha{% else %}-{% endif %}
+                        </td>
+                        <td class="govuk-table__cell">
+                          {% if measure.storageVolumeM3 %}{{ measure.storageVolumeM3 }} m³{% else %}-{% endif %}
+                        </td>
+                        <td class="govuk-table__cell">
+                          {% if measure.lengthKm %}{{ measure.lengthKm }} km{% else %}-{% endif %}
+                        </td>
+                        <td class="govuk-table__cell">
+                          {% if measure.widthM %}{{ measure.widthM }} m{% else %}-{% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </details>
           {% endif %}
         {% else %}
           <p class="govuk-body">{{ t('projects.overview.nfm_summary_card.not_added') }}</p>

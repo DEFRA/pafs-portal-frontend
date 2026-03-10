@@ -78,6 +78,21 @@ export const projectNfm = {
           ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE,
           measureEditPreHandlers,
           nfmController
+        ),
+        ...createRoutePair(
+          ROUTES.PROJECT.EDIT.NFM.RUNOFF_MANAGEMENT,
+          measureEditPreHandlers,
+          nfmController
+        ),
+        ...createRoutePair(
+          ROUTES.PROJECT.EDIT.NFM.SALTMARSH,
+          measureEditPreHandlers,
+          nfmController
+        ),
+        ...createRoutePair(
+          ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
+          measureEditPreHandlers,
+          nfmController
         )
       ])
     }
