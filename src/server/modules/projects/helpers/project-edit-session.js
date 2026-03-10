@@ -12,6 +12,42 @@ import {
 } from '../../../common/constants/projects.js'
 import { getSessionData } from './project-utils.js'
 
+const NFM_MEASURE_FIELD_MAPPINGS = {
+  river_floodplain_restoration: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA,
+    storageVolumeM3: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME
+  },
+  leaky_barriers_in_channel_storage: {
+    storageVolumeM3: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME,
+    lengthKm: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH,
+    widthM: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH
+  },
+  offline_storage: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA,
+    storageVolumeM3: PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME
+  },
+  woodland: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA
+  },
+  headwater_drainage_management: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA
+  },
+  runoff_attenuation_management: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA,
+    storageVolumeM3: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME
+  },
+  saltmarsh_management: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA,
+    lengthKm: PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH
+  },
+  sand_dune_management: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA,
+    lengthKm: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH
+  }
+}
+
+const hasValue = (value) => value !== null && value !== undefined
+
 /**
  * Map a single NFM measure to frontend fields
  * @param {Object} measure - NFM measure object from backend
@@ -19,71 +55,18 @@ import { getSessionData } from './project-utils.js'
  */
 function mapSingleNfmMeasure(measure) {
   const mappedFields = {}
-  const { measureType, areaHectares, storageVolumeM3, lengthKm, widthM } =
-    measure
+  const fieldMapping = NFM_MEASURE_FIELD_MAPPINGS[measure?.measureType]
 
-  if (measureType === 'river_floodplain_restoration') {
-    if (areaHectares !== null && areaHectares !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA] =
-        areaHectares
-    }
-    if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME] =
-        storageVolumeM3
-    }
-  } else if (measureType === 'leaky_barriers_in_channel_storage') {
-    if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME] =
-        storageVolumeM3
-    }
-    if (lengthKm !== null && lengthKm !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH] = lengthKm
-    }
-    if (widthM !== null && widthM !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH] = widthM
-    }
-  } else if (measureType === 'offline_storage') {
-    if (areaHectares !== null && areaHectares !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA] =
-        areaHectares
-    }
-    if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME] =
-        storageVolumeM3
-    }
-  } else if (measureType === 'woodland') {
-    if (areaHectares !== null && areaHectares !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA] = areaHectares
-    }
-  } else if (measureType === 'headwater_drainage_management') {
-    if (areaHectares !== null && areaHectares !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA] =
-        areaHectares
-    }
-  } else if (measureType === 'runoff_attenuation_management') {
-    if (areaHectares !== null && areaHectares !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA] =
-        areaHectares
-    }
-    if (storageVolumeM3 !== null && storageVolumeM3 !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME] =
-        storageVolumeM3
-    }
-  } else if (measureType === 'saltmarsh_management') {
-    if (areaHectares !== null && areaHectares !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA] = areaHectares
-    }
-    if (lengthKm !== null && lengthKm !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH] = lengthKm
-    }
-  } else if (measureType === 'sand_dune_management') {
-    if (areaHectares !== null && areaHectares !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA] = areaHectares
-    }
-    if (lengthKm !== null && lengthKm !== undefined) {
-      mappedFields[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH] = lengthKm
-    }
+  if (!fieldMapping) {
+    return mappedFields
   }
+
+  Object.entries(fieldMapping).forEach(([sourceField, targetField]) => {
+    const value = measure[sourceField]
+    if (hasValue(value)) {
+      mappedFields[targetField] = value
+    }
+  })
 
   return mappedFields
 }

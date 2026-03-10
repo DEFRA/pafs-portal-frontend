@@ -13,6 +13,24 @@ import {
   PROJECT_VALIDATION_MESSAGES
 } from '../../../common/constants/projects.js'
 
+const MSG_ENTER_AREA = 'Enter an area'
+const MSG_AREA_POSITIVE = 'Area must be a positive number'
+const MSG_AREA_POSITIVE_2DP =
+  'Area must be a positive number with up to 2 decimal places'
+const MSG_AREA_PRECISION_2DP = 'Area must have up to 2 decimal places'
+
+const MSG_VOLUME_POSITIVE_2DP =
+  'Volume must be a positive number with up to 2 decimal places'
+const MSG_VOLUME_PRECISION_2DP = 'Volume must have up to 2 decimal places'
+
+const MSG_LENGTH_POSITIVE_2DP =
+  'Length must be a positive number with up to 2 decimal places'
+const MSG_LENGTH_PRECISION_2DP = 'Length must have up to 2 decimal places'
+
+const MSG_WIDTH_POSITIVE_2DP =
+  'Width must be a positive number with up to 2 decimal places'
+const MSG_WIDTH_PRECISION_2DP = 'Width must have up to 2 decimal places'
+
 const maxTwoDecimalPlaces = (value, helpers) => {
   if (value === null || value === '' || value === undefined) {
     return value
@@ -55,11 +73,9 @@ export const nfmRiverRestorationSchema = Joi.object({
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base':
-        'Area must be a positive number with up to 2 decimal places',
-      'number.positive':
-        'Area must be a positive number with up to 2 decimal places',
-      'number.precision': 'Area must have up to 2 decimal places',
+      'number.base': MSG_AREA_POSITIVE_2DP,
+      'number.positive': MSG_AREA_POSITIVE_2DP,
+      'number.precision': MSG_AREA_PRECISION_2DP,
       'any.required': 'Enter the area in hectares'
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: Joi.number()
@@ -68,11 +84,9 @@ export const nfmRiverRestorationSchema = Joi.object({
     .allow(null, '')
     .optional()
     .messages({
-      'number.base':
-        'Volume must be a positive number with up to 2 decimal places',
-      'number.positive':
-        'Volume must be a positive number with up to 2 decimal places',
-      'number.precision': 'Volume must have up to 2 decimal places'
+      'number.base': MSG_VOLUME_POSITIVE_2DP,
+      'number.positive': MSG_VOLUME_POSITIVE_2DP,
+      'number.precision': MSG_VOLUME_PRECISION_2DP
     })
 }).unknown(true)
 
@@ -87,22 +101,18 @@ export const nfmLeakyBarriersSchema = Joi.object({
     .allow(null, '')
     .optional()
     .messages({
-      'number.base':
-        'Volume must be a positive number with up to 2 decimal places',
-      'number.positive':
-        'Volume must be a positive number with up to 2 decimal places',
-      'number.precision': 'Volume must have up to 2 decimal places'
+      'number.base': MSG_VOLUME_POSITIVE_2DP,
+      'number.positive': MSG_VOLUME_POSITIVE_2DP,
+      'number.precision': MSG_VOLUME_PRECISION_2DP
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]: Joi.number()
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base':
-        'Length must be a positive number with up to 2 decimal places',
-      'number.positive':
-        'Length must be a positive number with up to 2 decimal places',
-      'number.precision': 'Length must have up to 2 decimal places',
+      'number.base': MSG_LENGTH_POSITIVE_2DP,
+      'number.positive': MSG_LENGTH_POSITIVE_2DP,
+      'number.precision': MSG_LENGTH_PRECISION_2DP,
       'any.required': 'Enter the length in kilometres'
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]: Joi.number()
@@ -110,11 +120,9 @@ export const nfmLeakyBarriersSchema = Joi.object({
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base':
-        'Width must be a positive number with up to 2 decimal places',
-      'number.positive':
-        'Width must be a positive number with up to 2 decimal places',
-      'number.precision': 'Width must have up to 2 decimal places',
+      'number.base': MSG_WIDTH_POSITIVE_2DP,
+      'number.positive': MSG_WIDTH_POSITIVE_2DP,
+      'number.precision': MSG_WIDTH_PRECISION_2DP,
       'any.required': 'Enter the typical width in metres'
     })
 }).unknown(true)
@@ -129,10 +137,10 @@ export const nfmOfflineStorageSchema = Joi.object({
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': 'Enter an area',
-      'number.positive': 'Area must be a positive number',
-      'number.precision': 'Area must have up to 2 decimal places',
-      'any.required': 'Enter an area'
+      'number.base': MSG_ENTER_AREA,
+      'number.positive': MSG_AREA_POSITIVE,
+      'number.precision': MSG_AREA_PRECISION_2DP,
+      'any.required': MSG_ENTER_AREA
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: Joi.number()
     .positive()
@@ -141,7 +149,7 @@ export const nfmOfflineStorageSchema = Joi.object({
     .messages({
       'number.base': 'Volume must be a number',
       'number.positive': 'Volume must be a positive number',
-      'number.precision': 'Volume must have up to 2 decimal places'
+      'number.precision': MSG_VOLUME_PRECISION_2DP
     })
 }).unknown(true)
 
@@ -155,10 +163,10 @@ export const nfmWoodlandSchema = Joi.object({
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': 'Enter an area',
-      'number.positive': 'Area must be a positive number',
-      'number.precision': 'Area must have up to 2 decimal places',
-      'any.required': 'Enter an area'
+      'number.base': MSG_ENTER_AREA,
+      'number.positive': MSG_AREA_POSITIVE,
+      'number.precision': MSG_AREA_PRECISION_2DP,
+      'any.required': MSG_ENTER_AREA
     })
 }).unknown(true)
 
@@ -172,11 +180,9 @@ export const nfmHeadwaterDrainageSchema = Joi.object({
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base':
-        'Area must be a positive number with up to 2 decimal places',
-      'number.positive':
-        'Area must be a positive number with up to 2 decimal places',
-      'number.precision': 'Area must have up to 2 decimal places',
+      'number.base': MSG_AREA_POSITIVE_2DP,
+      'number.positive': MSG_AREA_POSITIVE_2DP,
+      'number.precision': MSG_AREA_PRECISION_2DP,
       'any.required': 'Enter the area in hectares'
     })
 }).unknown(true)
@@ -191,10 +197,10 @@ export const nfmRunoffManagementSchema = Joi.object({
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': 'Enter an area',
-      'number.positive': 'Area must be a positive number',
-      'number.precision': 'Area must have up to 2 decimal places',
-      'any.required': 'Enter an area'
+      'number.base': MSG_ENTER_AREA,
+      'number.positive': MSG_AREA_POSITIVE,
+      'number.precision': MSG_AREA_PRECISION_2DP,
+      'any.required': MSG_ENTER_AREA
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: Joi.number()
     .positive()
@@ -203,7 +209,7 @@ export const nfmRunoffManagementSchema = Joi.object({
     .messages({
       'number.base': 'Volume must be a number',
       'number.positive': 'Volume must be a positive number',
-      'number.precision': 'Volume must have up to 2 decimal places'
+      'number.precision': MSG_VOLUME_PRECISION_2DP
     })
 }).unknown(true)
 
@@ -217,10 +223,10 @@ export const nfmSaltmarshSchema = Joi.object({
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': 'Enter an area',
-      'number.positive': 'Area must be a positive number',
-      'number.precision': 'Area must have up to 2 decimal places',
-      'any.required': 'Enter an area'
+      'number.base': MSG_ENTER_AREA,
+      'number.positive': MSG_AREA_POSITIVE,
+      'number.precision': MSG_AREA_PRECISION_2DP,
+      'any.required': MSG_ENTER_AREA
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: Joi.number()
     .positive()
@@ -229,7 +235,7 @@ export const nfmSaltmarshSchema = Joi.object({
     .messages({
       'number.base': 'Length must be a number',
       'number.positive': 'Length must be a positive number',
-      'number.precision': 'Length must have up to 2 decimal places'
+      'number.precision': MSG_LENGTH_PRECISION_2DP
     })
 }).unknown(true)
 
@@ -243,10 +249,10 @@ export const nfmSandDuneSchema = Joi.object({
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': 'Enter an area',
-      'number.positive': 'Area must be a positive number',
-      'number.precision': 'Area must have up to 2 decimal places',
-      'any.required': 'Enter an area'
+      'number.base': MSG_ENTER_AREA,
+      'number.positive': MSG_AREA_POSITIVE,
+      'number.precision': MSG_AREA_PRECISION_2DP,
+      'any.required': MSG_ENTER_AREA
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: Joi.number()
     .positive()
@@ -255,6 +261,6 @@ export const nfmSandDuneSchema = Joi.object({
     .messages({
       'number.base': 'Length must be a number',
       'number.positive': 'Length must be a positive number',
-      'number.precision': 'Length must have up to 2 decimal places'
+      'number.precision': MSG_LENGTH_PRECISION_2DP
     })
 }).unknown(true)
