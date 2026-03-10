@@ -117,6 +117,14 @@
         href: "#financialStartYear"
     }
   ]) %}
+{% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_OUT_OF_RANGE or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_OUT_OF_RANGE or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_OUT_OF_RANGE or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_OUT_OF_RANGE %}
+  {% set errorList = errorList.concat([
+    {
+      text: t(financialLocalePrefixKey + '.errors.out_of_range')if financialLocalePrefixKey else 
+        t('projects.financial_year_start_manual.errors.out_of_range'),
+        href: "#financialStartYear"
+    }
+  ]) %}
 {% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_IN_FUTURE or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_IN_FUTURE or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_IN_FUTURE or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_IN_FUTURE %}
   {% set errorList = errorList.concat([
     {
@@ -367,7 +375,7 @@
   {% set errorList = errorList.concat([
     {
       text: t('projects.important_dates.validation.earliest_date_after_obc_start', {
-        obcStartDate: obcStartDateFormatted or (formData.startOutlineBusinessCaseMonth + '/' + formData.startOutlineBusinessCaseYear)
+        obcStartDate: obcStartDateFormatted or(formData.startOutlineBusinessCaseMonth + '/' + formData.startOutlineBusinessCaseYear)
       }),
       href: "#earliestWithGiaMonth"
     }

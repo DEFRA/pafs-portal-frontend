@@ -191,7 +191,7 @@ const validateStandardTimelineDate = (
 }
 
 /**
- * Validate EARLIEST_WITH_GIA date (must be before or equal to START_OUTLINE_BUSINESS_CASE)
+ * Validate EARLIEST_WITH_GIA date (must be before START_OUTLINE_BUSINESS_CASE)
  * Range: Current financial month/year to START_OUTLINE_BUSINESS_CASE month/year
  */
 const validateEarliestWithGiaDate = (monthField, yearField) => {
@@ -212,14 +212,14 @@ const validateEarliestWithGiaDate = (monthField, yearField) => {
       return value
     }
 
-    // Check date is before or equal to START_OUTLINE_BUSINESS_CASE
+    // Check date is before START_OUTLINE_BUSINESS_CASE
     const comparison = compareMonthYear(
       month,
       year,
       startOBCMonth,
       startOBCYear
     )
-    if (comparison > 0) {
+    if (comparison >= 0) {
       return helpers.error('custom.earliest_gia_after_start_obc')
     }
 
