@@ -704,7 +704,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "woodland": {
@@ -729,7 +731,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "wet_woodland": {
@@ -754,7 +758,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "wetland_or_wet_grassland": {
@@ -779,7 +785,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "grassland": {
@@ -804,7 +812,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "heathland": {
@@ -829,7 +839,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "ponds_lakes": {
@@ -854,7 +866,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "arable_land": {
@@ -879,7 +893,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "comprehensive_restoration": {
@@ -904,7 +920,9 @@
       "suffix": "km",
       "validation": {
         "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must include the number of kilometres your project will create."
+        "invalid": "You must enter a valid number for kilometres.",
+        "min": "The number of kilometres must be greater than 0.",
+        "precision": "The number of kilometres must have no more than 2 decimal places."
       }
     },
     "partial_restoration": {
@@ -929,7 +947,9 @@
       "suffix": "km",
       "validation": {
         "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must include the number of kilometres your project will create."
+        "invalid": "You must enter a valid number for kilometres.",
+        "min": "The number of kilometres must be greater than 0.",
+        "precision": "The number of kilometres must have no more than 2 decimal places."
       }
     },
     "create_habitat_watercourse": {
@@ -954,7 +974,9 @@
       "suffix": "km",
       "validation": {
         "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must include the number of kilometres your project will create."
+        "invalid": "You must enter a valid number for kilometres.",
+        "min": "The number of kilometres must be greater than 0.",
+        "precision": "The number of kilometres must have no more than 2 decimal places."
       }
     },
     "footer": {

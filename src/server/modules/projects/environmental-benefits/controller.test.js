@@ -1,5 +1,8 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
-import { environmentalBenefitsController } from './controller.js'
+import {
+  environmentalBenefitsController,
+  EnvironmentalBenefitsController
+} from './controller.js'
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
@@ -841,6 +844,367 @@ describe('EnvironmentalBenefitsController', () => {
           [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]: 0
         })
       )
+    })
+  })
+
+  describe('_getValidationMessageKey', () => {
+    test('should return "required" for QUANTITY_REQUIRED error code', () => {
+      const controller = new EnvironmentalBenefitsController()
+      const result = controller._getValidationMessageKey(
+        'ENVIRONMENTAL_BENEFITS_QUANTITY_REQUIRED'
+      )
+      expect(result).toBe('required')
+    })
+
+    test('should return "invalid" for QUANTITY_INVALID error code', () => {
+      const controller = new EnvironmentalBenefitsController()
+      const result = controller._getValidationMessageKey(
+        'ENVIRONMENTAL_BENEFITS_QUANTITY_INVALID'
+      )
+      expect(result).toBe('invalid')
+    })
+
+    test('should return "min" for QUANTITY_MIN error code', () => {
+      const controller = new EnvironmentalBenefitsController()
+      const result = controller._getValidationMessageKey(
+        'ENVIRONMENTAL_BENEFITS_QUANTITY_MIN'
+      )
+      expect(result).toBe('min')
+    })
+
+    test('should return "precision" for QUANTITY_PRECISION error code', () => {
+      const controller = new EnvironmentalBenefitsController()
+      const result = controller._getValidationMessageKey(
+        'ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION'
+      )
+      expect(result).toBe('precision')
+    })
+
+    test('should return "required" as default for unknown error code', () => {
+      const controller = new EnvironmentalBenefitsController()
+      const result = controller._getValidationMessageKey('UNKNOWN_ERROR')
+      expect(result).toBe('required')
+    })
+
+    test('should return "required" for null error code', () => {
+      const controller = new EnvironmentalBenefitsController()
+      const result = controller._getValidationMessageKey(null)
+      expect(result).toBe('required')
+    })
+  })
+
+  describe('_buildErrorViewData', () => {
+    let controller
+
+    beforeEach(() => {
+      controller = new EnvironmentalBenefitsController()
+    })
+
+    test('should add validationMessageKey for input field with required error', () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED
+      )
+
+      ENVIRONMENTAL_BENEFITS_CONFIG[
+        PROJECT_STEPS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED
+      ] = {
+        localKeyPrefix:
+          'projects.environmental_benefits.hectares_of_intertidal_habitat_created_or_enhanced',
+        backLinkOptions: { targetURL: ROUTES.PROJECT.OVERVIEW },
+        fieldName:
+          PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED,
+        fieldType: 'input'
+      }
+
+      buildViewData.mockReturnValue({
+        pageTitle: 'Test Page',
+        inputValue: 5.25
+      })
+
+      const fieldErrors = {
+        [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]:
+          'ENVIRONMENTAL_BENEFITS_QUANTITY_REQUIRED'
+      }
+
+      const result = controller._buildErrorViewData(mockRequest, fieldErrors)
+
+      expect(result.fieldErrors).toEqual(fieldErrors)
+      expect(result.validationMessageKey).toBe('required')
+    })
+
+    test('should add validationMessageKey for input field with invalid error', () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED
+      )
+
+      ENVIRONMENTAL_BENEFITS_CONFIG[
+        PROJECT_STEPS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED
+      ] = {
+        localKeyPrefix:
+          'projects.environmental_benefits.hectares_of_woodland_habitat_created_or_enhanced',
+        backLinkOptions: { targetURL: ROUTES.PROJECT.OVERVIEW },
+        fieldName:
+          PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED,
+        fieldType: 'input'
+      }
+
+      const fieldErrors = {
+        [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED]:
+          'ENVIRONMENTAL_BENEFITS_QUANTITY_INVALID'
+      }
+
+      const result = controller._buildErrorViewData(mockRequest, fieldErrors)
+
+      expect(result.validationMessageKey).toBe('invalid')
+    })
+
+    test('should add validationMessageKey for input field with min error', () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.HECTARES_OF_GRASSLAND_HABITAT_CREATED_OR_ENHANCED
+      )
+
+      ENVIRONMENTAL_BENEFITS_CONFIG[
+        PROJECT_STEPS.HECTARES_OF_GRASSLAND_HABITAT_CREATED_OR_ENHANCED
+      ] = {
+        localKeyPrefix:
+          'projects.environmental_benefits.hectares_of_grassland_habitat_created_or_enhanced',
+        backLinkOptions: { targetURL: ROUTES.PROJECT.OVERVIEW },
+        fieldName:
+          PROJECT_PAYLOAD_FIELDS.HECTARES_OF_GRASSLAND_HABITAT_CREATED_OR_ENHANCED,
+        fieldType: 'input'
+      }
+
+      const fieldErrors = {
+        [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_GRASSLAND_HABITAT_CREATED_OR_ENHANCED]:
+          'ENVIRONMENTAL_BENEFITS_QUANTITY_MIN'
+      }
+
+      const result = controller._buildErrorViewData(mockRequest, fieldErrors)
+
+      expect(result.validationMessageKey).toBe('min')
+    })
+
+    test('should add validationMessageKey for input field with precision error', () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.HECTARES_OF_HEATHLAND_CREATED_OR_ENHANCED
+      )
+
+      ENVIRONMENTAL_BENEFITS_CONFIG[
+        PROJECT_STEPS.HECTARES_OF_HEATHLAND_CREATED_OR_ENHANCED
+      ] = {
+        localKeyPrefix:
+          'projects.environmental_benefits.hectares_of_heathland_created_or_enhanced',
+        backLinkOptions: { targetURL: ROUTES.PROJECT.OVERVIEW },
+        fieldName:
+          PROJECT_PAYLOAD_FIELDS.HECTARES_OF_HEATHLAND_CREATED_OR_ENHANCED,
+        fieldType: 'input'
+      }
+
+      const fieldErrors = {
+        [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_HEATHLAND_CREATED_OR_ENHANCED]:
+          'ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION'
+      }
+
+      const result = controller._buildErrorViewData(mockRequest, fieldErrors)
+
+      expect(result.validationMessageKey).toBe('precision')
+    })
+
+    test('should not add validationMessageKey for radio field errors', () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.INTERTIDAL_HABITAT)
+
+      ENVIRONMENTAL_BENEFITS_CONFIG[PROJECT_STEPS.INTERTIDAL_HABITAT] = {
+        localKeyPrefix: 'projects.environmental_benefits.intertidal_habitat',
+        backLinkOptions: { targetURL: ROUTES.PROJECT.OVERVIEW },
+        fieldName: PROJECT_PAYLOAD_FIELDS.INTERTIDAL_HABITAT,
+        fieldType: 'radio'
+      }
+
+      const fieldErrors = {
+        [PROJECT_PAYLOAD_FIELDS.INTERTIDAL_HABITAT]:
+          'ENVIRONMENTAL_BENEFITS_REQUIRED'
+      }
+
+      const result = controller._buildErrorViewData(mockRequest, fieldErrors)
+
+      expect(result.fieldErrors).toEqual(fieldErrors)
+      expect(result.validationMessageKey).toBeUndefined()
+    })
+
+    test('should not add validationMessageKey when field has no error', () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED
+      )
+
+      ENVIRONMENTAL_BENEFITS_CONFIG[
+        PROJECT_STEPS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED
+      ] = {
+        localKeyPrefix:
+          'projects.environmental_benefits.hectares_of_intertidal_habitat_created_or_enhanced',
+        backLinkOptions: { targetURL: ROUTES.PROJECT.OVERVIEW },
+        fieldName:
+          PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED,
+        fieldType: 'input'
+      }
+
+      const fieldErrors = {}
+
+      const result = controller._buildErrorViewData(mockRequest, fieldErrors)
+
+      expect(result.fieldErrors).toEqual(fieldErrors)
+      expect(result.validationMessageKey).toBeUndefined()
+    })
+  })
+
+  describe('validation error preserves submitted value', () => {
+    test('should update session before validation to preserve input value on error', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED
+      )
+
+      ENVIRONMENTAL_BENEFITS_CONFIG[
+        PROJECT_STEPS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED
+      ] = {
+        localKeyPrefix:
+          'projects.environmental_benefits.hectares_of_intertidal_habitat_created_or_enhanced',
+        backLinkOptions: { targetURL: ROUTES.PROJECT.OVERVIEW },
+        schema: {
+          validate: vi
+            .fn()
+            .mockReturnValue({ error: { details: [{ message: 'Error' }] } })
+        },
+        fieldName:
+          PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED,
+        fieldType: 'input'
+      }
+
+      mockRequest.payload = {
+        [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]:
+          '15.755'
+      }
+
+      extractJoiErrors.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]:
+          'ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION'
+      })
+
+      await environmentalBenefitsController.postHandler(mockRequest, mockH)
+
+      // Session should be updated with raw value BEFORE validation
+      expect(updateSessionData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]:
+            '15.755'
+        })
+      )
+
+      // View should be called with error data
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.ENVIRONMENTAL_BENEFITS,
+        expect.objectContaining({
+          fieldErrors: expect.any(Object),
+          validationMessageKey: 'precision'
+        })
+      )
+    })
+
+    test('should preserve string value in session when validation fails (not NaN)', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED
+      )
+
+      ENVIRONMENTAL_BENEFITS_CONFIG[
+        PROJECT_STEPS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED
+      ] = {
+        localKeyPrefix:
+          'projects.environmental_benefits.hectares_of_intertidal_habitat_created_or_enhanced',
+        backLinkOptions: { targetURL: ROUTES.PROJECT.OVERVIEW },
+        schema: {
+          validate: vi
+            .fn()
+            .mockReturnValue({ error: { details: [{ message: 'Error' }] } })
+        },
+        fieldName:
+          PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED,
+        fieldType: 'input'
+      }
+
+      // User enters invalid string
+      mockRequest.payload = {
+        [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]:
+          'abc'
+      }
+
+      extractJoiErrors.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]:
+          'ENVIRONMENTAL_BENEFITS_QUANTITY_INVALID'
+      })
+
+      await environmentalBenefitsController.postHandler(mockRequest, mockH)
+
+      // Session should preserve the original string value, NOT convert to NaN
+      expect(updateSessionData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]:
+            'abc'
+        })
+      )
+
+      // View should be called with error data
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.ENVIRONMENTAL_BENEFITS,
+        expect.objectContaining({
+          fieldErrors: expect.any(Object),
+          validationMessageKey: 'invalid'
+        })
+      )
+    })
+
+    test('should update session with normalized value after successful validation', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED
+      )
+
+      ENVIRONMENTAL_BENEFITS_CONFIG[
+        PROJECT_STEPS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED
+      ] = {
+        localKeyPrefix:
+          'projects.environmental_benefits.hectares_of_woodland_habitat_created_or_enhanced',
+        backLinkOptions: { targetURL: ROUTES.PROJECT.OVERVIEW },
+        schema: {
+          validate: vi.fn().mockReturnValue({ error: null })
+        },
+        fieldName:
+          PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED,
+        fieldType: 'input'
+      }
+
+      mockRequest.payload = {
+        [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED]:
+          '10.25'
+      }
+
+      await environmentalBenefitsController.postHandler(mockRequest, mockH)
+
+      // Session should be updated twice - first with raw, then with normalized
+      expect(updateSessionData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED]:
+            '10.25'
+        })
+      )
+
+      expect(updateSessionData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED]: 10.25
+        })
+      )
+
+      expect(updateSessionData).toHaveBeenCalledTimes(2)
     })
   })
 })

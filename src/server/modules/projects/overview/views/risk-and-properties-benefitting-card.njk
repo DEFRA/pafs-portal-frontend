@@ -40,7 +40,7 @@
               {% if projectData[PROJECT_PAYLOAD_FIELDS.MAIN_RISK] %}
                 {{ t('projects.risk_and_properties.risk.options.' + projectData[PROJECT_PAYLOAD_FIELDS.MAIN_RISK]) }}
               {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -68,7 +68,7 @@
                       <li>{{ t('projects.overview.risk_and_properties_summary_card.increasing_resilience') }}: {{ projectData[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] }}</li>
                     {% endif %}
                     {% if not projectData[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] and not projectData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] and not projectData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] and not projectData[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] %}
-                      {{ t('projects.overview.common.not_provided') }}
+                      {{ t('projects.overview.common.na') }}
                     {% endif %}
                   </ul>
                 {% endif %}
@@ -94,7 +94,7 @@
                       <li>{{ t('projects.overview.risk_and_properties_summary_card.reducing_coastal_erosion') }}: {{ projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] }}</li>
                     {% endif %}
                     {% if not projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] and not projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] %}
-                      {{ t('projects.overview.common.not_provided') }}
+                      {{ t('projects.overview.common.na') }}
                     {% endif %}
                   </ul>
                 {% endif %}
@@ -110,7 +110,7 @@
               {% if projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] %}
                 {{ projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] }}%
             {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -123,7 +123,7 @@
               {% if projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] %}
                 {{ projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] }}%
             {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -138,7 +138,7 @@
                 {% if projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK] %}
                   {{ t('projects.overview.risk_and_properties_summary_card.flood_risk.' + projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK]) }}
                 {% else %}
-                  {{ t('projects.overview.common.not_provided') }}
+                  {{ t('projects.overview.common.na') }}
                 {% endif %}
               </dd>
             </div>
@@ -154,7 +154,7 @@
                 {% if projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK] %}
                   {{ t('projects.overview.risk_and_properties_summary_card.flood_risk.' + projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK]) }}
                 {% else %}
-                  {{ t('projects.overview.common.not_provided') }}
+                  {{ t('projects.overview.common.na') }}
                 {% endif %}
               </dd>
             </div>
@@ -169,7 +169,7 @@
                 {% if projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK] %}
                   {{ t('projects.overview.risk_and_properties_summary_card.coastal_erosion_risk.' + projectData[PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK]) }}
                 {% else %}
-                  {{ t('projects.overview.common.not_provided') }}
+                  {{ t('projects.overview.common.na') }}
                 {% endif %}
               </dd>
             </div>

@@ -41,7 +41,8 @@
       {# Input field for quantity questions #}
       {% if fieldErrors and fieldErrors[fieldName] %}
         {% set inputError = {
-          text: t(localKeyPrefix + '.validation.required')
+          text: t(localKeyPrefix + '.validation.' + (
+          validationMessageKey or 'required'))
         } %}
       {% else %}
         {% set inputError = false %}
@@ -52,7 +53,7 @@
         name: fieldName,
         value: inputValue if inputValue != null else '',
         type: "text",
-        inputmode: "decimal",
+        inputmode: "numeric",
         spellcheck: false,
         classes: "govuk-input--width-10",
         label: {
