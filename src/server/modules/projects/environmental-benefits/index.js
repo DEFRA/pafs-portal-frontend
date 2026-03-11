@@ -26,49 +26,49 @@ function createHabitatPreHandlers() {
     requireIntertidalHabitatEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.INTERTIDAL_HABITAT,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.INTERTIDAL_HABITAT,
       'Intertidal habitat not enabled'
     ),
     requireWoodlandEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.WOODLAND,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.WOODLAND,
       'Woodland not enabled'
     ),
     requireWetWoodlandEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.WET_WOODLAND,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.WET_WOODLAND,
       'Wet woodland not enabled'
     ),
     requireWetlandOrWetGrasslandEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.WETLAND_OR_WET_GRASSLAND,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.WETLAND_OR_WET_GRASSLAND,
       'Wetland or wet grassland not enabled'
     ),
     requireGrasslandEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.GRASSLAND,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.GRASSLAND,
       'Grassland not enabled'
     ),
     requireHeathlandEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.HEATHLAND,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.HEATHLAND,
       'Heathland not enabled'
     ),
     requirePondsLakesEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.PONDS_LAKES,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.PONDS_LAKES,
       'Ponds and lakes not enabled'
     ),
     requireArableLandEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.ARABLE_LAND,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.ARABLE_LAND,
       'Arable land not enabled'
     )
   }
@@ -82,19 +82,19 @@ function createWatercoursePreHandlers() {
     requireComprehensiveRestorationEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.COMPREHENSIVE_RESTORATION,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.COMPREHENSIVE_RESTORATION,
       'Comprehensive restoration not enabled'
     ),
     requirePartialRestorationEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.PARTIAL_RESTORATION,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.PARTIAL_RESTORATION,
       'Partial restoration not enabled'
     ),
     requireCreateHabitatWatercourseEnabled: createConditionalPreHandler(
       PROJECT_PAYLOAD_FIELDS.CREATE_HABITAT_WATERCOURSE,
       true,
-      ROUTES.PROJECT.OVERVIEW,
+      ROUTES.PROJECT.EDIT.CREATE_HABITAT_WATERCOURSE,
       'Create habitat watercourse not enabled'
     )
   }
