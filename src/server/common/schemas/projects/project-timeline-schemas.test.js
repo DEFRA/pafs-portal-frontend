@@ -531,7 +531,7 @@ describe('project-timeline-schemas', () => {
       )
     })
 
-    it('should allow date equal to OBC start', () => {
+    it('should not allow date equal to OBC start', () => {
       const schema = Joi.object({
         [PROJECT_PAYLOAD_FIELDS.COULD_START_EARLY]: couldStartEarlySchema,
         [PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH]:
@@ -550,7 +550,8 @@ describe('project-timeline-schemas', () => {
         [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]: 6,
         [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]: 2025
       })
-      expect(error).toBeUndefined()
+      expect(error).toBeDefined()
+      expect(error.details[0].type).toBe('custom.earliest_gia_after_start_obc')
     })
 
     it('should allow date at current financial year start (April)', () => {

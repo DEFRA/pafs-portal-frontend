@@ -26,7 +26,7 @@
               {% if projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BETTER_PROTECTED] %}
                 {{ t('projects.confidence_assessment.property_confidence.options.' + projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BETTER_PROTECTED] + '.label') }}
               {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -36,7 +36,7 @@
               {% if projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR] %}
                 {{ t('projects.confidence_assessment.gateway_confidence.options.' + projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR] + '.label') }}
               {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -46,7 +46,7 @@
               {% if projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING] %}
                 {{ t('projects.confidence_assessment.funding_confidence.options.' + projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING] + '.label') }}
               {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>

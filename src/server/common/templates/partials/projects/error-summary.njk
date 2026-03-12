@@ -117,6 +117,14 @@
         href: "#financialStartYear"
     }
   ]) %}
+{% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_OUT_OF_RANGE or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_OUT_OF_RANGE or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_OUT_OF_RANGE or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_OUT_OF_RANGE %}
+  {% set errorList = errorList.concat([
+    {
+      text: t(financialLocalePrefixKey + '.errors.out_of_range')if financialLocalePrefixKey else 
+        t('projects.financial_year_start_manual.errors.out_of_range'),
+        href: "#financialStartYear"
+    }
+  ]) %}
 {% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_IN_FUTURE or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_IN_FUTURE or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_IN_FUTURE or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_IN_FUTURE %}
   {% set errorList = errorList.concat([
     {
@@ -367,7 +375,7 @@
   {% set errorList = errorList.concat([
     {
       text: t('projects.important_dates.validation.earliest_date_after_obc_start', {
-        obcStartDate: obcStartDateFormatted or (formData.startOutlineBusinessCaseMonth + '/' + formData.startOutlineBusinessCaseYear)
+        obcStartDate: obcStartDateFormatted or(formData.startOutlineBusinessCaseMonth + '/' + formData.startOutlineBusinessCaseYear)
       }),
       href: "#earliestWithGiaMonth"
     }
@@ -535,9 +543,23 @@
 {# Environmental Benefits - Generic field errors #}
 {# Handle all environmental benefits fields dynamically using fieldName and localKeyPrefix #}
 {% if fieldErrors[fieldName] and localKeyPrefix and localKeyPrefix.startsWith('projects.environmental_benefits') %}
+  {% set errorCode = fieldErrors[fieldName] %}
+  {% set validationKey = 'required' %}
+  
+  {# Determine which validation message key to use based on error code #}
+  {% if errorCode.includes('QUANTITY_INVALID') %}
+    {% set validationKey = 'invalid' %}
+  {% elif errorCode.includes('QUANTITY_MIN') %}
+    {% set validationKey = 'min' %}
+  {% elif errorCode.includes('QUANTITY_PRECISION') %}
+    {% set validationKey = 'precision' %}
+  {% elif errorCode.includes('INVALID') %}
+    {% set validationKey = 'required' %}
+  {% endif %}
+  
   {% set errorList = errorList.concat([
     {
-      text: t(localKeyPrefix + '.validation.required'),
+      text: t(localKeyPrefix + '.validation.' + validationKey),
       href: "#" + fieldName
     }
   ]) %}

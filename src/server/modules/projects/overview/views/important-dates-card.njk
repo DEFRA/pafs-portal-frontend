@@ -26,7 +26,7 @@
               {%if projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR] %}
                 {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]) }}
               {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -36,7 +36,7 @@
               {%if projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR] %}
                 {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR]) }}
               {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -46,7 +46,7 @@
               {%if projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_YEAR] %}
                 {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_YEAR]) }}
               {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -56,7 +56,7 @@
               {%if projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR] %}
                 {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]) }}
               {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -66,7 +66,7 @@
               {%if projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR] %}
                 {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]) }}
               {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -78,7 +78,7 @@
               {% elif projectData[PROJECT_PAYLOAD_FIELDS.COULD_START_EARLY] == false or projectData[PROJECT_PAYLOAD_FIELDS.COULD_START_EARLY] == 'false' %}
                 {{ t('common.no') }}
               {% else %}
-                {{ t('projects.overview.common.not_provided') }}
+                {{ t('projects.overview.common.na') }}
               {% endif %}
             </dd>
           </div>
@@ -89,7 +89,7 @@
                 {%if projectData[PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_YEAR] %}
                   {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_YEAR]) }}
                 {% else %}
-                  {{ t('projects.overview.common.not_provided') }}
+                  {{ t('projects.overview.common.na') }}
                 {% endif %}
               </dd>
             </div>

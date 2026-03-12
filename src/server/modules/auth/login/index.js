@@ -16,6 +16,14 @@ export const login = {
           ...loginController
         },
         {
+          method: 'GET',
+          path: '/users/sign_in',
+          options: {
+            pre: [{ method: redirectIfAuth }]
+          },
+          ...loginController
+        },
+        {
           method: 'POST',
           path: ROUTES.LOGIN,
           options: {

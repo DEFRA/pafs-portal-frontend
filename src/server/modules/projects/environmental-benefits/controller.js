@@ -321,9 +321,40 @@ class EnvironmentalBenefitsController {
     return viewData
   }
 
+  _getValidationMessageKey(errorCode) {
+    if (errorCode?.includes('QUANTITY_REQUIRED')) {
+      return 'required'
+    }
+    if (errorCode?.includes('QUANTITY_INVALID')) {
+      return 'invalid'
+    }
+    if (errorCode?.includes('QUANTITY_MIN')) {
+      return 'min'
+    }
+    if (errorCode?.includes('QUANTITY_PRECISION')) {
+      return 'precision'
+    }
+    return 'required'
+  }
+
   _buildErrorViewData(request, fieldErrors) {
     const viewData = this._getViewData(request)
-    return { ...viewData, fieldErrors }
+    const step = getProjectStep(request)
+    const config = this._getConfig(step)
+    const enrichedViewData = { ...viewData, fieldErrors }
+
+    // For input fields, determine which validation message to show
+    if (
+      config.fieldType === 'input' &&
+      config.fieldName &&
+      fieldErrors[config.fieldName]
+    ) {
+      enrichedViewData.validationMessageKey = this._getValidationMessageKey(
+        fieldErrors[config.fieldName]
+      )
+    }
+
+    return enrichedViewData
   }
 
   _handleValidationError(h, request, fieldErrors) {
@@ -356,10 +387,13 @@ class EnvironmentalBenefitsController {
     }
 
     const { fieldName, fieldType, schema } = config
-    const fieldValue = this._normalizeFieldValue(
-      request.payload[fieldName],
-      fieldType
-    )
+    const rawFieldValue = request.payload[fieldName]
+
+    // Update session with raw value before validation to preserve user input on error
+    updateSessionData(request, { [fieldName]: rawFieldValue })
+
+    // Normalize value for validation
+    const fieldValue = this._normalizeFieldValue(rawFieldValue, fieldType)
 
     // Build payload for validation
     const validationPayload = this._buildPayload(
@@ -377,7 +411,7 @@ class EnvironmentalBenefitsController {
       return this._handleValidationError(h, request, fieldErrors)
     }
 
-    // Update session data
+    // Update session with normalized value after successful validation
     updateSessionData(request, { [fieldName]: fieldValue })
 
     // Save to API
@@ -404,6 +438,8 @@ class EnvironmentalBenefitsController {
 }
 
 const controller = new EnvironmentalBenefitsController()
+
+export { EnvironmentalBenefitsController }
 
 export const environmentalBenefitsController = {
   getHandler: (request, h) => controller.get(request, h),

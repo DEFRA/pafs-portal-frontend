@@ -11,7 +11,7 @@
             {{ t('projects.overview.proposal_details_summary_card.project_name') }}
           </dt>
           <dd class="govuk-summary-list__value">
-            {{ projectData[PROJECT_PAYLOAD_FIELDS.NAME] or t('projects.overview.common.not_provided') }}
+            {{ projectData[PROJECT_PAYLOAD_FIELDS.NAME] or t('projects.overview.common.na') }}
           </dd>
           {% if not isReadOnly %}
             <dd class="govuk-summary-list__actions">
@@ -29,7 +29,7 @@
             {{ t('projects.overview.proposal_details_summary_card.rma') }}
           </dt>
           <dd class="govuk-summary-list__value">
-            {{ projectData.rmaName or t('projects.overview.common.not_provided') }}
+            {{ projectData.rmaName or t('projects.overview.common.na') }}
           </dd>
         </div>
 
@@ -54,7 +54,7 @@
             {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.STU %}
               {% set projectTypeLabel = t('projects.project_type.options.stu') %}
             {% endif %}
-            {{ projectTypeLabel or t('projects.overview.common.not_provided') }}
+            {{ projectTypeLabel or t('projects.overview.common.na') }}
           </dd>
           {% if not isReadOnly %}
             <dd class="govuk-summary-list__actions">
@@ -116,7 +116,7 @@
             {% if projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR] %}
               {{ buildFinancialYearLabel(projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]) }}
             {% else %}
-              {{ t('projects.overview.common.not_provided') }}
+              {{ t('projects.overview.common.na') }}
             {% endif %}
           </dd>
           {% if not isReadOnly %}
@@ -138,7 +138,7 @@
             {% if projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR] %}
               {{ buildFinancialYearLabel(projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]) }}
             {% else %}
-              {{ t('projects.overview.common.not_provided') }}
+              {{ t('projects.overview.common.na') }}
             {% endif %}
           </dd>
           {% if not isReadOnly %}

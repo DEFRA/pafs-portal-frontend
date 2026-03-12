@@ -26,6 +26,7 @@ const quantitySchema = Joi.number()
   .precision(2)
   .required()
   .strict()
+  .prefs({ convert: false })
   .messages({
     'any.required':
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_REQUIRED,
@@ -34,7 +35,7 @@ const quantitySchema = Joi.number()
     'number.min':
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_MIN,
     'number.precision':
-      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_INVALID
+      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION
   })
 
 // Main environmental benefits gate

@@ -229,8 +229,8 @@
     "after_march_link": "The project starts after March {{afterMarchYear}}",
     "errors": {
       "required": "Select the financial year when the project first requires funding",
-      "after_last_year": "Your first financial year should be less than your last financial year",
-      "invalid_range": "Your first financial year should be less than your last financial year"
+      "after_last_year": "Your first financial year should be less than or equal to your last financial year",
+      "invalid_range": "Your first financial year should be less than or equal to your last financial year"
     }
   },
   "financial_year_start_manual": {
@@ -241,8 +241,9 @@
     "errors": {
       "required": "Enter a financial year",
       "invalid_format": "Enter a financial year in the correct format",
+      "out_of_range": "Enter a financial year less than or equal to 2100",
       "should_be_in_future": "Enter a financial year that is the current year or later",
-      "invalid_range": "Your first financial year should be less than your last financial year"
+      "invalid_range": "Your first financial year should be less than or equal to your last financial year"
     }
   },
   "financial_year_end": {
@@ -252,7 +253,7 @@
     "after_march_link": "The project stops spending funds after March {{afterMarchYear}}",
     "errors": {
       "required": "Select the financial year when the project stops spending funds",
-      "invalid_range": "Your last financial year should be greater than your first financial year"
+      "invalid_range": "Your last financial year should be greater than or equal to your first financial year"
     }
   },
   "financial_year_end_manual": {
@@ -263,8 +264,9 @@
     "errors": {
       "required": "Enter a financial year",
       "invalid_format": "Enter a financial year in the correct format",
+      "out_of_range": "Enter a financial year less than or equal to 2100",
       "should_be_in_future": "Enter a financial year that is the current year or later",
-      "invalid_range": "Your last financial year should be greater than your first financial year"
+      "invalid_range": "Your last financial year should be greater than or equal to your first financial year"
     }
   },
   "important_dates": {
@@ -324,7 +326,7 @@
       "earliest_date_invalid": "Enter a valid earliest date the project can start",
       "earliest_date_in_past": "You cannot enter a date in the past for the earliest date the project can start",
       "earliest_date_before_financial_start": "The earliest date the project can start must be after {{financialYearStart}}",
-      "earliest_date_after_obc_start": "The earliest date the project can start must be before or on {{obcStartDate}}"
+      "earliest_date_after_obc_start": "The earliest date the project can start must be before {{obcStartDate}}"
     }
   },
   "project_benefit_area": {
@@ -927,7 +929,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "woodland": {
@@ -952,7 +956,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "wet_woodland": {
@@ -977,7 +983,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "wetland_or_wet_grassland": {
@@ -1002,7 +1010,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "grassland": {
@@ -1027,7 +1037,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "heathland": {
@@ -1052,7 +1064,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "ponds_lakes": {
@@ -1077,7 +1091,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "arable_land": {
@@ -1102,7 +1118,9 @@
       "suffix": "ha",
       "validation": {
         "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must include the number of hectares your project will create."
+        "invalid": "You must enter a valid number for hectares.",
+        "min": "The number of hectares must be greater than 0.",
+        "precision": "The number of hectares must have no more than 2 decimal places."
       }
     },
     "comprehensive_restoration": {
@@ -1127,7 +1145,9 @@
       "suffix": "km",
       "validation": {
         "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must include the number of kilometres your project will create."
+        "invalid": "You must enter a valid number for kilometres.",
+        "min": "The number of kilometres must be greater than 0.",
+        "precision": "The number of kilometres must have no more than 2 decimal places."
       }
     },
     "partial_restoration": {
@@ -1152,7 +1172,9 @@
       "suffix": "km",
       "validation": {
         "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must include the number of kilometres your project will create."
+        "invalid": "You must enter a valid number for kilometres.",
+        "min": "The number of kilometres must be greater than 0.",
+        "precision": "The number of kilometres must have no more than 2 decimal places."
       }
     },
     "create_habitat_watercourse": {
@@ -1177,7 +1199,9 @@
       "suffix": "km",
       "validation": {
         "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must include the number of kilometres your project will create."
+        "invalid": "You must enter a valid number for kilometres.",
+        "min": "The number of kilometres must be greater than 0.",
+        "precision": "The number of kilometres must have no more than 2 decimal places."
       }
     },
     "footer": {
