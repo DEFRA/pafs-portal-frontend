@@ -1,8 +1,75 @@
 import {
+  NFM_LAND_TYPES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_STEPS,
   NFM_MEASURES
 } from '../../../../common/constants/projects.js'
+
+/**
+ * Config mapping each land-use type to its before/after payload fields.
+ * Used to clear and process land-use data generically.
+ */
+const LAND_TYPE_FIELD_CONFIG = [
+  {
+    landType: NFM_LAND_TYPES.ENCLOSED_ARABLE_FARMLAND,
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND
+  },
+  {
+    landType: NFM_LAND_TYPES.ENCLOSED_LIVESTOCK_FARMLAND,
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND
+  },
+  {
+    landType: NFM_LAND_TYPES.ENCLOSED_DAIRYING_FARMLAND,
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND
+  },
+  {
+    landType: NFM_LAND_TYPES.SEMI_NATURAL_GRASSLAND,
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_SEMI_NATURAL_GRASSLAND
+  },
+  {
+    landType: NFM_LAND_TYPES.WOODLAND,
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_WOODLAND
+  },
+  {
+    landType: NFM_LAND_TYPES.MOUNTAIN_MOORS_AND_HEATH,
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH
+  },
+  {
+    landType: NFM_LAND_TYPES.PEATLAND_RESTORATION,
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_PEATLAND_RESTORATION
+  },
+  {
+    landType: NFM_LAND_TYPES.RIVERS_WETLANDS_FRESHWATER_HABITATS,
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER
+  },
+  {
+    landType: NFM_LAND_TYPES.COASTAL_MARGINS,
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_COASTAL_MARGINS
+  }
+]
+
+/** Quick lookup from step → field config */
+const STEP_TO_LAND_TYPE_FIELD_CONFIG = Object.fromEntries(
+  LAND_TYPE_FIELD_CONFIG.map((c) => [c.step, c])
+)
 
 /**
  * Convert empty string to null
@@ -94,6 +161,19 @@ function clearSandDuneData(payload) {
 }
 
 /**
+ * Clear land-use detail data for a given land type from payload
+ * @param {Object} payload - Request payload
+ * @param {string} landType - NFM_LAND_TYPES value
+ */
+function clearLandUseDetailData(payload, landType) {
+  const config = LAND_TYPE_FIELD_CONFIG.find((c) => c.landType === landType)
+  if (config) {
+    payload[config.beforeField] = null
+    payload[config.afterField] = null
+  }
+}
+
+/**
  * Normalize NFM measures payload - convert to array if needed
  * @param {string|Array} measures - Measures as string or array
  * @returns {Array} Normalized array of measures
@@ -179,6 +259,22 @@ function processSelectedMeasures(payload, sessionData) {
   // Convert array to comma-separated string for backend and session
   const measuresString = newMeasures.join(',')
   payload[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES] = measuresString
+}
+
+function processLandUseChange(payload, sessionData) {
+  const newLandTypes = normalizeNfmMeasuresPayload(payload.nfmLandUseChange)
+  const previousLandTypes = normalizeNfmMeasuresPayload(
+    sessionData?.[PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]
+  )
+
+  // Clear data for any land types that have been deselected
+  previousLandTypes.forEach((landType) => {
+    if (!newLandTypes.includes(landType)) {
+      clearLandUseDetailData(payload, landType)
+    }
+  })
+
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE] = newLandTypes.join(',')
 }
 
 /**
@@ -269,47 +365,50 @@ function processSandDune(payload) {
 }
 
 /**
+ * Process land-use detail payload for any land type step.
+ * Converts before/after string values to floats.
+ * @param {Object} payload - Request payload
+ * @param {string} step - Current project step
+ */
+function processLandUseDetailData(payload, step) {
+  const config = STEP_TO_LAND_TYPE_FIELD_CONFIG[step]
+  if (!config) {
+    return
+  }
+  payload[config.beforeField] = parseToFloat(payload[config.beforeField])
+  payload[config.afterField] = parseToFloat(payload[config.afterField])
+}
+
+/**
  * Process and normalize payload based on step
  * @param {string} step - Current project step
  * @param {Object} payload - Request payload
  * @param {Object} sessionData - Session data for comparison (optional)
  */
 export function processPayload(step, payload, sessionData) {
-  switch (step) {
-    case PROJECT_STEPS.NFM_SELECTED_MEASURES:
-      processSelectedMeasures(payload, sessionData)
-      break
+  const measureHandlers = {
+    [PROJECT_STEPS.NFM_SELECTED_MEASURES]: () =>
+      processSelectedMeasures(payload, sessionData),
+    [PROJECT_STEPS.NFM_RIVER_RESTORATION]: () =>
+      processRiverRestoration(payload),
+    [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: () => processLeakyBarriers(payload),
+    [PROJECT_STEPS.NFM_OFFLINE_STORAGE]: () => processOfflineStorage(payload),
+    [PROJECT_STEPS.NFM_WOODLAND]: () => processWoodland(payload),
+    [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]: () =>
+      processRunoffManagement(payload),
+    [PROJECT_STEPS.NFM_SALTMARSH]: () => processSaltmarsh(payload),
+    [PROJECT_STEPS.NFM_SAND_DUNE]: () => processSandDune(payload),
+    [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: () =>
+      processLandUseChange(payload, sessionData)
+  }
 
-    case PROJECT_STEPS.NFM_RIVER_RESTORATION:
-      processRiverRestoration(payload)
-      break
+  if (step in measureHandlers) {
+    measureHandlers[step]()
+    return
+  }
 
-    case PROJECT_STEPS.NFM_LEAKY_BARRIERS:
-      processLeakyBarriers(payload)
-      break
-
-    case PROJECT_STEPS.NFM_OFFLINE_STORAGE:
-      processOfflineStorage(payload)
-      break
-
-    case PROJECT_STEPS.NFM_WOODLAND:
-      processWoodland(payload)
-      break
-
-    case PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT:
-      processRunoffManagement(payload)
-      break
-
-    case PROJECT_STEPS.NFM_SALTMARSH:
-      processSaltmarsh(payload)
-      break
-
-    case PROJECT_STEPS.NFM_SAND_DUNE:
-      processSandDune(payload)
-      break
-
-    // Add more cases for other NFM steps here
-    default:
-      break
+  // All land-use detail steps use the generic handler
+  if (step in STEP_TO_LAND_TYPE_FIELD_CONFIG) {
+    processLandUseDetailData(payload, step)
   }
 }

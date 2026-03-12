@@ -6,6 +6,16 @@ import {
   nfmOfflineStorageSchema,
   nfmRiverRestorationSchema,
   nfmRunoffManagementSchema,
+  nfmLandUseChangeSchema,
+  nfmLandUseEnclosedArableFarmlandSchema,
+  nfmLandUseEnclosedLivestockFarmlandSchema,
+  nfmLandUseEnclosedDairyingFarmlandSchema,
+  nfmLandUseSemiNaturalGrasslandSchema,
+  nfmLandUseWoodlandSchema,
+  nfmLandUseMountainMoorsAndHeathSchema,
+  nfmLandUsePeatlandRestorationSchema,
+  nfmLandUseRiversWetlandsFreshwaterSchema,
+  nfmLandUseCoastalMarginsSchema,
   nfmSaltmarshSchema,
   nfmSandDuneSchema,
   nfmSelectedMeasuresSchema,
@@ -96,6 +106,95 @@ export const NFM_CONFIG = {
     },
     schema: nfmSandDuneSchema,
     fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: {
+    localKeyPrefix: 'projects.nfm.land_use_change',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseChangeSchema,
+    fieldType: 'checkbox'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND]: {
+    localKeyPrefix: 'projects.nfm.land_use.enclosed_arable_farmland',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseEnclosedArableFarmlandSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND]: {
+    localKeyPrefix: 'projects.nfm.land_use.enclosed_livestock_farmland',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseEnclosedLivestockFarmlandSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND]: {
+    localKeyPrefix: 'projects.nfm.land_use.enclosed_dairying_farmland',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseEnclosedDairyingFarmlandSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_SEMI_NATURAL_GRASSLAND]: {
+    localKeyPrefix: 'projects.nfm.land_use.semi_natural_grassland',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseSemiNaturalGrasslandSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_WOODLAND]: {
+    localKeyPrefix: 'projects.nfm.land_use.woodland',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseWoodlandSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH]: {
+    localKeyPrefix: 'projects.nfm.land_use.mountain_moors_and_heath',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseMountainMoorsAndHeathSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_PEATLAND_RESTORATION]: {
+    localKeyPrefix: 'projects.nfm.land_use.peatland_restoration',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUsePeatlandRestorationSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER]: {
+    localKeyPrefix: 'projects.nfm.land_use.rivers_wetlands_freshwater_habitats',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseRiversWetlandsFreshwaterSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_COASTAL_MARGINS]: {
+    localKeyPrefix: 'projects.nfm.land_use.coastal_margins',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseCoastalMarginsSchema,
+    fieldType: 'input'
   }
-  // Add more NFM steps here as needed
 }

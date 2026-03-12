@@ -75,7 +75,22 @@ export const PROJECT_STEPS = {
   NFM_HEADWATER_DRAINAGE: 'nfm-headwater-drainage',
   NFM_RUNOFF_MANAGEMENT: 'nfm-runoff-management',
   NFM_SALTMARSH: 'nfm-saltmarsh',
-  NFM_SAND_DUNE: 'nfm-sand-dune'
+  NFM_SAND_DUNE: 'nfm-sand-dune',
+  NFM_LAND_USE_CHANGE: 'nfm-land-use-change',
+  NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND:
+    'nfm-land-use-enclosed-arable-farmland',
+  NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND:
+    'nfm-land-use-enclosed-livestock-farmland',
+  NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND:
+    'nfm-land-use-enclosed-dairying-farmland',
+  NFM_LAND_USE_SEMI_NATURAL_GRASSLAND: 'nfm-land-use-semi-natural-grassland',
+  NFM_LAND_USE_WOODLAND: 'nfm-land-use-woodland',
+  NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH:
+    'nfm-land-use-mountain-moors-and-heath',
+  NFM_LAND_USE_PEATLAND_RESTORATION: 'nfm-land-use-peatland-restoration',
+  NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER:
+    'nfm-land-use-rivers-wetlands-freshwater-habitats',
+  NFM_LAND_USE_COASTAL_MARGINS: 'nfm-land-use-coastal-margins'
 }
 
 export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'
@@ -188,7 +203,26 @@ export const PROJECT_PAYLOAD_FIELDS = {
   NFM_SALTMARSH_AREA: 'nfmSaltmarshArea',
   NFM_SALTMARSH_LENGTH: 'nfmSaltmarshLength',
   NFM_SAND_DUNE_AREA: 'nfmSandDuneArea',
-  NFM_SAND_DUNE_LENGTH: 'nfmSandDuneLength'
+  NFM_SAND_DUNE_LENGTH: 'nfmSandDuneLength',
+  NFM_LAND_USE_CHANGE: 'nfmLandUseChange',
+  NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE: 'nfmEnclosedArableFarmlandBefore',
+  NFM_ENCLOSED_ARABLE_FARMLAND_AFTER: 'nfmEnclosedArableFarmlandAfter',
+  NFM_ENCLOSED_LIVESTOCK_FARMLAND_BEFORE: 'nfmEnclosedLivestockFarmlandBefore',
+  NFM_ENCLOSED_LIVESTOCK_FARMLAND_AFTER: 'nfmEnclosedLivestockFarmlandAfter',
+  NFM_ENCLOSED_DAIRYING_FARMLAND_BEFORE: 'nfmEnclosedDairyingFarmlandBefore',
+  NFM_ENCLOSED_DAIRYING_FARMLAND_AFTER: 'nfmEnclosedDairyingFarmlandAfter',
+  NFM_SEMI_NATURAL_GRASSLAND_BEFORE: 'nfmSemiNaturalGrasslandBefore',
+  NFM_SEMI_NATURAL_GRASSLAND_AFTER: 'nfmSemiNaturalGrasslandAfter',
+  NFM_WOODLAND_LAND_USE_BEFORE: 'nfmWoodlandLandUseBefore',
+  NFM_WOODLAND_LAND_USE_AFTER: 'nfmWoodlandLandUseAfter',
+  NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE: 'nfmMountainMoorsAndHeathBefore',
+  NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER: 'nfmMountainMoorsAndHeathAfter',
+  NFM_PEATLAND_RESTORATION_BEFORE: 'nfmPeatlandRestorationBefore',
+  NFM_PEATLAND_RESTORATION_AFTER: 'nfmPeatlandRestorationAfter',
+  NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE: 'nfmRiversWetlandsFreshwaterBefore',
+  NFM_RIVERS_WETLANDS_FRESHWATER_AFTER: 'nfmRiversWetlandsFreshwaterAfter',
+  NFM_COASTAL_MARGINS_BEFORE: 'nfmCoastalMarginsBefore',
+  NFM_COASTAL_MARGINS_AFTER: 'nfmCoastalMarginsAfter'
 }
 
 export const PROJECT_PAYLOAD_LEVELS = {
@@ -263,7 +297,35 @@ export const PROJECT_PAYLOAD_LEVELS = {
   NFM_HEADWATER_DRAINAGE: 'NFM_HEADWATER_DRAINAGE',
   NFM_RUNOFF_MANAGEMENT: 'NFM_RUNOFF_MANAGEMENT',
   NFM_SALTMARSH: 'NFM_SALTMARSH',
-  NFM_SAND_DUNE: 'NFM_SAND_DUNE'
+  NFM_SAND_DUNE: 'NFM_SAND_DUNE',
+  NFM_LAND_USE_CHANGE: 'NFM_LAND_USE_CHANGE',
+  NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND:
+    'NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND',
+  NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND:
+    'NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND',
+  NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND:
+    'NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND',
+  NFM_LAND_USE_SEMI_NATURAL_GRASSLAND: 'NFM_LAND_USE_SEMI_NATURAL_GRASSLAND',
+  NFM_LAND_USE_WOODLAND: 'NFM_LAND_USE_WOODLAND',
+  NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH:
+    'NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH',
+  NFM_LAND_USE_PEATLAND_RESTORATION: 'NFM_LAND_USE_PEATLAND_RESTORATION',
+  NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER:
+    'NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER',
+  NFM_LAND_USE_COASTAL_MARGINS: 'NFM_LAND_USE_COASTAL_MARGINS'
+}
+
+export const NFM_LAND_TYPES = {
+  ENCLOSED_ARABLE_FARMLAND: 'enclosed_arable_farmland',
+  ENCLOSED_LIVESTOCK_FARMLAND: 'enclosed_livestock_farmland',
+  ENCLOSED_DAIRYING_FARMLAND: 'enclosed_dairying_farmland',
+  SEMI_NATURAL_GRASSLAND: 'semi_natural_grassland',
+  WOODLAND: 'woodland',
+  MOUNTAIN_MOORS_AND_HEATH: 'mountain_moors_and_heath',
+  PEATLAND_RESTORATION: 'peatland_restoration',
+  RIVERS_WETLANDS_FRESHWATER_HABITATS:
+    'rivers_wetlands_and_freshwater_habitats',
+  COASTAL_MARGINS: 'coastal_margins'
 }
 
 export const PROJECT_TYPES = {

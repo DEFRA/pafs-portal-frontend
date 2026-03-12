@@ -89,20 +89,23 @@ describe('NFM Controller', () => {
       test('should build view data with correct configuration', async () => {
         await nfmController.getHandler(mockRequest, mockH)
 
-        expect(buildViewData).toHaveBeenCalledWith(mockRequest, {
-          localKeyPrefix: 'projects.nfm.selected_measures',
-          backLinkOptions: {
-            targetEditURL: '/project/{referenceNumber}',
-            conditionalRedirect: false
-          },
-          additionalData: {
-            step: PROJECT_STEPS.NFM_SELECTED_MEASURES,
-            projectSteps: PROJECT_STEPS,
-            fieldType: 'checkbox',
-            nfmMeasureOptions: expect.any(Array),
-            columnWidth: 'full'
-          }
-        })
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            localKeyPrefix: 'projects.nfm.selected_measures',
+            backLinkOptions: {
+              targetEditURL: '/project/{referenceNumber}',
+              conditionalRedirect: false
+            },
+            additionalData: expect.objectContaining({
+              step: PROJECT_STEPS.NFM_SELECTED_MEASURES,
+              projectSteps: PROJECT_STEPS,
+              fieldType: 'checkbox',
+              nfmMeasureOptions: expect.any(Array),
+              columnWidth: 'full'
+            })
+          })
+        )
       })
 
       test('should include all 8 NFM measure options', async () => {

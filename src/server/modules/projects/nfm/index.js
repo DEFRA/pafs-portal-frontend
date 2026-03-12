@@ -28,72 +28,128 @@ const createRoutePair = (path, preHandlers, controller) => [
   }
 ]
 
+const createEditPreHandlers = () => [
+  { method: requireAuth },
+  { method: fetchProjectForEdit },
+  { method: initializeEditSessionPreHandler },
+  { method: requireNfmOrSudIntervention }
+]
+
+const createMeasureEditPreHandlers = () => [
+  ...createEditPreHandlers(),
+  { method: requireSelectedMeasure }
+]
+
+const getNfmMeasureRoutes = (editPreHandlers, measureEditPreHandlers) => [
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
+    measureEditPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
+    measureEditPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
+    measureEditPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.WOODLAND,
+    measureEditPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE,
+    measureEditPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.RUNOFF_MANAGEMENT,
+    measureEditPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.SALTMARSH,
+    measureEditPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
+    measureEditPreHandlers,
+    nfmController
+  )
+]
+
+const getNfmLandUseRoutes = (editPreHandlers) => [
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_ENCLOSED_ARABLE_FARMLAND,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_ENCLOSED_DAIRYING_FARMLAND,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_SEMI_NATURAL_GRASSLAND,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_MOUNTAIN_MOORS_AND_HEATH,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_PEATLAND_RESTORATION,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_RIVERS_WETLANDS_FRESHWATER,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_COASTAL_MARGINS,
+    editPreHandlers,
+    nfmController
+  )
+]
+
 export const projectNfm = {
   plugin: {
     name: 'Project - NFM',
     register(server) {
-      const editPreHandlers = [
-        { method: requireAuth },
-        { method: fetchProjectForEdit },
-        { method: initializeEditSessionPreHandler },
-        { method: requireNfmOrSudIntervention }
-      ]
-
-      // Pre-handlers for measure-specific pages (includes measure selection check)
-      const measureEditPreHandlers = [
-        { method: requireAuth },
-        { method: fetchProjectForEdit },
-        { method: initializeEditSessionPreHandler },
-        { method: requireNfmOrSudIntervention },
-        { method: requireSelectedMeasure }
-      ]
-
+      const editPreHandlers = createEditPreHandlers()
+      const measureEditPreHandlers = createMeasureEditPreHandlers()
       server.route([
-        ...createRoutePair(
-          ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
-          editPreHandlers,
-          nfmController
-        ),
-        ...createRoutePair(
-          ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
-          measureEditPreHandlers,
-          nfmController
-        ),
-        ...createRoutePair(
-          ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
-          measureEditPreHandlers,
-          nfmController
-        ),
-        ...createRoutePair(
-          ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
-          measureEditPreHandlers,
-          nfmController
-        ),
-        ...createRoutePair(
-          ROUTES.PROJECT.EDIT.NFM.WOODLAND,
-          measureEditPreHandlers,
-          nfmController
-        ),
-        ...createRoutePair(
-          ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE,
-          measureEditPreHandlers,
-          nfmController
-        ),
-        ...createRoutePair(
-          ROUTES.PROJECT.EDIT.NFM.RUNOFF_MANAGEMENT,
-          measureEditPreHandlers,
-          nfmController
-        ),
-        ...createRoutePair(
-          ROUTES.PROJECT.EDIT.NFM.SALTMARSH,
-          measureEditPreHandlers,
-          nfmController
-        ),
-        ...createRoutePair(
-          ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
-          measureEditPreHandlers,
-          nfmController
-        )
+        ...getNfmMeasureRoutes(editPreHandlers, measureEditPreHandlers),
+        ...getNfmLandUseRoutes(editPreHandlers)
       ])
     }
   }

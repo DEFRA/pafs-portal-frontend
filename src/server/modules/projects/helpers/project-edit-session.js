@@ -91,6 +91,85 @@ function mapNfmMeasuresToFields(nfmMeasures) {
   return mappedFields
 }
 
+function mapNfmLandUseChangesToFields(nfmLandUseChanges) {
+  const mappedFields = {}
+
+  if (!Array.isArray(nfmLandUseChanges)) {
+    return mappedFields
+  }
+
+  const LAND_USE_FIELD_MAPPINGS = [
+    {
+      landUseType: 'enclosed_arable_farmland',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER
+    },
+    {
+      landUseType: 'enclosed_livestock_farmland',
+      beforeField:
+        PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_AFTER
+    },
+    {
+      landUseType: 'enclosed_dairying_farmland',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_AFTER
+    },
+    {
+      landUseType: 'semi_natural_grassland',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_AFTER
+    },
+    {
+      landUseType: 'woodland',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
+    },
+    {
+      landUseType: 'mountain_moors_and_heath',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
+    },
+    {
+      landUseType: 'peatland_restoration',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_AFTER
+    },
+    {
+      landUseType: 'rivers_wetlands_and_freshwater_habitats',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER
+    },
+    {
+      landUseType: 'coastal_margins',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER
+    }
+  ]
+
+  LAND_USE_FIELD_MAPPINGS.forEach(
+    ({ landUseType, beforeField, afterField }) => {
+      const landUseChange = nfmLandUseChanges.find(
+        (item) => item?.landUseType === landUseType
+      )
+
+      if (!landUseChange) {
+        return
+      }
+
+      if (hasValue(landUseChange.areaBeforeHectares)) {
+        mappedFields[beforeField] = landUseChange.areaBeforeHectares
+      }
+
+      if (hasValue(landUseChange.areaAfterHectares)) {
+        mappedFields[afterField] = landUseChange.areaAfterHectares
+      }
+    }
+  )
+
+  return mappedFields
+}
+
 /**
  * Compare two values for equality, handling arrays, strings, and numbers
  * @param {*} value1 - First value
@@ -129,16 +208,21 @@ function areValuesEqual(value1, value2) {
 export function initializeEditSession(request, projectData) {
   // Map NFM measures from backend format to frontend fields
   const nfmFields = mapNfmMeasuresToFields(projectData.pafs_core_nfm_measures)
+  const nfmLandUseFields = mapNfmLandUseChangesToFields(
+    projectData.pafs_core_nfm_land_use_changes
+  )
 
   const sessionData = {
     ...projectData,
     ...nfmFields, // Merge the mapped NFM fields
+    ...nfmLandUseFields,
     journeyStarted: true,
     isEdit: true,
     referenceNumber: projectData.referenceNumber,
     originalData: {
       ...projectData,
-      ...nfmFields // Store mapped NFM fields in originalData too
+      ...nfmFields, // Store mapped NFM fields in originalData too
+      ...nfmLandUseFields
     }
   }
 

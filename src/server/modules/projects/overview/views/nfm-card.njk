@@ -20,27 +20,7 @@
         </ul>
       </div>
       <div class="govuk-summary-card__content">
-        {% if hasNfmData %}
-          <dl class="govuk-summary-list">
-            <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">
-                {{ t('projects.overview.nfm_summary_card.selected_measures') }}
-              </dt>
-              <dd class="govuk-summary-list__value">
-                {% if projectData[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES] %}
-                  {% set measures = projectData[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES].split(',') if projectData[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES] is string else projectData[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES] %}
-                  <ul class="govuk-list govuk-list--bullet">
-                    {% for measure in measures %}
-                      <li>{{ t('projects.nfm.selected_measures.options.' + measure) }}</li>
-                    {% endfor %}
-                  </ul>
-                {% else %}
-                  {{ t('projects.overview.common.not_provided') }}
-                {% endif %}
-              </dd>
-            </div>
-          </dl>
-          
+        {% if hasNfmData %}  
           {# NFM Measures Details Table #}
           {% if projectData.pafs_core_nfm_measures and projectData.pafs_core_nfm_measures.length > 0 %}
             <details class="govuk-details govuk-!-margin-top-6">
@@ -77,6 +57,43 @@
                         </td>
                         <td class="govuk-table__cell">
                           {% if measure.widthM %}{{ measure.widthM }} m{% else %}-{% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          {% endif %}
+
+          {# NFM Land Use Changes Table #}
+          {% if projectData.pafs_core_nfm_land_use_changes and projectData.pafs_core_nfm_land_use_changes.length > 0 %}
+            <details class="govuk-details govuk-!-margin-top-4">
+              <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                  Land use changes ({{ projectData.pafs_core_nfm_land_use_changes.length }})
+                </span>
+              </summary>
+              <div class="govuk-details__text">
+                <table class="govuk-table">
+                  <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.land_use_changes_table.land_use_type') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.land_use_changes_table.area_before') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.land_use_changes_table.area_after') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="govuk-table__body">
+                    {% for landUse in projectData.pafs_core_nfm_land_use_changes %}
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">
+                          {{ t('projects.nfm.land_use_change.options.' + landUse.landUseType) }}
+                        </th>
+                        <td class="govuk-table__cell">
+                          {% if landUse.areaBeforeHectares %}{{ landUse.areaBeforeHectares }} ha{% else %}-{% endif %}
+                        </td>
+                        <td class="govuk-table__cell">
+                          {% if landUse.areaAfterHectares %}{{ landUse.areaAfterHectares }} ha{% else %}-{% endif %}
                         </td>
                       </tr>
                     {% endfor %}

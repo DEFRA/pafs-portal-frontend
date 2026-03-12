@@ -16,5 +16,15 @@ export {
   nfmHeadwaterDrainageSchema,
   nfmRunoffManagementSchema,
   nfmSaltmarshSchema,
-  nfmSandDuneSchema
+  nfmSandDuneSchema,
+  nfmLandUseChangeSchema,
+  nfmLandUseEnclosedArableFarmlandSchema,
+  nfmLandUseEnclosedLivestockFarmlandSchema,
+  nfmLandUseEnclosedDairyingFarmlandSchema,
+  nfmLandUseSemiNaturalGrasslandSchema,
+  nfmLandUseWoodlandSchema,
+  nfmLandUseMountainMoorsAndHeathSchema,
+  nfmLandUsePeatlandRestorationSchema,
+  nfmLandUseRiversWetlandsFreshwaterSchema,
+  nfmLandUseCoastalMarginsSchema
 } from '../schemas/nfm-schemas.js'

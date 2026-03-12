@@ -56,7 +56,11 @@ export const PROJECT_VIEWS = {
   NFM_HEADWATER_DRAINAGE: 'modules/projects/nfm/headwater-drainage',
   NFM_RUNOFF_MANAGEMENT: 'modules/projects/nfm/runoff-management',
   NFM_SALTMARSH: 'modules/projects/nfm/saltmarsh',
-  NFM_SAND_DUNE: 'modules/projects/nfm/sand-dune'
+  NFM_SAND_DUNE: 'modules/projects/nfm/sand-dune',
+  NFM_LAND_USE_CHANGE: 'modules/projects/nfm/land-use-change',
+  NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND:
+    'modules/projects/nfm/land-use-enclosed-arable-farmland',
+  NFM_LAND_USE_DETAIL: 'modules/projects/nfm/land-use-detail'
 }
 
 export const GENERAL_VIEWS = {

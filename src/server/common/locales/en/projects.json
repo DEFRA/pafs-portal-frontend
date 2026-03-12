@@ -152,6 +152,11 @@
         "length": "Length",
         "width": "Width",
         "actions": "Actions"
+      },
+      "land_use_changes_table": {
+        "land_use_type": "Land use type",
+        "area_before": "Area before (ha)",
+        "area_after": "Area after (ha)"
       }
     }
   },
@@ -577,6 +582,105 @@
       "length": {
         "label": "Length",
         "hint": "If known"
+      }
+    },
+    "land_use_change": {
+      "title": "Tell us what the land use in your project area will be before and after your natural flood measures project",
+      "hint": "Select all that apply",
+      "error": "Select at least one land type",
+      "options": {
+        "enclosed_arable_farmland": "Enclosed arable farmland",
+        "enclosed_livestock_farmland": "Enclosed livestock farmland",
+        "enclosed_dairying_farmland": "Enclosed dairying farmland",
+        "semi_natural_grassland": "Semi-natural grassland",
+        "woodland": "Woodland",
+        "mountain_moors_and_heath": "Mountain moors and heath",
+        "peatland_restoration": "Peatland restoration",
+        "rivers_wetlands_and_freshwater_habitats": "Rivers, wetlands, and freshwater habitats",
+        "coastal_margins": "Coastal margins"
+      }
+    },
+    "land_use": {
+      "enclosed_arable_farmland": {
+        "title": "What is the area of Enclosed arable farmland?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        }
+      },
+      "enclosed_livestock_farmland": {
+        "title": "What is the area of Enclosed livestock farmland?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        }
+      },
+      "enclosed_dairying_farmland": {
+        "title": "What is the area of Enclosed dairying farmland?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        }
+      },
+      "semi_natural_grassland": {
+        "title": "What is the area of Semi-natural grassland?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        }
+      },
+      "woodland": {
+        "title": "What is the area of Woodland?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        }
+      },
+      "mountain_moors_and_heath": {
+        "title": "What is the area of Mountain moors and heath?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        }
+      },
+      "peatland_restoration": {
+        "title": "What is the area of Peatland restoration?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        }
+      },
+      "rivers_wetlands_freshwater_habitats": {
+        "title": "What is the area of Rivers, wetlands, and freshwater habitats?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        }
+      },
+      "coastal_margins": {
+        "title": "What is the area of Coastal margins?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        }
       }
     }
   },

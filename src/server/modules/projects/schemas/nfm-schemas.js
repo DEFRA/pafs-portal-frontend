@@ -8,6 +8,7 @@
 
 import Joi from 'joi'
 import {
+  NFM_LAND_TYPES,
   NFM_MEASURES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_VALIDATION_MESSAGES
@@ -18,6 +19,7 @@ const MSG_AREA_POSITIVE = 'Area must be a positive number'
 const MSG_AREA_POSITIVE_2DP =
   'Area must be a positive number with up to 2 decimal places'
 const MSG_AREA_PRECISION_2DP = 'Area must have up to 2 decimal places'
+const MSG_AREA_NON_NEGATIVE = 'Area must be a number 0 or greater'
 
 const MSG_VOLUME_POSITIVE_2DP =
   'Volume must be a positive number with up to 2 decimal places'
@@ -264,3 +266,98 @@ export const nfmSandDuneSchema = Joi.object({
       'number.precision': MSG_LENGTH_PRECISION_2DP
     })
 }).unknown(true)
+
+/**
+ * NFM Land Use Change Schema
+ * Validates land use types selection after NFM measures
+ */
+export const nfmLandUseChangeSchema = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: Joi.array()
+    .items(Joi.string().valid(...Object.values(NFM_LAND_TYPES)))
+    .min(1)
+    .required()
+    .messages({
+      'array.min': 'Select at least one land type',
+      'any.required': 'Select at least one land type',
+      'array.includesRequiredUnknowns': 'Select at least one land type'
+    })
+}).unknown(true)
+
+/**
+ * NFM Land Use Enclosed Arable Farmland Schema
+ * Validates before/after area values
+ */
+/**
+ * Helper: creates a land-use detail Joi schema for a given before/after field pair
+ */
+const createLandUseDetailSchema = (beforeField, afterField) =>
+  Joi.object({
+    [beforeField]: Joi.number()
+      .positive()
+      .custom(maxTwoDecimalPlaces)
+      .required()
+      .messages({
+        'number.base': MSG_AREA_NON_NEGATIVE,
+        'number.positive': MSG_AREA_NON_NEGATIVE,
+        'number.precision': MSG_AREA_PRECISION_2DP,
+        'any.required': 'Enter the area before natural flood measures'
+      }),
+    [afterField]: Joi.number()
+      .positive()
+      .custom(maxTwoDecimalPlaces)
+      .required()
+      .messages({
+        'number.base': MSG_AREA_NON_NEGATIVE,
+        'number.positive': MSG_AREA_NON_NEGATIVE,
+        'number.precision': MSG_AREA_PRECISION_2DP,
+        'any.required': 'Enter the area after natural flood measures'
+      })
+  }).unknown(true)
+
+export const nfmLandUseEnclosedArableFarmlandSchema = createLandUseDetailSchema(
+  PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
+  PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER
+)
+
+export const nfmLandUseEnclosedLivestockFarmlandSchema =
+  createLandUseDetailSchema(
+    PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_BEFORE,
+    PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_AFTER
+  )
+
+export const nfmLandUseEnclosedDairyingFarmlandSchema =
+  createLandUseDetailSchema(
+    PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_BEFORE,
+    PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_AFTER
+  )
+
+export const nfmLandUseSemiNaturalGrasslandSchema = createLandUseDetailSchema(
+  PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_BEFORE,
+  PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_AFTER
+)
+
+export const nfmLandUseWoodlandSchema = createLandUseDetailSchema(
+  PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE,
+  PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
+)
+
+export const nfmLandUseMountainMoorsAndHeathSchema = createLandUseDetailSchema(
+  PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
+  PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
+)
+
+export const nfmLandUsePeatlandRestorationSchema = createLandUseDetailSchema(
+  PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_BEFORE,
+  PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_AFTER
+)
+
+export const nfmLandUseRiversWetlandsFreshwaterSchema =
+  createLandUseDetailSchema(
+    PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
+    PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER
+  )
+
+export const nfmLandUseCoastalMarginsSchema = createLandUseDetailSchema(
+  PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE,
+  PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER
+)

@@ -1,6 +1,8 @@
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
+  NFM_LAND_TYPES,
   NFM_MEASURES,
+  PROJECT_PAYLOAD_FIELDS,
   PROJECT_PAYLOAD_LEVELS,
   PROJECT_STEPS
 } from '../../../common/constants/projects.js'
@@ -37,8 +39,74 @@ const PAYLOAD_LEVEL_MAP = {
   [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]:
     PROJECT_PAYLOAD_LEVELS.NFM_RUNOFF_MANAGEMENT,
   [PROJECT_STEPS.NFM_SALTMARSH]: PROJECT_PAYLOAD_LEVELS.NFM_SALTMARSH,
-  [PROJECT_STEPS.NFM_SAND_DUNE]: PROJECT_PAYLOAD_LEVELS.NFM_SAND_DUNE
+  [PROJECT_STEPS.NFM_SAND_DUNE]: PROJECT_PAYLOAD_LEVELS.NFM_SAND_DUNE,
+  [PROJECT_STEPS.NFM_LAND_USE_CHANGE]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_CHANGE,
+  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND,
+  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND,
+  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND,
+  [PROJECT_STEPS.NFM_LAND_USE_SEMI_NATURAL_GRASSLAND]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_SEMI_NATURAL_GRASSLAND,
+  [PROJECT_STEPS.NFM_LAND_USE_WOODLAND]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_WOODLAND,
+  [PROJECT_STEPS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH,
+  [PROJECT_STEPS.NFM_LAND_USE_PEATLAND_RESTORATION]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_PEATLAND_RESTORATION,
+  [PROJECT_STEPS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER,
+  [PROJECT_STEPS.NFM_LAND_USE_COASTAL_MARGINS]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_COASTAL_MARGINS
   // Add more NFM steps here as needed
+}
+
+/**
+ * Maps each land-use detail step to its before/after field names
+ * Used by the generic land-use-detail template
+ */
+const LAND_USE_DETAIL_FIELD_CONFIG = {
+  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND]: {
+    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
+    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND]: {
+    beforeFieldName:
+      PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_BEFORE,
+    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_AFTER
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND]: {
+    beforeFieldName:
+      PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_BEFORE,
+    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_AFTER
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_SEMI_NATURAL_GRASSLAND]: {
+    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_BEFORE,
+    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_AFTER
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_WOODLAND]: {
+    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE,
+    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH]: {
+    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
+    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_PEATLAND_RESTORATION]: {
+    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_BEFORE,
+    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_AFTER
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER]: {
+    beforeFieldName:
+      PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
+    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_COASTAL_MARGINS]: {
+    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE,
+    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER
+  }
 }
 
 /**
@@ -91,6 +159,52 @@ class NfmController {
     ]
   }
 
+  _getNfmLandUseOptions(request) {
+    const localKeyPrefix = 'projects.nfm.land_use_change'
+    return [
+      {
+        text: request.t(`${localKeyPrefix}.options.enclosed_arable_farmland`),
+        value: NFM_LAND_TYPES.ENCLOSED_ARABLE_FARMLAND
+      },
+      {
+        text: request.t(
+          `${localKeyPrefix}.options.enclosed_livestock_farmland`
+        ),
+        value: NFM_LAND_TYPES.ENCLOSED_LIVESTOCK_FARMLAND
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.enclosed_dairying_farmland`),
+        value: NFM_LAND_TYPES.ENCLOSED_DAIRYING_FARMLAND
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.semi_natural_grassland`),
+        value: NFM_LAND_TYPES.SEMI_NATURAL_GRASSLAND
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.woodland`),
+        value: NFM_LAND_TYPES.WOODLAND
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.mountain_moors_and_heath`),
+        value: NFM_LAND_TYPES.MOUNTAIN_MOORS_AND_HEATH
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.peatland_restoration`),
+        value: NFM_LAND_TYPES.PEATLAND_RESTORATION
+      },
+      {
+        text: request.t(
+          `${localKeyPrefix}.options.rivers_wetlands_and_freshwater_habitats`
+        ),
+        value: NFM_LAND_TYPES.RIVERS_WETLANDS_FRESHWATER_HABITATS
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.coastal_margins`),
+        value: NFM_LAND_TYPES.COASTAL_MARGINS
+      }
+    ]
+  }
+
   _getViewData(request) {
     const step = getProjectStep(request)
     const config = this._getConfig(step)
@@ -103,12 +217,18 @@ class NfmController {
       backLinkOptions = dynamicBackLink
     }
 
+    const landUseFieldConfig = LAND_USE_DETAIL_FIELD_CONFIG[step]
     const additionalData = {
       step,
       projectSteps: PROJECT_STEPS,
       fieldType,
       nfmMeasureOptions: this._getNfmMeasureOptions(request),
-      columnWidth: 'full'
+      nfmLandUseOptions: this._getNfmLandUseOptions(request),
+      columnWidth: 'full',
+      ...(landUseFieldConfig && {
+        beforeFieldName: landUseFieldConfig.beforeFieldName,
+        afterFieldName: landUseFieldConfig.afterFieldName
+      })
     }
 
     return buildViewData(request, {
@@ -155,28 +275,27 @@ class NfmController {
   }
 
   _getViewTemplate(step) {
-    switch (step) {
-      case PROJECT_STEPS.NFM_SELECTED_MEASURES:
-        return PROJECT_VIEWS.NFM
-      case PROJECT_STEPS.NFM_RIVER_RESTORATION:
-        return PROJECT_VIEWS.NFM_RIVER_RESTORATION
-      case PROJECT_STEPS.NFM_LEAKY_BARRIERS:
-        return PROJECT_VIEWS.NFM_LEAKY_BARRIERS
-      case PROJECT_STEPS.NFM_OFFLINE_STORAGE:
-        return PROJECT_VIEWS.NFM_OFFLINE_STORAGE
-      case PROJECT_STEPS.NFM_WOODLAND:
-        return PROJECT_VIEWS.NFM_WOODLAND
-      case PROJECT_STEPS.NFM_HEADWATER_DRAINAGE:
-        return PROJECT_VIEWS.NFM_HEADWATER_DRAINAGE
-      case PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT:
-        return PROJECT_VIEWS.NFM_RUNOFF_MANAGEMENT
-      case PROJECT_STEPS.NFM_SALTMARSH:
-        return PROJECT_VIEWS.NFM_SALTMARSH
-      case PROJECT_STEPS.NFM_SAND_DUNE:
-        return PROJECT_VIEWS.NFM_SAND_DUNE
-      default:
-        return PROJECT_VIEWS.NFM
+    if (step in LAND_USE_DETAIL_FIELD_CONFIG) {
+      return PROJECT_VIEWS.NFM_LAND_USE_DETAIL
     }
+
+    const STEP_VIEW_MAP = {
+      [PROJECT_STEPS.NFM_SELECTED_MEASURES]: PROJECT_VIEWS.NFM,
+      [PROJECT_STEPS.NFM_RIVER_RESTORATION]:
+        PROJECT_VIEWS.NFM_RIVER_RESTORATION,
+      [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: PROJECT_VIEWS.NFM_LEAKY_BARRIERS,
+      [PROJECT_STEPS.NFM_OFFLINE_STORAGE]: PROJECT_VIEWS.NFM_OFFLINE_STORAGE,
+      [PROJECT_STEPS.NFM_WOODLAND]: PROJECT_VIEWS.NFM_WOODLAND,
+      [PROJECT_STEPS.NFM_HEADWATER_DRAINAGE]:
+        PROJECT_VIEWS.NFM_HEADWATER_DRAINAGE,
+      [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]:
+        PROJECT_VIEWS.NFM_RUNOFF_MANAGEMENT,
+      [PROJECT_STEPS.NFM_SALTMARSH]: PROJECT_VIEWS.NFM_SALTMARSH,
+      [PROJECT_STEPS.NFM_SAND_DUNE]: PROJECT_VIEWS.NFM_SAND_DUNE,
+      [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: PROJECT_VIEWS.NFM_LAND_USE_CHANGE
+    }
+
+    return STEP_VIEW_MAP[step] ?? PROJECT_VIEWS.NFM
   }
 
   async get(request, h) {
@@ -211,6 +330,14 @@ class NfmController {
         request.payload.nfmSelectedMeasures = [
           request.payload.nfmSelectedMeasures
         ]
+      }
+
+      if (
+        step === PROJECT_STEPS.NFM_LAND_USE_CHANGE &&
+        request.payload.nfmLandUseChange &&
+        !Array.isArray(request.payload.nfmLandUseChange)
+      ) {
+        request.payload.nfmLandUseChange = [request.payload.nfmLandUseChange]
       }
 
       // Validate payload BEFORE processing (validate array format)

@@ -1,0 +1,63 @@
+{% extends "layouts/projects.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}{{ t(localKeyPrefix + '.title') }}{% endblock %}
+
+{% block body %}
+  {% if errors and errors.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.errors.error_summary_title'),
+      errorList: errors
+    }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <div class="govuk-form-group {% if fieldErrors[beforeFieldName] or fieldErrors[afterFieldName] %}govuk-form-group--error{% endif %}">
+      <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.title') }}</h1>
+
+      {{ govukInput({
+        label: {
+          text: t(localKeyPrefix + '.before.label'),
+          classes: "govuk-label--m",
+          isPageHeading: false
+        },
+        id: beforeFieldName,
+        name: beforeFieldName,
+        value: formData[beforeFieldName] if formData[beforeFieldName] else '',
+        suffix: {
+          text: "hectares"
+        },
+        classes: "govuk-input--width-10",
+        errorMessage: {
+          text: fieldErrors[beforeFieldName]
+        } if fieldErrors[beforeFieldName] else undefined
+      }) }}
+
+      {{ govukInput({
+        label: {
+          text: t(localKeyPrefix + '.after.label'),
+          classes: "govuk-label--m",
+          isPageHeading: false
+        },
+        id: afterFieldName,
+        name: afterFieldName,
+        value: formData[afterFieldName] if formData[afterFieldName] else '',
+        suffix: {
+          text: "hectares"
+        },
+        classes: "govuk-input--width-10",
+        errorMessage: {
+          text: fieldErrors[afterFieldName]
+        } if fieldErrors[afterFieldName] else undefined
+      }) }}
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+  </form>
+{% endblock %}

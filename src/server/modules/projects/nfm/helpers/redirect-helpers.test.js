@@ -34,7 +34,7 @@ describe('NFM Redirect Helpers', () => {
       expect(result.path).toContain('TEST-001')
     })
 
-    test('should redirect to overview when leaky barriers not selected', async () => {
+    test('should redirect to land use change when leaky barriers not selected', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'river_floodplain_restoration'
@@ -50,10 +50,10 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toBe('/project/TEST-001')
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
     })
 
-    test('should redirect to overview when no measures selected', async () => {
+    test('should redirect to land use change when no measures selected', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: ''
       }
@@ -68,10 +68,10 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toBe('/project/TEST-001')
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
     })
 
-    test('should redirect to overview when selected measures is undefined', async () => {
+    test('should redirect to land use change when selected measures is undefined', async () => {
       const sessionData = {}
 
       const result = await handleConditionalRedirect(
@@ -84,12 +84,12 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toBe('/project/TEST-001')
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
     })
   })
 
   describe('handleConditionalRedirect - NFM_LEAKY_BARRIERS', () => {
-    test('should redirect to overview after leaky barriers', async () => {
+    test('should redirect to land use change after leaky barriers', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'river_floodplain_restoration,leaky_barriers'
@@ -105,7 +105,7 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toBe('/project/TEST-001')
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
     })
   })
 
@@ -152,7 +152,7 @@ describe('NFM Redirect Helpers', () => {
       expect(result.path).toContain('TEST-001')
     })
 
-    test('should redirect to overview when saltmarsh not selected', async () => {
+    test('should redirect to land use change when saltmarsh not selected', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'leaky_barriers,runoff_management'
@@ -168,7 +168,7 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toBe('/project/TEST-001')
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
     })
   })
 
@@ -193,7 +193,7 @@ describe('NFM Redirect Helpers', () => {
       expect(result.path).toContain('TEST-001')
     })
 
-    test('should redirect to overview when sand dune not selected', async () => {
+    test('should redirect to land use change when sand dune not selected', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'saltmarsh_management'
       }
@@ -208,12 +208,12 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toBe('/project/TEST-001')
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
     })
   })
 
   describe('handleConditionalRedirect - NFM_SAND_DUNE', () => {
-    test('should redirect to project overview after sand dune', async () => {
+    test('should redirect to land use change after sand dune', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'saltmarsh_management,sand_dune_management'
@@ -229,7 +229,7 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toBe('/project/TEST-001')
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
     })
   })
 
