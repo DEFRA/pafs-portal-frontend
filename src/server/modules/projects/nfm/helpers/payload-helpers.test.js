@@ -384,9 +384,9 @@ describe('NFM Payload Helpers', () => {
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]).toBe(
         null
       )
-      expect(
-        payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]
-      ).toBe(null)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]).toBe(
+        null
+      )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe(null)
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(null)
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(null)

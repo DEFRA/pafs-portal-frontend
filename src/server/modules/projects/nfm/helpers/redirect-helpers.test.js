@@ -9,7 +9,10 @@ import { ROUTES } from '../../../../common/constants/routes.js'
 import { navigateToProjectOverview } from '../../helpers/project-utils.js'
 
 vi.mock('../../helpers/project-utils.js', () => ({
-  navigateToProjectOverview: vi.fn(() => ({ redirected: true, path: '/overview' }))
+  navigateToProjectOverview: vi.fn(() => ({
+    redirected: true,
+    path: '/overview'
+  }))
 }))
 
 describe('NFM Redirect Helpers', () => {
@@ -348,9 +351,7 @@ describe('NFM Redirect Helpers', () => {
 
     test('should navigate to overview from last selected land-use detail step', async () => {
       const sessionData = {
-        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [
-          NFM_LAND_TYPES.WOODLAND
-        ]
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [NFM_LAND_TYPES.WOODLAND]
       }
 
       const result = await handleConditionalRedirect(
