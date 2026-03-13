@@ -2,7 +2,8 @@ import { describe, test, expect } from 'vitest'
 import { ROUTES } from '../../../../common/constants/routes.js'
 import {
   PROJECT_STEPS,
-  PROJECT_PAYLOAD_FIELDS
+  PROJECT_PAYLOAD_FIELDS,
+  NFM_LAND_TYPES
 } from '../../../../common/constants/projects.js'
 import { getDynamicBackLink, NFM_STEP_SEQUENCE } from './navigation-helpers.js'
 
@@ -181,6 +182,53 @@ describe('nfm navigation helpers', () => {
 
     expect(result).toEqual({
       targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+      conditionalRedirect: false
+    })
+  })
+
+  test('handles null session data for measure steps', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_WOODLAND, null)
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+      conditionalRedirect: false
+    })
+  })
+
+  test('land-use detail goes back to previous selected land type', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_LAND_USE_WOODLAND, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+        'enclosed_arable_farmland,woodland'
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_ENCLOSED_ARABLE_FARMLAND,
+      conditionalRedirect: false
+    })
+  })
+
+  test('first selected land-use detail goes back to land-use-change', () => {
+    const result = getDynamicBackLink(
+      PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND,
+      {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [
+          NFM_LAND_TYPES.ENCLOSED_ARABLE_FARMLAND,
+          NFM_LAND_TYPES.WOODLAND
+        ]
+      }
+    )
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    })
+  })
+
+  test('land-use detail with missing session falls back to land-use-change', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_LAND_USE_WOODLAND, null)
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
       conditionalRedirect: false
     })
   })

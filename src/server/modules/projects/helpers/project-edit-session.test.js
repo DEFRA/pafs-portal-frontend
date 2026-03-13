@@ -262,6 +262,98 @@ describe('project-edit-session', () => {
         result[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]
       ).toBeUndefined()
     })
+
+    test('should map remaining NFM measure types (runoff, saltmarsh, sand dune)', () => {
+      const projectData = {
+        referenceNumber: 'REF123',
+        pafs_core_nfm_measures: [
+          {
+            measureType: 'runoff_attenuation_management',
+            areaHectares: 14,
+            storageVolumeM3: 220
+          },
+          {
+            measureType: 'saltmarsh_management',
+            areaHectares: 6.5,
+            lengthKm: 1.2
+          },
+          {
+            measureType: 'sand_dune_management',
+            areaHectares: 4.25,
+            lengthKm: 0.75
+          }
+        ]
+      }
+
+      const result = initializeEditSession(mockRequest, projectData)
+
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]).toBe(14)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]).toBe(
+        220
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe(6.5)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(1.2)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(4.25)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(0.75)
+    })
+
+    test('should map NFM land-use changes into before and after fields', () => {
+      const projectData = {
+        referenceNumber: 'REF123',
+        pafs_core_nfm_land_use_changes: [
+          {
+            landUseType: 'enclosed_arable_farmland',
+            areaBeforeHectares: 20,
+            areaAfterHectares: 14
+          },
+          {
+            landUseType: 'woodland',
+            areaBeforeHectares: 8,
+            areaAfterHectares: 12
+          },
+          {
+            landUseType: 'coastal_margins',
+            areaBeforeHectares: null,
+            areaAfterHectares: 2.5
+          }
+        ]
+      }
+
+      const result = initializeEditSession(mockRequest, projectData)
+
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]
+      ).toBe(20)
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]
+      ).toBe(14)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE]).toBe(
+        8
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER]).toBe(
+        12
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE]).toBe(
+        undefined
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER]).toBe(2.5)
+    })
+
+    test('should ignore non-array NFM land-use changes', () => {
+      const projectData = {
+        referenceNumber: 'REF123',
+        pafs_core_nfm_land_use_changes: null
+      }
+
+      const result = initializeEditSession(mockRequest, projectData)
+
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]
+      ).toBeUndefined()
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]
+      ).toBeUndefined()
+    })
   })
 
   describe('detectChanges', () => {

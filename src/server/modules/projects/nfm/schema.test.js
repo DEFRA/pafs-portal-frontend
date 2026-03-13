@@ -8,11 +8,14 @@ import {
   nfmHeadwaterDrainageSchema,
   nfmRunoffManagementSchema,
   nfmSaltmarshSchema,
-  nfmSandDuneSchema
+  nfmSandDuneSchema,
+  nfmLandUseChangeSchema,
+  nfmLandUseEnclosedArableFarmlandSchema
 } from './schema.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
-  NFM_MEASURES
+  NFM_MEASURES,
+  NFM_LAND_TYPES
 } from '../../../common/constants/projects.js'
 
 describe('NFM Selected Measures Schema', () => {
@@ -119,6 +122,15 @@ describe('NFM Measure Schemas', () => {
     expect(result.error.details[0].type).toBe('number.precision')
   })
 
+  test('rejects river restoration when area is undefined', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: undefined,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: 10.5
+    })
+
+    expect(result.error).toBeDefined()
+  })
+
   test('requires leaky barriers length and width', () => {
     const result = nfmLeakyBarriersSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: 4.5
@@ -210,5 +222,54 @@ describe('NFM Measure Schemas', () => {
     })
 
     expect(result.error).toBeUndefined()
+  })
+
+  test('allows empty string for optional volume fields', () => {
+    const result = nfmRunoffManagementSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: 10.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: ''
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+})
+
+describe('NFM Land-use Schemas', () => {
+  test('validates selected land-use types', () => {
+    const result = nfmLandUseChangeSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [
+        NFM_LAND_TYPES.ENCLOSED_ARABLE_FARMLAND,
+        NFM_LAND_TYPES.WOODLAND
+      ]
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects invalid land-use type', () => {
+    const result = nfmLandUseChangeSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: ['invalid_land_type']
+    })
+
+    expect(result.error).toBeDefined()
+  })
+
+  test('validates enclosed arable farmland before and after values', () => {
+    const result = nfmLandUseEnclosedArableFarmlandSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]: 22.5,
+      [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]: 15.25
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects enclosed arable farmland before with more than 2 decimals', () => {
+    const result = nfmLandUseEnclosedArableFarmlandSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]: 22.555,
+      [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]: 15.25
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
   })
 })

@@ -360,6 +360,101 @@ describe('NFM Payload Helpers', () => {
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]).toBe('')
     })
+
+    test('should clear runoff, saltmarsh and sand dune fields when deselected', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: [
+          'river_floodplain_restoration'
+        ],
+        [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: 12,
+        [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: 120,
+        [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: 8,
+        [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: 2,
+        [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: 5,
+        [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: 1.5
+      }
+
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration,runoff_management,saltmarsh_management,sand_dune_management'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SELECTED_MEASURES, payload, sessionData)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]).toBe(
+        null
+      )
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]
+      ).toBe(null)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe(null)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(null)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(null)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(null)
+    })
+  })
+
+  describe('processPayload - NFM_LAND_USE_CHANGE', () => {
+    test('should normalize selected land types and clear deselected land-use details', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [
+          'enclosed_arable_farmland'
+        ],
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE]: 22,
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER]: 18
+      }
+
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+          'enclosed_arable_farmland,woodland'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_LAND_USE_CHANGE, payload, sessionData)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]).toBe(
+        'enclosed_arable_farmland'
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE]).toBe(
+        null
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER]).toBe(
+        null
+      )
+    })
+
+    test('should ignore unknown deselected land-use types without throwing', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: []
+      }
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: 'unknown_land_type'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_LAND_USE_CHANGE, payload, sessionData)
+
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]).toBe('')
+    })
+  })
+
+  describe('processPayload - NFM land-use detail steps', () => {
+    test('should parse enclosed arable before/after values to floats', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]: '11.2',
+        [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]: '9.4'
+      }
+
+      processPayload(
+        PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND,
+        payload
+      )
+
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]
+      ).toBe(11.2)
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]
+      ).toBe(9.4)
+    })
   })
 
   describe('processPayload - NFM_RUNOFF_MANAGEMENT', () => {

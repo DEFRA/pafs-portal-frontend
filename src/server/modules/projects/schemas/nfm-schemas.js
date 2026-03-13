@@ -32,6 +32,7 @@ const MSG_LENGTH_PRECISION_2DP = 'Length must have up to 2 decimal places'
 const MSG_WIDTH_POSITIVE_2DP =
   'Width must be a positive number with up to 2 decimal places'
 const MSG_WIDTH_PRECISION_2DP = 'Width must have up to 2 decimal places'
+const MSG_SELECT_AT_LEAST_ONE_LAND_TYPE = 'Select at least one land type'
 
 const maxTwoDecimalPlaces = (value, helpers) => {
   if (value === null || value === '' || value === undefined) {
@@ -277,9 +278,9 @@ export const nfmLandUseChangeSchema = Joi.object({
     .min(1)
     .required()
     .messages({
-      'array.min': 'Select at least one land type',
-      'any.required': 'Select at least one land type',
-      'array.includesRequiredUnknowns': 'Select at least one land type'
+      'array.min': MSG_SELECT_AT_LEAST_ONE_LAND_TYPE,
+      'any.required': MSG_SELECT_AT_LEAST_ONE_LAND_TYPE,
+      'array.includesRequiredUnknowns': MSG_SELECT_AT_LEAST_ONE_LAND_TYPE
     })
 }).unknown(true)
 

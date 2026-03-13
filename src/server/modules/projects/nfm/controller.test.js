@@ -299,6 +299,35 @@ describe('NFM Controller', () => {
         )
       })
     })
+
+    describe('NFM Land-use detail', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(
+          PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND
+        )
+      })
+
+      test('should render land-use detail template with before/after field names', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_LAND_USE_DETAIL,
+          expect.any(Object)
+        )
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            additionalData: expect.objectContaining({
+              beforeFieldName:
+                PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
+              afterFieldName:
+                PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER
+            })
+          })
+        )
+      })
+    })
   })
 
   describe('postHandler', () => {
@@ -411,6 +440,19 @@ describe('NFM Controller', () => {
           '/project/TEST-001/nfm-river-restoration'
         )
         expect(mockH.takeover).toHaveBeenCalled()
+      })
+
+      test('should normalize single selected measure to array before validation', async () => {
+        mockRequest.payload = {
+          nfmSelectedMeasures: NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+        }
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(mockRequest.payload.nfmSelectedMeasures).toEqual([
+          NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+        ])
+        expect(validatePayload).toHaveBeenCalled()
       })
 
       test('should handle API errors gracefully', async () => {
@@ -723,6 +765,34 @@ describe('NFM Controller', () => {
         expect(navigateToProjectOverview).toHaveBeenCalledWith(
           'TEST-001',
           mockH
+        )
+      })
+    })
+
+    describe('NFM Land Use Change', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_LAND_USE_CHANGE)
+        mockRequest.payload = {
+          nfmLandUseChange: 'woodland'
+        }
+      })
+
+      test('should normalize single land-use value into array before validation', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(validatePayload).toHaveBeenCalled()
+        expect(mockRequest.payload.nfmLandUseChange).toEqual(['woodland'])
+      })
+
+      test('should save using land-use-change payload level', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_CHANGE,
+          expect.any(Object),
+          PROJECT_VIEWS.NFM_LAND_USE_CHANGE
         )
       })
     })
