@@ -16,3 +16,11 @@
 .app-\!-align-with-button {
   align-self: center;
 }
+
+// Responsive table wrapper — prevents data tables from causing page-level
+// horizontal scroll at narrow viewports (WCAG 1.4.10 Reflow, Level AA).
+// Data tables with many columns are permitted to scroll within their container;
+// the page itself must not require 2D scrolling.
+.app-\!-overflow-x-auto {
+  overflow-x: auto;
+}
