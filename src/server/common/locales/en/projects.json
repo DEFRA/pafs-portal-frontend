@@ -955,7 +955,7 @@
     "create_habitat_watercourse": {
       "title": "Will the project enhance or create a single major physical or habitat of watercourse?",
       "heading": "Will the project enhance or create a single major physical or habitat of watercourse?",
-      "hint": "na",
+      "hint": "A single major physical or habitat enhancement (km). In this category only one physical pressure is improved by the project, for example, by reinstating natural banks or improving fish passage by removing or modifying structures.",
       "options": {
         "yes": {
           "label": "Yes"
