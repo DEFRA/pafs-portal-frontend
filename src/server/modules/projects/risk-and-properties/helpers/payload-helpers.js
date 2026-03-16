@@ -150,10 +150,50 @@ export function processPayload(step, payload, sessionData) {
   // Handle property affected flooding
   if (step === PROJECT_STEPS.PROPERTY_AFFECTED_FLOODING) {
     processNoPropertiesAtRiskCheckbox(payload)
+    // Normalise empty strings to null so the backend accepts the value (null is
+    // allowed) and stale '' is never saved to the session (which would cause
+    // the backend to reject a subsequent RISK-level submission on the wrong page).
+    normalizeNumericFields(payload, [
+      PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS,
+      PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS,
+      PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50,
+      PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE
+    ])
   }
 
   // Handle property affected coastal erosion
   if (step === PROJECT_STEPS.PROPERTY_AFFECTED_COASTAL_EROSION) {
     processNoPropertiesCoastalErosionCheckbox(payload)
+    normalizeNumericFields(payload, [
+      PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL,
+      PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION
+    ])
   }
+}
+
+/**
+ * Normalise numeric property fields — convert empty strings to null.
+ *
+ * When a user leaves a number field blank in the browser, the browser submits
+ * an empty string ('').  The backend Joi schemas for these fields use
+ * Joi.number().optional().allow(null) which accepts null but rejects ''.
+ * If '' is saved to the session and a different step (e.g. RISK) later sends
+ * those session values to the API, the backend rejects the submission and
+ * surfaces a misleading validation error on the wrong page.
+ *
+ * Normalising '' → null here (before updateSessionData is called) ensures:
+ *   1. The session always contains backend-safe values.
+ *   2. null fails the frontend propertyValueSchema, so the error is surfaced
+ *      on the correct page (PROPERTY_AFFECTED_FLOODING) via client-side
+ *      validation rather than a round-trip to the API.
+ *
+ * @param {object} payload - Request payload (modified in place)
+ * @param {string[]} fields - Field names to normalise
+ */
+export function normalizeNumericFields(payload, fields) {
+  fields.forEach((field) => {
+    if (payload[field] === '') {
+      payload[field] = null
+    }
+  })
 }

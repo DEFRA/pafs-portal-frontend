@@ -435,7 +435,8 @@
       "heading": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
       "hint": "Enter a number between 0 and 100",
       "errors": {
-        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places"
+        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places",
+        "required": "Enter the percentage of properties benefitting in the 20% most deprived areas"
       }
     },
     "forty_percent_deprived": {
@@ -443,7 +444,8 @@
       "heading": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
       "hint": "Enter a number between 0 and 100",
       "errors": {
-        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places"
+        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places",
+        "required": "Enter the percentage of properties benefitting in the 40% most deprived areas"
       }
     },
     "current_flood_fluvial_risk": {
