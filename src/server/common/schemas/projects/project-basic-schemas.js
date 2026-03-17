@@ -29,7 +29,7 @@ export const projectReferenceNumberSchema = Joi.string()
  */
 export const projectNameSchema = Joi.string()
   .trim()
-  .replaceAll(/\s+/g, ' ')
+  .custom((value) => value.split(/\s+/).join(' '))
   .pattern(VALIDATION_PATTERNS.NAME_WITH_ALPHANUMERIC_SPACE_UNDERSCORE_DASH)
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.NAME)
