@@ -22,7 +22,7 @@ const MSG_AREA_POSITIVE = 'Area must be a positive number'
 const MSG_AREA_POSITIVE_2DP =
   'Area must be a positive number with up to 2 decimal places'
 const MSG_AREA_PRECISION_2DP = 'Area must have up to 2 decimal places'
-const MSG_AREA_NON_NEGATIVE = 'Area must be a number 0 or greater'
+const MSG_AREA_NON_NEGATIVE = 'Area must be a number greater than or equal to 0'
 
 const MSG_VOLUME_POSITIVE_2DP =
   'Volume must be a positive number with up to 2 decimal places'
@@ -297,22 +297,24 @@ export const nfmLandUseChangeSchema = Joi.object({
 const createLandUseDetailSchema = (beforeField, afterField) =>
   Joi.object({
     [beforeField]: Joi.number()
-      .positive()
+      .empty('')
+      .min(0)
       .custom(maxTwoDecimalPlaces)
       .required()
       .messages({
         'number.base': MSG_AREA_NON_NEGATIVE,
-        'number.positive': MSG_AREA_NON_NEGATIVE,
+        'number.min': MSG_AREA_NON_NEGATIVE,
         'number.precision': MSG_AREA_PRECISION_2DP,
         'any.required': 'Enter the area before natural flood measures'
       }),
     [afterField]: Joi.number()
-      .positive()
+      .empty('')
+      .min(0)
       .custom(maxTwoDecimalPlaces)
       .required()
       .messages({
         'number.base': MSG_AREA_NON_NEGATIVE,
-        'number.positive': MSG_AREA_NON_NEGATIVE,
+        'number.min': MSG_AREA_NON_NEGATIVE,
         'number.precision': MSG_AREA_PRECISION_2DP,
         'any.required': 'Enter the area after natural flood measures'
       })

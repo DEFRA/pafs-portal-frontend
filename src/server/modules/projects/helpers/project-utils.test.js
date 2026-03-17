@@ -162,7 +162,14 @@ describe('project-utils', () => {
       expect(extractJoiErrors).toHaveBeenCalled()
       expect(mockH.view).toHaveBeenCalledWith('test.njk', {
         title: 'Test',
-        fieldErrors: mockErrors
+        fieldErrors: mockErrors,
+        errors: [
+          {
+            text: 'Required',
+            href: '#name'
+          }
+        ],
+        formData: mockRequest.payload
       })
     })
   })

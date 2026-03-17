@@ -97,7 +97,7 @@ describe('NFM Controller', () => {
             localKeyPrefix: 'projects.nfm.selected_measures',
             backLinkOptions: {
               targetEditURL: '/project/{referenceNumber}',
-              conditionalRedirect: false
+              conditionalRedirect: true
             },
             additionalData: expect.objectContaining({
               step: PROJECT_STEPS.NFM_SELECTED_MEASURES,

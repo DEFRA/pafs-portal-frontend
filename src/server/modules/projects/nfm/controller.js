@@ -436,7 +436,8 @@ class NfmController {
       const validationError = validatePayload(request, h, {
         template,
         schema,
-        viewData
+        viewData,
+        formData: request.payload
       })
       if (validationError) {
         return validationError

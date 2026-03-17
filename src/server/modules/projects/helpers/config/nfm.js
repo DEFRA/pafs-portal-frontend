@@ -33,7 +33,7 @@ export const NFM_CONFIG = {
     localKeyPrefix: 'projects.nfm.selected_measures',
     backLinkOptions: {
       targetEditURL: ROUTES.PROJECT.OVERVIEW,
-      conditionalRedirect: false
+      conditionalRedirect: true
     },
     schema: nfmSelectedMeasuresSchema,
     fieldType: 'checkbox'

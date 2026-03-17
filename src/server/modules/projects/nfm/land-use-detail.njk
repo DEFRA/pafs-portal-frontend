@@ -6,10 +6,28 @@
 {% block pageTitle %}{{ t(localKeyPrefix + '.title') }}{% endblock %}
 
 {% block body %}
-  {% if errors and errors.length > 0 %}
+  {% set beforeError = fieldErrors[beforeFieldName] %}
+  {% set afterError = fieldErrors[afterFieldName] %}
+  {% set showBothErrors = beforeError and afterError and beforeError != afterError %}
+
+  {% if beforeError or afterError %}
     {{ govukErrorSummary({
-      titleText: t('common.errors.error_summary_title'),
-      errorList: errors
+      titleText: t('common.error_summary_title'),
+      errorList: showBothErrors and [
+        {
+          text: beforeError,
+          href: '#' + beforeFieldName
+        },
+        {
+          text: afterError,
+          href: '#' + afterFieldName
+        }
+      ] or [
+        {
+          text: beforeError or afterError,
+          href: '#' + (beforeFieldName if beforeError else afterFieldName)
+        }
+      ]
     }) }}
   {% endif %}
 

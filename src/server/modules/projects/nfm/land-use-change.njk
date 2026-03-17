@@ -6,7 +6,7 @@
 {% block body %}
   {% if errors and errors.length > 0 %}
     {{ govukErrorSummary({
-      titleText: t('common.errors.error_summary_title'),
+      titleText: t('common.error_summary_title'),
       errorList: errors
     }) }}
   {% endif %}

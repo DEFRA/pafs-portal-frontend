@@ -101,24 +101,6 @@ export const propertiesBenefitInvestmentCoastalErosionSchema =
  * No negatives, no values above 100, numbers only (no text or symbols)
  */
 
-// Helper to get error messages from locale (for future-proofing, but hardcoded here for now)
-const twentyPercentDeprivedErrors = {
-  'string.pattern.base':
-    'Enter a valid number between 0 and 100 with at most 2 decimal places',
-  'any.required':
-    'Enter the percentage of properties benefitting in the 20% most deprived areas',
-  'string.empty':
-    'Enter the percentage of properties benefitting in the 20% most deprived areas'
-}
-const fortyPercentDeprivedErrors = {
-  'string.pattern.base':
-    'Enter a valid number between 0 and 100 with at most 2 decimal places',
-  'any.required':
-    'Enter the percentage of properties benefitting in the 40% most deprived areas',
-  'string.empty':
-    'Enter the percentage of properties benefitting in the 40% most deprived areas'
-}
-
 const percentageSchemaRequired = (errorMessages) =>
   Joi.string()
     .pattern(/^(?:100(?:\.0{1,2})?|[1-9]?\d(?:\.\d{1,2})?)$/)
@@ -130,17 +112,27 @@ const percentageSchemaRequired = (errorMessages) =>
  * Percent properties in 20% most deprived areas schema
  */
 export const percentProperties20PercentDeprivedSchema =
-  percentageSchemaRequired(twentyPercentDeprivedErrors).label(
-    PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED
-  )
+  percentageSchemaRequired({
+    'string.pattern.base':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED_INVALID,
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED_REQUIRED,
+    'string.empty':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED_REQUIRED
+  }).label(PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED)
 
 /**
  * Percent properties in 40% most deprived areas schema
  */
 export const percentProperties40PercentDeprivedSchema =
-  percentageSchemaRequired(fortyPercentDeprivedErrors).label(
-    PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED
-  )
+  percentageSchemaRequired({
+    'string.pattern.base':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED_INVALID,
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED_REQUIRED,
+    'string.empty':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED_REQUIRED
+  }).label(PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED)
 
 /**
  * Current flood risk schema (for fluvial, tidal, sea flooding)

@@ -5,10 +5,15 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block body %}
-  {% if errors and errors.length > 0 %}
+  {% if fieldErrors.nfmSelectedMeasures %}
     {{ govukErrorSummary({
-      titleText: t('common.errors.error_summary_title'),
-      errorList: errors
+      titleText: t('common.error_summary_title'),
+      errorList: [
+        {
+          text: t('projects.nfm.selected_measures.error'),
+          href: '#nfm-measure-1'
+        }
+      ]
     }) }}
   {% endif %}
 

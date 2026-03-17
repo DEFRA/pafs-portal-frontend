@@ -278,6 +278,50 @@ describe('NFM Land-use Schemas', () => {
     expect(result.error).toBeDefined()
     expect(result.error.details[0].type).toBe('number.precision')
   })
+
+  test('shows required messages when before and after are blank', () => {
+    const result = nfmLandUseEnclosedArableFarmlandSchema.validate(
+      {
+        [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]: '',
+        [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]: ''
+      },
+      { abortEarly: false }
+    )
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: 'Enter the area before natural flood measures'
+        }),
+        expect.objectContaining({
+          message: 'Enter the area after natural flood measures'
+        })
+      ])
+    )
+  })
+
+  test('shows non-negative message for non-numeric or negative values', () => {
+    const nonNumericResult = nfmLandUseEnclosedArableFarmlandSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]: 'abc',
+      [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]: 1
+    })
+
+    expect(nonNumericResult.error).toBeDefined()
+    expect(nonNumericResult.error.details[0].message).toBe(
+      'Area must be a number greater than or equal to 0'
+    )
+
+    const negativeResult = nfmLandUseEnclosedArableFarmlandSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]: -1,
+      [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]: 1
+    })
+
+    expect(negativeResult.error).toBeDefined()
+    expect(negativeResult.error.details[0].message).toBe(
+      'Area must be a number greater than or equal to 0'
+    )
+  })
 })
 
 describe('NFM Landowner Consent Schema', () => {

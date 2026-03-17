@@ -45,7 +45,7 @@ export function getBackLink(request, options = {}) {
  * @private
  */
 export function validatePayload(request, h, options) {
-  const { template, schema, viewData } = options
+  const { template, schema, viewData, formData } = options
 
   // Skip validation if no schema defined (e.g., START step)
   if (!schema) {
@@ -57,7 +57,19 @@ export function validatePayload(request, h, options) {
     return null
   }
 
-  return h.view(template, { ...viewData, fieldErrors: extractJoiErrors(error) })
+  const fieldErrors = extractJoiErrors(error)
+  const errors = Object.entries(fieldErrors).map(([field, text]) => ({
+    text,
+    href: `#${field}`
+  }))
+
+  // Preserve submitted form data on validation error
+  return h.view(template, {
+    ...viewData,
+    fieldErrors,
+    errors,
+    formData: formData || request.payload
+  })
 }
 
 /**
