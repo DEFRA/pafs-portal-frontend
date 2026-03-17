@@ -2,6 +2,8 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { nfmController } from './controller.js'
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
+  NFM_EXPERIENCE_LEVEL_OPTIONS,
+  NFM_LANDOWNER_CONSENT_OPTIONS,
   NFM_MEASURES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_PAYLOAD_LEVELS,
@@ -325,6 +327,42 @@ describe('NFM Controller', () => {
                 PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER
             })
           })
+        )
+      })
+    })
+
+    describe('NFM Landowner Consent', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_LANDOWNER_CONSENT)
+      })
+
+      test('should render NFM_LANDOWNER_CONSENT view', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_LANDOWNER_CONSENT,
+          expect.any(Object)
+        )
+      })
+
+      test('should include all 4 landowner consent options in order', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        const callArgs = buildViewData.mock.calls[0][1]
+        const options = callArgs.additionalData.nfmLandownerConsentOptions
+
+        expect(options).toHaveLength(4)
+        expect(options[0].value).toBe(
+          NFM_LANDOWNER_CONSENT_OPTIONS.CONSENT_FULLY_SECURED
+        )
+        expect(options[1].value).toBe(
+          NFM_LANDOWNER_CONSENT_OPTIONS.ENGAGED_BUT_NOT_FULLY_SECURED
+        )
+        expect(options[2].value).toBe(
+          NFM_LANDOWNER_CONSENT_OPTIONS.INITIAL_CONTACT_MADE
+        )
+        expect(options[3].value).toBe(
+          NFM_LANDOWNER_CONSENT_OPTIONS.NOT_YET_ENGAGED
         )
       })
     })
@@ -793,6 +831,59 @@ describe('NFM Controller', () => {
           PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_CHANGE,
           expect.any(Object),
           PROJECT_VIEWS.NFM_LAND_USE_CHANGE
+        )
+      })
+    })
+
+    describe('NFM Landowner Consent', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_LANDOWNER_CONSENT)
+        mockRequest.payload = {
+          [PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT]:
+            NFM_LANDOWNER_CONSENT_OPTIONS.CONSENT_FULLY_SECURED
+        }
+      })
+
+      test('should save using landowner-consent payload level', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          PROJECT_PAYLOAD_LEVELS.NFM_LANDOWNER_CONSENT,
+          expect.any(Object),
+          PROJECT_VIEWS.NFM_LANDOWNER_CONSENT
+        )
+      })
+    })
+
+    describe('NFM Experience', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_EXPERIENCE)
+        mockRequest.payload = {
+          [PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL]:
+            NFM_EXPERIENCE_LEVEL_OPTIONS.SOME_EXPERIENCE
+        }
+      })
+
+      test('should render NFM_EXPERIENCE view', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_EXPERIENCE,
+          expect.any(Object)
+        )
+      })
+
+      test('should save using nfm-experience payload level', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          PROJECT_PAYLOAD_LEVELS.NFM_EXPERIENCE_LEVEL,
+          expect.any(Object),
+          PROJECT_VIEWS.NFM_EXPERIENCE
         )
       })
     })

@@ -138,6 +138,21 @@ const getNfmLandUseRoutes = (editPreHandlers) => [
     ROUTES.PROJECT.EDIT.NFM.LAND_USE_COASTAL_MARGINS,
     editPreHandlers,
     nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LANDOWNER_CONSENT,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.PROJECT_READINESS,
+    editPreHandlers,
+    nfmController
   )
 ]
 

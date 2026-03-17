@@ -170,7 +170,14 @@ export async function handleConditionalRedirect(
       return redirectToLandType(h, referenceNumber, nextLandType)
     }
 
-    return navigateToProjectOverview(referenceNumber, h)
+    return h
+      .redirect(
+        ROUTES.PROJECT.EDIT.NFM.LANDOWNER_CONSENT.replace(
+          REFERENCE_NUMBER_PLACEHOLDER,
+          referenceNumber
+        )
+      )
+      .takeover()
   }
 
   return null

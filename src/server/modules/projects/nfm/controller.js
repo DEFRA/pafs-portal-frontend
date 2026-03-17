@@ -1,10 +1,13 @@
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
+  NFM_EXPERIENCE_LEVEL_OPTIONS,
   NFM_LAND_TYPES,
+  NFM_LANDOWNER_CONSENT_OPTIONS,
   NFM_MEASURES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_PAYLOAD_LEVELS,
-  PROJECT_STEPS
+  PROJECT_STEPS,
+  NFM_PROJECT_READINESS_OPTIONS
 } from '../../../common/constants/projects.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
 import { NFM_CONFIG } from '../helpers/project-config.js'
@@ -59,8 +62,12 @@ const PAYLOAD_LEVEL_MAP = {
   [PROJECT_STEPS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER]:
     PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER,
   [PROJECT_STEPS.NFM_LAND_USE_COASTAL_MARGINS]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_COASTAL_MARGINS
-  // Add more NFM steps here as needed
+    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_COASTAL_MARGINS,
+  [PROJECT_STEPS.NFM_LANDOWNER_CONSENT]:
+    PROJECT_PAYLOAD_LEVELS.NFM_LANDOWNER_CONSENT,
+  [PROJECT_STEPS.NFM_EXPERIENCE]: PROJECT_PAYLOAD_LEVELS.NFM_EXPERIENCE_LEVEL,
+  [PROJECT_STEPS.NFM_PROJECT_READINESS]:
+    PROJECT_PAYLOAD_LEVELS.NFM_PROJECT_READINESS
 }
 
 /**
@@ -205,6 +212,74 @@ class NfmController {
     ]
   }
 
+  _getNfmLandownerConsentOptions(request) {
+    const localKeyPrefix = 'projects.nfm.landowner_consent'
+    return [
+      {
+        text: request.t(`${localKeyPrefix}.options.consent_fully_secured`),
+        value: NFM_LANDOWNER_CONSENT_OPTIONS.CONSENT_FULLY_SECURED
+      },
+      {
+        text: request.t(
+          `${localKeyPrefix}.options.engaged_but_not_fully_secured`
+        ),
+        value: NFM_LANDOWNER_CONSENT_OPTIONS.ENGAGED_BUT_NOT_FULLY_SECURED
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.initial_contact_made`),
+        value: NFM_LANDOWNER_CONSENT_OPTIONS.INITIAL_CONTACT_MADE
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.not_yet_engaged`),
+        value: NFM_LANDOWNER_CONSENT_OPTIONS.NOT_YET_ENGAGED
+      }
+    ]
+  }
+
+  _getNfmExperienceOptions(request) {
+    const localKeyPrefix = 'projects.nfm.experience'
+    return [
+      {
+        text: request.t(`${localKeyPrefix}.options.no_experience`),
+        value: NFM_EXPERIENCE_LEVEL_OPTIONS.NO_EXPERIENCE
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.some_experience`),
+        value: NFM_EXPERIENCE_LEVEL_OPTIONS.SOME_EXPERIENCE
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.moderate_experience`),
+        value: NFM_EXPERIENCE_LEVEL_OPTIONS.MODERATE_EXPERIENCE
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.extensive_experience`),
+        value: NFM_EXPERIENCE_LEVEL_OPTIONS.EXTENSIVE_EXPERIENCE
+      }
+    ]
+  }
+
+  _getNfmProjectReadinessOptions(request) {
+    const localKeyPrefix = 'projects.nfm.project_readiness'
+    return [
+      {
+        text: request.t(`${localKeyPrefix}.options.early_concept`),
+        value: NFM_PROJECT_READINESS_OPTIONS.EARLY_CONCEPT
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.developing_proposal`),
+        value: NFM_PROJECT_READINESS_OPTIONS.DEVELOPING_PROPOSAL
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.well_developed_proposal`),
+        value: NFM_PROJECT_READINESS_OPTIONS.WELL_DEVELOPED_PROPOSAL
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.ready_to_deliver`),
+        value: NFM_PROJECT_READINESS_OPTIONS.READY_TO_DELIVER
+      }
+    ]
+  }
+
   _getViewData(request) {
     const step = getProjectStep(request)
     const config = this._getConfig(step)
@@ -217,13 +292,26 @@ class NfmController {
       backLinkOptions = dynamicBackLink
     }
 
+    const fieldNameMap = {
+      [PROJECT_STEPS.NFM_LANDOWNER_CONSENT]:
+        PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT,
+      [PROJECT_STEPS.NFM_EXPERIENCE]:
+        PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL,
+      [PROJECT_STEPS.NFM_PROJECT_READINESS]:
+        PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS
+    }
+
     const landUseFieldConfig = LAND_USE_DETAIL_FIELD_CONFIG[step]
     const additionalData = {
       step,
       projectSteps: PROJECT_STEPS,
       fieldType,
+      fieldName: fieldNameMap[step],
       nfmMeasureOptions: this._getNfmMeasureOptions(request),
       nfmLandUseOptions: this._getNfmLandUseOptions(request),
+      nfmLandownerConsentOptions: this._getNfmLandownerConsentOptions(request),
+      nfmExperienceOptions: this._getNfmExperienceOptions(request),
+      nfmProjectReadinessOptions: this._getNfmProjectReadinessOptions(request),
       columnWidth: 'full',
       ...(landUseFieldConfig && {
         beforeFieldName: landUseFieldConfig.beforeFieldName,
@@ -292,7 +380,11 @@ class NfmController {
         PROJECT_VIEWS.NFM_RUNOFF_MANAGEMENT,
       [PROJECT_STEPS.NFM_SALTMARSH]: PROJECT_VIEWS.NFM_SALTMARSH,
       [PROJECT_STEPS.NFM_SAND_DUNE]: PROJECT_VIEWS.NFM_SAND_DUNE,
-      [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: PROJECT_VIEWS.NFM_LAND_USE_CHANGE
+      [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: PROJECT_VIEWS.NFM_LAND_USE_CHANGE,
+      [PROJECT_STEPS.NFM_LANDOWNER_CONSENT]:
+        PROJECT_VIEWS.NFM_LANDOWNER_CONSENT,
+      [PROJECT_STEPS.NFM_EXPERIENCE]: PROJECT_VIEWS.NFM_EXPERIENCE,
+      [PROJECT_STEPS.NFM_PROJECT_READINESS]: PROJECT_VIEWS.NFM_PROJECT_READINESS
     }
 
     return STEP_VIEW_MAP[step] ?? PROJECT_VIEWS.NFM

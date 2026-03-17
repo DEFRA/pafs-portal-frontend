@@ -90,7 +90,10 @@ export const PROJECT_STEPS = {
   NFM_LAND_USE_PEATLAND_RESTORATION: 'nfm-land-use-peatland-restoration',
   NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER:
     'nfm-land-use-rivers-wetlands-freshwater-habitats',
-  NFM_LAND_USE_COASTAL_MARGINS: 'nfm-land-use-coastal-margins'
+  NFM_LAND_USE_COASTAL_MARGINS: 'nfm-land-use-coastal-margins',
+  NFM_LANDOWNER_CONSENT: 'nfm-landowner-consent',
+  NFM_EXPERIENCE: 'nfm-experience',
+  NFM_PROJECT_READINESS: 'nfm-project-readiness'
 }
 
 export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'
@@ -222,7 +225,10 @@ export const PROJECT_PAYLOAD_FIELDS = {
   NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE: 'nfmRiversWetlandsFreshwaterBefore',
   NFM_RIVERS_WETLANDS_FRESHWATER_AFTER: 'nfmRiversWetlandsFreshwaterAfter',
   NFM_COASTAL_MARGINS_BEFORE: 'nfmCoastalMarginsBefore',
-  NFM_COASTAL_MARGINS_AFTER: 'nfmCoastalMarginsAfter'
+  NFM_COASTAL_MARGINS_AFTER: 'nfmCoastalMarginsAfter',
+  NFM_LANDOWNER_CONSENT: 'nfmLandownerConsent',
+  NFM_EXPERIENCE_LEVEL: 'nfmExperienceLevel',
+  NFM_PROJECT_READINESS: 'nfmProjectReadiness'
 }
 
 export const PROJECT_PAYLOAD_LEVELS = {
@@ -312,7 +318,10 @@ export const PROJECT_PAYLOAD_LEVELS = {
   NFM_LAND_USE_PEATLAND_RESTORATION: 'NFM_LAND_USE_PEATLAND_RESTORATION',
   NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER:
     'NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER',
-  NFM_LAND_USE_COASTAL_MARGINS: 'NFM_LAND_USE_COASTAL_MARGINS'
+  NFM_LAND_USE_COASTAL_MARGINS: 'NFM_LAND_USE_COASTAL_MARGINS',
+  NFM_LANDOWNER_CONSENT: 'NFM_LANDOWNER_CONSENT',
+  NFM_EXPERIENCE_LEVEL: 'NFM_EXPERIENCE_LEVEL',
+  NFM_PROJECT_READINESS: 'NFM_PROJECT_READINESS'
 }
 
 export const NFM_LAND_TYPES = {
@@ -376,6 +385,27 @@ export const NFM_MEASURES = {
   RUNOFF_MANAGEMENT: 'runoff_management',
   SALTMARSH_MANAGEMENT: 'saltmarsh_management',
   SAND_DUNE_MANAGEMENT: 'sand_dune_management'
+}
+
+export const NFM_LANDOWNER_CONSENT_OPTIONS = {
+  CONSENT_FULLY_SECURED: 'consent_fully_secured',
+  ENGAGED_BUT_NOT_FULLY_SECURED: 'engaged_but_not_fully_secured',
+  INITIAL_CONTACT_MADE: 'initial_contact_made',
+  NOT_YET_ENGAGED: 'not_yet_engaged'
+}
+
+export const NFM_EXPERIENCE_LEVEL_OPTIONS = {
+  NO_EXPERIENCE: 'no_experience',
+  SOME_EXPERIENCE: 'some_experience',
+  MODERATE_EXPERIENCE: 'moderate_experience',
+  EXTENSIVE_EXPERIENCE: 'extensive_experience'
+}
+
+export const NFM_PROJECT_READINESS_OPTIONS = {
+  EARLY_CONCEPT: 'early_concept',
+  DEVELOPING_PROPOSAL: 'developing_proposal',
+  WELL_DEVELOPED_PROPOSAL: 'well_developed_proposal',
+  READY_TO_DELIVER: 'ready_to_deliver'
 }
 
 export const PROJECT_VALIDATION_MESSAGES = {

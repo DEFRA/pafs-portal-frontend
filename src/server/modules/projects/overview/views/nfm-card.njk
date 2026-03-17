@@ -1,4 +1,4 @@
-{% macro nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, t) %}
+{% macro nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t) %}
   {% set hasNfmData = projectData[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES] %}
   {% set hasNfmOrSudIntervention = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] and 
       (PROJECT_INTERVENTION_TYPES.NFM in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] or 
@@ -101,6 +101,42 @@
                 </table>
               </div>
             </details>
+          {% endif %}
+
+          {# NFM Landowner Consent #}
+          {% if projectData[PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT] %}
+            <dl class="govuk-summary-list govuk-!-margin-top-6">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ t('projects.overview.nfm_summary_card.landowner_consent') }}</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ t('projects.nfm.landowner_consent.options.' + projectData[PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT]) }}
+                </dd>
+              </div>
+            </dl>
+          {% endif %}
+
+          {# NFM Experience Level #}
+          {% if projectData[PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL] %}
+            <dl class="govuk-summary-list govuk-!-margin-top-6">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ t('projects.overview.nfm_summary_card.experience_level') }}</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ t('projects.nfm.experience.options.' + projectData[PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL]) }}
+                </dd>
+              </div>
+            </dl>
+          {% endif %}
+
+          {# NFM Project Readiness #}
+          {% if projectData[PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS] %}
+            <dl class="govuk-summary-list govuk-!-margin-top-6">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ t('projects.overview.nfm_summary_card.project_readiness') }}</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ t('projects.nfm.project_readiness.options.' + projectData[PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS]) }}
+                </dd>
+              </div>
+            </dl>
           {% endif %}
         {% else %}
           <p class="govuk-body">{{ t('projects.overview.nfm_summary_card.not_added') }}</p>

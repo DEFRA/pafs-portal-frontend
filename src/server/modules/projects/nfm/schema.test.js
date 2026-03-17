@@ -10,10 +10,16 @@ import {
   nfmSaltmarshSchema,
   nfmSandDuneSchema,
   nfmLandUseChangeSchema,
-  nfmLandUseEnclosedArableFarmlandSchema
+  nfmLandUseEnclosedArableFarmlandSchema,
+  nfmLandownerConsentSchema,
+  nfmExperienceLevelSchema,
+  nfmProjectReadinessSchema
 } from './schema.js'
 import {
+  NFM_EXPERIENCE_LEVEL_OPTIONS,
+  NFM_PROJECT_READINESS_OPTIONS,
   PROJECT_PAYLOAD_FIELDS,
+  NFM_LANDOWNER_CONSENT_OPTIONS,
   NFM_MEASURES,
   NFM_LAND_TYPES
 } from '../../../common/constants/projects.js'
@@ -271,5 +277,62 @@ describe('NFM Land-use Schemas', () => {
 
     expect(result.error).toBeDefined()
     expect(result.error.details[0].type).toBe('number.precision')
+  })
+})
+
+describe('NFM Landowner Consent Schema', () => {
+  test('validates a selected landowner consent option', () => {
+    const result = nfmLandownerConsentSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT]:
+        NFM_LANDOWNER_CONSENT_OPTIONS.CONSENT_FULLY_SECURED
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects missing landowner consent option', () => {
+    const result = nfmLandownerConsentSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT]: ''
+    })
+
+    expect(result.error).toBeDefined()
+  })
+})
+
+describe('NFM Experience Level Schema', () => {
+  test('validates a selected experience option', () => {
+    const result = nfmExperienceLevelSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL]:
+        NFM_EXPERIENCE_LEVEL_OPTIONS.NO_EXPERIENCE
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects missing experience option', () => {
+    const result = nfmExperienceLevelSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL]: ''
+    })
+
+    expect(result.error).toBeDefined()
+  })
+})
+
+describe('NFM Project Readiness Schema', () => {
+  test('validates a selected project readiness option', () => {
+    const result = nfmProjectReadinessSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS]:
+        NFM_PROJECT_READINESS_OPTIONS.EARLY_CONCEPT
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects missing project readiness option', () => {
+    const result = nfmProjectReadinessSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS]: ''
+    })
+
+    expect(result.error).toBeDefined()
   })
 })

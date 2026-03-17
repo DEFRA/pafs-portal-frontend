@@ -1,0 +1,46 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block body %}
+  {% set hasExperienceError = fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL] %}
+
+  {% if hasExperienceError %}
+    {{ govukErrorSummary({
+      titleText: t('common.errors.error_summary_title'),
+      errorList: [
+        {
+          text: t(localKeyPrefix + '.error'),
+          href: '#nfmExperienceLevel'
+        }
+      ]
+    }) }}
+  {% endif %}
+
+  <form method="POST" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    {{ govukRadios({
+      idPrefix: PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL,
+      name: PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL,
+      value: formData[PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL],
+      fieldset: {
+        legend: {
+          text: t(localKeyPrefix + '.heading'),
+          classes: "govuk-fieldset__legend--xl",
+          isPageHeading: true
+        }
+      },
+      items: nfmExperienceOptions,
+      errorMessage: hasExperienceError and {
+        text: t(localKeyPrefix + '.error')
+      }
+    }) }}
+
+    {{ govukButton({
+      text: t('common.buttons.save_and_continue')
+    }) }}
+  </form>
+{% endblock %}

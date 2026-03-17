@@ -60,7 +60,10 @@ export const PROJECT_VIEWS = {
   NFM_LAND_USE_CHANGE: 'modules/projects/nfm/land-use-change',
   NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND:
     'modules/projects/nfm/land-use-enclosed-arable-farmland',
-  NFM_LAND_USE_DETAIL: 'modules/projects/nfm/land-use-detail'
+  NFM_LAND_USE_DETAIL: 'modules/projects/nfm/land-use-detail',
+  NFM_LANDOWNER_CONSENT: 'modules/projects/nfm/landowner-consent',
+  NFM_EXPERIENCE: 'modules/projects/nfm/experience',
+  NFM_PROJECT_READINESS: 'modules/projects/nfm/project-readiness'
 }
 
 export const GENERAL_VIEWS = {

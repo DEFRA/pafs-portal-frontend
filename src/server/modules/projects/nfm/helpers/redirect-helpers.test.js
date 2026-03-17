@@ -349,7 +349,7 @@ describe('NFM Redirect Helpers', () => {
       )
     })
 
-    test('should navigate to overview from last selected land-use detail step', async () => {
+    test('should redirect to landowner consent from last selected land-use detail step', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [NFM_LAND_TYPES.WOODLAND]
       }
@@ -362,8 +362,10 @@ describe('NFM Redirect Helpers', () => {
         'TEST-001'
       )
 
-      expect(navigateToProjectOverview).toHaveBeenCalledWith('TEST-001', mockH)
-      expect(result).toEqual({ redirected: true, path: '/overview' })
+      expect(result).toEqual({
+        redirected: true,
+        path: '/project/TEST-001/nfm-landowner-consent'
+      })
     })
   })
 })

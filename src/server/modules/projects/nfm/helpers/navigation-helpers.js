@@ -130,6 +130,25 @@ function getLandUseDetailBackLink(step, sessionData) {
   }
 }
 
+function getLandownerConsentBackLink(sessionData) {
+  const selectedLandTypes = getSelectedLandTypes(sessionData)
+
+  for (let i = NFM_LAND_TYPE_ORDER.length - 1; i >= 0; i--) {
+    const landType = NFM_LAND_TYPE_ORDER[i]
+    if (selectedLandTypes.includes(landType)) {
+      return {
+        targetEditURL: LAND_TYPE_ROUTE_MAP[landType],
+        conditionalRedirect: false
+      }
+    }
+  }
+
+  return {
+    targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+    conditionalRedirect: false
+  }
+}
+
 /**
  * Step sequence for NFM section
  * Maps each step to the next step's route
@@ -153,7 +172,10 @@ export const NFM_STEP_SEQUENCE = {
   [PROJECT_STEPS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH]: null,
   [PROJECT_STEPS.NFM_LAND_USE_PEATLAND_RESTORATION]: null,
   [PROJECT_STEPS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER]: null,
-  [PROJECT_STEPS.NFM_LAND_USE_COASTAL_MARGINS]: null
+  [PROJECT_STEPS.NFM_LAND_USE_COASTAL_MARGINS]: null,
+  [PROJECT_STEPS.NFM_LANDOWNER_CONSENT]: ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
+  [PROJECT_STEPS.NFM_EXPERIENCE]: ROUTES.PROJECT.EDIT.NFM.PROJECT_READINESS,
+  [PROJECT_STEPS.NFM_PROJECT_READINESS]: null
 }
 
 /**
@@ -172,6 +194,24 @@ export function getDynamicBackLink(step, sessionData) {
   // Land-use detail steps need dynamic back-link based on previous selected type
   if (LAND_USE_DETAIL_STEPS.has(step)) {
     return getLandUseDetailBackLink(step, sessionData)
+  }
+
+  if (step === PROJECT_STEPS.NFM_LANDOWNER_CONSENT) {
+    return getLandownerConsentBackLink(sessionData)
+  }
+
+  if (step === PROJECT_STEPS.NFM_EXPERIENCE) {
+    return {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LANDOWNER_CONSENT,
+      conditionalRedirect: false
+    }
+  }
+
+  if (step === PROJECT_STEPS.NFM_PROJECT_READINESS) {
+    return {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
+      conditionalRedirect: false
+    }
   }
 
   if (!(step in STEP_PREVIOUS_MEASURES)) {

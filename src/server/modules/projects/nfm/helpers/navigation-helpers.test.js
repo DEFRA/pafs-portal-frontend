@@ -14,6 +14,12 @@ describe('nfm navigation helpers', () => {
     )
     expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_RIVER_RESTORATION]).toBeNull()
     expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_LEAKY_BARRIERS]).toBeNull()
+    expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_LANDOWNER_CONSENT]).toBe(
+      ROUTES.PROJECT.EDIT.NFM.EXPERIENCE
+    )
+    expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_EXPERIENCE]).toBe(
+      ROUTES.PROJECT.EDIT.NFM.PROJECT_READINESS
+    )
   })
 
   test('returns null for selected measures step', () => {
@@ -229,6 +235,47 @@ describe('nfm navigation helpers', () => {
 
     expect(result).toEqual({
       targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    })
+  })
+
+  test('landowner consent goes back to last selected land-use detail', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_LANDOWNER_CONSENT, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+        'enclosed_arable_farmland,coastal_margins'
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_COASTAL_MARGINS,
+      conditionalRedirect: false
+    })
+  })
+
+  test('landowner consent falls back to land-use-change when no selected land types', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_LANDOWNER_CONSENT, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: ''
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    })
+  })
+
+  test('nfm experience goes back to landowner consent', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_EXPERIENCE, {})
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LANDOWNER_CONSENT,
+      conditionalRedirect: false
+    })
+  })
+
+  test('nfm project readiness goes back to experience', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_PROJECT_READINESS, {})
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
       conditionalRedirect: false
     })
   })

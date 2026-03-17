@@ -16,10 +16,13 @@ import {
   nfmLandUsePeatlandRestorationSchema,
   nfmLandUseRiversWetlandsFreshwaterSchema,
   nfmLandUseCoastalMarginsSchema,
+  nfmLandownerConsentSchema,
+  nfmExperienceLevelSchema,
   nfmSaltmarshSchema,
   nfmSandDuneSchema,
   nfmSelectedMeasuresSchema,
-  nfmWoodlandSchema
+  nfmWoodlandSchema,
+  nfmProjectReadinessSchema
 } from '../../schema.js'
 
 /**
@@ -196,5 +199,32 @@ export const NFM_CONFIG = {
     },
     schema: nfmLandUseCoastalMarginsSchema,
     fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LANDOWNER_CONSENT]: {
+    localKeyPrefix: 'projects.nfm.landowner_consent',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_COASTAL_MARGINS,
+      conditionalRedirect: false
+    },
+    schema: nfmLandownerConsentSchema,
+    fieldType: 'radio'
+  },
+  [PROJECT_STEPS.NFM_EXPERIENCE]: {
+    localKeyPrefix: 'projects.nfm.experience',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LANDOWNER_CONSENT,
+      conditionalRedirect: false
+    },
+    schema: nfmExperienceLevelSchema,
+    fieldType: 'radio'
+  },
+  [PROJECT_STEPS.NFM_PROJECT_READINESS]: {
+    localKeyPrefix: 'projects.nfm.project_readiness',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
+      conditionalRedirect: false
+    },
+    schema: nfmProjectReadinessSchema,
+    fieldType: 'radio'
   }
 }

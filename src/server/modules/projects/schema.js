@@ -94,5 +94,8 @@ export {
   nfmLandUseMountainMoorsAndHeathSchema,
   nfmLandUsePeatlandRestorationSchema,
   nfmLandUseRiversWetlandsFreshwaterSchema,
-  nfmLandUseCoastalMarginsSchema
+  nfmLandUseCoastalMarginsSchema,
+  nfmLandownerConsentSchema,
+  nfmExperienceLevelSchema,
+  nfmProjectReadinessSchema
 } from './schemas/nfm-schemas.js'

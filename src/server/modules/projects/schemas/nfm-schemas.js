@@ -8,10 +8,13 @@
 
 import Joi from 'joi'
 import {
+  NFM_EXPERIENCE_LEVEL_OPTIONS,
   NFM_LAND_TYPES,
+  NFM_LANDOWNER_CONSENT_OPTIONS,
   NFM_MEASURES,
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_VALIDATION_MESSAGES
+  PROJECT_VALIDATION_MESSAGES,
+  NFM_PROJECT_READINESS_OPTIONS
 } from '../../../common/constants/projects.js'
 
 const MSG_ENTER_AREA = 'Enter an area'
@@ -362,3 +365,42 @@ export const nfmLandUseCoastalMarginsSchema = createLandUseDetailSchema(
   PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE,
   PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER
 )
+
+export const nfmLandownerConsentSchema = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT]: Joi.string()
+    .valid(...Object.values(NFM_LANDOWNER_CONSENT_OPTIONS))
+    .required()
+    .messages({
+      'any.required':
+        'Please select whether you have secured consent from the relevant landowners.',
+      'string.empty':
+        'Please select whether you have secured consent from the relevant landowners.',
+      'any.only':
+        'Please select whether you have secured consent from the relevant landowners.'
+    })
+}).unknown(true)
+
+export const nfmExperienceLevelSchema = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL]: Joi.string()
+    .valid(...Object.values(NFM_EXPERIENCE_LEVEL_OPTIONS))
+    .required()
+    .messages({
+      'any.required':
+        'Please select your experience of completing natural flood management measures.',
+      'string.empty':
+        'Please select your experience of completing natural flood management measures.',
+      'any.only':
+        'Please select your experience of completing natural flood management measures.'
+    })
+}).unknown(true)
+
+export const nfmProjectReadinessSchema = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS]: Joi.string()
+    .valid(...Object.values(NFM_PROJECT_READINESS_OPTIONS))
+    .required()
+    .messages({
+      'any.required': 'Please select how developed your proposal is.',
+      'string.empty': 'Please select how developed your proposal is.',
+      'any.only': 'Please select how developed your proposal is.'
+    })
+}).unknown(true)

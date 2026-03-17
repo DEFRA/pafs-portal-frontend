@@ -145,6 +145,9 @@
       "not_added": "No natural flood management measures added yet",
       "selected_measures": "Selected NFM measures",
       "measures_details": "Measure details",
+      "landowner_consent": "Landowner consent",
+      "experience_level": "Experience of completing NFM measures",
+      "project_readiness": "How developed the proposal is",
       "table": {
         "measure_type": "Measure type",
         "area": "Area",
@@ -685,6 +688,39 @@
         "after": {
           "label": "After natural flood measures"
         }
+      }
+    },
+    "landowner_consent": {
+      "title": "Have you secured consent from the relevant landowners?",
+      "heading": "Have you secured consent from the relevant landowners?",
+      "error": "Please select whether you have secured consent from the relevant landowners.",
+      "options": {
+        "consent_fully_secured": "Consent fully secured",
+        "engaged_but_not_fully_secured": "Engaged but not fully secured",
+        "initial_contact_made": "Initial contact made",
+        "not_yet_engaged": "Not yet engaged"
+      }
+    },
+    "experience": {
+      "title": "What is your experience of completing natural flood management measures?",
+      "heading": "What is your experience of completing natural flood management measures?",
+      "error": "Please select your experience of completing natural flood management measures.",
+      "options": {
+        "no_experience": "No experience: not completed natural flood management measures before but have relevant land or environmental project experience",
+        "some_experience": "Some experience: completed or supported one or two small natural flood management measures",
+        "moderate_experience": "Moderate experience: completed several natural flood management measures across one or more sites, and worked with landowners, contractors, and regulators",
+        "extensive_experience": "Extensive experience: led multiple natural flood management measure projects across a catchment or coastal area, and have a strong record of partnership working"
+      }
+    },
+    "project_readiness": {
+      "title": "How developed is your proposal?",
+      "heading": "How developed is your proposal?",
+      "error": "Please select how developed your proposal is.",
+      "options": {
+        "early_concept": "Early concept: ideas identified but designs are at scoping stage and a team is not yet formed or roles are unclear",
+        "developing_proposal": "Developing proposal: outline designs are drafted, a core team has been identified with some relevant skills, and initial partner engagement is underway",
+        "well_developed_proposal": "Well-developed proposal: detailed designs are ready, team roles have been defined and capacity assessed, and partnerships have been agreed in principle",
+        "ready_to_deliver": "Ready to deliver: detailed designs are ready, an experienced team is ready, and partners are confirmed and have clear responsibilities"
       }
     }
   },
