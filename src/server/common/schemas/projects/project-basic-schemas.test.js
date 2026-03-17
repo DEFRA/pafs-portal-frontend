@@ -92,6 +92,22 @@ describe('project-basic-schemas', () => {
       expect(value).toBe('Project Name')
     })
 
+    test('should collapse multiple internal spaces to a single space', () => {
+      const { error, value } = projectNameSchema.validate(
+        'South  Yorkshire Flood'
+      )
+      expect(error).toBeUndefined()
+      expect(value).toBe('South Yorkshire Flood')
+    })
+
+    test('should collapse many consecutive spaces to a single space', () => {
+      const { error, value } = projectNameSchema.validate(
+        'South   Yorkshire   Flood'
+      )
+      expect(error).toBeUndefined()
+      expect(value).toBe('South Yorkshire Flood')
+    })
+
     test('should reject empty string', () => {
       const { error } = projectNameSchema.validate('')
       expect(error).toBeDefined()
