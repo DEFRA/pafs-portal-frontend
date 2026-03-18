@@ -143,8 +143,9 @@ export const currentFloodFluvialRiskSchema = Joi.string()
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK)
   .messages({
-    'any.required': 'Select a flood risk level',
-    'any.only': 'Select a valid flood risk level'
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.CURRENT_FLOOD_FLUVIAL_RISK_REQUIRED,
+    'any.only': PROJECT_VALIDATION_MESSAGES.CURRENT_FLOOD_FLUVIAL_RISK_INVALID
   })
 
 /**
@@ -156,8 +157,10 @@ export const currentFloodSurfaceWaterRiskSchema = Joi.string()
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK)
   .messages({
-    'any.required': 'Select a surface water flood risk level',
-    'any.only': 'Select a valid surface water flood risk level'
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.CURRENT_FLOOD_SURFACE_WATER_RISK_REQUIRED,
+    'any.only':
+      PROJECT_VALIDATION_MESSAGES.CURRENT_FLOOD_SURFACE_WATER_RISK_INVALID
   })
 
 /**
@@ -169,6 +172,7 @@ export const currentCoastalErosionRiskSchema = Joi.string()
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK)
   .messages({
-    'any.required': 'Select a coastal erosion risk level',
-    'any.only': 'Select a valid coastal erosion risk level'
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.CURRENT_COASTAL_EROSION_RISK_REQUIRED,
+    'any.only': PROJECT_VALIDATION_MESSAGES.CURRENT_COASTAL_EROSION_RISK_INVALID
   })

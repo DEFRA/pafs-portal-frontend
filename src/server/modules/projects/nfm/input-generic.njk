@@ -1,0 +1,53 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}{{ t(localKeyPrefix + '.title') }}{% endblock %}
+
+{% block body %}
+  {% if errors and errors.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.error_summary_title'),
+      errorList: errors
+    }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    <div class="govuk-form-group {% if errors and errors.length > 0 %}govuk-form-group--error{% endif %}">
+      <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.title') }}</h1>
+
+      {% for field in inputFields %}
+        {{ govukInput({
+          label: {
+            text: t(localKeyPrefix + '.' + field.labelKey),
+            classes: "govuk-label--m",
+            isPageHeading: false
+          },
+          hint: field.hintKey and {
+            text: t(localKeyPrefix + '.' + field.hintKey)
+          },
+          id: field.name,
+          name: field.name,
+          value: formData[field.name] or '',
+          suffix: {
+            text: field.suffix
+          },
+          classes: "govuk-input--width-10",
+          errorMessage: fieldErrors[field.name] and {
+            text: fieldErrors[field.name]
+          }
+        }) }}
+      {% endfor %}
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+  </form>
+{% endblock %}

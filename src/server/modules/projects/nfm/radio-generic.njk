@@ -5,15 +5,15 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block body %}
-  {% set hasConsentError = fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT] %}
+  {% set hasRadioError = fieldErrors and fieldErrors[radioFieldName] %}
 
-  {% if hasConsentError %}
+  {% if hasRadioError %}
     {{ govukErrorSummary({
       titleText: t('common.error_summary_title'),
       errorList: [
         {
           text: t(localKeyPrefix + '.error'),
-          href: '#nfmLandownerConsent'
+          href: '#' + radioFieldName
         }
       ]
     }) }}
@@ -23,9 +23,9 @@
     <input type="hidden" name="crumb" value="{{ crumb }}">
 
     {{ govukRadios({
-      idPrefix: PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT,
-      name: PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT,
-      value: formData[PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT],
+      idPrefix: radioFieldName,
+      name: radioFieldName,
+      value: formData[radioFieldName],
       fieldset: {
         legend: {
           text: t(localKeyPrefix + '.heading'),
@@ -33,8 +33,8 @@
           isPageHeading: true
         }
       },
-      items: nfmLandownerConsentOptions,
-      errorMessage: hasConsentError and {
+      items: radioOptions,
+      errorMessage: hasRadioError and {
         text: t(localKeyPrefix + '.error')
       }
     }) }}

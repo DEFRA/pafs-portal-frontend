@@ -283,7 +283,14 @@ class NfmController {
   _getViewData(request) {
     const step = getProjectStep(request)
     const config = this._getConfig(step)
-    let { backLinkOptions, localKeyPrefix, fieldType } = config
+    let {
+      backLinkOptions,
+      localKeyPrefix,
+      fieldType,
+      inputFields,
+      radioFieldName,
+      radioOptionsType
+    } = config
     const sessionData = getSessionData(request)
 
     // Get dynamic back link if applicable
@@ -301,12 +308,23 @@ class NfmController {
         PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS
     }
 
+    const radioOptionsByType = {
+      landownerConsent: this._getNfmLandownerConsentOptions(request),
+      experience: this._getNfmExperienceOptions(request),
+      projectReadiness: this._getNfmProjectReadinessOptions(request)
+    }
+
     const landUseFieldConfig = LAND_USE_DETAIL_FIELD_CONFIG[step]
     const additionalData = {
       step,
       projectSteps: PROJECT_STEPS,
       fieldType,
       fieldName: fieldNameMap[step],
+      inputFields,
+      radioFieldName,
+      radioOptions: radioOptionsType
+        ? radioOptionsByType[radioOptionsType]
+        : undefined,
       nfmMeasureOptions: this._getNfmMeasureOptions(request),
       nfmLandUseOptions: this._getNfmLandUseOptions(request),
       nfmLandownerConsentOptions: this._getNfmLandownerConsentOptions(request),

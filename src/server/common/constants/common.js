@@ -49,21 +49,21 @@ export const PROJECT_VIEWS = {
   GOALS_URGENCY_CONFIDENCE: 'modules/projects/goals-urgency-confidence/index',
   ENVIRONMENTAL_BENEFITS: 'modules/projects/environmental-benefits/index',
   NFM: 'modules/projects/nfm/index',
-  NFM_RIVER_RESTORATION: 'modules/projects/nfm/river-restoration',
-  NFM_LEAKY_BARRIERS: 'modules/projects/nfm/leaky-barriers',
-  NFM_OFFLINE_STORAGE: 'modules/projects/nfm/offline-storage',
-  NFM_WOODLAND: 'modules/projects/nfm/woodland',
-  NFM_HEADWATER_DRAINAGE: 'modules/projects/nfm/headwater-drainage',
-  NFM_RUNOFF_MANAGEMENT: 'modules/projects/nfm/runoff-management',
-  NFM_SALTMARSH: 'modules/projects/nfm/saltmarsh',
-  NFM_SAND_DUNE: 'modules/projects/nfm/sand-dune',
+  NFM_RIVER_RESTORATION: 'modules/projects/nfm/input-generic',
+  NFM_LEAKY_BARRIERS: 'modules/projects/nfm/input-generic',
+  NFM_OFFLINE_STORAGE: 'modules/projects/nfm/input-generic',
+  NFM_WOODLAND: 'modules/projects/nfm/input-generic',
+  NFM_HEADWATER_DRAINAGE: 'modules/projects/nfm/input-generic',
+  NFM_RUNOFF_MANAGEMENT: 'modules/projects/nfm/input-generic',
+  NFM_SALTMARSH: 'modules/projects/nfm/input-generic',
+  NFM_SAND_DUNE: 'modules/projects/nfm/input-generic',
   NFM_LAND_USE_CHANGE: 'modules/projects/nfm/land-use-change',
   NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND:
     'modules/projects/nfm/land-use-enclosed-arable-farmland',
   NFM_LAND_USE_DETAIL: 'modules/projects/nfm/land-use-detail',
-  NFM_LANDOWNER_CONSENT: 'modules/projects/nfm/landowner-consent',
-  NFM_EXPERIENCE: 'modules/projects/nfm/experience',
-  NFM_PROJECT_READINESS: 'modules/projects/nfm/project-readiness'
+  NFM_LANDOWNER_CONSENT: 'modules/projects/nfm/radio-generic',
+  NFM_EXPERIENCE: 'modules/projects/nfm/radio-generic',
+  NFM_PROJECT_READINESS: 'modules/projects/nfm/radio-generic'
 }
 
 export const GENERAL_VIEWS = {

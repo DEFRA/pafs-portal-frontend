@@ -611,6 +611,12 @@
         },
         "after": {
           "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
         }
       },
       "enclosed_livestock_farmland": {
@@ -620,6 +626,12 @@
         },
         "after": {
           "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
         }
       },
       "enclosed_dairying_farmland": {
@@ -629,6 +641,12 @@
         },
         "after": {
           "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
         }
       },
       "semi_natural_grassland": {
@@ -638,6 +656,12 @@
         },
         "after": {
           "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
         }
       },
       "woodland": {
@@ -647,6 +671,12 @@
         },
         "after": {
           "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
         }
       },
       "mountain_moors_and_heath": {
@@ -656,6 +686,12 @@
         },
         "after": {
           "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
         }
       },
       "peatland_restoration": {
@@ -665,6 +701,12 @@
         },
         "after": {
           "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
         }
       },
       "rivers_wetlands_freshwater_habitats": {
@@ -674,6 +716,12 @@
         },
         "after": {
           "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
         }
       },
       "coastal_margins": {
@@ -683,6 +731,12 @@
         },
         "after": {
           "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
         }
       }
     },

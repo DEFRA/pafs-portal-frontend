@@ -18,22 +18,20 @@ import {
 } from '../../../common/constants/projects.js'
 
 const MSG_ENTER_AREA = 'Enter an area'
-const MSG_AREA_POSITIVE = 'Area must be a positive number'
-const MSG_AREA_POSITIVE_2DP =
-  'Area must be a positive number with up to 2 decimal places'
+const MSG_ENTER_AREA_IN_HECTARES = 'Enter the area in hectares'
+const MSG_AREA_GREATER_THAN_ZERO = 'Area must be a number greater than 0'
 const MSG_AREA_PRECISION_2DP = 'Area must have up to 2 decimal places'
 const MSG_AREA_NON_NEGATIVE = 'Area must be a number greater than or equal to 0'
+const MSG_LAND_USE_AREA_BEFORE = 'Enter the area before natural flood measures'
+const MSG_LAND_USE_AREA_AFTER = 'Enter the area after natural flood measures'
 
-const MSG_VOLUME_POSITIVE_2DP =
-  'Volume must be a positive number with up to 2 decimal places'
+const MSG_VOLUME_GREATER_THAN_ZERO = 'Volume must be a number greater than 0'
 const MSG_VOLUME_PRECISION_2DP = 'Volume must have up to 2 decimal places'
 
-const MSG_LENGTH_POSITIVE_2DP =
-  'Length must be a positive number with up to 2 decimal places'
+const MSG_LENGTH_GREATER_THAN_ZERO = 'Length must be a number greater than 0'
 const MSG_LENGTH_PRECISION_2DP = 'Length must have up to 2 decimal places'
 
-const MSG_WIDTH_POSITIVE_2DP =
-  'Width must be a positive number with up to 2 decimal places'
+const MSG_WIDTH_GREATER_THAN_ZERO = 'Width must be a number greater than 0'
 const MSG_WIDTH_PRECISION_2DP = 'Width must have up to 2 decimal places'
 const MSG_SELECT_AT_LEAST_ONE_LAND_TYPE = 'Select at least one land type'
 
@@ -42,10 +40,20 @@ const maxTwoDecimalPlaces = (value, helpers) => {
     return value
   }
 
-  const scaled = value * 100
-  const hasMaxTwoDecimals = Math.abs(scaled - Math.trunc(scaled)) < 1e-8
+  // Convert to string to check decimal places accurately
+  const valueStr = String(value)
+  const decimalIndex = valueStr.indexOf('.')
 
-  return hasMaxTwoDecimals ? value : helpers.error('number.precision')
+  // If no decimal point, it's valid (whole number)
+  if (decimalIndex === -1) {
+    return value
+  }
+
+  // Count decimal places
+  const decimalPlaces = valueStr.length - decimalIndex - 1
+
+  // Allow up to 2 decimal places
+  return decimalPlaces <= 2 ? value : helpers.error('number.precision')
 }
 
 /**
@@ -75,14 +83,15 @@ export const nfmSelectedMeasuresSchema = Joi.object({
  */
 export const nfmRiverRestorationSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': MSG_AREA_POSITIVE_2DP,
-      'number.positive': MSG_AREA_POSITIVE_2DP,
+      'number.base': MSG_AREA_GREATER_THAN_ZERO,
+      'number.positive': MSG_AREA_GREATER_THAN_ZERO,
       'number.precision': MSG_AREA_PRECISION_2DP,
-      'any.required': 'Enter the area in hectares'
+      'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: Joi.number()
     .positive()
@@ -90,8 +99,8 @@ export const nfmRiverRestorationSchema = Joi.object({
     .allow(null, '')
     .optional()
     .messages({
-      'number.base': MSG_VOLUME_POSITIVE_2DP,
-      'number.positive': MSG_VOLUME_POSITIVE_2DP,
+      'number.base': MSG_VOLUME_GREATER_THAN_ZERO,
+      'number.positive': MSG_VOLUME_GREATER_THAN_ZERO,
       'number.precision': MSG_VOLUME_PRECISION_2DP
     })
 }).unknown(true)
@@ -107,29 +116,31 @@ export const nfmLeakyBarriersSchema = Joi.object({
     .allow(null, '')
     .optional()
     .messages({
-      'number.base': MSG_VOLUME_POSITIVE_2DP,
-      'number.positive': MSG_VOLUME_POSITIVE_2DP,
+      'number.base': MSG_VOLUME_GREATER_THAN_ZERO,
+      'number.positive': MSG_VOLUME_GREATER_THAN_ZERO,
       'number.precision': MSG_VOLUME_PRECISION_2DP
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': MSG_LENGTH_POSITIVE_2DP,
-      'number.positive': MSG_LENGTH_POSITIVE_2DP,
+      'number.base': MSG_LENGTH_GREATER_THAN_ZERO,
+      'number.positive': MSG_LENGTH_GREATER_THAN_ZERO,
       'number.precision': MSG_LENGTH_PRECISION_2DP,
-      'any.required': 'Enter the length in kilometres'
+      'any.required': 'Enter the length in km'
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': MSG_WIDTH_POSITIVE_2DP,
-      'number.positive': MSG_WIDTH_POSITIVE_2DP,
+      'number.base': MSG_WIDTH_GREATER_THAN_ZERO,
+      'number.positive': MSG_WIDTH_GREATER_THAN_ZERO,
       'number.precision': MSG_WIDTH_PRECISION_2DP,
-      'any.required': 'Enter the typical width in metres'
+      'any.required': 'Enter the breadth in m'
     })
 }).unknown(true)
 
@@ -139,22 +150,23 @@ export const nfmLeakyBarriersSchema = Joi.object({
  */
 export const nfmOfflineStorageSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': MSG_ENTER_AREA,
-      'number.positive': MSG_AREA_POSITIVE,
+      'number.base': MSG_AREA_GREATER_THAN_ZERO,
+      'number.positive': MSG_AREA_GREATER_THAN_ZERO,
       'number.precision': MSG_AREA_PRECISION_2DP,
-      'any.required': MSG_ENTER_AREA
+      'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: Joi.number()
     .positive()
     .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .messages({
-      'number.base': 'Volume must be a number',
-      'number.positive': 'Volume must be a positive number',
+      'number.base': MSG_VOLUME_GREATER_THAN_ZERO,
+      'number.positive': MSG_VOLUME_GREATER_THAN_ZERO,
       'number.precision': MSG_VOLUME_PRECISION_2DP
     })
 }).unknown(true)
@@ -165,14 +177,15 @@ export const nfmOfflineStorageSchema = Joi.object({
  */
 export const nfmWoodlandSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': MSG_ENTER_AREA,
-      'number.positive': MSG_AREA_POSITIVE,
+      'number.base': MSG_AREA_GREATER_THAN_ZERO,
+      'number.positive': MSG_AREA_GREATER_THAN_ZERO,
       'number.precision': MSG_AREA_PRECISION_2DP,
-      'any.required': MSG_ENTER_AREA
+      'any.required': MSG_ENTER_AREA_IN_HECTARES
     })
 }).unknown(true)
 
@@ -182,14 +195,15 @@ export const nfmWoodlandSchema = Joi.object({
  */
 export const nfmHeadwaterDrainageSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': MSG_AREA_POSITIVE_2DP,
-      'number.positive': MSG_AREA_POSITIVE_2DP,
+      'number.base': MSG_AREA_GREATER_THAN_ZERO,
+      'number.positive': MSG_AREA_GREATER_THAN_ZERO,
       'number.precision': MSG_AREA_PRECISION_2DP,
-      'any.required': 'Enter the area in hectares'
+      'any.required': MSG_ENTER_AREA_IN_HECTARES
     })
 }).unknown(true)
 
@@ -199,22 +213,23 @@ export const nfmHeadwaterDrainageSchema = Joi.object({
  */
 export const nfmRunoffManagementSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': MSG_ENTER_AREA,
-      'number.positive': MSG_AREA_POSITIVE,
+      'number.base': MSG_AREA_GREATER_THAN_ZERO,
+      'number.positive': MSG_AREA_GREATER_THAN_ZERO,
       'number.precision': MSG_AREA_PRECISION_2DP,
-      'any.required': MSG_ENTER_AREA
+      'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: Joi.number()
     .positive()
     .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .messages({
-      'number.base': 'Volume must be a number',
-      'number.positive': 'Volume must be a positive number',
+      'number.base': MSG_VOLUME_GREATER_THAN_ZERO,
+      'number.positive': MSG_VOLUME_GREATER_THAN_ZERO,
       'number.precision': MSG_VOLUME_PRECISION_2DP
     })
 }).unknown(true)
@@ -225,14 +240,15 @@ export const nfmRunoffManagementSchema = Joi.object({
  */
 export const nfmSaltmarshSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': MSG_ENTER_AREA,
-      'number.positive': MSG_AREA_POSITIVE,
+      'number.base': MSG_AREA_GREATER_THAN_ZERO,
+      'number.positive': MSG_AREA_GREATER_THAN_ZERO,
       'number.precision': MSG_AREA_PRECISION_2DP,
-      'any.required': MSG_ENTER_AREA
+      'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: Joi.number()
     .positive()
@@ -251,14 +267,15 @@ export const nfmSaltmarshSchema = Joi.object({
  */
 export const nfmSandDuneSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
-      'number.base': MSG_ENTER_AREA,
-      'number.positive': MSG_AREA_POSITIVE,
+      'number.base': MSG_AREA_GREATER_THAN_ZERO,
+      'number.positive': MSG_AREA_GREATER_THAN_ZERO,
       'number.precision': MSG_AREA_PRECISION_2DP,
-      'any.required': MSG_ENTER_AREA
+      'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: Joi.number()
     .positive()
@@ -305,7 +322,7 @@ const createLandUseDetailSchema = (beforeField, afterField) =>
         'number.base': MSG_AREA_NON_NEGATIVE,
         'number.min': MSG_AREA_NON_NEGATIVE,
         'number.precision': MSG_AREA_PRECISION_2DP,
-        'any.required': 'Enter the area before natural flood measures'
+        'any.required': MSG_LAND_USE_AREA_BEFORE
       }),
     [afterField]: Joi.number()
       .empty('')
@@ -316,7 +333,7 @@ const createLandUseDetailSchema = (beforeField, afterField) =>
         'number.base': MSG_AREA_NON_NEGATIVE,
         'number.min': MSG_AREA_NON_NEGATIVE,
         'number.precision': MSG_AREA_PRECISION_2DP,
-        'any.required': 'Enter the area after natural flood measures'
+        'any.required': MSG_LAND_USE_AREA_AFTER
       })
   }).unknown(true)
 
@@ -374,11 +391,10 @@ export const nfmLandownerConsentSchema = Joi.object({
     .required()
     .messages({
       'any.required':
-        'Please select whether you have secured consent from the relevant landowners.',
+        PROJECT_VALIDATION_MESSAGES.NFM_LANDOWNER_CONSENT_REQUIRED,
       'string.empty':
-        'Please select whether you have secured consent from the relevant landowners.',
-      'any.only':
-        'Please select whether you have secured consent from the relevant landowners.'
+        PROJECT_VALIDATION_MESSAGES.NFM_LANDOWNER_CONSENT_REQUIRED,
+      'any.only': PROJECT_VALIDATION_MESSAGES.NFM_LANDOWNER_CONSENT_INVALID
     })
 }).unknown(true)
 
@@ -387,12 +403,9 @@ export const nfmExperienceLevelSchema = Joi.object({
     .valid(...Object.values(NFM_EXPERIENCE_LEVEL_OPTIONS))
     .required()
     .messages({
-      'any.required':
-        'Please select your experience of completing natural flood management measures.',
-      'string.empty':
-        'Please select your experience of completing natural flood management measures.',
-      'any.only':
-        'Please select your experience of completing natural flood management measures.'
+      'any.required': PROJECT_VALIDATION_MESSAGES.NFM_EXPERIENCE_LEVEL_REQUIRED,
+      'string.empty': PROJECT_VALIDATION_MESSAGES.NFM_EXPERIENCE_LEVEL_REQUIRED,
+      'any.only': PROJECT_VALIDATION_MESSAGES.NFM_EXPERIENCE_LEVEL_INVALID
     })
 }).unknown(true)
 
@@ -401,8 +414,10 @@ export const nfmProjectReadinessSchema = Joi.object({
     .valid(...Object.values(NFM_PROJECT_READINESS_OPTIONS))
     .required()
     .messages({
-      'any.required': 'Please select how developed your proposal is.',
-      'string.empty': 'Please select how developed your proposal is.',
-      'any.only': 'Please select how developed your proposal is.'
+      'any.required':
+        PROJECT_VALIDATION_MESSAGES.NFM_PROJECT_READINESS_REQUIRED,
+      'string.empty':
+        PROJECT_VALIDATION_MESSAGES.NFM_PROJECT_READINESS_REQUIRED,
+      'any.only': PROJECT_VALIDATION_MESSAGES.NFM_PROJECT_READINESS_INVALID
     })
 }).unknown(true)

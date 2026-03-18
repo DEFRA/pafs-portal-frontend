@@ -1,5 +1,8 @@
 import { ROUTES } from '../../../../common/constants/routes.js'
-import { PROJECT_STEPS } from '../../../../common/constants/projects.js'
+import {
+  PROJECT_PAYLOAD_FIELDS,
+  PROJECT_STEPS
+} from '../../../../common/constants/projects.js'
 import {
   nfmHeadwaterDrainageSchema,
   nfmLeakyBarriersSchema,
@@ -45,7 +48,20 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmRiverRestorationSchema,
-    fieldType: 'input'
+    fieldType: 'input',
+    inputFields: [
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA,
+        labelKey: 'area.label',
+        suffix: 'hectares'
+      },
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME,
+        labelKey: 'volume.label',
+        hintKey: 'volume.hint',
+        suffix: 'm³'
+      }
+    ]
   },
   [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: {
     localKeyPrefix: 'projects.nfm.leaky_barriers',
@@ -54,7 +70,25 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmLeakyBarriersSchema,
-    fieldType: 'input'
+    fieldType: 'input',
+    inputFields: [
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME,
+        labelKey: 'volume.label',
+        hintKey: 'volume.hint',
+        suffix: 'm³'
+      },
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH,
+        labelKey: 'length.label',
+        suffix: 'km'
+      },
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH,
+        labelKey: 'width.label',
+        suffix: 'm'
+      }
+    ]
   },
   [PROJECT_STEPS.NFM_OFFLINE_STORAGE]: {
     localKeyPrefix: 'projects.nfm.offline_storage',
@@ -63,7 +97,20 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmOfflineStorageSchema,
-    fieldType: 'input'
+    fieldType: 'input',
+    inputFields: [
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA,
+        labelKey: 'area.label',
+        suffix: 'hectares'
+      },
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME,
+        labelKey: 'volume.label',
+        hintKey: 'volume.hint',
+        suffix: 'm³'
+      }
+    ]
   },
   [PROJECT_STEPS.NFM_WOODLAND]: {
     localKeyPrefix: 'projects.nfm.woodland',
@@ -72,7 +119,14 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmWoodlandSchema,
-    fieldType: 'input'
+    fieldType: 'input',
+    inputFields: [
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA,
+        labelKey: 'area.label',
+        suffix: 'hectares'
+      }
+    ]
   },
   [PROJECT_STEPS.NFM_HEADWATER_DRAINAGE]: {
     localKeyPrefix: 'projects.nfm.headwater_drainage',
@@ -81,7 +135,14 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmHeadwaterDrainageSchema,
-    fieldType: 'input'
+    fieldType: 'input',
+    inputFields: [
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA,
+        labelKey: 'area.label',
+        suffix: 'hectares'
+      }
+    ]
   },
   [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]: {
     localKeyPrefix: 'projects.nfm.runoff_management',
@@ -90,7 +151,20 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmRunoffManagementSchema,
-    fieldType: 'input'
+    fieldType: 'input',
+    inputFields: [
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA,
+        labelKey: 'area.label',
+        suffix: 'hectares'
+      },
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME,
+        labelKey: 'volume.label',
+        hintKey: 'volume.hint',
+        suffix: 'm³'
+      }
+    ]
   },
   [PROJECT_STEPS.NFM_SALTMARSH]: {
     localKeyPrefix: 'projects.nfm.saltmarsh',
@@ -99,7 +173,20 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmSaltmarshSchema,
-    fieldType: 'input'
+    fieldType: 'input',
+    inputFields: [
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA,
+        labelKey: 'area.label',
+        suffix: 'hectares'
+      },
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH,
+        labelKey: 'length.label',
+        hintKey: 'length.hint',
+        suffix: 'km'
+      }
+    ]
   },
   [PROJECT_STEPS.NFM_SAND_DUNE]: {
     localKeyPrefix: 'projects.nfm.sand_dune',
@@ -108,7 +195,20 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmSandDuneSchema,
-    fieldType: 'input'
+    fieldType: 'input',
+    inputFields: [
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA,
+        labelKey: 'area.label',
+        suffix: 'hectares'
+      },
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH,
+        labelKey: 'length.label',
+        hintKey: 'length.hint',
+        suffix: 'km'
+      }
+    ]
   },
   [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: {
     localKeyPrefix: 'projects.nfm.land_use_change',
@@ -207,7 +307,9 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmLandownerConsentSchema,
-    fieldType: 'radio'
+    fieldType: 'radio',
+    radioFieldName: PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT,
+    radioOptionsType: 'landownerConsent'
   },
   [PROJECT_STEPS.NFM_EXPERIENCE]: {
     localKeyPrefix: 'projects.nfm.experience',
@@ -216,7 +318,9 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmExperienceLevelSchema,
-    fieldType: 'radio'
+    fieldType: 'radio',
+    radioFieldName: PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL,
+    radioOptionsType: 'experience'
   },
   [PROJECT_STEPS.NFM_PROJECT_READINESS]: {
     localKeyPrefix: 'projects.nfm.project_readiness',
@@ -225,6 +329,8 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmProjectReadinessSchema,
-    fieldType: 'radio'
+    fieldType: 'radio',
+    radioFieldName: PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS,
+    radioOptionsType: 'projectReadiness'
   }
 }
