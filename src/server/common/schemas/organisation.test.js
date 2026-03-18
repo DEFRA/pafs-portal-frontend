@@ -51,6 +51,20 @@ describe('Organisation Schemas', () => {
       const result = organisationNameSchema.validate('A')
       expect(result.error).toBeUndefined()
     })
+
+    test('collapses multiple internal spaces to a single space', () => {
+      const result = organisationNameSchema.validate('South  Yorkshire')
+      expect(result.error).toBeUndefined()
+      expect(result.value).toBe('South Yorkshire')
+    })
+
+    test('collapses many consecutive spaces to a single space', () => {
+      const result = organisationNameSchema.validate(
+        'South   Yorkshire   Flood'
+      )
+      expect(result.error).toBeUndefined()
+      expect(result.value).toBe('South Yorkshire Flood')
+    })
   })
 
   describe('organisationIdentifierSchema', () => {

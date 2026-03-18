@@ -1,0 +1,63 @@
+{% extends "layouts/projects.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}{{ t('projects.nfm.land_use.enclosed_arable_farmland.title') }}{% endblock %}
+
+{% block body %}
+  {% if errors and errors.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.error_summary_title'),
+      errorList: errors
+    }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <div class="govuk-form-group {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE] or fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER] %}govuk-form-group--error{% endif %}">
+      <h1 class="govuk-heading-l">{{ t('projects.nfm.land_use.enclosed_arable_farmland.title') }}</h1>
+
+      {{ govukInput({
+        label: {
+          text: t('projects.nfm.land_use.enclosed_arable_farmland.before.label'),
+          classes: "govuk-label--m",
+          isPageHeading: false
+        },
+        id: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
+        name: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
+        value: formData.nfmEnclosedArableFarmlandBefore if formData.nfmEnclosedArableFarmlandBefore else '',
+        suffix: {
+          text: "hectares"
+        },
+        classes: "govuk-input--width-10",
+        errorMessage: {
+          text: fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]
+        } if fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE] else undefined
+      }) }}
+
+      {{ govukInput({
+        label: {
+          text: t('projects.nfm.land_use.enclosed_arable_farmland.after.label'),
+          classes: "govuk-label--m",
+          isPageHeading: false
+        },
+        id: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER,
+        name: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER,
+        value: formData.nfmEnclosedArableFarmlandAfter if formData.nfmEnclosedArableFarmlandAfter else '',
+        suffix: {
+          text: "hectares"
+        },
+        classes: "govuk-input--width-10",
+        errorMessage: {
+          text: fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]
+        } if fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER] else undefined
+      }) }}
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+  </form>
+{% endblock %}

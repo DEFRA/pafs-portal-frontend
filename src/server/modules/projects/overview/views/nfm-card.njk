@@ -1,0 +1,147 @@
+{% macro nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t) %}
+  {% set hasNfmData = projectData[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES] %}
+  {% set hasNfmOrSudIntervention = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] and 
+      (PROJECT_INTERVENTION_TYPES.NFM in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] or 
+       PROJECT_INTERVENTION_TYPES.SUDS in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]) %}
+  
+  {% if hasNfmOrSudIntervention %}
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title">{{ t('projects.overview.nfm_summary_card.title') }}</h2>
+        <ul class="govuk-summary-card__actions">
+          <li class="govuk-summary-card__action">
+            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.NFM_SELECTED_MEASURES }}">
+              {% if hasNfmData %}{{ t('common.change') }}
+              {% else %}{{ t('common.add') }}
+              {% endif %}
+              <span class="govuk-visually-hidden"> {{ t('projects.overview.nfm_summary_card.title') | lower }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="govuk-summary-card__content">
+        {% if hasNfmData %}  
+          {# NFM Measures Details Table #}
+          {% if projectData.pafs_core_nfm_measures and projectData.pafs_core_nfm_measures.length > 0 %}
+            <details class="govuk-details govuk-!-margin-top-6">
+              <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                  Selected Measures ({{ projectData.pafs_core_nfm_measures.length }})
+                </span>
+              </summary>
+              <div class="govuk-details__text">
+                <table class="govuk-table">
+                  <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.measure_type') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.area') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.volume') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.length') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.table.width') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="govuk-table__body">
+                    {% for measure in projectData.pafs_core_nfm_measures %}
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">
+                          {{ t('projects.nfm.selected_measures.options.' + measure.measureType) }}
+                        </th>
+                        <td class="govuk-table__cell">
+                          {% if measure.areaHectares %}{{ measure.areaHectares }} ha{% else %}-{% endif %}
+                        </td>
+                        <td class="govuk-table__cell">
+                          {% if measure.storageVolumeM3 %}{{ measure.storageVolumeM3 }} m³{% else %}-{% endif %}
+                        </td>
+                        <td class="govuk-table__cell">
+                          {% if measure.lengthKm %}{{ measure.lengthKm }} km{% else %}-{% endif %}
+                        </td>
+                        <td class="govuk-table__cell">
+                          {% if measure.widthM %}{{ measure.widthM }} m{% else %}-{% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          {% endif %}
+
+          {# NFM Land Use Changes Table #}
+          {% if projectData.pafs_core_nfm_land_use_changes and projectData.pafs_core_nfm_land_use_changes.length > 0 %}
+            <details class="govuk-details govuk-!-margin-top-4">
+              <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                  Land use changes ({{ projectData.pafs_core_nfm_land_use_changes.length }})
+                </span>
+              </summary>
+              <div class="govuk-details__text">
+                <table class="govuk-table">
+                  <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.land_use_changes_table.land_use_type') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.land_use_changes_table.area_before') }}</th>
+                      <th scope="col" class="govuk-table__header">{{ t('projects.overview.nfm_summary_card.land_use_changes_table.area_after') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="govuk-table__body">
+                    {% for landUse in projectData.pafs_core_nfm_land_use_changes %}
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">
+                          {{ t('projects.nfm.land_use_change.options.' + landUse.landUseType) }}
+                        </th>
+                        <td class="govuk-table__cell">
+                          {% if landUse.areaBeforeHectares %}{{ landUse.areaBeforeHectares }} ha{% else %}-{% endif %}
+                        </td>
+                        <td class="govuk-table__cell">
+                          {% if landUse.areaAfterHectares %}{{ landUse.areaAfterHectares }} ha{% else %}-{% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          {% endif %}
+
+          {# NFM Landowner Consent #}
+          {% if projectData[PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT] %}
+            <dl class="govuk-summary-list govuk-!-margin-top-6">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ t('projects.overview.nfm_summary_card.landowner_consent') }}</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ t('projects.nfm.landowner_consent.options.' + projectData[PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT]) }}
+                </dd>
+              </div>
+            </dl>
+          {% endif %}
+
+          {# NFM Experience Level #}
+          {% if projectData[PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL] %}
+            <dl class="govuk-summary-list govuk-!-margin-top-6">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ t('projects.overview.nfm_summary_card.experience_level') }}</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ t('projects.nfm.experience.options.' + projectData[PROJECT_PAYLOAD_FIELDS.NFM_EXPERIENCE_LEVEL]) }}
+                </dd>
+              </div>
+            </dl>
+          {% endif %}
+
+          {# NFM Project Readiness #}
+          {% if projectData[PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS] %}
+            <dl class="govuk-summary-list govuk-!-margin-top-6">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ t('projects.overview.nfm_summary_card.project_readiness') }}</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ t('projects.nfm.project_readiness.options.' + projectData[PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS]) }}
+                </dd>
+              </div>
+            </dl>
+          {% endif %}
+        {% else %}
+          <p class="govuk-body">{{ t('projects.overview.nfm_summary_card.not_added') }}</p>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+{% endmacro %}

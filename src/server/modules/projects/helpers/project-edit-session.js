@@ -6,8 +6,169 @@
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { getProjectProposalOverview } from '../../../common/services/project/project-service.js'
 import { ROUTES } from '../../../common/constants/routes.js'
-import { PROJECT_SESSION_KEY } from '../../../common/constants/projects.js'
+import {
+  PROJECT_SESSION_KEY,
+  PROJECT_PAYLOAD_FIELDS
+} from '../../../common/constants/projects.js'
 import { getSessionData } from './project-utils.js'
+
+const NFM_MEASURE_FIELD_MAPPINGS = {
+  river_floodplain_restoration: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA,
+    storageVolumeM3: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME
+  },
+  leaky_barriers_in_channel_storage: {
+    storageVolumeM3: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME,
+    lengthKm: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH,
+    widthM: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH
+  },
+  offline_storage: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA,
+    storageVolumeM3: PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME
+  },
+  woodland: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA
+  },
+  headwater_drainage_management: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA
+  },
+  runoff_attenuation_management: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA,
+    storageVolumeM3: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME
+  },
+  saltmarsh_management: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA,
+    lengthKm: PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH
+  },
+  sand_dune_management: {
+    areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA,
+    lengthKm: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH
+  }
+}
+
+const hasValue = (value) => value !== null && value !== undefined
+
+/**
+ * Map a single NFM measure to frontend fields
+ * @param {Object} measure - NFM measure object from backend
+ * @returns {Object} - Mapped fields for this measure
+ */
+function mapSingleNfmMeasure(measure) {
+  const mappedFields = {}
+  const fieldMapping = NFM_MEASURE_FIELD_MAPPINGS[measure?.measureType]
+
+  if (!fieldMapping) {
+    return mappedFields
+  }
+
+  Object.entries(fieldMapping).forEach(([sourceField, targetField]) => {
+    const value = measure[sourceField]
+    if (hasValue(value)) {
+      mappedFields[targetField] = value
+    }
+  })
+
+  return mappedFields
+}
+
+/**
+ * Map NFM measures array from backend to individual fields for frontend
+ * @param {Array} nfmMeasures - Array of NFM measure objects from backend
+ * @returns {Object} - Mapped NFM fields
+ */
+function mapNfmMeasuresToFields(nfmMeasures) {
+  const mappedFields = {}
+
+  if (!nfmMeasures || !Array.isArray(nfmMeasures)) {
+    return mappedFields
+  }
+
+  nfmMeasures.forEach((measure) => {
+    const singleMeasureFields = mapSingleNfmMeasure(measure)
+    Object.assign(mappedFields, singleMeasureFields)
+  })
+
+  return mappedFields
+}
+
+function mapNfmLandUseChangesToFields(nfmLandUseChanges) {
+  const mappedFields = {}
+
+  if (!Array.isArray(nfmLandUseChanges)) {
+    return mappedFields
+  }
+
+  const LAND_USE_FIELD_MAPPINGS = [
+    {
+      landUseType: 'enclosed_arable_farmland',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER
+    },
+    {
+      landUseType: 'enclosed_livestock_farmland',
+      beforeField:
+        PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_AFTER
+    },
+    {
+      landUseType: 'enclosed_dairying_farmland',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_AFTER
+    },
+    {
+      landUseType: 'semi_natural_grassland',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_AFTER
+    },
+    {
+      landUseType: 'woodland',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
+    },
+    {
+      landUseType: 'mountain_moors_and_heath',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
+    },
+    {
+      landUseType: 'peatland_restoration',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_AFTER
+    },
+    {
+      landUseType: 'rivers_wetlands_and_freshwater_habitats',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER
+    },
+    {
+      landUseType: 'coastal_margins',
+      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE,
+      afterField: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER
+    }
+  ]
+
+  LAND_USE_FIELD_MAPPINGS.forEach(
+    ({ landUseType, beforeField, afterField }) => {
+      const landUseChange = nfmLandUseChanges.find(
+        (item) => item?.landUseType === landUseType
+      )
+
+      if (!landUseChange) {
+        return
+      }
+
+      if (hasValue(landUseChange.areaBeforeHectares)) {
+        mappedFields[beforeField] = landUseChange.areaBeforeHectares
+      }
+
+      if (hasValue(landUseChange.areaAfterHectares)) {
+        mappedFields[afterField] = landUseChange.areaAfterHectares
+      }
+    }
+  )
+
+  return mappedFields
+}
 
 /**
  * Compare two values for equality, handling arrays, strings, and numbers
@@ -45,13 +206,23 @@ function areValuesEqual(value1, value2) {
  * @returns {Object} Session data
  */
 export function initializeEditSession(request, projectData) {
+  // Map NFM measures from backend format to frontend fields
+  const nfmFields = mapNfmMeasuresToFields(projectData.pafs_core_nfm_measures)
+  const nfmLandUseFields = mapNfmLandUseChangesToFields(
+    projectData.pafs_core_nfm_land_use_changes
+  )
+
   const sessionData = {
     ...projectData,
+    ...nfmFields, // Merge the mapped NFM fields
+    ...nfmLandUseFields,
     journeyStarted: true,
     isEdit: true,
     referenceNumber: projectData.referenceNumber,
     originalData: {
-      ...projectData
+      ...projectData,
+      ...nfmFields, // Store mapped NFM fields in originalData too
+      ...nfmLandUseFields
     }
   }
 

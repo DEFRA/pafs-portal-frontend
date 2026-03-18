@@ -9,7 +9,10 @@ import {
   PROJECT_TYPES,
   PROJECT_VIEW_ERROR_CODES,
   URGENCY_REASONS,
-  CONFIDENCE_LEVELS
+  CONFIDENCE_LEVELS,
+  NFM_MEASURES,
+  NFM_LANDOWNER_CONSENT_OPTIONS,
+  NFM_EXPERIENCE_LEVEL_OPTIONS
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
@@ -55,6 +58,9 @@ class OverviewController {
       PROJECT_RISK_TYPES,
       PROJECT_PAYLOAD_FIELDS,
       PROJECT_STEPS,
+      NFM_MEASURES,
+      NFM_LANDOWNER_CONSENT_OPTIONS,
+      NFM_EXPERIENCE_LEVEL_OPTIONS,
       URGENCY_REASONS,
       CONFIDENCE_LEVELS,
       buildFinancialYearLabel,

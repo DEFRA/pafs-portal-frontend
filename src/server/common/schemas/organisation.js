@@ -7,6 +7,7 @@ import { AREAS_RESPONSIBILITIES_MAP, SIZE } from '../constants/common.js'
  */
 export const organisationNameSchema = Joi.string()
   .trim()
+  .custom((value) => value.split(/\s+/).join(' '))
   .min(1)
   .max(SIZE.LENGTH_255)
   .required()

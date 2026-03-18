@@ -100,29 +100,39 @@ export const propertiesBenefitInvestmentCoastalErosionSchema =
  * Can be number or string representation
  * No negatives, no values above 100, numbers only (no text or symbols)
  */
-const percentageSchema = Joi.string()
-  .allow('', null)
-  .pattern(/^(?:100(?:\.0{1,2})?|[1-9]?\d(?:\.\d{1,2})?)$/)
-  .optional()
-  .label('Percentage')
-  .messages({
-    'string.pattern.base':
-      'Enter a valid number between 0 and 100 with at most 2 decimal places'
-  })
+
+const percentageSchemaRequired = (errorMessages) =>
+  Joi.string()
+    .pattern(/^(?:100(?:\.0{1,2})?|[1-9]?\d(?:\.\d{1,2})?)$/)
+    .required()
+    .label('Percentage')
+    .messages(errorMessages)
 
 /**
  * Percent properties in 20% most deprived areas schema
  */
-export const percentProperties20PercentDeprivedSchema = percentageSchema.label(
-  PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED
-)
+export const percentProperties20PercentDeprivedSchema =
+  percentageSchemaRequired({
+    'string.pattern.base':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED_INVALID,
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED_REQUIRED,
+    'string.empty':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED_REQUIRED
+  }).label(PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED)
 
 /**
  * Percent properties in 40% most deprived areas schema
  */
-export const percentProperties40PercentDeprivedSchema = percentageSchema.label(
-  PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED
-)
+export const percentProperties40PercentDeprivedSchema =
+  percentageSchemaRequired({
+    'string.pattern.base':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED_INVALID,
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED_REQUIRED,
+    'string.empty':
+      PROJECT_VALIDATION_MESSAGES.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED_REQUIRED
+  }).label(PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED)
 
 /**
  * Current flood risk schema (for fluvial, tidal, sea flooding)
@@ -133,8 +143,9 @@ export const currentFloodFluvialRiskSchema = Joi.string()
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_FLUVIAL_RISK)
   .messages({
-    'any.required': 'Select a flood risk level',
-    'any.only': 'Select a valid flood risk level'
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.CURRENT_FLOOD_FLUVIAL_RISK_REQUIRED,
+    'any.only': PROJECT_VALIDATION_MESSAGES.CURRENT_FLOOD_FLUVIAL_RISK_INVALID
   })
 
 /**
@@ -146,8 +157,10 @@ export const currentFloodSurfaceWaterRiskSchema = Joi.string()
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.CURRENT_FLOOD_SURFACE_WATER_RISK)
   .messages({
-    'any.required': 'Select a surface water flood risk level',
-    'any.only': 'Select a valid surface water flood risk level'
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.CURRENT_FLOOD_SURFACE_WATER_RISK_REQUIRED,
+    'any.only':
+      PROJECT_VALIDATION_MESSAGES.CURRENT_FLOOD_SURFACE_WATER_RISK_INVALID
   })
 
 /**
@@ -159,6 +172,7 @@ export const currentCoastalErosionRiskSchema = Joi.string()
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.CURRENT_COASTAL_EROSION_RISK)
   .messages({
-    'any.required': 'Select a coastal erosion risk level',
-    'any.only': 'Select a valid coastal erosion risk level'
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.CURRENT_COASTAL_EROSION_RISK_REQUIRED,
+    'any.only': PROJECT_VALIDATION_MESSAGES.CURRENT_COASTAL_EROSION_RISK_INVALID
   })

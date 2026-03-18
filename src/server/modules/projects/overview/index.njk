@@ -12,6 +12,7 @@
 {% from "views/goals-approach-card.njk" import goalsApproachSummaryCard %}
 {% from "views/urgency-assessment-card.njk" import urgencyAssessmentSummaryCard %}
 {% from "views/confidence-assessment-card.njk" import confidenceAssessmentSummaryCard %}
+{% from "views/nfm-card.njk" import nfmSummaryCard %}
 
 {% block body %}
 
@@ -101,6 +102,8 @@
   {{ urgencyAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, URGENCY_REASONS, t, isReadOnly) }}
 
   {{ confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, t, isReadOnly) }}
+
+  {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t) }}
 
   {% if not isReadOnly %}
     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">

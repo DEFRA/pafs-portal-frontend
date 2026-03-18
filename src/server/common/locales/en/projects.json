@@ -102,6 +102,9 @@
       "title": "Project goals and approach",
       "not_added": "No project goals or approach added yet"
     },
+    "urgency_summary_card": {
+      "title": "Urgency"
+    },
     "urgency_assessment_summary_card": {
       "title": "Project Urgency",
       "urgency_reason": "Urgency reason",
@@ -132,7 +135,29 @@
       "hectares": "hectares",
       "kilometres": "kilometres"
     },
-    "submission_info": "By submitting this proposal you confirm all the information provided is accurate and complete."
+    "submission_info": "By submitting this proposal you confirm all the information provided is accurate and complete.",
+    "nfm_summary_card": {
+      "title": "Natural Flood Management",
+      "not_added": "No natural flood management measures added yet",
+      "selected_measures": "Selected NFM measures",
+      "measures_details": "Measure details",
+      "landowner_consent": "Landowner consent",
+      "experience_level": "Experience of completing NFM measures",
+      "project_readiness": "How developed the proposal is",
+      "table": {
+        "measure_type": "Measure type",
+        "area": "Area",
+        "volume": "Storage volume",
+        "length": "Length",
+        "width": "Width",
+        "actions": "Actions"
+      },
+      "land_use_changes_table": {
+        "land_use_type": "Land use type",
+        "area_before": "Area before (ha)",
+        "area_after": "Area after (ha)"
+      }
+    }
   },
   "start_proposal": {
     "title": "Start a new proposal",
@@ -409,7 +434,8 @@
       "heading": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
       "hint": "Enter a number between 0 and 100",
       "errors": {
-        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places"
+        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places",
+        "required": "Enter the percentage of properties benefitting in the 20% most deprived areas"
       }
     },
     "forty_percent_deprived": {
@@ -417,7 +443,8 @@
       "heading": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
       "hint": "Enter a number between 0 and 100",
       "errors": {
-        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places"
+        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places",
+        "required": "Enter the percentage of properties benefitting in the 40% most deprived areas"
       }
     },
     "current_flood_fluvial_risk": {
@@ -458,6 +485,292 @@
       },
       "errors": {
         "required": "Select a coastal erosion risk level"
+      }
+    }
+  },
+  "nfm": {
+    "selected_measures": {
+      "title": "Which natural flood management measures are in your project?",
+      "heading": "Which natural flood management measures are in your project?",
+      "hint": "Select all that apply",
+      "error": "Select at least one natural flood management measure",
+      "options": {
+        "river_floodplain_restoration": "River and floodplain restoration",
+        "leaky_barriers": "Leaky barriers and in-channel storage",
+        "leaky_barriers_in_channel_storage": "Leaky barriers and in-channel storage",
+        "offline_storage": "Offline storage areas",
+        "woodland": "Woodland",
+        "headwater_drainage": "Headwater drainage management",
+        "headwater_drainage_management": "Headwater drainage management",
+        "runoff_management": "Runoff attenuation or management",
+        "runoff_attenuation_management": "Runoff attenuation or management",
+        "saltmarsh_management": "Saltmarsh or mudflat management",
+        "sand_dune_management": "Sand dune management"
+      }
+    },
+    "river_restoration": {
+      "title": "Details of new river and floodplain restoration",
+      "area": {
+        "label": "Area"
+      },
+      "volume": {
+        "label": "Design storage volume",
+        "hint": "If known"
+      }
+    },
+    "leaky_barriers": {
+      "title": "Details of Leaky barriers and in-channel storage",
+      "volume": {
+        "label": "Design storage volume",
+        "hint": "If known"
+      },
+      "length": {
+        "label": "Length"
+      },
+      "width": {
+        "label": "Typical width"
+      }
+    },
+    "offline_storage": {
+      "title": "Details of new offline storage areas",
+      "area": {
+        "label": "Area"
+      },
+      "volume": {
+        "label": "Design storage volume",
+        "hint": "If known"
+      }
+    },
+    "woodland": {
+      "title": "Details of new woodland",
+      "area": {
+        "label": "Area",
+        "hint": "Enter the area in hectares",
+        "suffix": "hectares"
+      }
+    },
+    "headwater_drainage": {
+      "title": "Details of new headwater drainage management",
+      "area": {
+        "label": "Area",
+        "hint": "Enter the area in hectares",
+        "suffix": "hectares"
+      }
+    },
+    "runoff_management": {
+      "title": "Details of new runoff attenuation or management",
+      "area": {
+        "label": "Area"
+      },
+      "volume": {
+        "label": "Design storage volume",
+        "hint": "If known"
+      }
+    },
+    "saltmarsh": {
+      "title": "Details of new Saltmarsh or mudflat management",
+      "area": {
+        "label": "Area"
+      },
+      "length": {
+        "label": "Length",
+        "hint": "If known"
+      }
+    },
+    "sand_dune": {
+      "title": "Details of new Sand dune management",
+      "area": {
+        "label": "Area"
+      },
+      "length": {
+        "label": "Length",
+        "hint": "If known"
+      }
+    },
+    "land_use_change": {
+      "title": "Tell us what the land use in your project area will be before and after your natural flood measures project",
+      "hint": "Select all that apply",
+      "error": "Select at least one land type",
+      "options": {
+        "enclosed_arable_farmland": "Enclosed arable farmland",
+        "enclosed_livestock_farmland": "Enclosed livestock farmland",
+        "enclosed_dairying_farmland": "Enclosed dairying farmland",
+        "semi_natural_grassland": "Semi-natural grassland",
+        "woodland": "Woodland",
+        "mountain_moors_and_heath": "Mountain moors and heath",
+        "peatland_restoration": "Peatland restoration",
+        "rivers_wetlands_and_freshwater_habitats": "Rivers, wetlands, and freshwater habitats",
+        "coastal_margins": "Coastal margins"
+      }
+    },
+    "land_use": {
+      "enclosed_arable_farmland": {
+        "title": "What is the area of Enclosed arable farmland?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
+        }
+      },
+      "enclosed_livestock_farmland": {
+        "title": "What is the area of Enclosed livestock farmland?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
+        }
+      },
+      "enclosed_dairying_farmland": {
+        "title": "What is the area of Enclosed dairying farmland?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
+        }
+      },
+      "semi_natural_grassland": {
+        "title": "What is the area of Semi-natural grassland?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
+        }
+      },
+      "woodland": {
+        "title": "What is the area of Woodland?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
+        }
+      },
+      "mountain_moors_and_heath": {
+        "title": "What is the area of Mountain moors and heath?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
+        }
+      },
+      "peatland_restoration": {
+        "title": "What is the area of Peatland restoration?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
+        }
+      },
+      "rivers_wetlands_freshwater_habitats": {
+        "title": "What is the area of Rivers, wetlands, and freshwater habitats?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
+        }
+      },
+      "coastal_margins": {
+        "title": "What is the area of Coastal margins?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Area must have up to 2 decimal places"
+        }
+      }
+    },
+    "landowner_consent": {
+      "title": "Have you secured consent from the relevant landowners?",
+      "heading": "Have you secured consent from the relevant landowners?",
+      "error": "Please select whether you have secured consent from the relevant landowners.",
+      "options": {
+        "consent_fully_secured": "Consent fully secured",
+        "engaged_but_not_fully_secured": "Engaged but not fully secured",
+        "initial_contact_made": "Initial contact made",
+        "not_yet_engaged": "Not yet engaged"
+      }
+    },
+    "experience": {
+      "title": "What is your experience of completing natural flood management measures?",
+      "heading": "What is your experience of completing natural flood management measures?",
+      "error": "Please select your experience of completing natural flood management measures.",
+      "options": {
+        "no_experience": "No experience: not completed natural flood management measures before but have relevant land or environmental project experience",
+        "some_experience": "Some experience: completed or supported one or two small natural flood management measures",
+        "moderate_experience": "Moderate experience: completed several natural flood management measures across one or more sites, and worked with landowners, contractors, and regulators",
+        "extensive_experience": "Extensive experience: led multiple natural flood management measure projects across a catchment or coastal area, and have a strong record of partnership working"
+      }
+    },
+    "project_readiness": {
+      "title": "How developed is your proposal?",
+      "heading": "How developed is your proposal?",
+      "error": "Please select how developed your proposal is.",
+      "options": {
+        "early_concept": "Early concept: ideas identified but designs are at scoping stage and a team is not yet formed or roles are unclear",
+        "developing_proposal": "Developing proposal: outline designs are drafted, a core team has been identified with some relevant skills, and initial partner engagement is underway",
+        "well_developed_proposal": "Well-developed proposal: detailed designs are ready, team roles have been defined and capacity assessed, and partnerships have been agreed in principle",
+        "ready_to_deliver": "Ready to deliver: detailed designs are ready, an experienced team is ready, and partners are confirmed and have clear responsibilities"
       }
     }
   },

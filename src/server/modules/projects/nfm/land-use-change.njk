@@ -1,0 +1,66 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block body %}
+  {% if errors and errors.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.error_summary_title'),
+      errorList: errors
+    }) }}
+  {% endif %}
+
+  <form method="POST" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    <div class="govuk-form-group {% if fieldErrors.nfmLandUseChange %}govuk-form-group--error{% endif %}">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+          <h1 class="govuk-fieldset__heading">
+            {{ t('projects.nfm.land_use_change.title') }}
+          </h1>
+        </legend>
+
+        {% if t('projects.nfm.land_use_change.hint') %}
+          <div class="govuk-hint">
+            {{ t('projects.nfm.land_use_change.hint') }}
+          </div>
+        {% endif %}
+
+        {% if fieldErrors.nfmLandUseChange %}
+          <p id="nfm-land-use-change-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">{{ t('common.error') }}:</span>
+            {{ t('projects.nfm.land_use_change.error') }}
+          </p>
+        {% endif %}
+
+        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+          {%- set selectedLandUse = formData.nfmLandUseChange.split(',') if formData.nfmLandUseChange else [] -%}
+          {% for option in nfmLandUseOptions %}
+            <div class="govuk-checkboxes__item">
+              <input
+                class="govuk-checkboxes__input"
+                id="nfm-land-use-{{ loop.index }}"
+                name="nfmLandUseChange"
+                type="checkbox"
+                value="{{ option.value }}"
+                {% if option.value in selectedLandUse %}checked{% endif %}
+                {% if fieldErrors.nfmLandUseChange %}aria-describedby="nfm-land-use-change-error"{% endif %}
+              >
+              <label class="govuk-label govuk-checkboxes__label" for="nfm-land-use-{{ loop.index }}">
+                {{ option.text }}
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+  </form>
+{% endblock %}

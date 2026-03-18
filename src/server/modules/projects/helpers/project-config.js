@@ -34,5 +34,8 @@ export {
   ENVIRONMENTAL_BENEFITS_FIELD_PAIRS
 } from './config/environmental-benefits.js'
 
+// Re-export NFM configuration
+export { NFM_CONFIG } from './config/nfm.js'
+
 // Re-export payload level fields
 export { PROJECT_PAYLOAD_LEVEL_FIELDS } from './config/payload-levels.js'

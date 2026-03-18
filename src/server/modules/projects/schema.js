@@ -74,3 +74,28 @@ export {
   validateCreateHabitatWatercourse,
   validateKilometresOfWatercourseEnhancedOrCreatedSingle
 } from './schemas/environmental-benefits-schemas.js'
+
+export {
+  nfmSelectedMeasuresSchema,
+  nfmRiverRestorationSchema,
+  nfmLeakyBarriersSchema,
+  nfmOfflineStorageSchema,
+  nfmWoodlandSchema,
+  nfmHeadwaterDrainageSchema,
+  nfmRunoffManagementSchema,
+  nfmSaltmarshSchema,
+  nfmSandDuneSchema,
+  nfmLandUseChangeSchema,
+  nfmLandUseEnclosedArableFarmlandSchema,
+  nfmLandUseEnclosedLivestockFarmlandSchema,
+  nfmLandUseEnclosedDairyingFarmlandSchema,
+  nfmLandUseSemiNaturalGrasslandSchema,
+  nfmLandUseWoodlandSchema,
+  nfmLandUseMountainMoorsAndHeathSchema,
+  nfmLandUsePeatlandRestorationSchema,
+  nfmLandUseRiversWetlandsFreshwaterSchema,
+  nfmLandUseCoastalMarginsSchema,
+  nfmLandownerConsentSchema,
+  nfmExperienceLevelSchema,
+  nfmProjectReadinessSchema
+} from './schemas/nfm-schemas.js'

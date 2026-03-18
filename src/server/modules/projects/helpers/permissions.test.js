@@ -9,6 +9,7 @@ import {
   requireInterventionTypesSet,
   requirePrimaryInterventionTypeSet,
   requireFinancialStartYearSet,
+  requireNfmOrSudIntervention,
   canViewProposal,
   canEditProposal,
   requireViewPermission,
@@ -66,6 +67,16 @@ describe('permissions helper - comprehensive', () => {
   })
 
   describe('requireRmaUser', () => {
+    test('should return auth redirect when authentication does not continue', async () => {
+      const authRedirect = Symbol('auth-redirect')
+      requireAuth.mockResolvedValue(authRedirect)
+
+      const result = await requireRmaUser(mockRequest, mockH)
+
+      expect(result).toBe(authRedirect)
+      expect(getAuthSession).not.toHaveBeenCalled()
+    })
+
     test('should allow RMA users', async () => {
       getAuthSession.mockReturnValue({
         user: { id: '2', isRma: true }
@@ -236,6 +247,56 @@ describe('permissions helper - comprehensive', () => {
       expect(mockH.redirect).toHaveBeenCalledWith(
         ROUTES.PROJECT.FINANCIAL_START_YEAR
       )
+    })
+  })
+
+  describe('requireNfmOrSudIntervention', () => {
+    test('should continue when intervention types include NFM', async () => {
+      getSessionData.mockReturnValue({
+        projectInterventionTypes: ['NFM'],
+        slug: 'PAFS-123'
+      })
+
+      const result = await requireNfmOrSudIntervention(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('should continue when intervention types include SUDS', async () => {
+      getSessionData.mockReturnValue({
+        projectInterventionTypes: ['SUDS'],
+        slug: 'PAFS-124'
+      })
+
+      const result = await requireNfmOrSudIntervention(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('should redirect to project overview when no NFM/SUDS intervention', async () => {
+      getAuthSession.mockReturnValue({ user: { id: '9' } })
+      getSessionData.mockReturnValue({
+        projectInterventionTypes: ['PFR'],
+        slug: 'PAFS-125'
+      })
+
+      await requireNfmOrSudIntervention(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith('/project/PAFS-125')
+      expect(mockH.takeover).toHaveBeenCalled()
+    })
+
+    test('should redirect when intervention types is not an array', async () => {
+      getAuthSession.mockReturnValue({ user: { id: '10' } })
+      getSessionData.mockReturnValue({
+        projectInterventionTypes: 'NFM',
+        slug: 'PAFS-126'
+      })
+
+      await requireNfmOrSudIntervention(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith('/project/PAFS-126')
+      expect(mockH.takeover).toHaveBeenCalled()
     })
   })
 

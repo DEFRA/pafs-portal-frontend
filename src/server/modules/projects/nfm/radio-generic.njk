@@ -1,0 +1,46 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block body %}
+  {% set hasRadioError = fieldErrors and fieldErrors[radioFieldName] %}
+
+  {% if hasRadioError %}
+    {{ govukErrorSummary({
+      titleText: t('common.error_summary_title'),
+      errorList: [
+        {
+          text: t(localKeyPrefix + '.error'),
+          href: '#' + radioFieldName
+        }
+      ]
+    }) }}
+  {% endif %}
+
+  <form method="POST" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    {{ govukRadios({
+      idPrefix: radioFieldName,
+      name: radioFieldName,
+      value: formData[radioFieldName],
+      fieldset: {
+        legend: {
+          text: t(localKeyPrefix + '.heading'),
+          classes: "govuk-fieldset__legend--xl",
+          isPageHeading: true
+        }
+      },
+      items: radioOptions,
+      errorMessage: hasRadioError and {
+        text: t(localKeyPrefix + '.error')
+      }
+    }) }}
+
+    {{ govukButton({
+      text: t('common.buttons.save_and_continue')
+    }) }}
+  </form>
+{% endblock %}

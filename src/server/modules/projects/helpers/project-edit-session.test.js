@@ -6,7 +6,10 @@ import {
   fetchProjectForEdit,
   fetchProjectForOverview
 } from './project-edit-session.js'
-import { PROJECT_SESSION_KEY } from '../../../common/constants/projects.js'
+import {
+  PROJECT_SESSION_KEY,
+  PROJECT_PAYLOAD_FIELDS
+} from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { getProjectProposalOverview } from '../../../common/services/project/project-service.js'
@@ -175,6 +178,181 @@ describe('project-edit-session', () => {
       // Verify it's a copy not a reference
       expect(result.originalData).toEqual(projectData)
       expect(result.originalData).not.toBe(projectData)
+    })
+
+    test('should map NFM measures into session fields', () => {
+      const projectData = {
+        referenceNumber: 'REF123',
+        pafs_core_nfm_measures: [
+          {
+            measureType: 'river_floodplain_restoration',
+            areaHectares: 10,
+            storageVolumeM3: 100
+          },
+          {
+            measureType: 'leaky_barriers_in_channel_storage',
+            storageVolumeM3: 200,
+            lengthKm: 1.5,
+            widthM: 2.5
+          },
+          {
+            measureType: 'offline_storage',
+            areaHectares: 15,
+            storageVolumeM3: 300
+          },
+          {
+            measureType: 'woodland',
+            areaHectares: 5
+          },
+          {
+            measureType: 'headwater_drainage_management',
+            areaHectares: 7
+          }
+        ]
+      }
+
+      const result = initializeEditSession(mockRequest, projectData)
+
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]).toBe(10)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]).toBe(
+        100
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]).toBe(200)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]).toBe(1.5)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]).toBe(2.5)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]).toBe(15)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]).toBe(
+        300
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]).toBe(5)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA]).toBe(7)
+      expect(
+        result.originalData[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]
+      ).toBe(5)
+    })
+
+    test('should ignore invalid NFM measure arrays', () => {
+      const projectData = {
+        referenceNumber: 'REF123',
+        pafs_core_nfm_measures: null
+      }
+
+      const result = initializeEditSession(mockRequest, projectData)
+
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]
+      ).toBeUndefined()
+      expect(result.originalData).toMatchObject(projectData)
+    })
+
+    test('should ignore unknown measure types', () => {
+      const projectData = {
+        referenceNumber: 'REF123',
+        pafs_core_nfm_measures: [
+          {
+            measureType: 'unknown_measure',
+            areaHectares: 9
+          }
+        ]
+      }
+
+      const result = initializeEditSession(mockRequest, projectData)
+
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]
+      ).toBeUndefined()
+    })
+
+    test('should map remaining NFM measure types (runoff, saltmarsh, sand dune)', () => {
+      const projectData = {
+        referenceNumber: 'REF123',
+        pafs_core_nfm_measures: [
+          {
+            measureType: 'runoff_attenuation_management',
+            areaHectares: 14,
+            storageVolumeM3: 220
+          },
+          {
+            measureType: 'saltmarsh_management',
+            areaHectares: 6.5,
+            lengthKm: 1.2
+          },
+          {
+            measureType: 'sand_dune_management',
+            areaHectares: 4.25,
+            lengthKm: 0.75
+          }
+        ]
+      }
+
+      const result = initializeEditSession(mockRequest, projectData)
+
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]).toBe(14)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]).toBe(
+        220
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe(6.5)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(1.2)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(4.25)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(0.75)
+    })
+
+    test('should map NFM land-use changes into before and after fields', () => {
+      const projectData = {
+        referenceNumber: 'REF123',
+        pafs_core_nfm_land_use_changes: [
+          {
+            landUseType: 'enclosed_arable_farmland',
+            areaBeforeHectares: 20,
+            areaAfterHectares: 14
+          },
+          {
+            landUseType: 'woodland',
+            areaBeforeHectares: 8,
+            areaAfterHectares: 12
+          },
+          {
+            landUseType: 'coastal_margins',
+            areaBeforeHectares: null,
+            areaAfterHectares: 2.5
+          }
+        ]
+      }
+
+      const result = initializeEditSession(mockRequest, projectData)
+
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]
+      ).toBe(20)
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]
+      ).toBe(14)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE]).toBe(
+        8
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER]).toBe(
+        12
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE]).toBe(
+        undefined
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER]).toBe(2.5)
+    })
+
+    test('should ignore non-array NFM land-use changes', () => {
+      const projectData = {
+        referenceNumber: 'REF123',
+        pafs_core_nfm_land_use_changes: null
+      }
+
+      const result = initializeEditSession(mockRequest, projectData)
+
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]
+      ).toBeUndefined()
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]
+      ).toBeUndefined()
     })
   })
 

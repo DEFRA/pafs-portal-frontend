@@ -223,7 +223,34 @@ export async function requireFinancialStartYearSet(request, h) {
 }
 
 /**
- * Factory function to create a conditional pre-handler that requires a specific field value
+ * Validates if project interventions include NFM or SUD
+ * Restricts access to NFM routes when project doesn't have NFM/SUD interventions
+ * @param {Object} request - Hapi request object
+ * @param {Object} h - Hapi response toolkit
+ * @returns {Object} h.continue if interventions include NFM or SUD, otherwise redirect to overview
+ */
+export async function requireNfmOrSudIntervention(request, h) {
+  const projectSession = getSessionData(request)
+  const session = getAuthSession(request)
+  const { projectInterventionTypes, slug } = projectSession
+
+  const hasNfmOrSud =
+    projectInterventionTypes &&
+    Array.isArray(projectInterventionTypes) &&
+    (projectInterventionTypes.includes('NFM') ||
+      projectInterventionTypes.includes('SUDS'))
+
+  if (!hasNfmOrSud) {
+    request.server?.logger?.warn(
+      { userId: session?.user?.id, projectSlug: slug },
+      'User attempted to access NFM route without NFM/SUD intervention'
+    )
+    return h.redirect(`/project/${slug}`).takeover()
+  }
+
+  return h.continue
+}
+/** Factory function to create a conditional pre-handler that requires a specific field value
  * Used for conditional routing where access to a route depends on another field's value
  *
  * @param {string} fieldName - The field name to check in project data
