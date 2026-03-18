@@ -17,7 +17,6 @@ import {
   NFM_PROJECT_READINESS_OPTIONS
 } from '../../../common/constants/projects.js'
 
-const MSG_ENTER_AREA = 'Enter an area'
 const MSG_ENTER_AREA_IN_HECTARES = 'Enter the area in hectares'
 const MSG_AREA_GREATER_THAN_ZERO = 'Area must be a number greater than 0'
 const MSG_AREA_PRECISION_2DP = 'Area must have up to 2 decimal places'
