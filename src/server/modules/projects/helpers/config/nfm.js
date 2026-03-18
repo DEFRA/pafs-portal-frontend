@@ -28,6 +28,13 @@ import {
   nfmProjectReadinessSchema
 } from '../../schema.js'
 
+const AREA_LABEL = 'area.label'
+const VOLUME_LABEL = 'volume.label'
+const VOLUME_HINT = 'volume.hint'
+const LENGTH_LABEL = 'length.label'
+const LENGTH_HINT = 'length.hint'
+const WIDTH_LABEL = 'width.label'
+
 /**
  * Configuration for NFM (Natural Flood Management) related steps
  */
@@ -52,13 +59,13 @@ export const NFM_CONFIG = {
     inputFields: [
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA,
-        labelKey: 'area.label',
+        labelKey: AREA_LABEL,
         suffix: 'hectares'
       },
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME,
-        labelKey: 'volume.label',
-        hintKey: 'volume.hint',
+        labelKey: VOLUME_LABEL,
+        hintKey: VOLUME_HINT,
         suffix: 'm³'
       }
     ]
@@ -74,18 +81,18 @@ export const NFM_CONFIG = {
     inputFields: [
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME,
-        labelKey: 'volume.label',
-        hintKey: 'volume.hint',
+        labelKey: VOLUME_LABEL,
+        hintKey: VOLUME_HINT,
         suffix: 'm³'
       },
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH,
-        labelKey: 'length.label',
+        labelKey: LENGTH_LABEL,
         suffix: 'km'
       },
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH,
-        labelKey: 'width.label',
+        labelKey: WIDTH_LABEL,
         suffix: 'm'
       }
     ]
@@ -101,13 +108,13 @@ export const NFM_CONFIG = {
     inputFields: [
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA,
-        labelKey: 'area.label',
+        labelKey: AREA_LABEL,
         suffix: 'hectares'
       },
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME,
-        labelKey: 'volume.label',
-        hintKey: 'volume.hint',
+        labelKey: VOLUME_LABEL,
+        hintKey: VOLUME_HINT,
         suffix: 'm³'
       }
     ]
@@ -123,7 +130,7 @@ export const NFM_CONFIG = {
     inputFields: [
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA,
-        labelKey: 'area.label',
+        labelKey: AREA_LABEL,
         suffix: 'hectares'
       }
     ]
@@ -139,7 +146,7 @@ export const NFM_CONFIG = {
     inputFields: [
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA,
-        labelKey: 'area.label',
+        labelKey: AREA_LABEL,
         suffix: 'hectares'
       }
     ]
@@ -155,13 +162,13 @@ export const NFM_CONFIG = {
     inputFields: [
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA,
-        labelKey: 'area.label',
+        labelKey: AREA_LABEL,
         suffix: 'hectares'
       },
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME,
-        labelKey: 'volume.label',
-        hintKey: 'volume.hint',
+        labelKey: VOLUME_LABEL,
+        hintKey: VOLUME_HINT,
         suffix: 'm³'
       }
     ]
@@ -177,13 +184,13 @@ export const NFM_CONFIG = {
     inputFields: [
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA,
-        labelKey: 'area.label',
+        labelKey: AREA_LABEL,
         suffix: 'hectares'
       },
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH,
-        labelKey: 'length.label',
-        hintKey: 'length.hint',
+        labelKey: LENGTH_LABEL,
+        hintKey: LENGTH_HINT,
         suffix: 'km'
       }
     ]
@@ -199,13 +206,13 @@ export const NFM_CONFIG = {
     inputFields: [
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA,
-        labelKey: 'area.label',
+        labelKey: AREA_LABEL,
         suffix: 'hectares'
       },
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH,
-        labelKey: 'length.label',
-        hintKey: 'length.hint',
+        labelKey: LENGTH_LABEL,
+        hintKey: LENGTH_HINT,
         suffix: 'km'
       }
     ]
