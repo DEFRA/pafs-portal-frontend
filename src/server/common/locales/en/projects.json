@@ -20,6 +20,7 @@
       "submitted": "Submitted",
       "archive": "Archive",
       "revert_to_draft": "Revert to draft",
+      "revert_to_revise": "Revert to revise",
       "download": "Download",
       "delete": "Delete",
       "not_submitted": "Not yet submitted",
@@ -27,7 +28,7 @@
       "na": "N/A",
       "legacy_banner_title": "Important",
       "legacy_banner_draft": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. Please review and complete any empty sections before submitting your proposal.",
-      "legacy_banner_submitted": "This proposal was originally submitted in the previous system. Following the 2025 policy reforms, some sections have been updated. Certain sections may appear empty as the information was not collected under the previous system.",
+      "legacy_banner_submitted": "This proposal was originally submitted in the previous system. Following the 2025 policy reforms, some sections have been updated. Certain sections may appear empty as the information was not collected under the previous system. To access your legacy data use the download function.",
       "legacy_banner_archived": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. To make changes, you will need to revert this proposal to draft status first."
     },
     "proposal_details_summary_card": {
@@ -847,28 +848,28 @@
   },
   "confidence_assessment": {
     "property_confidence": {
-      "title": "Confidence in number of properties benefiting by this project",
-      "heading": "Confidence in number of properties benefiting by this project",
+      "title": "Confidence in number of properties benefitting by this project",
+      "heading": "Confidence in number of properties benefitting by this project",
       "options": {
         "high": {
           "label": "High",
-          "hint": "In Construction/Scheme complete and properties delivered"
+          "hint": "Project in construction or complete and properties delivered."
         },
         "medium_high": {
           "label": "Medium High",
-          "hint": "Number of properties verified in approved business case"
+          "hint": "Number of properties verified in approved business case."
         },
         "medium_low": {
           "label": "Medium Low",
-          "hint": "Initial modelling carried out"
+          "hint": "Initial modelling carried out."
         },
         "low": {
           "label": "Low",
-          "hint": "Based on Shapefile / Estimate"
+          "hint": "Based on shapefile or estimate."
         },
         "not_applicable": {
           "label": "N/A",
-          "hint": "No properties benefitting from this project"
+          "hint": "No properties benefitting from this project."
         }
       },
       "validation": {
@@ -876,28 +877,28 @@
       }
     },
     "gateway_confidence": {
-      "title": "Confidence in achieving the project's forecast Gateway 4 (readiness for service) date",
-      "heading": "Confidence in achieving the project's forecast Gateway 4 (readiness for service) date",
+      "title": "Confidence in achieving the project's forecast Gateway 4 (Readiness for Service) date",
+      "heading": "Confidence in achieving the project's forecast Gateway 4 (Readiness for Service) date",
       "options": {
         "high": {
           "label": "High",
-          "hint": "High confidence in completing by specified Gateway 4 date / Scheme complete and properties delivered"
+          "hint": "High confidence in completing by specified Gateway 4 date / project complete and properties delivered."
         },
         "medium_high": {
           "label": "Medium High",
-          "hint": "Low level concerns in completing by specified Gateway 4 date or profile of properties benefitting"
+          "hint": "Low level concerns in completing by specified Gateway 4 date or profile of properties benefitting."
         },
         "medium_low": {
           "label": "Medium Low",
-          "hint": "Moderate concerns in completing by specified Gateway 4 date or profile of properties benefitting"
+          "hint": "Moderate concern in completing by specified Gateway 4 date or profile of properties benefitting."
         },
         "low": {
           "label": "Low",
-          "hint": "Significant concerns in completing by specified Gateway 4 date or profile of properties benefitting"
+          "hint": "Significant concerns in completing by specified Gateway 4 date or profile of properties benefitting."
         },
         "not_applicable": {
           "label": "N/A",
-          "hint": "No property benefits being provided by the project"
+          "hint": "No property benefits being provided by the project."
         }
       },
       "validation": {
@@ -910,23 +911,23 @@
       "options": {
         "high": {
           "label": "High",
-          "hint": "Secured, or heads of terms in place / scheme complete with funding secured"
+          "hint": "Secured or heads of terms in place / project complete with funding secured."
         },
         "medium_high": {
           "label": "Medium High",
-          "hint": "Expected that contributions will be received. Some issues to overcome but confidence in contributions being achieved"
+          "hint": "Expected that contributions will be received. Some issues to overcome but confidence in contributions being achieved."
         },
         "medium_low": {
           "label": "Medium Low",
-          "hint": "Optimistic contributions will be secured but contribution not known and/or concerns over those identified"
+          "hint": "Optimistic contributions will be secured but contributors not known and/or concerns over those identified."
         },
         "low": {
           "label": "Low",
-          "hint": "Low confidence contributions will be secured"
+          "hint": "Low confidence contributions will be secured."
         },
         "not_applicable": {
           "label": "N/A",
-          "hint": "Schema to be fully funded through Grant in Aid"
+          "hint": "Project to be fully funded through Grant in Aid."
         }
       },
       "validation": {
@@ -945,10 +946,10 @@
         },
         "divider": "or",
         "statutory_need": {
-          "label": "There is a business critical statutory need"
+          "label": "There is a business-critical statutory need"
         },
         "legal_need": {
-          "label": "There is a business critical legal need"
+          "label": "There is a business-critical legal need"
         },
         "health_and_safety": {
           "label": "There is a health and safety issue"
@@ -1268,7 +1269,7 @@
     "create_habitat_watercourse": {
       "title": "Will the project enhance or create a single major physical or habitat of watercourse?",
       "heading": "Will the project enhance or create a single major physical or habitat of watercourse?",
-      "hint": "na",
+      "hint": "A single major physical or habitat enhancement (km). In this category only one physical pressure is improved by the project, for example, by reinstating natural banks or improving fish passage by removing or modifying structures.",
       "options": {
         "yes": {
           "label": "Yes"
@@ -1313,9 +1314,9 @@
       "if_no_success": "If displays successfully resubmitted, end of process.",
       "if_no_failed": "If displays failed to resubmit, the resend was unsuccessful",
       "contact_helpdesk": "For unsuccessful resends, please contact the Program Framework helpdesk",
-      "helpdesk_email": "helpdesk@programframework.com",
+      "helpdesk_email": "support@easervicedesk.zendesk.com",
       "copy_team": "Also copy into the email the Asset Management Business Systems Team",
-      "team_email": "AssetManagementTeam@environment-agency.gov.uk"
+      "team_email": "AMBST@environment-agency.gov.uk"
     }
   },
   "archived_proposals": {

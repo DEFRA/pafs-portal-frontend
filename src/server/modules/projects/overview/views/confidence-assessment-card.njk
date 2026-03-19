@@ -1,5 +1,8 @@
-{% macro confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, t, isReadOnly) %}
+{% macro confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, PROJECT_TYPES, t, isReadOnly, isConfidenceRestricted) %}
   {% set hasConfidence = projectData[PROJECT_PAYLOAD_FIELDS.CONFIDENCE_HOMES_BETTER_PROTECTED] %}
+  
+  {# Hide confidence section for restricted project types (ELO, HCR, STR, STU) #}
+  {% if !isConfidenceRestricted %}
   <div class="govuk-summary-card">
     <div class="govuk-summary-card__title-wrapper">
       <h2 class="govuk-summary-card__title">{{ t('projects.overview.confidence_assessment_summary_card.title') }}</h2>
@@ -56,4 +59,5 @@
       {% endif %}
     </div>
   </div>
+  {% endif %}
 {% endmacro %}
