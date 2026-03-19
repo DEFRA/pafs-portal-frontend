@@ -245,7 +245,15 @@ class EnvironmentalBenefitsController {
     }
 
     // Convert input values to number for quantity fields
-    if (fieldType === 'input' && fieldValue !== null && fieldValue !== '') {
+    // Return undefined for empty/missing values so Joi's required() fires instead of number.base
+    if (fieldType === 'input') {
+      if (
+        fieldValue === '' ||
+        fieldValue === null ||
+        fieldValue === undefined
+      ) {
+        return undefined
+      }
       return Number(fieldValue)
     }
 
