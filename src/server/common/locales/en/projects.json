@@ -967,8 +967,8 @@
     },
     "urgency_detail": {
       "title": "Why is your project urgent?",
-      "statutory_need_heading": "What is the business critical statutory need?",
-      "legal_need_heading": "What is the business critical legal need?",
+      "statutory_need_heading": "What is the business-critical or statutory need?",
+      "legal_need_heading": "What is the business-critical or legal need?",
       "health_and_safety_heading": "What is the health and safety issue?",
       "emergency_works_heading": "What is the emergency?",
       "time_limited_heading": "What is the specific aspect of the project that has a time limit?",
