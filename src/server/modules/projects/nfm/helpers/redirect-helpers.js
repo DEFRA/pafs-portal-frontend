@@ -6,6 +6,7 @@ import { ROUTES } from '../../../../common/constants/routes.js'
 import { navigateToProjectOverview } from '../../helpers/project-utils.js'
 import {
   LAND_TYPE_ROUTE_MAP,
+  MEASURE_TO_ROUTE,
   STEP_TO_LAND_TYPE,
   LAND_USE_DETAIL_STEPS,
   getSelectedLandTypes,
@@ -14,18 +15,6 @@ import {
 } from './shared-navigation-helpers.js'
 
 const REFERENCE_NUMBER_PLACEHOLDER = '{referenceNumber}'
-
-const MEASURE_ROUTES = {
-  [NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION]:
-    ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
-  [NFM_MEASURES.LEAKY_BARRIERS]: ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
-  [NFM_MEASURES.OFFLINE_STORAGE]: ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
-  [NFM_MEASURES.WOODLAND]: ROUTES.PROJECT.EDIT.NFM.WOODLAND,
-  [NFM_MEASURES.HEADWATER_DRAINAGE]: ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE,
-  [NFM_MEASURES.RUNOFF_MANAGEMENT]: ROUTES.PROJECT.EDIT.NFM.RUNOFF_MANAGEMENT,
-  [NFM_MEASURES.SALTMARSH_MANAGEMENT]: ROUTES.PROJECT.EDIT.NFM.SALTMARSH,
-  [NFM_MEASURES.SAND_DUNE_MANAGEMENT]: ROUTES.PROJECT.EDIT.NFM.SAND_DUNE
-}
 
 const STEP_NEXT_MEASURES = {
   [PROJECT_STEPS.NFM_SELECTED_MEASURES]: [
@@ -75,20 +64,8 @@ const STEP_NEXT_MEASURES = {
   [PROJECT_STEPS.NFM_SAND_DUNE]: []
 }
 
-const STEPS_REDIRECTING_TO_LAND_USE = new Set([
-  PROJECT_STEPS.NFM_SELECTED_MEASURES,
-  PROJECT_STEPS.NFM_RIVER_RESTORATION,
-  PROJECT_STEPS.NFM_LEAKY_BARRIERS,
-  PROJECT_STEPS.NFM_OFFLINE_STORAGE,
-  PROJECT_STEPS.NFM_WOODLAND,
-  PROJECT_STEPS.NFM_HEADWATER_DRAINAGE,
-  PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT,
-  PROJECT_STEPS.NFM_SALTMARSH,
-  PROJECT_STEPS.NFM_SAND_DUNE
-])
-
 function redirectToMeasure(h, referenceNumber, measure) {
-  const route = MEASURE_ROUTES[measure]
+  const route = MEASURE_TO_ROUTE[measure]
   if (!route) {
     return null
   }
@@ -131,18 +108,14 @@ export async function handleConditionalRedirect(
       }
     }
 
-    if (STEPS_REDIRECTING_TO_LAND_USE.has(step)) {
-      return h
-        .redirect(
-          ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE.replace(
-            REFERENCE_NUMBER_PLACEHOLDER,
-            referenceNumber
-          )
+    return h
+      .redirect(
+        ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE.replace(
+          REFERENCE_NUMBER_PLACEHOLDER,
+          referenceNumber
         )
-        .takeover()
-    }
-
-    return null
+      )
+      .takeover()
   }
 
   // After land-use-change selection: navigate to first selected land type
