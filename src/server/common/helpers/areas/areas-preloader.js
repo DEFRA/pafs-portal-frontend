@@ -22,7 +22,8 @@ export const areasPreloader = {
     // Track if areas have been preloaded
     let areasPreloaded = false
 
-    // Hook into onPreHandler to preload areas on first request
+    // Hook into onPreHandler to preload areas on first request and keep
+    // server.app.areasByType populated so synchronous helpers can read it
     server.ext('onPreHandler', async (_request, h) => {
       if (!areasPreloaded) {
         try {
@@ -42,6 +43,16 @@ export const areasPreloader = {
           )
         }
       }
+
+      try {
+        server.app.areasByType = await areasService.getAreasByType()
+      } catch (error) {
+        server.logger.warn(
+          { error: { message: error.message, name: error.name } },
+          'Failed to populate server.app.areasByType - area-based features may be limited'
+        )
+      }
+
       return h.continue
     })
 

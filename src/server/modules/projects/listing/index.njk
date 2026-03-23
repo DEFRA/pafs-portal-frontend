@@ -104,7 +104,7 @@
         </form>
       {% endif %}
 
-      {% if isUserProjectListing and canCreateProjects and isAdmin %}
+      {% if isUserProjectListing and(canCreateProjects or isAdmin) %}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
             <a href="/project/start" role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-3"

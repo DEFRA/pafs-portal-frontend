@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import {
-  requireRmaUser,
+  requireProposalCreator,
   noEditSessionRequired,
   requireJourneyStarted,
   requireProjectNameSet,
@@ -66,12 +66,12 @@ describe('permissions helper - comprehensive', () => {
     requireAuth.mockResolvedValue(mockH.continue)
   })
 
-  describe('requireRmaUser', () => {
+  describe('requireProposalCreator', () => {
     test('should return auth redirect when authentication does not continue', async () => {
       const authRedirect = Symbol('auth-redirect')
       requireAuth.mockResolvedValue(authRedirect)
 
-      const result = await requireRmaUser(mockRequest, mockH)
+      const result = await requireProposalCreator(mockRequest, mockH)
 
       expect(result).toBe(authRedirect)
       expect(getAuthSession).not.toHaveBeenCalled()
@@ -82,17 +82,27 @@ describe('permissions helper - comprehensive', () => {
         user: { id: '2', isRma: true }
       })
 
-      const result = await requireRmaUser(mockRequest, mockH)
+      const result = await requireProposalCreator(mockRequest, mockH)
 
       expect(result).toBe(mockH.continue)
     })
 
-    test('should redirect non-RMA users', async () => {
+    test('should allow admin users', async () => {
+      getAuthSession.mockReturnValue({
+        user: { id: '1', admin: true }
+      })
+
+      const result = await requireProposalCreator(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+    })
+
+    test('should redirect non-RMA non-admin users', async () => {
       getAuthSession.mockReturnValue({
         user: { id: '3', isRma: false, isPso: true }
       })
 
-      await requireRmaUser(mockRequest, mockH)
+      await requireProposalCreator(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.GENERAL.HOME)
       expect(mockH.takeover).toHaveBeenCalled()

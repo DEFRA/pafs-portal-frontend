@@ -172,7 +172,15 @@ export function buildViewData(request, options = {}) {
 
 export function loggedInUserAreas(request) {
   const session = getAuthSession(request)
-  return session?.user?.areas || []
+  const user = session?.user
+
+  if (user?.admin) {
+    // Admin users can create proposals for any RMA area
+    const areasByType = request.server.app.areasByType
+    return areasByType?.RMA || []
+  }
+
+  return user?.areas || []
 }
 
 export function loggedInUserMainArea(request) {
@@ -184,18 +192,7 @@ export function loggedInUserMainArea(request) {
 }
 
 export function loggedInUserAreaOptions(request) {
-  const session = getAuthSession(request)
-  const isAdmin = session?.user?.isAdmin || false
-
-  let areas
-  if (isAdmin) {
-    // Admin users see all RMA areas from the areas list
-    const areasByType = request.server.app.areasByType
-    areas = areasByType?.RMA || []
-  } else {
-    // Non-admin users see only their assigned areas
-    areas = loggedInUserAreas(request)
-  }
+  const areas = loggedInUserAreas(request)
 
   const areasOption = [
     {

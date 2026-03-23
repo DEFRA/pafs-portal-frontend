@@ -63,10 +63,10 @@
             &nbsp; | &nbsp;
             <form method="post" action="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/revert-to-draft" class="app-inline-form">
               <button type="submit" class="govuk-link app-link-button" data-testid="revert-to-draft-link">
-                {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'draft' %}
-                  {{ t('projects.overview.common.revert_to_draft') }}
-                {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'revise' %}
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.IS_LEGACY] and not projectData[PROJECT_PAYLOAD_FIELDS.IS_REVISED] %}
                   {{ t('projects.overview.common.revert_to_revise') }}
+                {% else %}
+                  {{ t('projects.overview.common.revert_to_draft') }}
                 {% endif %}
               </button>
             </form>

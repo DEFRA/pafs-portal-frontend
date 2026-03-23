@@ -309,7 +309,7 @@ describe('project-utils', () => {
   })
 
   describe('loggedInUserAreas', () => {
-    test('should return user areas', () => {
+    test('should return user areas for non-admin', () => {
       const areas = [{ areaId: '1', name: 'Area 1' }]
       getAuthSession.mockReturnValue({
         user: { areas }
@@ -318,6 +318,32 @@ describe('project-utils', () => {
       const result = loggedInUserAreas(mockRequest)
 
       expect(result).toEqual(areas)
+    })
+
+    test('should return all RMA areas for admin users', () => {
+      const rmaAreas = [
+        { id: '10', name: 'RMA Area 1' },
+        { id: '20', name: 'RMA Area 2' }
+      ]
+      getAuthSession.mockReturnValue({
+        user: { admin: true, areas: [{ areaId: '10', name: 'RMA Area 1' }] }
+      })
+      mockRequest.server = { app: { areasByType: { RMA: rmaAreas } } }
+
+      const result = loggedInUserAreas(mockRequest)
+
+      expect(result).toEqual(rmaAreas)
+    })
+
+    test('should return empty array for admin when areasByType is null', () => {
+      getAuthSession.mockReturnValue({
+        user: { admin: true, areas: [] }
+      })
+      mockRequest.server = { app: { areasByType: null } }
+
+      const result = loggedInUserAreas(mockRequest)
+
+      expect(result).toEqual([])
     })
 
     test('should return empty array when no areas', () => {
@@ -386,7 +412,7 @@ describe('project-utils', () => {
         { areaId: '2', name: 'Area 2' }
       ]
       getAuthSession.mockReturnValue({
-        user: { isAdmin: false, areas }
+        user: { admin: false, areas }
       })
 
       const result = loggedInUserAreaOptions(mockRequest)
@@ -400,7 +426,7 @@ describe('project-utils', () => {
 
     test('should return only placeholder when non-admin has no areas', () => {
       getAuthSession.mockReturnValue({
-        user: { isAdmin: false, areas: [] }
+        user: { admin: false, areas: [] }
       })
 
       const result = loggedInUserAreaOptions(mockRequest)
@@ -417,7 +443,7 @@ describe('project-utils', () => {
         { id: '30', name: 'RMA Area 3' }
       ]
       getAuthSession.mockReturnValue({
-        user: { isAdmin: true, areas: [{ areaId: '10', name: 'RMA Area 1' }] }
+        user: { admin: true, areas: [{ areaId: '10', name: 'RMA Area 1' }] }
       })
       mockRequest.server = {
         app: {
@@ -441,7 +467,7 @@ describe('project-utils', () => {
 
     test('should return only placeholder when admin but no RMA areas in areasByType', () => {
       getAuthSession.mockReturnValue({
-        user: { isAdmin: true, areas: [] }
+        user: { admin: true, areas: [] }
       })
       mockRequest.server = {
         app: {
@@ -462,7 +488,7 @@ describe('project-utils', () => {
 
     test('should return only placeholder when admin but areasByType is null', () => {
       getAuthSession.mockReturnValue({
-        user: { isAdmin: true, areas: [] }
+        user: { admin: true, areas: [] }
       })
       mockRequest.server = {
         app: {
@@ -480,7 +506,7 @@ describe('project-utils', () => {
     test('should handle areas with areaId property for non-admin', () => {
       const areas = [{ areaId: '5', name: 'Test Area' }]
       getAuthSession.mockReturnValue({
-        user: { isAdmin: false, areas }
+        user: { admin: false, areas }
       })
 
       const result = loggedInUserAreaOptions(mockRequest)
@@ -494,7 +520,7 @@ describe('project-utils', () => {
     test('should handle areas with id property for admin', () => {
       const rmaAreas = [{ id: '15', name: 'Admin RMA Area' }]
       getAuthSession.mockReturnValue({
-        user: { isAdmin: true, areas: [] }
+        user: { admin: true, areas: [] }
       })
       mockRequest.server = {
         app: {
