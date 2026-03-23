@@ -13,6 +13,7 @@ import {
 } from '../../../common/constants/common.js'
 import { PROJECT_STATUS } from '../../../common/constants/projects.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
+import { getProjectStateTag } from '../helpers/project-utils.js'
 
 /**
  * I18n key configuration for each listing variant.
@@ -211,9 +212,14 @@ function handleSuccessResponse({ sharedParams, projectsResult }) {
   const projects = projectsResult.data?.data || []
   const pagination = projectsResult.data?.pagination || {}
 
+  const projectsWithTags = projects.map((project) => ({
+    ...project,
+    statusTag: getProjectStateTag(project.status)
+  }))
+
   return renderProjectsView({
     ...sharedParams,
-    projects,
+    projects: projectsWithTags,
     pagination
   })
 }

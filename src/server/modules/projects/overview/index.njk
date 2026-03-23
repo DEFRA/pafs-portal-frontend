@@ -63,7 +63,11 @@
             &nbsp; | &nbsp;
             <form method="post" action="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/revert-to-draft" class="app-inline-form">
               <button type="submit" class="govuk-link app-link-button" data-testid="revert-to-draft-link">
-                {{ t('projects.overview.common.revert_to_draft') }}
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.IS_LEGACY] and not projectData[PROJECT_PAYLOAD_FIELDS.IS_REVISED] %}
+                  {{ t('projects.overview.common.revert_to_revise') }}
+                {% else %}
+                  {{ t('projects.overview.common.revert_to_draft') }}
+                {% endif %}
               </button>
             </form>
           {% endif %}
@@ -101,7 +105,7 @@
 
   {{ urgencyAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, URGENCY_REASONS, t, isReadOnly) }}
 
-  {{ confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, t, isReadOnly) }}
+  {{ confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, PROJECT_TYPES, t, isReadOnly, isConfidenceRestricted) }}
 
   {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t) }}
 

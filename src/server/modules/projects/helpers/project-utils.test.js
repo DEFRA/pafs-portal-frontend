@@ -19,12 +19,15 @@ import {
   isYearBeyondRange,
   getMonthName,
   formatDate,
-  formatFileSize
+  formatFileSize,
+  getProjectStateTag,
+  isConfidenceRestrictedProjectType
 } from './project-utils.js'
 import {
   PROJECT_SESSION_KEY,
   PROJECT_TYPES,
-  PROJECT_PAYLOAD_FIELDS
+  PROJECT_PAYLOAD_FIELDS,
+  PROJECT_STATUS
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
@@ -306,7 +309,7 @@ describe('project-utils', () => {
   })
 
   describe('loggedInUserAreas', () => {
-    test('should return user areas', () => {
+    test('should return user areas for non-admin', () => {
       const areas = [{ areaId: '1', name: 'Area 1' }]
       getAuthSession.mockReturnValue({
         user: { areas }
@@ -315,6 +318,32 @@ describe('project-utils', () => {
       const result = loggedInUserAreas(mockRequest)
 
       expect(result).toEqual(areas)
+    })
+
+    test('should return all RMA areas for admin users', () => {
+      const rmaAreas = [
+        { id: '10', name: 'RMA Area 1' },
+        { id: '20', name: 'RMA Area 2' }
+      ]
+      getAuthSession.mockReturnValue({
+        user: { admin: true, areas: [{ areaId: '10', name: 'RMA Area 1' }] }
+      })
+      mockRequest.server = { app: { areasByType: { RMA: rmaAreas } } }
+
+      const result = loggedInUserAreas(mockRequest)
+
+      expect(result).toEqual(rmaAreas)
+    })
+
+    test('should return empty array for admin when areasByType is null', () => {
+      getAuthSession.mockReturnValue({
+        user: { admin: true, areas: [] }
+      })
+      mockRequest.server = { app: { areasByType: null } }
+
+      const result = loggedInUserAreas(mockRequest)
+
+      expect(result).toEqual([])
     })
 
     test('should return empty array when no areas', () => {
@@ -377,13 +406,13 @@ describe('project-utils', () => {
   })
 
   describe('loggedInUserAreaOptions', () => {
-    test('should return formatted area options', () => {
+    test('should return formatted area options for non-admin users', () => {
       const areas = [
         { areaId: '1', name: 'Area 1' },
         { areaId: '2', name: 'Area 2' }
       ]
       getAuthSession.mockReturnValue({
-        user: { areas }
+        user: { admin: false, areas }
       })
 
       const result = loggedInUserAreaOptions(mockRequest)
@@ -395,15 +424,117 @@ describe('project-utils', () => {
       ])
     })
 
-    test('should return only placeholder when no areas', () => {
+    test('should return only placeholder when non-admin has no areas', () => {
       getAuthSession.mockReturnValue({
-        user: { areas: [] }
+        user: { admin: false, areas: [] }
       })
 
       const result = loggedInUserAreaOptions(mockRequest)
 
       expect(result).toEqual([
         { text: 'projects.area_selection.select_rma_option_text', value: '' }
+      ])
+    })
+
+    test('should return all RMA areas for admin users', () => {
+      const rmaAreas = [
+        { id: '10', name: 'RMA Area 1' },
+        { id: '20', name: 'RMA Area 2' },
+        { id: '30', name: 'RMA Area 3' }
+      ]
+      getAuthSession.mockReturnValue({
+        user: { admin: true, areas: [{ areaId: '10', name: 'RMA Area 1' }] }
+      })
+      mockRequest.server = {
+        app: {
+          areasByType: {
+            RMA: rmaAreas,
+            PSO: [],
+            EA: []
+          }
+        }
+      }
+
+      const result = loggedInUserAreaOptions(mockRequest)
+
+      expect(result).toEqual([
+        { text: 'projects.area_selection.select_rma_option_text', value: '' },
+        { text: 'RMA Area 1', value: 10 },
+        { text: 'RMA Area 2', value: 20 },
+        { text: 'RMA Area 3', value: 30 }
+      ])
+    })
+
+    test('should return only placeholder when admin but no RMA areas in areasByType', () => {
+      getAuthSession.mockReturnValue({
+        user: { admin: true, areas: [] }
+      })
+      mockRequest.server = {
+        app: {
+          areasByType: {
+            RMA: [],
+            PSO: [],
+            EA: []
+          }
+        }
+      }
+
+      const result = loggedInUserAreaOptions(mockRequest)
+
+      expect(result).toEqual([
+        { text: 'projects.area_selection.select_rma_option_text', value: '' }
+      ])
+    })
+
+    test('should return only placeholder when admin but areasByType is null', () => {
+      getAuthSession.mockReturnValue({
+        user: { admin: true, areas: [] }
+      })
+      mockRequest.server = {
+        app: {
+          areasByType: null
+        }
+      }
+
+      const result = loggedInUserAreaOptions(mockRequest)
+
+      expect(result).toEqual([
+        { text: 'projects.area_selection.select_rma_option_text', value: '' }
+      ])
+    })
+
+    test('should handle areas with areaId property for non-admin', () => {
+      const areas = [{ areaId: '5', name: 'Test Area' }]
+      getAuthSession.mockReturnValue({
+        user: { admin: false, areas }
+      })
+
+      const result = loggedInUserAreaOptions(mockRequest)
+
+      expect(result).toEqual([
+        { text: 'projects.area_selection.select_rma_option_text', value: '' },
+        { text: 'Test Area', value: 5 }
+      ])
+    })
+
+    test('should handle areas with id property for admin', () => {
+      const rmaAreas = [{ id: '15', name: 'Admin RMA Area' }]
+      getAuthSession.mockReturnValue({
+        user: { admin: true, areas: [] }
+      })
+      mockRequest.server = {
+        app: {
+          areasByType: {
+            RMA: rmaAreas
+          }
+        }
+      }
+
+      const result = loggedInUserAreaOptions(mockRequest)
+
+      expect(result).toEqual([
+        { text: 'projects.area_selection.select_rma_option_text', value: '' },
+        { text: 'Admin RMA Area', value: 15 }
       ])
     })
   })
@@ -668,6 +799,98 @@ describe('project-utils', () => {
     test('should handle null or undefined', () => {
       expect(formatFileSize(null)).toBe('0 B')
       expect(formatFileSize(undefined)).toBe('0 B')
+    })
+  })
+
+  describe('getProjectStateTag', () => {
+    test('should return light blue tag for DRAFT status', () => {
+      expect(getProjectStateTag(PROJECT_STATUS.DRAFT)).toBe(
+        'govuk-tag--light-blue'
+      )
+    })
+
+    test('should return light blue tag for REVISE status', () => {
+      expect(getProjectStateTag(PROJECT_STATUS.REVISE)).toBe(
+        'govuk-tag--light-blue'
+      )
+    })
+
+    test('should return grey tag for ARCHIVED status', () => {
+      expect(getProjectStateTag(PROJECT_STATUS.ARCHIVED)).toBe(
+        'govuk-tag--grey'
+      )
+    })
+
+    test('should return grey tag for SUBMITTED status', () => {
+      expect(getProjectStateTag(PROJECT_STATUS.SUBMITTED)).toBe(
+        'govuk-tag--grey'
+      )
+    })
+
+    test('should return grey tag for APPROVED status', () => {
+      expect(getProjectStateTag(PROJECT_STATUS.APPROVED)).toBe(
+        'govuk-tag--grey'
+      )
+    })
+
+    test('should return grey tag for REJECTED status', () => {
+      expect(getProjectStateTag(PROJECT_STATUS.REJECTED)).toBe(
+        'govuk-tag--grey'
+      )
+    })
+
+    test('should return grey tag for undefined status', () => {
+      expect(getProjectStateTag(undefined)).toBe('govuk-tag--grey')
+    })
+
+    test('should return grey tag for null status', () => {
+      expect(getProjectStateTag(null)).toBe('govuk-tag--grey')
+    })
+
+    test('should return grey tag for unknown status', () => {
+      expect(getProjectStateTag('UNKNOWN_STATUS')).toBe('govuk-tag--grey')
+    })
+  })
+
+  describe('isConfidenceRestrictedProjectType', () => {
+    test('should return true for ELO project type', () => {
+      expect(isConfidenceRestrictedProjectType(PROJECT_TYPES.ELO)).toBe(true)
+    })
+
+    test('should return true for HCR project type', () => {
+      expect(isConfidenceRestrictedProjectType(PROJECT_TYPES.HCR)).toBe(true)
+    })
+
+    test('should return true for STR project type', () => {
+      expect(isConfidenceRestrictedProjectType(PROJECT_TYPES.STR)).toBe(true)
+    })
+
+    test('should return true for STU project type', () => {
+      expect(isConfidenceRestrictedProjectType(PROJECT_TYPES.STU)).toBe(true)
+    })
+
+    test('should return false for DEF project type', () => {
+      expect(isConfidenceRestrictedProjectType(PROJECT_TYPES.DEF)).toBe(false)
+    })
+
+    test('should return false for REP project type', () => {
+      expect(isConfidenceRestrictedProjectType(PROJECT_TYPES.REP)).toBe(false)
+    })
+
+    test('should return false for REF project type', () => {
+      expect(isConfidenceRestrictedProjectType(PROJECT_TYPES.REF)).toBe(false)
+    })
+
+    test('should return false for undefined project type', () => {
+      expect(isConfidenceRestrictedProjectType(undefined)).toBe(false)
+    })
+
+    test('should return false for null project type', () => {
+      expect(isConfidenceRestrictedProjectType(null)).toBe(false)
+    })
+
+    test('should return false for unknown project type', () => {
+      expect(isConfidenceRestrictedProjectType('UNKNOWN_TYPE')).toBe(false)
     })
   })
 })

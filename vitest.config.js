@@ -18,6 +18,7 @@ export default defineConfig({
         'stylelint.config.js',
         'src/client/javascripts/**',
         '**/*.md',
+        '**/*.json',
         '**/*.njk',
         '**/.DS_Store'
       ]

@@ -16,29 +16,29 @@ import {
 import { getParentAreas } from '../../../common/helpers/areas/areas-helper.js'
 
 /**
- * Pre-handler that requires user to be an RMA user
- * Only RMA users are allowed to create proposals
- * PSO users and Area users cannot create proposals
+ * Pre-handler that requires the user to have proposal creation rights.
+ * Only RMA users and admin users are allowed to create proposals.
+ * PSO users and Area users cannot create proposals.
  *
  * @param {Object} request - Hapi request object
  * @param {Object} h - Hapi response toolkit
- * @returns {Object} h.continue if user is RMA, otherwise redirect to home
+ * @returns {Object} h.continue if user is an RMA or admin, otherwise redirect to home
  */
-export async function requireRmaUser(request, h) {
+export async function requireProposalCreator(request, h) {
   // First validate and refresh token if needed
   const authResult = await requireAuth(request, h)
   if (authResult !== h.continue) {
     return authResult
   }
 
-  // Now check if user is RMA - only RMA users can create proposals
   const session = getAuthSession(request)
+  const { isRma, admin } = session?.user ?? {}
 
-  // Admins, PSO users, and Area users cannot create proposals
-  if (!session?.user?.isRma) {
+  // Only RMA users and admins can create proposals
+  if (!isRma && !admin) {
     request.server?.logger?.warn(
       { userId: session?.user?.id },
-      'Non-RMA user attempted to access RMA-only route'
+      'Unauthorised user attempted to access proposal creation route'
     )
     return h.redirect(ROUTES.GENERAL.HOME).takeover()
   }

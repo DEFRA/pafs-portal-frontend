@@ -1,6 +1,6 @@
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
-  requireRmaUser,
+  requireProposalCreator,
   requireFinancialStartYearSet,
   requirePrimaryInterventionTypeSet,
   noEditSessionRequired
@@ -13,7 +13,7 @@ export const projectFinancialYear = {
     name: 'Project - Financial Year',
     register(server) {
       const basePreHandlers = [
-        { method: requireRmaUser },
+        { method: requireProposalCreator },
         { method: noEditSessionRequired }
       ]
 

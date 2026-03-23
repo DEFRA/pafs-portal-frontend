@@ -1,7 +1,12 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { overviewController } from './controller.js'
 import { PROJECT_STATUS } from '../../../common/constants/projects.js'
-import { getSessionData, getBackLink } from '../helpers/project-utils.js'
+import {
+  getSessionData,
+  getBackLink,
+  getProjectStateTag,
+  isConfidenceRestrictedProjectType
+} from '../helpers/project-utils.js'
 import { enrichProjectData } from '../helpers/overview/data-enrichment.js'
 import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
@@ -11,7 +16,9 @@ vi.mock('../helpers/project-utils.js', () => ({
   getBackLink: vi.fn(),
   formatDate: vi.fn(),
   buildFinancialYearLabel: vi.fn(),
-  formatFileSize: vi.fn()
+  formatFileSize: vi.fn(),
+  getProjectStateTag: vi.fn(),
+  isConfidenceRestrictedProjectType: vi.fn()
 }))
 
 vi.mock('../helpers/overview/data-enrichment.js')
@@ -36,6 +43,15 @@ describe('OverviewController', () => {
       href: '/projects/home',
       text: 'Back'
     })
+
+    getProjectStateTag.mockImplementation((status) => {
+      if (status === PROJECT_STATUS.DRAFT || status === PROJECT_STATUS.REVISE) {
+        return 'govuk-tag--light-blue'
+      }
+      return 'govuk-tag--grey'
+    })
+
+    isConfidenceRestrictedProjectType.mockReturnValue(false)
 
     getSessionData.mockReturnValue({
       id: 1,
@@ -156,7 +172,7 @@ describe('OverviewController', () => {
       )
     })
 
-    test('should set orange tag for ARCHIVED status', async () => {
+    test('should set grey tag for ARCHIVED status', async () => {
       getSessionData.mockReturnValue({
         projectState: PROJECT_STATUS.ARCHIVED
       })
@@ -166,7 +182,7 @@ describe('OverviewController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          projectStateTag: 'govuk-tag--orange'
+          projectStateTag: 'govuk-tag--grey'
         })
       )
     })
@@ -480,7 +496,7 @@ describe('OverviewController', () => {
       expect(call[1].projectStateTag).toBe('govuk-tag--grey')
     })
 
-    test('should return orange for ARCHIVED', async () => {
+    test('should return grey for ARCHIVED', async () => {
       getSessionData.mockReturnValue({
         projectState: PROJECT_STATUS.ARCHIVED
       })
@@ -488,7 +504,7 @@ describe('OverviewController', () => {
       await overviewController.getHandler(mockRequest, mockH)
 
       const call = mockH.view.mock.calls[0]
-      expect(call[1].projectStateTag).toBe('govuk-tag--orange')
+      expect(call[1].projectStateTag).toBe('govuk-tag--grey')
     })
 
     test('should return grey for undefined status', async () => {
