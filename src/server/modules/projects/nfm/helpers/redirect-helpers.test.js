@@ -263,6 +263,43 @@ describe('NFM Redirect Helpers', () => {
     })
   })
 
+  describe('handleConditionalRedirect - redirectToMeasure returns null (no route)', () => {
+    let handleConditionalRedirectMocked
+
+    beforeAll(async () => {
+      vi.doMock('./shared-navigation-helpers.js', async () => {
+        const actual = await vi.importActual('./shared-navigation-helpers.js')
+        return {
+          ...actual,
+          MEASURE_TO_ROUTE: {} // no routes defined — forces redirectToMeasure to return null
+        }
+      })
+      const mod = await import('./redirect-helpers.js?mock=no-routes')
+      handleConditionalRedirectMocked = mod.handleConditionalRedirect
+    })
+
+    afterAll(() => {
+      vi.doUnmock('./shared-navigation-helpers.js')
+    })
+
+    test('should return null when selected measure has no route mapping', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration'
+      }
+
+      const result = await handleConditionalRedirectMocked(
+        PROJECT_STEPS.NFM_SELECTED_MEASURES,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeNull()
+    })
+  })
+
   describe('handleConditionalRedirect - additional branch coverage', () => {
     test('should handle selected measures provided as array', async () => {
       const sessionData = {
