@@ -192,13 +192,24 @@ describe('NFM Measure Schemas', () => {
     expect(result.error.details[0].type).toBe('number.precision')
   })
 
-  test('validates saltmarsh with optional null length', () => {
+  test('rejects saltmarsh when length is missing', () => {
     const result = nfmSaltmarshSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: 12.34,
-      [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: null
+      [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: ''
     })
 
-    expect(result.error).toBeUndefined()
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].message).toBe('Enter the length in km')
+  })
+
+  test('rejects sand dune when length is missing', () => {
+    const result = nfmSandDuneSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: 9.99,
+      [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: ''
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].message).toBe('Enter the length in km')
   })
 
   test('rejects sand dune area with more than 2 decimal places', () => {

@@ -250,13 +250,15 @@ export const nfmSaltmarshSchema = Joi.object({
       'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
+    .required()
     .messages({
-      'number.base': 'Length must be a number',
-      'number.positive': 'Length must be a positive number',
-      'number.precision': MSG_LENGTH_PRECISION_2DP
+      'number.base': MSG_LENGTH_GREATER_THAN_ZERO,
+      'number.positive': MSG_LENGTH_GREATER_THAN_ZERO,
+      'number.precision': MSG_LENGTH_PRECISION_2DP,
+      'any.required': 'Enter the length in km'
     })
 }).unknown(true)
 
@@ -277,13 +279,15 @@ export const nfmSandDuneSchema = Joi.object({
       'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: Joi.number()
+    .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
+    .required()
     .messages({
-      'number.base': 'Length must be a number',
-      'number.positive': 'Length must be a positive number',
-      'number.precision': MSG_LENGTH_PRECISION_2DP
+      'number.base': MSG_LENGTH_GREATER_THAN_ZERO,
+      'number.positive': MSG_LENGTH_GREATER_THAN_ZERO,
+      'number.precision': MSG_LENGTH_PRECISION_2DP,
+      'any.required': 'Enter the length in km'
     })
 }).unknown(true)
 
