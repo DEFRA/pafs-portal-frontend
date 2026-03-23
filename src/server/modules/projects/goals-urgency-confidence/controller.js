@@ -17,7 +17,8 @@ import {
   buildViewData,
   getProjectStep,
   getSessionData,
-  updateSessionData
+  updateSessionData,
+  isConfidenceRestrictedProjectType
 } from '../helpers/project-utils.js'
 import { buildRadioItems } from '../helpers/radio-options.js'
 
@@ -194,7 +195,44 @@ class GoalsUrgencyConfidenceController {
     )
   }
 
+  _isConfidenceStep(step) {
+    return [
+      PROJECT_STEPS.CONFIDENCE_HOMES_BETTER_PROTECTED,
+      PROJECT_STEPS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR,
+      PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+    ].includes(step)
+  }
+
+  _checkConfidenceAccess(request, h, step) {
+    if (!this._isConfidenceStep(step)) {
+      return null
+    }
+
+    const sessionData = getSessionData(request)
+    const projectType = sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]
+
+    if (isConfidenceRestrictedProjectType(projectType)) {
+      const referenceNumber = request.params?.referenceNumber
+      return h
+        .redirect(
+          ROUTES.PROJECT.OVERVIEW.replace(
+            REFERENCE_NUMBER_PARAM,
+            referenceNumber
+          )
+        )
+        .takeover()
+    }
+
+    return null
+  }
+
   async get(request, h) {
+    const step = getProjectStep(request)
+    const accessCheck = this._checkConfidenceAccess(request, h, step)
+    if (accessCheck) {
+      return accessCheck
+    }
+
     return h.view(VIEW, this._getViewData(request))
   }
 
@@ -230,9 +268,14 @@ class GoalsUrgencyConfidenceController {
   }
 
   async post(request, h) {
+    const step = getProjectStep(request)
+    const accessCheck = this._checkConfidenceAccess(request, h, step)
+    if (accessCheck) {
+      return accessCheck
+    }
+
     updateSessionData(request, request.payload)
     const viewData = this._getViewData(request)
-    const step = getProjectStep(request)
     const config = this._getConfig(step)
     const { schema, fieldName, fieldType } = config
 

@@ -6,6 +6,7 @@
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
 
 {% block content %}
   {{ appHeading({
@@ -103,7 +104,7 @@
         </form>
       {% endif %}
 
-      {% if isUserProjectListing and canCreateProjects %}
+      {% if isUserProjectListing and(canCreateProjects or isAdmin) %}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
             <a href="/project/start" role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-3"
@@ -169,7 +170,12 @@
                 </td>
                 <td class="govuk-table__cell" data-label="{{ t('projects.manage_projects.table.assigned_rma') }}" data-testid="assigned-rma">{{ project.rmaName | default('-') }}</td>
                 {% if not isArchive and not isSubmission %}
-                  <td class="govuk-table__cell" data-label="{{ t('projects.manage_projects.table.status.label') }}" data-testid="status">{{ project.status | capitalize }}</td>
+                  <td class="govuk-table__cell" data-label="{{ t('projects.manage_projects.table.status.label') }}" data-testid="status">
+                    {{ govukTag({
+                      text: project.status | capitalize,
+                      classes: project.statusTag
+                    }) }}
+                  </td>
                 {% endif %}
                 {% if isAdminProjectListing %}
                   <td class="govuk-table__cell" data-label="">

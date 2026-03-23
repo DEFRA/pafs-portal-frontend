@@ -5,7 +5,7 @@ import {
   requireEditPermission,
   requireJourneyStarted,
   requireEditableStatus,
-  requireRmaUser
+  requireProposalCreator
 } from '../helpers/permissions.js'
 import {
   fetchProjectForEdit,
@@ -23,7 +23,7 @@ export const projectName = {
           path: ROUTES.PROJECT.NAME,
           options: {
             pre: [
-              { method: requireRmaUser },
+              { method: requireProposalCreator },
               { method: noEditSessionRequired },
               requireJourneyStarted
             ],
@@ -35,7 +35,7 @@ export const projectName = {
           path: ROUTES.PROJECT.NAME,
           options: {
             pre: [
-              { method: requireRmaUser },
+              { method: requireProposalCreator },
               { method: noEditSessionRequired },
               requireJourneyStarted
             ],

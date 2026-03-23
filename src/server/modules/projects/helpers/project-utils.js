@@ -4,11 +4,40 @@ import {
   PROJECT_TYPES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_VIEW_ERROR_CODES,
-  REFERENCE_NUMBER_PARAM
+  REFERENCE_NUMBER_PARAM,
+  EDITABLE_STATUSES
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { extractJoiErrors } from '../../../common/helpers/error-renderer/index.js'
+
+/**
+ * Get the GOV.UK tag class for a project state
+ * @param {string} projectState - The project state/status
+ * @returns {string} The GOV.UK tag class modifier
+ */
+export function getProjectStateTag(projectState) {
+  if (EDITABLE_STATUSES.includes(projectState)) {
+    return 'govuk-tag--light-blue'
+  }
+  return 'govuk-tag--grey'
+}
+
+/**
+ * Check if a project type is restricted from updating confidence fields
+ * Restricted types: ELO, HCR, STR, STU
+ * @param {string} projectType - The project type
+ * @returns {boolean} True if the project type is restricted
+ */
+export function isConfidenceRestrictedProjectType(projectType) {
+  const restrictedTypes = [
+    PROJECT_TYPES.ELO,
+    PROJECT_TYPES.HCR,
+    PROJECT_TYPES.STR,
+    PROJECT_TYPES.STU
+  ]
+  return restrictedTypes.includes(projectType)
+}
 
 export function getBackLink(request, options = {}) {
   const { targetURL = '/', conditionalRedirect = false } = options
@@ -143,7 +172,15 @@ export function buildViewData(request, options = {}) {
 
 export function loggedInUserAreas(request) {
   const session = getAuthSession(request)
-  return session?.user?.areas || []
+  const user = session?.user
+
+  if (user?.admin) {
+    // Admin users can create proposals for any RMA area
+    const areasByType = request.server.app.areasByType
+    return areasByType?.RMA || []
+  }
+
+  return user?.areas || []
 }
 
 export function loggedInUserMainArea(request) {
@@ -156,6 +193,7 @@ export function loggedInUserMainArea(request) {
 
 export function loggedInUserAreaOptions(request) {
   const areas = loggedInUserAreas(request)
+
   const areasOption = [
     {
       text: request.t('projects.area_selection.select_rma_option_text'),
@@ -165,7 +203,7 @@ export function loggedInUserAreaOptions(request) {
   return areasOption.concat(
     areas.map((area) => ({
       text: area.name,
-      value: Number(area.areaId)
+      value: Number(area.areaId || area.id)
     }))
   )
 }

@@ -17,7 +17,8 @@ import {
   buildViewData,
   getProjectStep,
   getSessionData,
-  updateSessionData
+  updateSessionData,
+  isConfidenceRestrictedProjectType
 } from '../helpers/project-utils.js'
 import { buildRadioItems } from '../helpers/radio-options.js'
 
@@ -146,6 +147,10 @@ describe('GoalsUrgencyConfidenceController', () => {
       { value: 'high', text: 'High', checked: true }
     ])
 
+    isConfidenceRestrictedProjectType.mockImplementation((projectType) => {
+      return ['ELO', 'HCR', 'STR', 'STU'].includes(projectType)
+    })
+
     saveProjectWithErrorHandling.mockResolvedValue(null)
   })
 
@@ -232,6 +237,106 @@ describe('GoalsUrgencyConfidenceController', () => {
       await goalsUrgencyConfidenceController.getHandler(mockRequest, mockH)
 
       expect(buildRadioItems).not.toHaveBeenCalled()
+    })
+
+    test('should redirect to overview for ELO project type on confidence step', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_HOMES_BETTER_PROTECTED
+      )
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'ELO'
+      })
+      mockRequest.params = { referenceNumber: 'TEST-001' }
+
+      await goalsUrgencyConfidenceController.getHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'TEST-001')
+      )
+      expect(mockH.view).not.toHaveBeenCalled()
+    })
+
+    test('should redirect to overview for HCR project type on confidence step', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR
+      )
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'HCR'
+      })
+      mockRequest.params = { referenceNumber: 'TEST-001' }
+
+      await goalsUrgencyConfidenceController.getHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'TEST-001')
+      )
+      expect(mockH.view).not.toHaveBeenCalled()
+    })
+
+    test('should redirect to overview for STR project type on confidence step', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+      )
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'STR'
+      })
+      mockRequest.params = { referenceNumber: 'TEST-001' }
+
+      await goalsUrgencyConfidenceController.getHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'TEST-001')
+      )
+      expect(mockH.view).not.toHaveBeenCalled()
+    })
+
+    test('should redirect to overview for STU project type on confidence step', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_HOMES_BETTER_PROTECTED
+      )
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'STU'
+      })
+      mockRequest.params = { referenceNumber: 'TEST-001' }
+
+      await goalsUrgencyConfidenceController.getHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'TEST-001')
+      )
+      expect(mockH.view).not.toHaveBeenCalled()
+    })
+
+    test('should allow DEF project type on confidence step', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_HOMES_BETTER_PROTECTED
+      )
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'DEF'
+      })
+
+      await goalsUrgencyConfidenceController.getHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).not.toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalled()
+    })
+
+    test('should not block non-confidence steps for restricted project types', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.PROJECT_GOALS)
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'ELO'
+      })
+
+      await goalsUrgencyConfidenceController.getHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).not.toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalled()
     })
 
     test('should include dynamic heading for URGENCY_DETAILS step', async () => {
@@ -441,6 +546,65 @@ describe('GoalsUrgencyConfidenceController', () => {
         expect.any(Object),
         PROJECT_VIEWS.GOALS_URGENCY_CONFIDENCE
       )
+    })
+
+    test('should redirect to overview on POST for ELO project type on confidence step', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_HOMES_BETTER_PROTECTED
+      )
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'ELO'
+      })
+      mockRequest.params = { referenceNumber: 'TEST-001' }
+      mockRequest.payload = {
+        confidenceHomesBetterProtected: 'high'
+      }
+
+      await goalsUrgencyConfidenceController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'TEST-001')
+      )
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+    })
+
+    test('should redirect to overview on POST for HCR project type on confidence step', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_HOMES_BY_GATEWAY_FOUR
+      )
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'HCR'
+      })
+      mockRequest.params = { referenceNumber: 'TEST-001' }
+      mockRequest.payload = {
+        confidenceHomesByGatewayFour: 'medium_high'
+      }
+
+      await goalsUrgencyConfidenceController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', 'TEST-001')
+      )
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+    })
+
+    test('should allow POST for DEF project type on confidence step', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_HOMES_BETTER_PROTECTED
+      )
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'DEF'
+      })
+      mockRequest.payload = {
+        confidenceHomesBetterProtected: 'high'
+      }
+
+      await goalsUrgencyConfidenceController.postHandler(mockRequest, mockH)
+
+      expect(saveProjectWithErrorHandling).toHaveBeenCalled()
     })
 
     test('should call saveProjectWithErrorHandling with correct level for URGENCY_REASON', async () => {

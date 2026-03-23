@@ -3,8 +3,14 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 globalThis.fetch = vi.fn()
 globalThis.AbortController = class {
   constructor() {
-    this.signal = {}
-    this.abort = vi.fn()
+    this.signal = {
+      aborted: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn()
+    }
+    this.abort = vi.fn(() => {
+      this.signal.aborted = true
+    })
   }
 }
 

@@ -2,7 +2,7 @@ import { ROUTES } from '../../../common/constants/routes.js'
 import {
   noEditSessionRequired,
   requireProjectNameSet,
-  requireRmaUser
+  requireProposalCreator
 } from '../helpers/permissions.js'
 import { areaController } from './controller.js'
 
@@ -16,7 +16,7 @@ export const projectArea = {
           path: ROUTES.PROJECT.AREA,
           options: {
             pre: [
-              { method: requireRmaUser },
+              { method: requireProposalCreator },
               { method: noEditSessionRequired },
               requireProjectNameSet
             ],
@@ -28,7 +28,7 @@ export const projectArea = {
           path: ROUTES.PROJECT.AREA,
           options: {
             pre: [
-              { method: requireRmaUser },
+              { method: requireProposalCreator },
               { method: noEditSessionRequired },
               requireProjectNameSet
             ],

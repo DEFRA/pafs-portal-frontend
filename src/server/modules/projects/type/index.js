@@ -4,7 +4,7 @@ import {
   requireInterventionTypesSet,
   requireProjectAreaSet,
   requireProjectTypeSet,
-  requireRmaUser
+  requireProposalCreator
 } from '../helpers/permissions.js'
 import { createRoutePair } from '../helpers/route-helpers.js'
 import { typeController } from './controller.js'
@@ -14,7 +14,7 @@ export const projectType = {
     name: 'Project - Project Type',
     register(server) {
       const basePreHandlers = [
-        { method: requireRmaUser },
+        { method: requireProposalCreator },
         { method: noEditSessionRequired }
       ]
 

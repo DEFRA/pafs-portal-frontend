@@ -3,7 +3,7 @@ import { projectFinancialYear } from './index.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { requireAuth } from '../../../common/helpers/auth/auth-middleware.js'
 import {
-  requireRmaUser,
+  requireProposalCreator,
   requireFinancialStartYearSet,
   requirePrimaryInterventionTypeSet,
   requireEditPermission,
@@ -55,7 +55,7 @@ describe('projectFinancialYear plugin', () => {
 
       expect(route).toBeDefined()
       expect(route.options.pre).toEqual([
-        { method: requireRmaUser },
+        { method: requireProposalCreator },
         { method: noEditSessionRequired },
         requirePrimaryInterventionTypeSet
       ])
@@ -87,7 +87,7 @@ describe('projectFinancialYear plugin', () => {
 
       expect(route).toBeDefined()
       expect(route.options.pre).toEqual([
-        { method: requireRmaUser },
+        { method: requireProposalCreator },
         { method: noEditSessionRequired },
         requirePrimaryInterventionTypeSet
       ])
@@ -117,7 +117,7 @@ describe('projectFinancialYear plugin', () => {
 
       expect(route).toBeDefined()
       expect(route.options.pre).toEqual([
-        { method: requireRmaUser },
+        { method: requireProposalCreator },
         { method: noEditSessionRequired },
         requireFinancialStartYearSet
       ])

@@ -4,7 +4,6 @@ import {
   PROJECT_INTERVENTION_TYPES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_RISK_TYPES,
-  PROJECT_STATUS,
   PROJECT_STEPS,
   PROJECT_TYPES,
   PROJECT_VIEW_ERROR_CODES,
@@ -20,35 +19,31 @@ import {
   getSessionData,
   formatDate,
   buildFinancialYearLabel,
-  formatFileSize
+  formatFileSize,
+  getProjectStateTag,
+  isConfidenceRestrictedProjectType
 } from '../helpers/project-utils.js'
 import { getBenefitAreaDownloadData } from '../helpers/overview/benefit-area.js'
 import { enrichProjectData } from '../helpers/overview/data-enrichment.js'
 import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
 class OverviewController {
-  _getProjectStateTag(projectState) {
-    if (EDITABLE_STATUSES.includes(projectState)) {
-      return 'govuk-tag--light-blue'
-    }
-    if (projectState === PROJECT_STATUS.ARCHIVED) {
-      return 'govuk-tag--orange'
-    }
-    return 'govuk-tag--grey'
-  }
-
   _getProjectViewData(request, options = {}) {
     const { backLink, projectData } = options
     const isReadOnly = !EDITABLE_STATUSES.includes(projectData.projectState)
     const isLegacy = Boolean(projectData.isLegacy)
+    const isConfidenceRestricted = isConfidenceRestrictedProjectType(
+      projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]
+    )
     return {
       pageTitle: request.t('projects.overview.heading'),
       backLinkURL: backLink.href,
       backLinkText: backLink.text,
       projectData,
-      projectStateTag: this._getProjectStateTag(projectData.projectState),
+      projectStateTag: getProjectStateTag(projectData.projectState),
       isReadOnly,
       isLegacy,
+      isConfidenceRestricted,
       ERROR_CODES: PROJECT_VIEW_ERROR_CODES,
       fieldErrors: {},
       errorCode: '',

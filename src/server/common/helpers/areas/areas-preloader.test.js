@@ -18,6 +18,7 @@ describe('AreasPreloader Plugin', () => {
 
   beforeEach(() => {
     mockServer = {
+      app: {},
       logger: {
         info: vi.fn(),
         warn: vi.fn()
@@ -117,7 +118,9 @@ describe('AreasPreloader Plugin', () => {
     })
 
     test('preloads areas on first request', async () => {
+      const mockAreas = { RMA: [{ id: '1', name: 'Wessex' }] }
       mockPreloadAreas.mockResolvedValue(undefined)
+      mockGetAreasByType.mockResolvedValue(mockAreas)
 
       await areasPreloader.register(mockServer, {})
 
@@ -132,11 +135,14 @@ describe('AreasPreloader Plugin', () => {
         'First request detected - preloading areas'
       )
       expect(mockPreloadAreas).toHaveBeenCalled()
+      expect(mockServer.app.areasByType).toEqual(mockAreas)
       expect(result).toBe(mockH.continue)
     })
 
     test('does not preload on subsequent requests', async () => {
+      const mockAreas = { RMA: [{ id: '1', name: 'Wessex' }] }
       mockPreloadAreas.mockResolvedValue(undefined)
+      mockGetAreasByType.mockResolvedValue(mockAreas)
 
       await areasPreloader.register(mockServer, {})
 
@@ -147,6 +153,8 @@ describe('AreasPreloader Plugin', () => {
 
       await onPreHandlerFunction(mockRequest, mockH)
       vi.clearAllMocks()
+      // Restore implementations cleared by clearAllMocks
+      mockGetAreasByType.mockResolvedValue(mockAreas)
 
       await onPreHandlerFunction(mockRequest, mockH)
 
@@ -157,6 +165,7 @@ describe('AreasPreloader Plugin', () => {
     test('handles preload error gracefully', async () => {
       const error = new Error('Preload failed')
       mockPreloadAreas.mockRejectedValue(error)
+      mockGetAreasByType.mockResolvedValue({})
 
       await areasPreloader.register(mockServer, {})
 
@@ -180,9 +189,11 @@ describe('AreasPreloader Plugin', () => {
 
     test('retries preload on next request after failure', async () => {
       const error = new Error('Preload failed')
+      const mockAreas = { RMA: [{ id: '1', name: 'Wessex' }] }
       mockPreloadAreas
         .mockRejectedValueOnce(error)
         .mockResolvedValueOnce(undefined)
+      mockGetAreasByType.mockResolvedValue(mockAreas)
 
       await areasPreloader.register(mockServer, {})
 
@@ -195,6 +206,8 @@ describe('AreasPreloader Plugin', () => {
       expect(mockServer.logger.warn).toHaveBeenCalled()
 
       vi.clearAllMocks()
+      // Restore implementations cleared by clearAllMocks
+      mockGetAreasByType.mockResolvedValue(mockAreas)
 
       await onPreHandlerFunction(mockRequest, mockH)
       expect(mockServer.logger.info).toHaveBeenCalledWith(
@@ -202,11 +215,58 @@ describe('AreasPreloader Plugin', () => {
       )
       expect(mockPreloadAreas).toHaveBeenCalledTimes(1)
     })
+
+    test('populates server.app.areasByType on every request', async () => {
+      const mockAreas = {
+        RMA: [{ id: '1', name: 'Wessex' }],
+        EA: [{ id: '2', name: 'Midlands' }]
+      }
+      mockPreloadAreas.mockResolvedValue(undefined)
+      mockGetAreasByType.mockResolvedValue(mockAreas)
+
+      await areasPreloader.register(mockServer, {})
+
+      const onPreHandlerFunction = mockServer.ext.mock.calls.find(
+        (call) => call[0] === 'onPreHandler'
+      )[1]
+
+      await onPreHandlerFunction(mockRequest, mockH)
+      expect(mockServer.app.areasByType).toEqual(mockAreas)
+
+      const updatedAreas = { RMA: [{ id: '3', name: 'Southern' }] }
+      mockGetAreasByType.mockResolvedValue(updatedAreas)
+
+      await onPreHandlerFunction(mockRequest, mockH)
+      expect(mockServer.app.areasByType).toEqual(updatedAreas)
+    })
+
+    test('handles getAreasByType failure gracefully without throwing', async () => {
+      const error = new Error('Cache unavailable')
+      mockPreloadAreas.mockResolvedValue(undefined)
+      mockGetAreasByType.mockRejectedValue(error)
+
+      await areasPreloader.register(mockServer, {})
+
+      const onPreHandlerFunction = mockServer.ext.mock.calls.find(
+        (call) => call[0] === 'onPreHandler'
+      )[1]
+
+      const result = await onPreHandlerFunction(mockRequest, mockH)
+
+      expect(mockServer.logger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error: expect.objectContaining({ message: 'Cache unavailable' })
+        }),
+        'Failed to populate server.app.areasByType - area-based features may be limited'
+      )
+      expect(result).toBe(mockH.continue)
+    })
   })
 
   describe('real-world usage patterns', () => {
     test('first user request triggers preload', async () => {
       mockPreloadAreas.mockResolvedValue(undefined)
+      mockGetAreasByType.mockResolvedValue({})
 
       await areasPreloader.register(mockServer, {})
 
@@ -225,6 +285,7 @@ describe('AreasPreloader Plugin', () => {
 
     test('subsequent users get cached areas without preload', async () => {
       mockPreloadAreas.mockResolvedValue(undefined)
+      mockGetAreasByType.mockResolvedValue({})
 
       await areasPreloader.register(mockServer, {})
 
@@ -235,6 +296,7 @@ describe('AreasPreloader Plugin', () => {
 
       await onPreHandlerFunction(mockRequest, mockH)
       vi.clearAllMocks()
+      mockGetAreasByType.mockResolvedValue({})
 
       await onPreHandlerFunction(mockRequest, mockH)
       await onPreHandlerFunction(mockRequest, mockH)

@@ -1034,6 +1034,65 @@ describe('projectsListingController', () => {
       )
     })
 
+    test('Should add statusTag to each project', async () => {
+      const mockProjects = [
+        {
+          id: 1,
+          referenceNumber: 'RMS12345',
+          name: 'Test Project 1',
+          status: 'draft'
+        },
+        {
+          id: 2,
+          referenceNumber: 'RMS67890',
+          name: 'Test Project 2',
+          status: 'submitted'
+        }
+      ]
+
+      buildListingRequestContext.mockReturnValue({
+        session: mockSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({ RMA: [] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: {
+          data: mockProjects,
+          pagination: {}
+        }
+      })
+
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            projects: expect.arrayContaining([
+              expect.objectContaining({
+                id: 1,
+                status: 'draft',
+                statusTag: expect.any(String)
+              }),
+              expect.objectContaining({
+                id: 2,
+                status: 'submitted',
+                statusTag: expect.any(String)
+              })
+            ])
+          })
+        })
+      )
+    })
+
     test('Should pass filters to error view when fetch fails', async () => {
       buildListingRequestContext.mockReturnValue({
         session: mockSession,
