@@ -158,6 +158,14 @@
         "area_before": "Area before (ha)",
         "area_after": "Area after (ha)"
       }
+    },
+    "wlc_summary_card": {
+      "title": "Whole life cost",
+      "not_added": "No whole life cost information added yet",
+      "whole_life_pv_costs": "Estimated whole life present value costs for appraisal",
+      "design_construction_costs": "Estimated design and construction costs",
+      "risk_contingency_costs": "Estimated risk contingency costs",
+      "future_costs": "Estimated future costs"
     }
   },
   "start_proposal": {
@@ -1333,5 +1341,22 @@
     "use_archive_link": "Use the archive link in the banner to see your archived proposals.",
     "revert_instructions": "Return to the proposal overview page and click on the 'revert to draft' link.",
     "will_reappear": "The proposal will reappear in your proposals and can then be edited."
+  },
+  "whole_life_cost": {
+    "title": "What are the estimated costs of your project?",
+    "heading": "What are the estimated costs of your project?",
+    "hint": "Enter a whole-number amount in pounds sterling (e.g. 1500)",
+    "table": {
+      "whole_life_pv_header": "What are the estimated whole life present value costs for appraisal ?",
+      "design_construction_header": "What are the estimated whole life present value costs for design and construction ?",
+      "risk_contingency_header": "What are the estimated whole life present value costs for risk contingency ?",
+      "future_costs_header": "What are the estimated whole life present value costs  future costs ?",
+      "if_known": "if known"
+    },
+    "errors": {
+      "required": "Please enter the value",
+      "invalid": "Enter a whole number with no decimal point or currency symbols",
+      "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+    }
   }
 }

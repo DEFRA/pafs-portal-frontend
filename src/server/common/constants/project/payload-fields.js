@@ -128,5 +128,10 @@ export const PROJECT_PAYLOAD_FIELDS = {
   NFM_EXPERIENCE_LEVEL: 'nfmExperienceLevel',
   NFM_PROJECT_READINESS: 'nfmProjectReadiness',
   IS_LEGACY: 'isLegacy',
-  IS_REVISED: 'isRevised'
+  IS_REVISED: 'isRevised',
+  WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS: 'wlcEstimatedWholeLifePvCosts',
+  WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS:
+    'wlcEstimatedDesignConstructionCosts',
+  WLC_ESTIMATED_RISK_CONTINGENCY_COSTS: 'wlcEstimatedRiskContingencyCosts',
+  WLC_ESTIMATED_FUTURE_COSTS: 'wlcEstimatedFutureCosts'
 }

@@ -24,3 +24,76 @@ if (headerToggleButton) {
     }
   })
 }
+
+// Public number formatting helpers for reuse across sections
+const digitsOnly = (value) => String(value || '').replace(/\D/g, '')
+
+const withCommas = (digits) => {
+  if (!digits) {
+    return ''
+  }
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+const formatNumberWithCommas = (value) => withCommas(digitsOnly(value))
+
+const formatInputValueWithCommas = (inputEl) => {
+  if (!inputEl) {
+    return
+  }
+  inputEl.value = formatNumberWithCommas(inputEl.value)
+}
+
+const unformatInputValue = (inputEl) => {
+  if (!inputEl) {
+    return
+  }
+  inputEl.value = digitsOnly(inputEl.value)
+}
+
+const bindCommaFormattingToInputs = (selector, options = {}) => {
+  const { unformatOnSubmit = false } = options
+  const inputs = document.querySelectorAll(selector)
+
+  if (inputs.length === 0) {
+    return []
+  }
+
+  inputs.forEach((inputEl) => {
+    formatInputValueWithCommas(inputEl)
+    inputEl.addEventListener('input', () => formatInputValueWithCommas(inputEl))
+    inputEl.addEventListener('blur', () => formatInputValueWithCommas(inputEl))
+  })
+
+  if (unformatOnSubmit) {
+    const forms = new Set()
+    inputs.forEach((inputEl) => {
+      if (inputEl.form) {
+        forms.add(inputEl.form)
+      }
+    })
+
+    forms.forEach((form) => {
+      form.addEventListener('submit', () => {
+        inputs.forEach((inputEl) => unformatInputValue(inputEl))
+      })
+    })
+  }
+
+  return Array.from(inputs)
+}
+
+globalThis.pafs = globalThis.pafs || {}
+globalThis.pafs.numberFormatting = {
+  digitsOnly,
+  withCommas,
+  formatNumberWithCommas,
+  formatInputValueWithCommas,
+  unformatInputValue,
+  bindCommaFormattingToInputs
+}
+
+bindCommaFormattingToInputs(
+  '[data-number-format="comma"], [data-wlc-cost-input="true"]',
+  { unformatOnSubmit: true }
+)

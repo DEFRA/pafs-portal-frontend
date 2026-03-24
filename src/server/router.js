@@ -65,7 +65,8 @@ export const router = {
         'risk-and-properties',
         'goals-urgency-confidence',
         'environmental-benefits',
-        'nfm'
+        'nfm',
+        'whole-life-cost'
       ])
 
       // Static assets

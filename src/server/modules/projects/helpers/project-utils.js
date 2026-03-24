@@ -312,3 +312,22 @@ export function formatFileSize(bytes) {
 
   return `${Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
 }
+
+/**
+ * Format an integer-like value with comma separators.
+ * Returns null when value is empty/invalid.
+ * @param {string|number|bigint|null|undefined} value
+ * @returns {string|null}
+ */
+export function formatNumberWithCommas(value) {
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+
+  const digits = String(value).replace(/\D/g, '')
+  if (!digits) {
+    return null
+  }
+
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}

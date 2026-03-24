@@ -15,6 +15,7 @@ vi.mock('../helpers/project-utils.js', () => ({
   getSessionData: vi.fn(),
   getBackLink: vi.fn(),
   formatDate: vi.fn(),
+  formatNumberWithCommas: vi.fn(),
   buildFinancialYearLabel: vi.fn(),
   formatFileSize: vi.fn(),
   getProjectStateTag: vi.fn(),
