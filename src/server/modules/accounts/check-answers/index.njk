@@ -382,6 +382,7 @@
           <p class="govuk-body">{{ t('accounts.' + localeKey + '.check_answers.confirmation_text') }}</p>
         {% endif %}
         <form method="post" action="{{ submitRoute }}" novalidate>
+          <input type="hidden" name="crumb" value="{{ crumb }}">
           <div class="govuk-button-group">
             {{ govukButton({
         text: submitButtonText,

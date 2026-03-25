@@ -22,6 +22,7 @@
     {% endif %}
     
     <form method="post" action="{{ submitRoute }}" novalidate>
+      <input type="hidden" name="crumb" value="{{ crumb }}">
       {{ govukRadios({
         name: "admin",
         fieldset: {

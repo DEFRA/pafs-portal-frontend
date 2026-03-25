@@ -35,6 +35,7 @@
       </div>
 
       <form method="post" novalidate>
+        <input type="hidden" name="crumb" value="{{ crumb }}">
         <div class="govuk-form-group{% if fieldErrors.areaId %} govuk-form-group--error{% endif %}">
           <label class="govuk-label govuk-label--m" for="areaId">
             {{ t('projects.manage_projects.edit_rma.select_label') }}

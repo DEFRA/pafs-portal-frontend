@@ -217,6 +217,7 @@
       <h1 class="govuk-heading-xl">{{ heading }}</h1>
 
       <form method="post" novalidate>
+        <input type="hidden" name="crumb" value="{{ crumb }}">
         {% if step == 'authority' %}
           {# Authority Type field error #}
           {% set authorityTypeError = false %}

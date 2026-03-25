@@ -37,6 +37,7 @@
   <p class="govuk-body">{{ t(localKeyPrefix + '.introduction') }}</p>
 
   <form method="post" action="{{ uploadUrl }}" enctype="multipart/form-data" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
 
     {{ govukFileUpload({
       id: "benefitAreaFile",

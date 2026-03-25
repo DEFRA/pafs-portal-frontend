@@ -31,6 +31,7 @@
       </p>
 
       <form action="/forgot-password" method="post" novalidate>
+        <input type="hidden" name="crumb" value="{{ crumb }}">
 
         {# Email field error #}
         {% set emailError = false %}
