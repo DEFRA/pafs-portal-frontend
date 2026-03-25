@@ -329,5 +329,20 @@ export function formatNumberWithCommas(value) {
     return null
   }
 
-  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  // Safe, linear-time implementation to insert commas
+  // Only works for digit strings, as intended
+  const n = digits.length
+  if (n <= 3) return digits
+  let out = ''
+  let i = n % 3
+  if (i > 0) {
+    out = digits.slice(0, i)
+    if (n > 3) out += ','
+  }
+  while (i < n) {
+    out += digits.slice(i, i + 3)
+    i += 3
+    if (i < n) out += ','
+  }
+  return out
 }

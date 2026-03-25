@@ -1,57 +1,82 @@
 import { initAll } from 'govuk-frontend'
 
-initAll()
+export function setupHeaderNavigation() {
+  initAll()
 
-// Custom header navigation toggle for mobile (v5-style navigation in v6)
-const ARIA_EXPANDED = 'aria-expanded'
-const headerToggleButton = document.querySelector('.govuk-js-header-toggle')
-if (headerToggleButton) {
-  const navigationWrapper = document.querySelector(
-    '.govuk-header__navigation-list-wrapper'
-  )
+  // Custom header navigation toggle for mobile (v5-style navigation in v6)
+  const ARIA_EXPANDED = 'aria-expanded'
+  const headerToggleButton =
+    typeof document !== 'undefined'
+      ? document.querySelector('.govuk-js-header-toggle')
+      : null
+  if (headerToggleButton) {
+    const navigationWrapper = document.querySelector(
+      '.govuk-header__navigation-list-wrapper'
+    )
 
-  headerToggleButton.removeAttribute('hidden')
-  headerToggleButton.setAttribute(ARIA_EXPANDED, 'false')
+    headerToggleButton.removeAttribute('hidden')
+    headerToggleButton.setAttribute(ARIA_EXPANDED, 'false')
 
-  headerToggleButton.addEventListener('click', function () {
-    const isOpen = this.getAttribute(ARIA_EXPANDED) === 'true'
-    this.setAttribute(ARIA_EXPANDED, isOpen ? 'false' : 'true')
+    headerToggleButton.addEventListener('click', function () {
+      const isOpen = this.getAttribute(ARIA_EXPANDED) === 'true'
+      this.setAttribute(ARIA_EXPANDED, isOpen ? 'false' : 'true')
 
-    if (navigationWrapper) {
-      navigationWrapper.classList.toggle(
-        'govuk-header__navigation-list-wrapper--open'
-      )
-    }
-  })
+      if (navigationWrapper) {
+        navigationWrapper.classList.toggle(
+          'govuk-header__navigation-list-wrapper--open'
+        )
+      }
+    })
+  }
 }
 
 // Public number formatting helpers for reuse across sections
-const digitsOnly = (value) => String(value || '').replace(/\D/g, '')
 
-const withCommas = (digits) => {
+export const digitsOnly = (value) => String(value || '').replaceAll(/\D/g, '')
+
+export const withCommas = (digits) => {
   if (!digits) {
     return ''
   }
-  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  // Safe, linear-time implementation to insert commas
+  // Only works for digit strings, as intended
+  const str = String(digits)
+  const n = str.length
+  if (n <= 3) return str
+  let out = ''
+  let i = n % 3
+  if (i > 0) {
+    out = str.slice(0, i)
+    if (n > 3) out += ','
+  }
+  while (i < n) {
+    out += str.slice(i, i + 3)
+    i += 3
+    if (i < n) out += ','
+  }
+  return out
 }
 
-const formatNumberWithCommas = (value) => withCommas(digitsOnly(value))
+export const formatNumberWithCommas = (value) => withCommas(digitsOnly(value))
 
-const formatInputValueWithCommas = (inputEl) => {
-  if (!inputEl) {
+export const formatInputValueWithCommas = (inputEl) => {
+  if (typeof document === 'undefined' || !inputEl) {
     return
   }
   inputEl.value = formatNumberWithCommas(inputEl.value)
 }
 
-const unformatInputValue = (inputEl) => {
-  if (!inputEl) {
+export const unformatInputValue = (inputEl) => {
+  if (typeof document === 'undefined' || !inputEl) {
     return
   }
   inputEl.value = digitsOnly(inputEl.value)
 }
 
-const bindCommaFormattingToInputs = (selector, options = {}) => {
+export const bindCommaFormattingToInputs = (selector, options = {}) => {
+  if (typeof document === 'undefined') {
+    return []
+  }
   const { unformatOnSubmit = false } = options
   const inputs = document.querySelectorAll(selector)
 

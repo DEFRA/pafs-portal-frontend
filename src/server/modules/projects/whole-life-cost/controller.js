@@ -125,8 +125,8 @@ class WholeLifeCostController {
       })
       if (error) {
         const fieldErrors = extractJoiErrors(error)
-        const viewData = this._buildViewData(request, { fieldErrors })
-        return h.view(VIEW, viewData)
+        const errorViewData = this._buildViewData(request, { fieldErrors })
+        return h.view(VIEW, errorViewData)
       }
     }
 

@@ -58,7 +58,9 @@ const optionalCostField = Joi.string()
   .allow(null, '')
   .optional()
   .custom((value, helpers) => {
-    if (value === null || value === undefined || value === '') return value
+    if (value === null || value === undefined || value === '') {
+      return value
+    }
     return validateWlcCostString(value, helpers)
   })
   .messages({
