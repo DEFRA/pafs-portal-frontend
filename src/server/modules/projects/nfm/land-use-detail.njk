@@ -32,6 +32,7 @@
   {% endif %}
 
   <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
     <div class="govuk-form-group {% if fieldErrors[beforeFieldName] or fieldErrors[afterFieldName] %}govuk-form-group--error{% endif %}">
       <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.title') }}</h1>
 

@@ -10,7 +10,7 @@
   .project-benefit-area-card__content-body {
     display: flex;
     flex-direction: row;
-    gap: 15px;
+    gap: govuk.govuk-spacing(3);
 
     .file-block {
       border: 2px solid govuk.govuk-colour("black", $variant: "tint-50");
@@ -23,25 +23,40 @@
 }
 
 .app-link-button {
+  display: inline-block;
+  margin-bottom: 0;
   padding: 0;
   border: none;
+  box-shadow: none;
   background: none;
   cursor: pointer;
   font-family: inherit;
   font-size: inherit;
+  line-height: inherit;
   font-weight: inherit;
+  vertical-align: baseline;
   text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.1em;
   color: govuk.govuk-colour("blue");
 
   &:hover {
-    color: govuk.govuk-colour("blue");
+    background: none;
+    box-shadow: none;
+    color: govuk.govuk-colour("dark-blue");
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
   }
 
   &:focus {
-    outline: govuk.$govuk-focus-width solid govuk.govuk-colour("yellow");
-    outline-offset: 0;
+    outline: 3px solid transparent;
     background-color: govuk.govuk-colour("yellow");
     color: govuk.govuk-colour("black");
+    box-shadow: 0 -2px govuk.govuk-colour("yellow"), 0 4px govuk.govuk-colour("black");
     text-decoration: none;
+  }
+
+  &:active {
+    top: 0;
   }
 }

@@ -68,6 +68,7 @@
 
       
         <form method="post" class="cookie-settings-form">
+          <input type="hidden" name="crumb" value="{{ crumb }}">
           {{ govukRadios({
             idPrefix: "analyticsConsent",
             name: "analyticsConsent",

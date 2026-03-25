@@ -36,6 +36,7 @@
     </h1>
 
     <form method="post" action="{{ submitRoute }}" novalidate>
+      <input type="hidden" name="crumb" value="{{ crumb }}">
       
       {% if groupedAreas and groupedAreas.length > 0 %}
         {# PSO/RMA: Use raw HTML for optgroups #}

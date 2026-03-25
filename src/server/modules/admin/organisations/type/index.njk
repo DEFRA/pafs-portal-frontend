@@ -36,6 +36,7 @@
     <h1 class="govuk-heading-xl">{{ heading }}</h1>
   
     <form method="post" novalidate>
+      <input type="hidden" name="crumb" value="{{ crumb }}">
 
       {# Area Type field error #}
       {% set areaTypeError = false %}

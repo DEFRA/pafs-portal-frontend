@@ -1,4 +1,5 @@
 {% extends "layouts/page.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -19,11 +20,13 @@
       <p class="govuk-body">{{ t(localKeyPrefix + '.warning') }}</p>
 
       <form method="post" action="">
+        <input type="hidden" name="crumb" value="{{ crumb }}">
         <input type="hidden" name="confirm" value="yes">
         <div class="govuk-button-group">
-          <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">
-            {{ t(localKeyPrefix + '.delete_button') }}
-          </button>
+          {{ govukButton({
+            text: t(localKeyPrefix + '.delete_button'),
+            classes: "govuk-button--warning"
+          }) }}
           <a class="govuk-link" href="{{ backLinkURL }}">{{ t('common.cancel_link') }}</a>
         </div>
       </form>

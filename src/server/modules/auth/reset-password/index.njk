@@ -67,6 +67,7 @@
       {% endif %}
 
       <form action="{{ formAction }}" method="post" novalidate>
+        <input type="hidden" name="crumb" value="{{ crumb }}">
 
         <input type="hidden" name="token" value="{{ token }}">
 
