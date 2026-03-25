@@ -13,6 +13,7 @@ import {
   projectTypesLocalKeyPrefix
 } from '../helpers/project-config.js'
 import { saveProjectWithErrorHandling } from '../helpers/project-submission.js'
+import { refreshSessionFromBackend } from '../helpers/session-refresh.js'
 import {
   buildViewData,
   getProjectStep,
@@ -359,6 +360,11 @@ class TypeController {
         )
         if (response) {
           return response
+        }
+        // Global: Refresh session from backend after save
+        const referenceNumber = request.params?.referenceNumber || ''
+        if (referenceNumber) {
+          await refreshSessionFromBackend(request, referenceNumber)
         }
       }
 

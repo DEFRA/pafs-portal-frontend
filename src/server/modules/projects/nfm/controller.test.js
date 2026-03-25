@@ -22,6 +22,7 @@ import {
 import { getDynamicBackLink } from './helpers/navigation-helpers.js'
 import { processPayload } from './helpers/payload-helpers.js'
 import { handleConditionalRedirect } from './helpers/redirect-helpers.js'
+import { refreshSessionFromBackend } from '../helpers/session-refresh.js'
 
 // Mock dependencies
 vi.mock('../../../common/helpers/error-renderer/index.js')
@@ -30,6 +31,7 @@ vi.mock('../helpers/project-utils.js')
 vi.mock('./helpers/navigation-helpers.js')
 vi.mock('./helpers/payload-helpers.js')
 vi.mock('./helpers/redirect-helpers.js')
+vi.mock('../helpers/session-refresh.js')
 
 describe('NFM Controller', () => {
   let mockRequest
@@ -369,6 +371,20 @@ describe('NFM Controller', () => {
   })
 
   describe('postHandler', () => {
+    beforeEach(() => {
+      refreshSessionFromBackend.mockResolvedValue()
+    })
+
+    test('should call refreshSessionFromBackend after save', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_SELECTED_MEASURES)
+      mockRequest.params.referenceNumber = 'TEST-001'
+      await nfmController.postHandler(mockRequest, mockH)
+      expect(refreshSessionFromBackend).toHaveBeenCalledWith(
+        mockRequest,
+        'TEST-001'
+      )
+    })
+
     describe('NFM Selected Measures', () => {
       beforeEach(() => {
         getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_SELECTED_MEASURES)

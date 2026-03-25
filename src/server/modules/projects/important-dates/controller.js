@@ -8,6 +8,7 @@ import { ROUTES } from '../../../common/constants/routes.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
 import { IMPORTANT_DATES_CONFIG } from '../helpers/project-config.js'
 import { saveProjectWithErrorHandling } from '../helpers/project-submission.js'
+import { refreshSessionFromBackend } from '../helpers/session-refresh.js'
 import {
   buildViewData,
   getProjectStep,
@@ -249,6 +250,12 @@ class ImportantDatesController {
       const response = await this._postSubmission(request, h)
       if (response) {
         return response
+      }
+
+      // Global: Refresh session from backend after save
+      const referenceNumber = request.params?.referenceNumber || ''
+      if (referenceNumber) {
+        await refreshSessionFromBackend(request, referenceNumber)
       }
 
       return this._postRedirect(request, h)

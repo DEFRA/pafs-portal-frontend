@@ -11,6 +11,7 @@ import { ROUTES } from '../../../common/constants/routes.js'
 import { extractJoiErrors } from '../../../common/helpers/error-renderer/index.js'
 import { ENVIRONMENTAL_BENEFITS_CONFIG } from '../helpers/project-config.js'
 import { saveProjectWithErrorHandling } from '../helpers/project-submission.js'
+import { refreshSessionFromBackend } from '../helpers/session-refresh.js'
 import {
   buildViewData,
   getProjectStep,
@@ -436,6 +437,11 @@ class EnvironmentalBenefitsController {
 
     if (response) {
       return response
+    }
+
+    // Global: Refresh session from backend after save
+    if (referenceNumber) {
+      await refreshSessionFromBackend(request, referenceNumber)
     }
 
     // Redirect to next step

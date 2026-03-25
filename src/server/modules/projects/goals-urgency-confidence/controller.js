@@ -13,6 +13,7 @@ import {
 } from '../../../common/helpers/error-renderer/index.js'
 import { GOALS_URGENCY_CONFIDENCE_CONFIG } from '../helpers/project-config.js'
 import { saveProjectWithErrorHandling } from '../helpers/project-submission.js'
+import { refreshSessionFromBackend } from '../helpers/session-refresh.js'
 import {
   buildViewData,
   getProjectStep,
@@ -308,6 +309,14 @@ class GoalsUrgencyConfidenceController {
       )
       if (response) {
         return response
+      }
+
+      // Global: Refresh session from backend after save
+      const sessionData = getSessionData(request)
+      const referenceNumber =
+        sessionData?.slug || request.params?.referenceNumber || ''
+      if (referenceNumber) {
+        await refreshSessionFromBackend(request, referenceNumber)
       }
 
       return h.redirect(this._getNextRoute(step, request)).takeover()
