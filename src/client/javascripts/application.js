@@ -1,3 +1,4 @@
+const GROUP_SIZE = 3
 import { initAll } from 'govuk-frontend'
 
 export function setupHeaderNavigation() {
@@ -6,9 +7,9 @@ export function setupHeaderNavigation() {
   // Custom header navigation toggle for mobile (v5-style navigation in v6)
   const ARIA_EXPANDED = 'aria-expanded'
   const headerToggleButton =
-    typeof document !== 'undefined'
-      ? document.querySelector('.govuk-js-header-toggle')
-      : null
+    typeof document === 'undefined'
+      ? null
+      : document.querySelector('.govuk-js-header-toggle')
   if (headerToggleButton) {
     const navigationWrapper = document.querySelector(
       '.govuk-header__navigation-list-wrapper'
@@ -42,17 +43,21 @@ export const withCommas = (digits) => {
   // Only works for digit strings, as intended
   const str = String(digits)
   const n = str.length
-  if (n <= 3) return str
+  if (n <= GROUP_SIZE) {
+    return str
+  }
   let out = ''
-  let i = n % 3
+  let i = n % GROUP_SIZE
   if (i > 0) {
     out = str.slice(0, i)
-    if (n > 3) out += ','
+    if (n > GROUP_SIZE) out += ','
   }
   while (i < n) {
-    out += str.slice(i, i + 3)
-    i += 3
-    if (i < n) out += ','
+    out += str.slice(i, i + GROUP_SIZE)
+    i += GROUP_SIZE
+    if (i < n) {
+      out += ','
+    }
   }
   return out
 }

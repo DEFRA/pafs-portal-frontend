@@ -1,3 +1,4 @@
+const GROUP_SIZE = 3
 import { SIZE } from '../../../common/constants/common.js'
 import {
   PROJECT_SESSION_KEY,
@@ -324,7 +325,7 @@ export function formatNumberWithCommas(value) {
     return null
   }
 
-  const digits = String(value).replace(/\D/g, '')
+  const digits = String(value).replaceAll(/\D/g, '')
   if (!digits) {
     return null
   }
@@ -332,17 +333,23 @@ export function formatNumberWithCommas(value) {
   // Safe, linear-time implementation to insert commas
   // Only works for digit strings, as intended
   const n = digits.length
-  if (n <= 3) return digits
+  if (n <= GROUP_SIZE) {
+    return digits
+  }
   let out = ''
-  let i = n % 3
+  let i = n % GROUP_SIZE
   if (i > 0) {
     out = digits.slice(0, i)
-    if (n > 3) out += ','
+    if (n > GROUP_SIZE) {
+      out += ','
+    }
   }
   while (i < n) {
-    out += digits.slice(i, i + 3)
-    i += 3
-    if (i < n) out += ','
+    out += digits.slice(i, i + GROUP_SIZE)
+    i += GROUP_SIZE
+    if (i < n) {
+      out += ','
+    }
   }
   return out
 }
