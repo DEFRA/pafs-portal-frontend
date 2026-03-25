@@ -6,6 +6,7 @@
 
 {% block body %}
   <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
 
     {% if fieldErrors and(fieldErrors[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR] or fieldErrors[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]) %}
       {% set errorKey = getFinancialYearError(fieldErrors, ERROR_CODES) | trim %}

@@ -31,6 +31,7 @@
     <p class="govuk-body">{{ t(translationBase + '.intro' + ('_admin' if isAdmin else '')) }}</p>
 
     <form method="post" action="{{ submitRoute }}" novalidate>
+      <input type="hidden" name="crumb" value="{{ crumb }}">
       {% if groupedParentAreas and groupedParentAreas.length > 0 %}
         {# RMA selecting PSO: Display grouped checkboxes with fieldset legends #}
         {% for group in groupedParentAreas %}

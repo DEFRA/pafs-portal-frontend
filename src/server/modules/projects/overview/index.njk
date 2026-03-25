@@ -1,4 +1,5 @@
 {% extends 'layouts/projects.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
@@ -63,22 +64,29 @@
           {% if user and(user.isRma or user.isPso or user.admin) %}
             &nbsp; | &nbsp;
             <form method="post" action="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/revert-to-draft" class="app-inline-form">
-              <button type="submit" class="govuk-link app-link-button" data-testid="revert-to-draft-link">
-                {% if projectData[PROJECT_PAYLOAD_FIELDS.IS_LEGACY] and not projectData[PROJECT_PAYLOAD_FIELDS.IS_REVISED] %}
-                  {{ t('projects.overview.common.revert_to_revise') }}
-                {% else %}
-                  {{ t('projects.overview.common.revert_to_draft') }}
-                {% endif %}
-              </button>
+              <input type="hidden" name="crumb" value="{{ crumb }}">
+              {% set revertButtonText = t('projects.overview.common.revert_to_revise') if (projectData[PROJECT_PAYLOAD_FIELDS.IS_LEGACY] and not projectData[PROJECT_PAYLOAD_FIELDS.IS_REVISED]) else t('projects.overview.common.revert_to_draft') %}
+              {{ govukButton({
+                text: revertButtonText,
+                classes: "app-link-button",
+                attributes: {
+                  'data-testid': 'revert-to-draft-link'
+                }
+              }) }}
             </form>
           {% endif %}
         {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'draft' or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_STATE] == 'revise' %}
           {% if user and(user.isRma or user.isPso or user.admin) %}
             &nbsp; | &nbsp;
             <form method="post" action="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/archive" class="app-inline-form">
-              <button type="submit" class="govuk-link app-link-button" data-testid="archive-link">
-                {{ t('projects.overview.common.archive') }}
-              </button>
+              <input type="hidden" name="crumb" value="{{ crumb }}">
+              {{ govukButton({
+                text: t('projects.overview.common.archive'),
+                classes: "app-link-button",
+                attributes: {
+                  'data-testid': 'archive-link'
+                }
+              }) }}
             </form>
           {% endif %}
         {% endif %}

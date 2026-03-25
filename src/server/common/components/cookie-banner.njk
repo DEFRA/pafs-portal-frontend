@@ -1,3 +1,4 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% set cookiePolicy = cookies.cookies_policy | jsonParse %}
 {% set prefsSet = cookies.cookies_preferences_set %}
 {% set showConfirmation = cookies.show_cookie_confirmation %}
@@ -26,9 +27,10 @@
         </div>
         <div class="govuk-button-group">
           <form method="POST" action="/cookies/hide-message" style="display: inline;">
-            <button type="submit" class="govuk-button" data-module="govuk-button">
-              {{ t('static-pages:cookie_banner.hide_button') }}
-            </button>
+            <input type="hidden" name="crumb" value="{{ crumb }}">
+            {{ govukButton({
+              text: t('static-pages:cookie_banner.hide_button')
+            }) }}
           </form>
         </div>
 
@@ -45,14 +47,16 @@
         </div>
         <div class="govuk-button-group">
           <form method="POST" action="/cookies/accept" style="display: inline;">
-            <button type="submit" class="govuk-button" data-module="govuk-button">
-              {{ t('static-pages:cookie_banner.accept_button') }}
-            </button>
+            <input type="hidden" name="crumb" value="{{ crumb }}">
+            {{ govukButton({
+              text: t('static-pages:cookie_banner.accept_button')
+            }) }}
           </form>
           <form method="POST" action="/cookies/reject" style="display: inline;">
-            <button type="submit" class="govuk-button" data-module="govuk-button">
-              {{ t('static-pages:cookie_banner.reject_button') }}
-            </button>
+            <input type="hidden" name="crumb" value="{{ crumb }}">
+            {{ govukButton({
+              text: t('static-pages:cookie_banner.reject_button')
+            }) }}
           </form>
           <a class="govuk-link app-!-align-with-button" href="/cookies">{{ t('static-pages:cookie_banner.view_cookies_link') }}</a>
         </div>

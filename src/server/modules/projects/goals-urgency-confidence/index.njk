@@ -5,6 +5,7 @@
 
 {% block body %}
   <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
     {% if fieldType == 'character-count' %}
       {# Character count textarea field #}
       {% if fieldErrors and fieldErrors[fieldName] %}

@@ -6,6 +6,7 @@
 
 {% block body %}
   <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
 
     {% if fieldErrors and(fieldErrors[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] or fieldErrors[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] or fieldErrors[PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE]) %}
       {% set errorKey = getTypeError(fieldErrors, ERROR_CODES) | trim %}

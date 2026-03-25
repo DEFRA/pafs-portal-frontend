@@ -14,6 +14,7 @@
   {% endif %}
 
   <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
     <div class="govuk-form-group {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE] or fieldErrors[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER] %}govuk-form-group--error{% endif %}">
       <h1 class="govuk-heading-l">{{ t('projects.nfm.land_use.enclosed_arable_farmland.title') }}</h1>
 
