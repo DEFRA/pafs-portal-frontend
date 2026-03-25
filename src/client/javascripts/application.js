@@ -50,7 +50,9 @@ export const withCommas = (digits) => {
   let i = n % GROUP_SIZE
   if (i > 0) {
     out = str.slice(0, i)
-    if (n > GROUP_SIZE) out += ','
+    if (n > GROUP_SIZE) {
+      out += ','
+    }
   }
   while (i < n) {
     out += str.slice(i, i + GROUP_SIZE)
