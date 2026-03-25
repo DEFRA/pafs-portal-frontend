@@ -1,5 +1,6 @@
 import path from 'node:path'
 import hapi from '@hapi/hapi'
+import Crumb from '@hapi/crumb'
 import Scooter from '@hapi/scooter'
 
 import { router } from './router.js'
@@ -27,7 +28,8 @@ export async function createServer() {
     routes: {
       validate: {
         options: {
-          abortEarly: false
+          abortEarly: false,
+          allowUnknown: true // permits 'crumb' CSRF token field in all POST payloads
         }
       },
       files: {
@@ -70,6 +72,16 @@ export async function createServer() {
     i18nPlugin,
     nunjucksConfig, // This uses context which needs request.yar
     Scooter,
+    {
+      plugin: Crumb,
+      options: {
+        cookieOptions: {
+          isSecure: config.get('isProduction'),
+          isHttpOnly: true,
+          isSameSite: 'Strict'
+        }
+      }
+    },
     contentSecurityPolicy,
     areasPreloader, // Preload areas on first request
     router // Register all the controllers/routes defined in src/server/router.js

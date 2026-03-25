@@ -45,6 +45,7 @@ export function context(request) {
     cookies: request.state
       ? { ...request.state, needsReacceptance }
       : { needsReacceptance },
+    crumb: request.plugins?.crumb ?? '',
     t: (key, params) => translate(key, 'en', params),
     getAssetPath(asset) {
       const webpackAssetPath = webpackManifest?.[asset]

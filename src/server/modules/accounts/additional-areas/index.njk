@@ -22,6 +22,7 @@
     </p>
 
     <form method="post" action="{{ submitRoute }}" novalidate>
+      <input type="hidden" name="crumb" value="{{ crumb }}">
       
       {% if groupedAreas and groupedAreas.length > 0 %}
         {# PSO/RMA: Display grouped checkboxes with headings #}
@@ -32,13 +33,13 @@
           
           {% for group in groupedAreas %}
             {# Display group heading #}
-            <h3 class="govuk-heading-s govuk-!-margin-top-4">
+            <h2 class="govuk-heading-s govuk-!-margin-top-4">
               {% if responsibility == 'pso' %}
                 {{ group.parent.name }}
               {% elif responsibility == 'rma' %}
                 {{ group.eaParent.name }} - {{ group.parent.name }}
               {% endif %}
-            </h3>
+            </h2>
             
             {# Display checkboxes for this group #}
             <div class="govuk-checkboxes" data-module="govuk-checkboxes">

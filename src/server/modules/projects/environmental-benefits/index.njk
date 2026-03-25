@@ -5,6 +5,7 @@
 
 {% block body %}
   <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
     {% if fieldType == 'radio' %}
       {# Radio field for yes/no gate questions #}
       {% if fieldErrors and fieldErrors[fieldName] %}

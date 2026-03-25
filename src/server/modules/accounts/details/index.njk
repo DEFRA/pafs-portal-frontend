@@ -116,6 +116,7 @@
     <p class="govuk-body">{{ t('accounts.' + localeKey + '.' + introSuffix) }}</p>
 
     <form method="post" action="{{ submitRoute }}" novalidate>
+      <input type="hidden" name="crumb" value="{{ crumb }}">
       {# First name field error #}
       {% set firstNameError = false %}
       {% if fieldErrors.firstName == ERROR_CODES.FIRST_NAME_REQUIRED %}

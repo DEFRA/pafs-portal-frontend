@@ -346,7 +346,7 @@ describe('GoalsUrgencyConfidenceController', () => {
           key ===
           'projects.project_urgency.urgency_detail.statutory_need_heading'
         ) {
-          return 'What is the business critical statutory need?'
+          return 'What is the business-critical or statutory need?'
         }
         return key
       })
@@ -357,7 +357,7 @@ describe('GoalsUrgencyConfidenceController', () => {
         mockRequest,
         expect.objectContaining({
           additionalData: expect.objectContaining({
-            dynamicHeading: 'What is the business critical statutory need?'
+            dynamicHeading: 'What is the business-critical or statutory need?'
           })
         })
       )

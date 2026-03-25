@@ -84,8 +84,8 @@ function _getUrgencyDetailHeading(request, sessionData) {
 
 /**
  * Extract the urgency reason text from the heading for use in validation messages.
- * Converts heading like "What is the business critical statutory need?"
- * to "the business critical statutory need".
+ * Converts heading like "What is the business-critical or statutory need?"
+ * to "the business-critical or statutory need".
  */
 function _getUrgencyReasonText(headingText) {
   if (!headingText) {
