@@ -1,5 +1,5 @@
 /// <reference types="vitest" />
-// @vitest-environment jsdo
+// @vitest-environment jsdom
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 

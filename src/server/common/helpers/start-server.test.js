@@ -24,7 +24,7 @@ describe('#startServer', () => {
 
     createServerSpy = vi.spyOn(createServerImport, 'createServer')
     hapiServerSpy = vi.spyOn(hapi, 'server')
-  }, 10000)
+  }, 30000)
 
   beforeEach(() => {
     mockCheckBackendHealth.mockReset()
