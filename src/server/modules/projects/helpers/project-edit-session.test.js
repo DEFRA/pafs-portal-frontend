@@ -517,7 +517,8 @@ describe('project-edit-session', () => {
       }
       mockRequest.yar.get.mockReturnValue({
         isEdit: true,
-        referenceNumber: 'REF123'
+        referenceNumber: 'REF123',
+        slug: 'REF123'
       })
 
       const result = await initializeEditSessionPreHandler(mockRequest, mockH)

@@ -2,7 +2,6 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { overviewController } from './controller.js'
 import { PROJECT_STATUS } from '../../../common/constants/projects.js'
 import {
-  getSessionData,
   getBackLink,
   getProjectStateTag,
   isConfidenceRestrictedProjectType
@@ -12,7 +11,6 @@ import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
 // Mock dependencies
 vi.mock('../helpers/project-utils.js', () => ({
-  getSessionData: vi.fn(),
   getBackLink: vi.fn(),
   formatDate: vi.fn(),
   buildFinancialYearLabel: vi.fn(),
@@ -32,7 +30,15 @@ describe('OverviewController', () => {
     vi.clearAllMocks()
 
     mockRequest = {
-      t: vi.fn((key) => key)
+      t: vi.fn((key) => key),
+      pre: {
+        projectData: {
+          id: 1,
+          referenceNumber: 'REF123',
+          name: 'Test Project',
+          projectState: PROJECT_STATUS.DRAFT
+        }
+      }
     }
 
     mockH = {
@@ -52,13 +58,6 @@ describe('OverviewController', () => {
     })
 
     isConfidenceRestrictedProjectType.mockReturnValue(false)
-
-    getSessionData.mockReturnValue({
-      id: 1,
-      referenceNumber: 'REF123',
-      name: 'Test Project',
-      projectState: PROJECT_STATUS.DRAFT
-    })
 
     enrichProjectData.mockResolvedValue({
       success: true,
@@ -87,15 +86,15 @@ describe('OverviewController', () => {
       )
     })
 
-    test('should include project data from session', async () => {
+    test('should include project data from request.pre', async () => {
       const projectData = {
-        id: 1,
-        referenceNumber: 'REF123',
-        name: 'Test Project',
-        projectState: PROJECT_STATUS.DRAFT,
-        areaId: 5
+        id: 2,
+        referenceNumber: 'REF456',
+        name: 'Another Project',
+        projectState: PROJECT_STATUS.REVISE,
+        areaId: 10
       }
-      getSessionData.mockReturnValue(projectData)
+      mockRequest.pre.projectData = projectData
 
       enrichProjectData.mockResolvedValue({
         success: true,
@@ -112,10 +111,15 @@ describe('OverviewController', () => {
       )
     })
 
+    test('should handle missing projectData in request.pre', async () => {
+      delete mockRequest.pre.projectData
+      const result = await overviewController.getHandler(mockRequest, mockH)
+      expect(mockH.view).not.toHaveBeenCalled()
+      expect(result).toEqual({ error: true })
+    })
+
     test('should set light blue tag for DRAFT status', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.DRAFT
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.DRAFT }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -128,9 +132,7 @@ describe('OverviewController', () => {
     })
 
     test('should set light blue tag for REVISE status', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.REVISE
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.REVISE }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -143,9 +145,7 @@ describe('OverviewController', () => {
     })
 
     test('should set grey tag for non-DRAFT status', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.SUBMITTED
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.SUBMITTED }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -158,9 +158,7 @@ describe('OverviewController', () => {
     })
 
     test('should set grey tag for APPROVED status', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.APPROVED
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.APPROVED }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -173,9 +171,7 @@ describe('OverviewController', () => {
     })
 
     test('should set grey tag for ARCHIVED status', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.ARCHIVED
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.ARCHIVED }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -188,9 +184,7 @@ describe('OverviewController', () => {
     })
 
     test('should set isReadOnly to true for archived projects', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.ARCHIVED
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.ARCHIVED }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -203,9 +197,7 @@ describe('OverviewController', () => {
     })
 
     test('should set isReadOnly to true for submitted projects', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.SUBMITTED
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.SUBMITTED }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -218,9 +210,7 @@ describe('OverviewController', () => {
     })
 
     test('should set isReadOnly to false for draft projects', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.DRAFT
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.DRAFT }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -233,9 +223,7 @@ describe('OverviewController', () => {
     })
 
     test('should set isReadOnly to false for revise projects', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.REVISE
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.REVISE }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -248,10 +236,10 @@ describe('OverviewController', () => {
     })
 
     test('should set isLegacy to true when project is legacy', async () => {
-      getSessionData.mockReturnValue({
+      mockRequest.pre.projectData = {
         projectState: PROJECT_STATUS.DRAFT,
         isLegacy: true
-      })
+      }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -264,10 +252,10 @@ describe('OverviewController', () => {
     })
 
     test('should set isLegacy to false when project is not legacy', async () => {
-      getSessionData.mockReturnValue({
+      mockRequest.pre.projectData = {
         projectState: PROJECT_STATUS.DRAFT,
         isLegacy: false
-      })
+      }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -280,9 +268,7 @@ describe('OverviewController', () => {
     })
 
     test('should set isLegacy to false when isLegacy field is absent', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.DRAFT
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.DRAFT }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -417,11 +403,7 @@ describe('OverviewController', () => {
     })
 
     test('should handle missing project state gracefully', async () => {
-      getSessionData.mockReturnValue({
-        id: 1,
-        referenceNumber: 'REF123'
-        // no projectState
-      })
+      mockRequest.pre.projectData = { id: 1, referenceNumber: 'REF123' }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -434,11 +416,11 @@ describe('OverviewController', () => {
     })
 
     test('should handle null project state', async () => {
-      getSessionData.mockReturnValue({
+      mockRequest.pre.projectData = {
         id: 1,
         referenceNumber: 'REF123',
         projectState: null
-      })
+      }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -453,9 +435,7 @@ describe('OverviewController', () => {
 
   describe('_getProjectStateTag (internal method)', () => {
     test('should return light blue for DRAFT', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.DRAFT
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.DRAFT }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -464,9 +444,7 @@ describe('OverviewController', () => {
     })
 
     test('should return grey for SUBMITTED', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.SUBMITTED
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.SUBMITTED }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -475,9 +453,7 @@ describe('OverviewController', () => {
     })
 
     test('should return grey for APPROVED', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.APPROVED
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.APPROVED }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -486,9 +462,7 @@ describe('OverviewController', () => {
     })
 
     test('should return grey for REJECTED', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.REJECTED
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.REJECTED }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -497,9 +471,7 @@ describe('OverviewController', () => {
     })
 
     test('should return grey for ARCHIVED', async () => {
-      getSessionData.mockReturnValue({
-        projectState: PROJECT_STATUS.ARCHIVED
-      })
+      mockRequest.pre.projectData = { projectState: PROJECT_STATUS.ARCHIVED }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -508,9 +480,7 @@ describe('OverviewController', () => {
     })
 
     test('should return grey for undefined status', async () => {
-      getSessionData.mockReturnValue({
-        projectState: undefined
-      })
+      mockRequest.pre.projectData = { projectState: undefined }
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -519,9 +489,7 @@ describe('OverviewController', () => {
     })
 
     test('should return grey for unknown status', async () => {
-      getSessionData.mockReturnValue({
-        projectState: 'UNKNOWN_STATUS'
-      })
+      mockRequest.pre.projectData = { projectState: 'UNKNOWN_STATUS' }
 
       await overviewController.getHandler(mockRequest, mockH)
 
