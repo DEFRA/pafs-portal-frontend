@@ -21,12 +21,14 @@ import {
   updateSessionData,
   validatePayload
 } from '../helpers/project-utils.js'
+import { refreshSessionFromBackend } from '../helpers/session-refresh.js'
 
 // Mock all dependencies
 vi.mock('../../../common/helpers/error-renderer/index.js')
 vi.mock('../helpers/project-config.js')
 vi.mock('../helpers/project-submission.js')
 vi.mock('../helpers/project-utils.js')
+vi.mock('../helpers/session-refresh.js')
 
 // Test constants
 const TEST_REFERENCE_NUMBER = 'TEST-001A-002A'
@@ -841,6 +843,18 @@ describe('RiskAndPropertiesController', () => {
         expect.objectContaining({
           currentCoastalErosionRisk: 'longer_term'
         })
+      )
+    })
+  })
+
+  describe('refreshSessionFromBackend integration', () => {
+    test('should call refreshSessionFromBackend after save', async () => {
+      mockRequest.params = { referenceNumber: TEST_REFERENCE_NUMBER }
+      refreshSessionFromBackend.mockResolvedValue()
+      await riskAndPropertiesController.postHandler(mockRequest, mockH)
+      expect(refreshSessionFromBackend).toHaveBeenCalledWith(
+        mockRequest,
+        TEST_REFERENCE_NUMBER
       )
     })
   })

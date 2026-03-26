@@ -20,12 +20,14 @@ import {
   updateSessionData,
   validatePayload
 } from '../helpers/project-utils.js'
+import { refreshSessionFromBackend } from '../helpers/session-refresh.js'
 
 // Mock all dependencies
 vi.mock('../../../common/helpers/error-renderer/index.js')
 vi.mock('../helpers/project-config.js')
 vi.mock('../helpers/project-submission.js')
 vi.mock('../helpers/project-utils.js')
+vi.mock('../helpers/session-refresh.js')
 
 describe('TypeController', () => {
   let mockRequest
@@ -521,6 +523,20 @@ describe('TypeController', () => {
         expect.objectContaining({
           error: { message: 'API error' }
         })
+      )
+    })
+  })
+
+  describe('refreshSessionFromBackend integration', () => {
+    test('should call refreshSessionFromBackend after save', async () => {
+      mockRequest.params = { referenceNumber: 'REF-123' }
+      refreshSessionFromBackend.mockResolvedValue()
+      // Simulate edit mode and final step
+      getProjectStep.mockReturnValue(PROJECT_STEPS.TYPE)
+      await typeController.postHandler(mockRequest, mockH)
+      expect(refreshSessionFromBackend).toHaveBeenCalledWith(
+        mockRequest,
+        'REF-123'
       )
     })
   })

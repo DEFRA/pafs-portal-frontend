@@ -21,12 +21,14 @@ import {
   updateSessionData
 } from '../helpers/project-utils.js'
 import { buildRadioItems } from '../helpers/radio-options.js'
+import { refreshSessionFromBackend } from '../helpers/session-refresh.js'
 
 vi.mock('../../../common/helpers/error-renderer/index.js')
 vi.mock('../helpers/project-config.js')
 vi.mock('../helpers/project-submission.js')
 vi.mock('../helpers/project-utils.js')
 vi.mock('../helpers/radio-options.js')
+vi.mock('../helpers/session-refresh.js')
 
 describe('EnvironmentalBenefitsController', () => {
   let mockRequest
@@ -1205,6 +1207,18 @@ describe('EnvironmentalBenefitsController', () => {
       )
 
       expect(updateSessionData).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe('refreshSessionFromBackend integration', () => {
+    test('should call refreshSessionFromBackend after save', async () => {
+      mockRequest.params = { referenceNumber: 'TEST-001' }
+      refreshSessionFromBackend.mockResolvedValue()
+      await environmentalBenefitsController.postHandler(mockRequest, mockH)
+      expect(refreshSessionFromBackend).toHaveBeenCalledWith(
+        mockRequest,
+        'TEST-001'
+      )
     })
   })
 })

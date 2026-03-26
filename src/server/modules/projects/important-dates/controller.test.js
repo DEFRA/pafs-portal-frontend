@@ -19,12 +19,14 @@ import {
   navigateToProjectOverview,
   formatDate
 } from '../helpers/project-utils.js'
+import { refreshSessionFromBackend } from '../helpers/session-refresh.js'
 
 // Mock all dependencies
 vi.mock('../../../common/helpers/error-renderer/index.js')
 vi.mock('../helpers/project-config.js')
 vi.mock('../helpers/project-submission.js')
 vi.mock('../helpers/project-utils.js')
+vi.mock('../helpers/session-refresh.js')
 
 describe('ImportantDatesController', () => {
   let mockRequest
@@ -435,6 +437,16 @@ describe('ImportantDatesController', () => {
 
       expect(mockH.redirect).toHaveBeenCalledWith(
         expect.stringContaining('undefined')
+      )
+    })
+
+    test('should call refreshSessionFromBackend after save', async () => {
+      mockRequest.params = { referenceNumber: 'TEST-001' }
+      refreshSessionFromBackend.mockResolvedValue()
+      await importantDatesController.postHandler(mockRequest, mockH)
+      expect(refreshSessionFromBackend).toHaveBeenCalledWith(
+        mockRequest,
+        'TEST-001'
       )
     })
   })
