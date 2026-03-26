@@ -18,6 +18,7 @@ import {
   getBackLink,
   getSessionData,
   formatDate,
+  formatNumberWithCommas,
   buildFinancialYearLabel,
   formatFileSize,
   getProjectStateTag,
@@ -60,6 +61,7 @@ class OverviewController {
       CONFIDENCE_LEVELS,
       buildFinancialYearLabel,
       formatDate,
+      formatNumberWithCommas,
       formatFileSize
     }
   }

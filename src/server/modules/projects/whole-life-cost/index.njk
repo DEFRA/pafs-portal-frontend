@@ -1,0 +1,128 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}{{ t('projects.whole_life_cost.title') }}{% endblock %}
+
+{% block body %}
+
+  {# Build error list for summary #}
+  {% set errorList = [] %}
+  {% for field in wlcFields %}
+    {% if fieldErrors[field] %}
+      {% set errorList = errorList.concat([{
+        text: fieldErrors[field],
+        href: '#' + field
+      }]) %}
+    {% endif %}
+  {% endfor %}
+
+  {% if errorList.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.error_summary_title'),
+      errorList: errorList
+    }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    <h1 class="govuk-heading-xl">{{ t('projects.whole_life_cost.heading') }}</h1>
+
+    <p class="govuk-hint">{{ t('projects.whole_life_cost.hint') }}</p>
+
+    {# Cost inputs table - matching property-affected-flooding layout #}
+    <div class="govuk-form-group{% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS]) %} govuk-form-group--error{% endif %}">
+
+      {% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS]) %}
+        <span class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span>
+          {{ t('projects.whole_life_cost.errors.invalid') }}
+        </span>
+      {% endif %}
+
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_cost.table.whole_life_pv_header') }}</th>
+            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_cost.table.design_construction_header') }}</th>
+            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_cost.table.risk_contingency_header') }}</th>
+            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_cost.table.future_costs_header') }}</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+              <input
+                class="govuk-input govuk-input--width-10{% if fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS] %} govuk-input--error{% endif %}"
+                id="{{ PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS }}"
+                name="{{ PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS }}"
+                type="text"
+                inputmode="numeric"
+                data-number-format="comma"
+                data-wlc-cost-input="true"
+                value="{{ formData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS] if formData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS] is not none else '' }}"
+              >
+              {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS] %}
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS] }}</span>
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              <input
+                class="govuk-input govuk-input--width-10{% if fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS] %} govuk-input--error{% endif %}"
+                id="{{ PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS }}"
+                name="{{ PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS }}"
+                type="text"
+                inputmode="numeric"
+                data-number-format="comma"
+                data-wlc-cost-input="true"
+                value="{{ formData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS] if formData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS] is not none else '' }}"
+              >
+              {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS] %}
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS] }}</span>
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              <input
+                class="govuk-input govuk-input--width-10{% if fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS] %} govuk-input--error{% endif %}"
+                id="{{ PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS }}"
+                name="{{ PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS }}"
+                type="text"
+                inputmode="numeric"
+                data-number-format="comma"
+                data-wlc-cost-input="true"
+                value="{{ formData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS] if formData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS] is not none else '' }}"
+              >
+              {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS] %}
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS] }}</span>
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              <input
+                class="govuk-input govuk-input--width-10{% if fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS] %} govuk-input--error{% endif %}"
+                id="{{ PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS }}"
+                name="{{ PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS }}"
+                type="text"
+                inputmode="numeric"
+                data-number-format="comma"
+                data-wlc-cost-input="true"
+                value="{{ formData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS] if formData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS] is not none else '' }}"
+              >
+              {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS] %}
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ fieldErrors[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS] }}</span>
+              {% endif %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+  </form>
+
+{% endblock %}
