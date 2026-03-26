@@ -517,7 +517,54 @@ describe('project-edit-session', () => {
       }
       mockRequest.yar.get.mockReturnValue({
         isEdit: true,
+        slug: 'REF123'
+      })
+
+      const result = await initializeEditSessionPreHandler(mockRequest, mockH)
+
+      expect(result).toBe(mockH.continue)
+      expect(mockRequest.yar.set).not.toHaveBeenCalled()
+    })
+
+    test('should reinitialize if forceRefresh is true even when already in edit mode', async () => {
+      mockRequest.params.referenceNumber = 'REF123'
+      mockRequest.pre.projectData = {
+        id: 1,
         referenceNumber: 'REF123',
+        name: 'Test'
+      }
+      mockRequest.yar.get.mockReturnValue({
+        isEdit: true,
+        slug: 'REF123'
+      })
+
+      const result = await initializeEditSessionPreHandler(mockRequest, mockH, {
+        forceRefresh: true
+      })
+
+      expect(result).toBe(mockH.continue)
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        PROJECT_SESSION_KEY,
+        expect.objectContaining({
+          isEdit: true,
+          referenceNumber: 'REF123',
+          journeyStarted: true
+        })
+      )
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        { referenceNumber: 'REF123' },
+        'Edit session reinitialized with fresh data (force refresh)'
+      )
+    })
+
+    test('should use default forceRefresh = false when options not provided', async () => {
+      mockRequest.params.referenceNumber = 'REF123'
+      mockRequest.pre.projectData = {
+        id: 1,
+        referenceNumber: 'REF123'
+      }
+      mockRequest.yar.get.mockReturnValue({
+        isEdit: true,
         slug: 'REF123'
       })
 
@@ -535,7 +582,7 @@ describe('project-edit-session', () => {
       }
       mockRequest.yar.get.mockReturnValue({
         isEdit: true,
-        referenceNumber: 'REF123'
+        slug: 'REF123'
       })
 
       const result = await initializeEditSessionPreHandler(mockRequest, mockH)

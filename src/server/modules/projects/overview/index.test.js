@@ -75,7 +75,8 @@ describe('Project Overview Routes', () => {
       const route = registeredRoutes[0]
       const thirdPre = route.options.pre[2]
       expect(thirdPre.method).toBeDefined()
-      expect(thirdPre.method.name).toBe('initializeEditSessionPreHandler')
+      // The third pre-handler is now an arrow function that calls initializeEditSessionPreHandler with forceRefresh: true
+      expect(typeof thirdPre.method).toBe('function')
     })
 
     test('should have requireViewPermission as fourth pre-handler', () => {
@@ -188,18 +189,16 @@ describe('Project Overview Routes', () => {
       const fetchIndex = preHandlers.findIndex(
         (p) => p.method.name === 'fetchProjectForOverview'
       )
-      const initIndex = preHandlers.findIndex(
-        (p) => p.method.name === 'initializeEditSessionPreHandler'
-      )
+      // Third pre-handler is the session initializer (arrow function calling initializeEditSessionPreHandler)
+      const initIndex = 2
 
       expect(fetchIndex).toBeLessThan(initIndex)
     })
 
     test('should initialize session before checking permissions', () => {
       const preHandlers = route.options.pre
-      const initIndex = preHandlers.findIndex(
-        (p) => p.method.name === 'initializeEditSessionPreHandler'
-      )
+      // Third pre-handler is the session initializer (arrow function calling initializeEditSessionPreHandler)
+      const initIndex = 2
       const permIndex = preHandlers.findIndex(
         (p) => p.method.name === 'requireViewPermission'
       )
@@ -257,6 +256,109 @@ describe('Project Overview Routes', () => {
       // Path should contain referenceNumber parameter
       expect(route.path).toContain('{referenceNumber}')
       expect(route.path).toContain('/project')
+    })
+  })
+
+  describe('initializeEditSessionPreHandler arrow function', () => {
+    let mockServer
+    let route
+    let mockRequest
+    let mockH
+    let initializeEditSessionPreHandlerSpy
+
+    beforeEach(async () => {
+      // Import and mock the function
+      const projectEditSession =
+        await import('../helpers/project-edit-session.js')
+      initializeEditSessionPreHandlerSpy = vi.spyOn(
+        projectEditSession,
+        'initializeEditSessionPreHandler'
+      )
+      initializeEditSessionPreHandlerSpy.mockResolvedValue(Symbol('continue'))
+
+      mockServer = {
+        route: vi.fn((routes) => {
+          route = Array.isArray(routes) ? routes[0] : routes
+        })
+      }
+
+      mockRequest = {
+        params: { referenceNumber: 'test-ref' },
+        pre: { projectData: { id: 1, name: 'Test Project' } },
+        yar: { get: vi.fn(), set: vi.fn() },
+        logger: { info: vi.fn() }
+      }
+
+      mockH = {
+        continue: Symbol('continue'),
+        response: vi.fn()
+      }
+
+      projectOverview.plugin.register(mockServer)
+    })
+
+    afterEach(() => {
+      if (initializeEditSessionPreHandlerSpy) {
+        initializeEditSessionPreHandlerSpy.mockRestore()
+      }
+    })
+
+    test('should call initializeEditSessionPreHandler with correct parameters when arrow function is invoked', async () => {
+      const thirdPreHandler = route.options.pre[2]
+
+      await thirdPreHandler.method(mockRequest, mockH)
+
+      expect(initializeEditSessionPreHandlerSpy).toHaveBeenCalledWith(
+        mockRequest,
+        mockH,
+        { forceRefresh: true }
+      )
+    })
+
+    test('should pass forceRefresh: true to initializeEditSessionPreHandler', async () => {
+      const thirdPreHandler = route.options.pre[2]
+
+      await thirdPreHandler.method(mockRequest, mockH)
+
+      expect(initializeEditSessionPreHandlerSpy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object),
+        expect.objectContaining({ forceRefresh: true })
+      )
+    })
+
+    test('should be called with request and h parameters', async () => {
+      const thirdPreHandler = route.options.pre[2]
+
+      await thirdPreHandler.method(mockRequest, mockH)
+
+      expect(initializeEditSessionPreHandlerSpy).toHaveBeenCalledWith(
+        mockRequest,
+        mockH,
+        expect.any(Object)
+      )
+    })
+
+    test('should return result from initializeEditSessionPreHandler', async () => {
+      const expectedResult = Symbol('test-result')
+      initializeEditSessionPreHandlerSpy.mockResolvedValue(expectedResult)
+
+      const thirdPreHandler = route.options.pre[2]
+      const result = await thirdPreHandler.method(mockRequest, mockH)
+
+      expect(result).toBe(expectedResult)
+    })
+
+    test('should handle async execution properly', async () => {
+      const continueSymbol = Symbol('continue')
+      initializeEditSessionPreHandlerSpy.mockResolvedValue(continueSymbol)
+
+      const thirdPreHandler = route.options.pre[2]
+      const resultPromise = thirdPreHandler.method(mockRequest, mockH)
+
+      expect(resultPromise).toBeInstanceOf(Promise)
+      const result = await resultPromise
+      expect(result).toBe(continueSymbol)
     })
   })
 })
