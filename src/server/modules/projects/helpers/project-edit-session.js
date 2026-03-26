@@ -292,10 +292,7 @@ export async function initializeEditSessionPreHandler(request, h) {
   const existingSession = request.yar.get(PROJECT_SESSION_KEY)
 
   // Only initialize if not already in edit mode for this project
-  if (
-    !existingSession?.isEdit ||
-    existingSession.referenceNumber !== referenceNumber
-  ) {
+  if (!existingSession?.isEdit || existingSession.slug !== referenceNumber) {
     initializeEditSession(request, projectData)
     request.logger?.info(
       { referenceNumber },
