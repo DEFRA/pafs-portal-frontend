@@ -32,7 +32,7 @@ export async function refreshSessionFromBackend(
       }
     }
   } catch (err) {
-    if (request?.logger?.error instanceof Function) {
+    if (typeof request?.logger?.error === 'function') {
       request.logger.error('Error in refreshSessionFromBackend', err)
     } else {
       throw err
