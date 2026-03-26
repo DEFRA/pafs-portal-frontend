@@ -33,6 +33,7 @@ const MSG_LENGTH_PRECISION_2DP = 'Length must have up to 2 decimal places'
 const MSG_WIDTH_GREATER_THAN_ZERO = 'Width must be a number greater than 0'
 const MSG_WIDTH_PRECISION_2DP = 'Width must have up to 2 decimal places'
 const MSG_SELECT_AT_LEAST_ONE_LAND_TYPE = 'Select at least one land type'
+const MSG_ENTER_LENGTH_IN_KM = 'Enter the length in km'
 
 const maxTwoDecimalPlaces = (value, helpers) => {
   if (value === null || value === '' || value === undefined) {
@@ -128,7 +129,7 @@ export const nfmLeakyBarriersSchema = Joi.object({
       'number.base': MSG_LENGTH_GREATER_THAN_ZERO,
       'number.positive': MSG_LENGTH_GREATER_THAN_ZERO,
       'number.precision': MSG_LENGTH_PRECISION_2DP,
-      'any.required': 'Enter the length in km'
+      'any.required': MSG_ENTER_LENGTH_IN_KM
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]: Joi.number()
     .empty('')
@@ -252,11 +253,12 @@ export const nfmSaltmarshSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: Joi.number()
     .positive()
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
+    .required()
     .messages({
       'number.base': 'Length must be a number',
       'number.positive': 'Length must be a positive number',
-      'number.precision': MSG_LENGTH_PRECISION_2DP
+      'number.precision': MSG_LENGTH_PRECISION_2DP,
+      'any.required': MSG_ENTER_LENGTH_IN_KM
     })
 }).unknown(true)
 
@@ -279,11 +281,12 @@ export const nfmSandDuneSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: Joi.number()
     .positive()
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
+    .required()
     .messages({
       'number.base': 'Length must be a number',
       'number.positive': 'Length must be a positive number',
-      'number.precision': MSG_LENGTH_PRECISION_2DP
+      'number.precision': MSG_LENGTH_PRECISION_2DP,
+      'any.required': MSG_ENTER_LENGTH_IN_KM
     })
 }).unknown(true)
 
