@@ -270,9 +270,15 @@ export function detectChanges(sessionData, fields = []) {
  *
  * @param {Object} request - Hapi request object
  * @param {Object} h - Hapi response toolkit
+ * @param {Object} options - Options object
+ * @param {boolean} options.forceRefresh - If true, always reinitialize session ignoring existing state
  * @returns {Object} Continues to handler
  */
-export async function initializeEditSessionPreHandler(request, h) {
+export async function initializeEditSessionPreHandler(
+  request,
+  h,
+  { forceRefresh = false } = {}
+) {
   const { referenceNumber } = request.params
   const projectData = request.pre?.projectData
 
@@ -291,12 +297,18 @@ export async function initializeEditSessionPreHandler(request, h) {
 
   const existingSession = request.yar.get(PROJECT_SESSION_KEY)
 
-  // Only initialize if not already in edit mode for this project
-  if (!existingSession?.isEdit || existingSession.slug !== referenceNumber) {
+  // Initialize if not already in edit mode for this project OR if force refresh requested
+  if (
+    !existingSession?.isEdit ||
+    existingSession.slug !== referenceNumber ||
+    forceRefresh
+  ) {
     initializeEditSession(request, projectData)
     request.logger?.info(
       { referenceNumber },
-      'Edit session initialized for project'
+      forceRefresh
+        ? 'Edit session reinitialized with fresh data (force refresh)'
+        : 'Edit session initialized for project'
     )
   }
 
