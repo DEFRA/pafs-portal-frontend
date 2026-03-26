@@ -432,55 +432,20 @@ class NfmController {
     const sessionData = getSessionData(request)
 
     try {
-      // Normalize nfmSelectedMeasures to array BEFORE validation (HTML forms send single checkbox as string)
-      if (
-        step === PROJECT_STEPS.NFM_SELECTED_MEASURES &&
-        request.payload.nfmSelectedMeasures &&
-        !Array.isArray(request.payload.nfmSelectedMeasures)
-      ) {
-        request.payload.nfmSelectedMeasures = [
-          request.payload.nfmSelectedMeasures
-        ]
-      }
-
-      if (
-        step === PROJECT_STEPS.NFM_LAND_USE_CHANGE &&
-        request.payload.nfmLandUseChange &&
-        !Array.isArray(request.payload.nfmLandUseChange)
-      ) {
-        request.payload.nfmLandUseChange = [request.payload.nfmLandUseChange]
-      }
-
-      // Validate payload BEFORE processing (validate array format)
-      const validationError = validatePayload(request, h, {
+      this._normalizePayloadForStep(step, request)
+      const validationError = this._validateStepPayload(
+        step,
+        request,
+        h,
         template,
         schema,
-        viewData,
-        formData: request.payload
-      })
-      if (validationError) {
-        return validationError
-      }
-
-      // Process and normalize payload (convert array to string for session/API)
-      // Pass sessionData for NFM_SELECTED_MEASURES to detect changes
-      processPayload(step, request.payload, sessionData)
-
-      // Save form data to session
-      updateSessionData(request, request.payload)
-
+        viewData
+      )
+      if (validationError) return validationError
+      this._processAndSavePayload(step, request, sessionData)
       const response = await this._postSubmission(request, h)
-      if (response) {
-        // If _postSubmission returns a response (e.g. error or redirect), return it
-        return response
-      }
-
-      // Global: Refresh session from backend after save
-      const referenceNumber = request.params?.referenceNumber || ''
-      if (referenceNumber) {
-        await refreshSessionFromBackend(request, referenceNumber)
-      }
-
+      if (response) return response
+      await this._refreshSessionIfNeeded(request)
       return await this._postRedirect(request, h)
     } catch (error) {
       request.logger.error('Error NFM POST', error)
@@ -488,6 +453,46 @@ class NfmController {
         ...viewData,
         error: extractApiError(request, error)
       })
+    }
+  }
+
+  _normalizePayloadForStep(step, request) {
+    if (
+      step === PROJECT_STEPS.NFM_SELECTED_MEASURES &&
+      request.payload.nfmSelectedMeasures &&
+      !Array.isArray(request.payload.nfmSelectedMeasures)
+    ) {
+      request.payload.nfmSelectedMeasures = [
+        request.payload.nfmSelectedMeasures
+      ]
+    }
+    if (
+      step === PROJECT_STEPS.NFM_LAND_USE_CHANGE &&
+      request.payload.nfmLandUseChange &&
+      !Array.isArray(request.payload.nfmLandUseChange)
+    ) {
+      request.payload.nfmLandUseChange = [request.payload.nfmLandUseChange]
+    }
+  }
+
+  _validateStepPayload(step, request, h, template, schema, viewData) {
+    return validatePayload(request, h, {
+      template,
+      schema,
+      viewData,
+      formData: request.payload
+    })
+  }
+
+  _processAndSavePayload(step, request, sessionData) {
+    processPayload(step, request.payload, sessionData)
+    updateSessionData(request, request.payload)
+  }
+
+  async _refreshSessionIfNeeded(request) {
+    const referenceNumber = request.params?.referenceNumber || ''
+    if (referenceNumber) {
+      await refreshSessionFromBackend(request, referenceNumber)
     }
   }
 }

@@ -530,9 +530,21 @@ describe('TypeController', () => {
   describe('refreshSessionFromBackend integration', () => {
     test('should call refreshSessionFromBackend after save', async () => {
       mockRequest.params = { referenceNumber: 'REF-123' }
+      mockRequest.payload = {
+        projectType: PROJECT_TYPES.STU, // triggers skip intervention types
+        projectInterventionTypes: []
+      }
+      getSessionData.mockReturnValue({
+        slug: 'REF-123',
+        projectType: PROJECT_TYPES.STU,
+        projectInterventionTypes: []
+      })
+      requiredInterventionTypesForProjectType.mockReturnValue(false)
       refreshSessionFromBackend.mockResolvedValue()
       // Simulate edit mode and final step
       getProjectStep.mockReturnValue(PROJECT_STEPS.TYPE)
+      // Ensure saveProjectWithErrorHandling returns undefined (no error response)
+      saveProjectWithErrorHandling.mockResolvedValue(undefined)
       await typeController.postHandler(mockRequest, mockH)
       expect(refreshSessionFromBackend).toHaveBeenCalledWith(
         mockRequest,

@@ -362,7 +362,6 @@ class TypeController {
           return response
         }
         // Global: Refresh session from backend after save
-        const referenceNumber = request.params?.referenceNumber || ''
         if (referenceNumber) {
           await refreshSessionFromBackend(request, referenceNumber)
         }

@@ -74,6 +74,6 @@ describe('refreshSessionFromBackend', () => {
     )
     await expect(
       refreshSessionFromBackend(mockRequest, 'REF-005')
-    ).resolves.toBeUndefined()
+    ).rejects.toThrow('fail')
   })
 })
