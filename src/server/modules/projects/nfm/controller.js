@@ -441,10 +441,14 @@ class NfmController {
         schema,
         viewData
       )
-      if (validationError) return validationError
+      if (validationError) {
+        return validationError
+      }
       this._processAndSavePayload(step, request, sessionData)
       const response = await this._postSubmission(request, h)
-      if (response) return response
+      if (response) {
+        return response
+      }
       await this._refreshSessionIfNeeded(request)
       return await this._postRedirect(request, h)
     } catch (error) {
@@ -475,7 +479,7 @@ class NfmController {
     }
   }
 
-  _validateStepPayload(step, request, h, template, schema, viewData) {
+  _validateStepPayload(_step, request, h, template, schema, viewData) {
     return validatePayload(request, h, {
       template,
       schema,
