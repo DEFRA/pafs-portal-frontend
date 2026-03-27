@@ -127,6 +127,12 @@ export const PROJECT_PAYLOAD_FIELDS = {
   NFM_LANDOWNER_CONSENT: 'nfmLandownerConsent',
   NFM_EXPERIENCE_LEVEL: 'nfmExperienceLevel',
   NFM_PROJECT_READINESS: 'nfmProjectReadiness',
+  ESTIMATED_WHOLE_LIFE_BENEFITS: 'wlbEstimatedWholeLifePvBenefits',
+  ESTIMATED_PROPERTY_DAMAGES_AVOIDED: 'wlbEstimatedPropertyDamagesAvoided',
+  ESTIMATED_ENVIRONMENTAL_BENEFITS: 'wlbEstimatedEnvironmentalBenefits',
+  ESTIMATED_RECREATION_TOURISM_BENEFITS:
+    'wlbEstimatedRecreationTourismBenefits',
+  ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS: 'wlbEstimatedLandValueUpliftBenefits',
   IS_LEGACY: 'isLegacy',
   IS_REVISED: 'isRevised',
   WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS: 'wlcEstimatedWholeLifePvCosts',

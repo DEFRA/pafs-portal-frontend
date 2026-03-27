@@ -166,6 +166,16 @@
       "design_construction_costs": "Estimated design and construction costs",
       "risk_contingency_costs": "Estimated risk contingency costs",
       "future_costs": "Estimated future costs"
+    },
+    "wlb_summary_card": {
+      "title": "Whole life benefits",
+      "not_added": "No whole life benefits added yet",
+      "estimated_whole_life_benefits": "Estimated whole life present value benefits",
+      "estimated_whole_life_benefits_optional": "Estimated whole life present value benefits",
+      "estimated_property_damages_avoided": "Estimated property damages avoided",
+      "estimated_environmental_benefits": "Estimated environmental benefits",
+      "estimated_recreation_tourism_benefits": "Estimated recreation and tourism benefits",
+      "estimated_land_value_uplift_benefits": "Estimated land value uplift and regeneration benefits"
     }
   },
   "start_proposal": {
@@ -1356,6 +1366,24 @@
     "errors": {
       "required": "Please enter the value",
       "invalid": "Enter a whole number with no decimal point or currency symbols",
+      "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+    }
+  },
+  "whole_life_benefits": {
+    "title": "Whole life benefits",
+    "heading": "What are the estimated whole life benefits of your project?",
+    "hint": "Enter a whole-number amount in pounds sterling (e.g. 1500)",
+    "table": {
+      "estimated_whole_life_benefits_header": "What are the estimated whole life present value benefits?",
+      "estimated_whole_life_benefits_header_optional": "What are the estimated whole life present value benefits (if known)?",
+      "estimated_property_damages_avoided_header": "What are the estimated property damages avoided (if known)?",
+      "estimated_environmental_benefits_header": "What are the estimated environmental benefits (if known)?",
+      "estimated_recreation_tourism_benefits_header": "What are the estimated recreation and tourism benefits (if known)?",
+      "estimated_land_value_uplift_benefits_header": "What are the estimated land value uplift benefits (if known)?"
+    },
+    "errors": {
+      "required": "Please enter the value",
+      "invalid": "Enter a whole number with no letters, spaces, decimal point, currency symbols or special characters",
       "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
     }
   }

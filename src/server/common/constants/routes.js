@@ -178,7 +178,8 @@ export const ROUTES = {
         EXPERIENCE: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_EXPERIENCE}`,
         PROJECT_READINESS: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_PROJECT_READINESS}`
       },
-      WHOLE_LIFE_COST: `/project/{referenceNumber}/${PROJECT_STEPS.WHOLE_LIFE_COST}`
+      WHOLE_LIFE_COST: `/project/{referenceNumber}/${PROJECT_STEPS.WHOLE_LIFE_COST}`,
+      WHOLE_LIFE_BENEFITS: `/project/{referenceNumber}/${PROJECT_STEPS.WHOLE_LIFE_BENEFITS}`
     }
   },
 
