@@ -30,7 +30,7 @@ const validateWlbEstimateString = (value, helpers) => {
 
 const WLB_REQUIRED_FIELD_ERROR = 'Please enter the value'
 const WLB_INVALID_FIELD_ERROR =
-  'Enter a whole number with no letters, spaces, decimal point, currency symbols or special characters'
+  'Enter a whole number with no decimal point or currency symbols'
 const WLB_MAX_DIGITS_ERROR =
   'You have exceeded the maximum number of digits allowed. Please re-enter.'
 

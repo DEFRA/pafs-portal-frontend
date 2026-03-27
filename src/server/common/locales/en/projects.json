@@ -1383,7 +1383,7 @@
     },
     "errors": {
       "required": "Please enter the value",
-      "invalid": "Enter a whole number with no letters, spaces, decimal point, currency symbols or special characters",
+      "invalid": "Enter a whole number with no decimal point or currency symbols",
       "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
     }
   }
