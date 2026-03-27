@@ -58,12 +58,7 @@ const optionalEstimateField = Joi.string()
   .trim()
   .allow(null, '')
   .optional()
-  .custom((value, helpers) => {
-    if (value === null || value === undefined || value === '') {
-      return value
-    }
-    return validateWlbEstimateString(value, helpers)
-  })
+  .custom((value, helpers) => validateWlbEstimateString(value, helpers))
   .messages({
     'string.base': WLB_INVALID_FIELD_ERROR,
     'string.pattern.base': WLB_INVALID_FIELD_ERROR,
