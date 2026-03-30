@@ -64,7 +64,8 @@ export const PROJECT_VIEWS = {
   NFM_LANDOWNER_CONSENT: 'modules/projects/nfm/radio-generic',
   NFM_EXPERIENCE: 'modules/projects/nfm/radio-generic',
   NFM_PROJECT_READINESS: 'modules/projects/nfm/radio-generic',
-  WHOLE_LIFE_COST: 'modules/projects/whole-life-cost/index'
+  WHOLE_LIFE_COST: 'modules/projects/whole-life-cost/index',
+  WHOLE_LIFE_BENEFITS: 'modules/projects/whole-life-benefits/index'
 }
 
 export const GENERAL_VIEWS = {
