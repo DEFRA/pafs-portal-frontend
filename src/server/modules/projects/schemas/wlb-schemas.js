@@ -1,7 +1,8 @@
 import Joi from 'joi'
 import {
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_TYPES
+  PROJECT_TYPES,
+  PROJECT_VALIDATION_MESSAGES
 } from '../../../common/constants/projects.js'
 
 const WLB_FIELDS = [
@@ -28,12 +29,6 @@ const validateWlbEstimateString = (value, helpers) => {
   return value
 }
 
-const WLB_REQUIRED_FIELD_ERROR = 'Please enter the value'
-const WLB_INVALID_FIELD_ERROR =
-  'Enter a whole number with no decimal point or currency symbols'
-const WLB_MAX_DIGITS_ERROR =
-  'You have exceeded the maximum number of digits allowed. Please re-enter.'
-
 /**
  * A single WLB estimate field schema (required variant).
  * Accepts an integer >= 0 with at most 18 digits.
@@ -44,10 +39,10 @@ const requiredEstimateField = Joi.string()
   .required()
   .custom(validateWlbEstimateString)
   .messages({
-    'string.base': WLB_INVALID_FIELD_ERROR,
-    'string.pattern.base': WLB_INVALID_FIELD_ERROR,
-    'string.max': WLB_MAX_DIGITS_ERROR,
-    'any.required': WLB_REQUIRED_FIELD_ERROR
+    'string.base': PROJECT_VALIDATION_MESSAGES.WLB_FIELD_INVALID,
+    'string.pattern.base': PROJECT_VALIDATION_MESSAGES.WLB_FIELD_INVALID,
+    'string.max': PROJECT_VALIDATION_MESSAGES.WLB_FIELD_OVER_MAX_DIGITS,
+    'any.required': PROJECT_VALIDATION_MESSAGES.WLB_FIELD_REQUIRED
   })
 
 /**
@@ -60,9 +55,9 @@ const optionalEstimateField = Joi.string()
   .optional()
   .custom((value, helpers) => validateWlbEstimateString(value, helpers))
   .messages({
-    'string.base': WLB_INVALID_FIELD_ERROR,
-    'string.pattern.base': WLB_INVALID_FIELD_ERROR,
-    'string.max': WLB_MAX_DIGITS_ERROR
+    'string.base': PROJECT_VALIDATION_MESSAGES.WLB_FIELD_INVALID,
+    'string.pattern.base': PROJECT_VALIDATION_MESSAGES.WLB_FIELD_INVALID,
+    'string.max': PROJECT_VALIDATION_MESSAGES.WLB_FIELD_OVER_MAX_DIGITS
   })
 
 const buildSchema = (fieldSchema) =>

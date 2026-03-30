@@ -6,13 +6,17 @@
 {% block pageTitle %}{{ t('projects.whole_life_benefits.title') }}{% endblock %}
 
 {% block body %}
-
   {# Build error list for summary #}
+  {% set wlbErrorMessages = {
+    'WLB_FIELD_REQUIRED': t('projects.whole_life_benefits.errors.required'),
+    'WLB_FIELD_INVALID': t('projects.whole_life_benefits.errors.invalid'),
+    'WLB_FIELD_OVER_MAX_DIGITS': t('projects.whole_life_benefits.errors.max_digits')
+  } %}
   {% set errorList = [] %}
   {% for field in wlbFields %}
     {% if fieldErrors[field] %}
       {% set errorList = errorList.concat([{
-        text: fieldErrors[field],
+        text: wlbErrorMessages[fieldErrors[field]] or fieldErrors[field],
         href: '#' + field
       }]) %}
     {% endif %}
@@ -68,7 +72,7 @@
                 value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] is not none else '' }}"
               >
               {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] %}
-                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] }}</span>
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ wlbErrorMessages[fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] }}</span>
               {% endif %}
             </td>
             <td class="govuk-table__cell">
@@ -83,7 +87,7 @@
                 value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] is not none else '' }}"
               >
               {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] %}
-                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] }}</span>
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ wlbErrorMessages[fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED]] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] }}</span>
               {% endif %}
             </td>
             <td class="govuk-table__cell">
@@ -98,7 +102,7 @@
                 value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] is not none else '' }}"
               >
               {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] %}
-                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] }}</span>
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ wlbErrorMessages[fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS]] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] }}</span>
               {% endif %}
             </td>
             <td class="govuk-table__cell">
@@ -113,7 +117,7 @@
                 value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] is not none else '' }}"
               >
               {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] %}
-                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] }}</span>
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ wlbErrorMessages[fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS]] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] }}</span>
               {% endif %}
             </td>
             <td class="govuk-table__cell">
@@ -128,7 +132,7 @@
                 value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] is not none else '' }}"
               >
               {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] %}
-                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] }}</span>
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ wlbErrorMessages[fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS]] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] }}</span>
               {% endif %}
             </td>
           </tr>

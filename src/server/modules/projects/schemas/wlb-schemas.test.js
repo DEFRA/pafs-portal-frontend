@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_TYPES
+  PROJECT_TYPES,
+  PROJECT_VALIDATION_MESSAGES
 } from '../../../common/constants/projects.js'
 import {
   getWlbSchemaForProjectType,
@@ -60,7 +61,9 @@ describe('wlb-schemas', () => {
       const { error } = wlbRequiredSchema.validate(payload)
 
       expect(error).toBeDefined()
-      expect(error.details[0].message).toBe('Please enter the value')
+      expect(error.details[0].message).toBe(
+        PROJECT_VALIDATION_MESSAGES.WLB_FIELD_REQUIRED
+      )
     })
 
     it('should fail when first field is empty string', () => {
@@ -71,7 +74,9 @@ describe('wlb-schemas', () => {
       const { error } = wlbRequiredSchema.validate(payload)
 
       expect(error).toBeDefined()
-      expect(error.details[0].message).toBe('Please enter the value')
+      expect(error.details[0].message).toBe(
+        PROJECT_VALIDATION_MESSAGES.WLB_FIELD_REQUIRED
+      )
     })
 
     it('should fail when first field contains non-digits', () => {
@@ -83,7 +88,7 @@ describe('wlb-schemas', () => {
 
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Enter a whole number with no decimal point or currency symbols'
+        PROJECT_VALIDATION_MESSAGES.WLB_FIELD_INVALID
       )
     })
 
@@ -97,7 +102,7 @@ describe('wlb-schemas', () => {
 
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'You have exceeded the maximum number of digits allowed. Please re-enter.'
+        PROJECT_VALIDATION_MESSAGES.WLB_FIELD_OVER_MAX_DIGITS
       )
     })
 
@@ -200,7 +205,7 @@ describe('wlb-schemas', () => {
 
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Enter a whole number with no decimal point or currency symbols'
+        PROJECT_VALIDATION_MESSAGES.WLB_FIELD_INVALID
       )
     })
 
@@ -214,7 +219,7 @@ describe('wlb-schemas', () => {
 
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'You have exceeded the maximum number of digits allowed. Please re-enter.'
+        PROJECT_VALIDATION_MESSAGES.WLB_FIELD_OVER_MAX_DIGITS
       )
     })
 
