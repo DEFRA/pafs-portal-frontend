@@ -95,16 +95,6 @@ class WholeLifeBenefitsController {
     })
   }
 
-  async get(request, h) {
-    const projectType = this._getProjectType(request)
-
-    if (this._isHiddenForProjectType(projectType)) {
-      return navigateToProjectOverview(request.params.referenceNumber, h)
-    }
-
-    return h.view(VIEW, this._buildViewData(request))
-  }
-
   async post(request, h) {
     const projectType = this._getProjectType(request)
 
@@ -161,6 +151,16 @@ class WholeLifeBenefitsController {
         error: extractApiError(error)
       })
     }
+  }
+
+  async get(request, h) {
+    const projectType = this._getProjectType(request)
+
+    if (this._isHiddenForProjectType(projectType)) {
+      return navigateToProjectOverview(request.params.referenceNumber, h)
+    }
+
+    return h.view(VIEW, this._buildViewData(request))
   }
 }
 
