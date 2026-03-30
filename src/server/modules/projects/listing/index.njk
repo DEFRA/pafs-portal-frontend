@@ -51,7 +51,6 @@
       {% if isUserProjectListing %}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-full">
-            <a href="{{ t('home.new_proposal_guidance.link_url') }}" class="govuk-link govuk-!-margin-bottom-3" target="_blank" rel="noopener noreferrer" data-testid="new-proposal-guidance">{{ t('home.new_proposal_guidance.link_text') }}</a>
             <div class="govuk-inset-text govuk-!-margin-top-4">{{t('home.inset_text')}}</div>
           </div>
         </div>
@@ -114,17 +113,28 @@
           </div>
         </div>
       {% endif %}
-
-      {% if isUserProjectListing and isNotRMA %}
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-full">
-            <p class="govuk-body">{{ t('home.pso_ea_block.info_text_1') | safe }}</p>
-            <p class="govuk-body">{{ t('home.pso_ea_block.info_text_2') }}</p>
-          </div>
-        </div>
-      {% endif %}
     </div>
   </div>
+
+  {% if isUserProjectListing %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <p class="govuk-body govuk-!-margin-top-3">
+          {{ t('home.new_proposal_guidance.intro_text') }}
+          <a href="{{ t('home.new_proposal_guidance.link_url') }}" class="govuk-link" target="_blank" rel="noopener noreferrer" data-testid="new-proposal-guidance">{{ t('home.new_proposal_guidance.link_text') }}</a>{{ t('home.new_proposal_guidance.outro_text') }}
+        </p>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if isUserProjectListing and isNotRMA %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <p class="govuk-body">{{ t('home.pso_ea_block.info_text_1') | safe }}</p>
+        <p class="govuk-body">{{ t('home.pso_ea_block.info_text_2') }}</p>
+      </div>
+    </div>
+  {% endif %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
