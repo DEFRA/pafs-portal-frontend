@@ -282,6 +282,43 @@ class TypeController {
   }
 
   /**
+   * Check if project type changed from DEF/REP to another type
+   * @private
+   */
+  _didProjectTypeChangeFromDefRep(prevType, newType) {
+    const isPrevDefRep =
+      prevType === PROJECT_TYPES.DEF || prevType === PROJECT_TYPES.REP
+    const isNewDefRep =
+      newType === PROJECT_TYPES.DEF || newType === PROJECT_TYPES.REP
+    return prevType && isPrevDefRep && !isNewDefRep
+  }
+
+  /**
+   * Check if intervention types changed from NFM/SUDS to another type
+   * @private
+   */
+  _didInterventionTypesChangeFromNfmSuds(prevTypes, newTypes) {
+    const isPrevNfmSuds =
+      (prevTypes || []).includes(PROJECT_INTERVENTION_TYPES.NFM) ||
+      (prevTypes || []).includes(PROJECT_INTERVENTION_TYPES.SUDS)
+    const isNewNfmSuds =
+      (newTypes || []).includes(PROJECT_INTERVENTION_TYPES.NFM) ||
+      (newTypes || []).includes(PROJECT_INTERVENTION_TYPES.SUDS)
+    return isPrevNfmSuds && !isNewNfmSuds
+  }
+
+  /**
+   * Flush NFM section if authorized
+   * @private
+   */
+  async _flushNfmIfAuthorized(request, referenceNumber) {
+    const auth = getAuthSession(request)
+    if (referenceNumber && auth?.accessToken) {
+      await flushNfmSection(referenceNumber, auth.accessToken)
+    }
+  }
+
+  /**
    * Update session with normalized payload data
    * Clears intervention type fields when not required
    */
@@ -315,53 +352,34 @@ class TypeController {
       }
     }
 
-    // --- NFM FLUSH LOGIC ---
-    // 1. If project type changes from DEF/REP to any other, flush NFM
-    const prevType = sessionData.projectType
-    const isPrevDefRep =
-      prevType === PROJECT_TYPES.DEF || prevType === PROJECT_TYPES.REP
-    const isNewDefRep =
-      projectType === PROJECT_TYPES.DEF || projectType === PROJECT_TYPES.REP
+    const referenceNumber =
+      sessionData.referenceNumber ||
+      sessionData.slug ||
+      request.params?.referenceNumber
+
+    // Handle project type change from DEF/REP
     if (
       step === PROJECT_STEPS.TYPE &&
-      prevType &&
-      isPrevDefRep &&
-      !isNewDefRep
+      this._didProjectTypeChangeFromDefRep(sessionData.projectType, projectType)
     ) {
-      // Remove all NFM fields from session
       const cleaned = clearNfmFields(sessionData)
       updateSessionData(request, { ...cleaned, ...finalPayload })
-      // Flush NFM in backend
-      const auth = getAuthSession(request)
-      if (sessionData.referenceNumber && auth?.accessToken) {
-        await flushNfmSection(sessionData.referenceNumber, auth.accessToken)
-      }
+      await this._flushNfmIfAuthorized(request, referenceNumber)
       return
     }
 
-    // 2. If intervention types change from NFM/SUDS to something else, flush NFM
-    if (step === PROJECT_STEPS.INTERVENTION_TYPE) {
-      const prevInterventions = sessionData.projectInterventionTypes || []
-      const isPrevNfmSuds =
-        prevInterventions.includes(PROJECT_INTERVENTION_TYPES.NFM) ||
-        prevInterventions.includes(PROJECT_INTERVENTION_TYPES.SUDS)
-      const isNewNfmSuds =
-        (projectInterventionTypes || []).includes(
-          PROJECT_INTERVENTION_TYPES.NFM
-        ) ||
-        (projectInterventionTypes || []).includes(
-          PROJECT_INTERVENTION_TYPES.SUDS
-        )
-      if (isPrevNfmSuds && !isNewNfmSuds) {
-        const cleaned = clearNfmFields(sessionData)
-        updateSessionData(request, { ...cleaned, ...finalPayload })
-        // Flush NFM in backend
-        const auth = getAuthSession(request)
-        if (sessionData.referenceNumber && auth?.accessToken) {
-          await flushNfmSection(sessionData.referenceNumber, auth.accessToken)
-        }
-        return
-      }
+    // Handle intervention types change from NFM/SUDS
+    if (
+      step === PROJECT_STEPS.INTERVENTION_TYPE &&
+      this._didInterventionTypesChangeFromNfmSuds(
+        sessionData.projectInterventionTypes,
+        projectInterventionTypes
+      )
+    ) {
+      const cleaned = clearNfmFields(sessionData)
+      updateSessionData(request, { ...cleaned, ...finalPayload })
+      await this._flushNfmIfAuthorized(request, referenceNumber)
+      return
     }
 
     updateSessionData(request, finalPayload)

@@ -2,7 +2,7 @@
 export default function clearNfmFields(sessionData) {
   const nfmFieldPrefixes = ['NFM_', 'nfm_', 'pafs_core_nfm_']
   // All known camelCase NFM fields in session
-  const nfmFieldNames = [
+  const nfmFieldNames = new Set([
     'nfmSelectedMeasures',
     'nfmLandUseChange',
     'nfmLandownerConsent',
@@ -23,12 +23,12 @@ export default function clearNfmFields(sessionData) {
     'nfmEnclosedLivestockFarmlandAfter',
     'nfmEnclosedDairyingFarmlandBefore',
     'nfmEnclosedDairyingFarmlandAfter'
-  ]
+  ])
   const cleared = { ...sessionData }
   Object.keys(cleared).forEach((key) => {
     if (
       nfmFieldPrefixes.some((prefix) => key.startsWith(prefix)) ||
-      nfmFieldNames.includes(key)
+      nfmFieldNames.has(key)
     ) {
       delete cleared[key]
     }

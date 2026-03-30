@@ -20,12 +20,18 @@ import {
   updateSessionData,
   validatePayload
 } from '../helpers/project-utils.js'
+import clearNfmFields from '../helpers/project-utils-nfm.js'
+import { flushNfmSection } from '../helpers/flush-nfm.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 
 // Mock all dependencies
 vi.mock('../../../common/helpers/error-renderer/index.js')
 vi.mock('../helpers/project-config.js')
 vi.mock('../helpers/project-submission.js')
 vi.mock('../helpers/project-utils.js')
+vi.mock('../helpers/project-utils-nfm.js')
+vi.mock('../helpers/flush-nfm.js')
+vi.mock('../../../common/helpers/auth/session-manager.js')
 
 describe('TypeController', () => {
   let mockRequest
@@ -83,6 +89,9 @@ describe('TypeController', () => {
     validatePayload.mockReturnValue(null)
     saveProjectWithErrorHandling.mockResolvedValue(null)
     requiredInterventionTypesForProjectType.mockReturnValue(true)
+    clearNfmFields.mockImplementation((session) => ({ ...session }))
+    flushNfmSection.mockResolvedValue({ success: true })
+    getAuthSession.mockReturnValue({ accessToken: 'test-token' })
   })
 
   describe('getHandler', () => {
@@ -274,6 +283,32 @@ describe('TypeController', () => {
       )
     })
 
+    test('should flush NFM when type changes from DEF to non-DEF/REP', async () => {
+      requiredInterventionTypesForProjectType.mockReturnValue(false)
+      mockRequest.payload = { projectType: PROJECT_TYPES.STU }
+      getSessionData.mockReturnValue({
+        slug: 'SOC501E-000A-005A',
+        projectType: PROJECT_TYPES.DEF,
+        projectInterventionTypes: [PROJECT_INTERVENTION_TYPES.NFM]
+      })
+      clearNfmFields.mockReturnValue({ cleaned: true })
+
+      await typeController.postHandler(mockRequest, mockH)
+
+      expect(clearNfmFields).toHaveBeenCalled()
+      expect(updateSessionData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          cleaned: true,
+          projectType: PROJECT_TYPES.STU
+        })
+      )
+      expect(flushNfmSection).toHaveBeenCalledWith(
+        'SOC501E-000A-005A',
+        'test-token'
+      )
+    })
+
     test('should submit and navigate to overview in edit mode when intervention types not required', async () => {
       mockRequest.params.referenceNumber = 'TEST-001'
       getSessionData.mockReturnValue({
@@ -431,6 +466,50 @@ describe('TypeController', () => {
           'TEST-001'
         )
       )
+    })
+
+    test('should flush NFM when intervention changes from NFM/SUDS to non-NFM/SUDS', async () => {
+      mockRequest.payload = {
+        projectInterventionTypes: [PROJECT_INTERVENTION_TYPES.OTHER]
+      }
+      getSessionData.mockReturnValue({
+        slug: 'SOC501E-000A-005A',
+        projectType: PROJECT_TYPES.DEF,
+        projectInterventionTypes: [PROJECT_INTERVENTION_TYPES.NFM]
+      })
+      clearNfmFields.mockReturnValue({ cleaned: true })
+
+      await typeController.postHandler(mockRequest, mockH)
+
+      expect(clearNfmFields).toHaveBeenCalled()
+      expect(updateSessionData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          cleaned: true,
+          projectInterventionTypes: [PROJECT_INTERVENTION_TYPES.OTHER]
+        })
+      )
+      expect(flushNfmSection).toHaveBeenCalledWith(
+        'SOC501E-000A-005A',
+        'test-token'
+      )
+    })
+
+    test('should not call backend flush when auth token is missing', async () => {
+      mockRequest.payload = {
+        projectInterventionTypes: [PROJECT_INTERVENTION_TYPES.OTHER]
+      }
+      getSessionData.mockReturnValue({
+        slug: 'SOC501E-000A-005A',
+        projectType: PROJECT_TYPES.DEF,
+        projectInterventionTypes: [PROJECT_INTERVENTION_TYPES.NFM]
+      })
+      getAuthSession.mockReturnValue({})
+
+      await typeController.postHandler(mockRequest, mockH)
+
+      expect(clearNfmFields).toHaveBeenCalled()
+      expect(flushNfmSection).not.toHaveBeenCalled()
     })
   })
 
