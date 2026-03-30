@@ -3,7 +3,9 @@ import {
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_PAYLOAD_LEVELS,
   PROJECT_STEPS,
-  REFERENCE_NUMBER_PARAM
+  REFERENCE_NUMBER_PARAM,
+  WLB_MANDATORY_PROJECT_TYPES,
+  WLB_HIDDEN_PROJECT_TYPES
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
@@ -18,10 +20,6 @@ import {
   updateSessionData
 } from '../helpers/project-utils.js'
 import { getWlbSchemaForProjectType } from '../schemas/wlb-schemas.js'
-import {
-  WLB_MANDATORY_PROJECT_TYPES,
-  WLB_HIDDEN_PROJECT_TYPES
-} from '../../../common/constants/projects.js'
 
 const VIEW = PROJECT_VIEWS.WHOLE_LIFE_BENEFITS
 const LOCAL_KEY_PREFIX = 'projects.whole_life_benefits'
