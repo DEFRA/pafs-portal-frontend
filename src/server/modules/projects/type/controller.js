@@ -324,7 +324,7 @@ class TypeController {
    * @private
    */
   _normalizePayload(step, payload) {
-    let finalPayload = { ...payload }
+    const finalPayload = { ...payload }
 
     // Clear intervention data if not required for project type
     if (
