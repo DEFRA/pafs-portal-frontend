@@ -1,8 +1,9 @@
 import Joi from 'joi'
 import {
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_TYPES,
-  PROJECT_VALIDATION_MESSAGES
+  PROJECT_VALIDATION_MESSAGES,
+  WLB_MANDATORY_PROJECT_TYPES,
+  WLB_OPTIONAL_PROJECT_TYPES
 } from '../../../common/constants/projects.js'
 
 const WLB_FIELDS = [
@@ -86,25 +87,6 @@ export const wlbRequiredSchema = Joi.object({
  * All WLB fields are optional.
  */
 export const wlbOptionalSchema = buildSchema(optionalEstimateField)
-
-/**
- * Project types for which WLB is mandatory.
- */
-export const WLB_MANDATORY_PROJECT_TYPES = [
-  PROJECT_TYPES.DEF,
-  PROJECT_TYPES.REF,
-  PROJECT_TYPES.REP
-]
-
-/**
- * Project types for which WLB is optional.
- */
-export const WLB_OPTIONAL_PROJECT_TYPES = [PROJECT_TYPES.ELO, PROJECT_TYPES.HCR]
-
-/**
- * Project types for which WLB is hidden (skip to overview).
- */
-export const WLB_HIDDEN_PROJECT_TYPES = [PROJECT_TYPES.STR, PROJECT_TYPES.STU]
 
 /**
  * Returns the appropriate WLB schema for the given project type,

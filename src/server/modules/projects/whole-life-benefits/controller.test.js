@@ -3,7 +3,8 @@ import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_PAYLOAD_LEVELS,
-  PROJECT_TYPES
+  PROJECT_TYPES,
+  WLB_HIDDEN_PROJECT_TYPES
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { wholeLifeBenefitsController } from './controller.js'
@@ -18,10 +19,7 @@ import {
   navigateToProjectOverview,
   updateSessionData
 } from '../helpers/project-utils.js'
-import {
-  getWlbSchemaForProjectType,
-  WLB_HIDDEN_PROJECT_TYPES
-} from '../schemas/wlb-schemas.js'
+import { getWlbSchemaForProjectType } from '../schemas/wlb-schemas.js'
 
 vi.mock('../../../common/helpers/error-renderer/index.js', () => ({
   extractApiError: vi.fn(),
@@ -40,9 +38,7 @@ vi.mock('../helpers/project-utils.js', () => ({
 }))
 
 vi.mock('../schemas/wlb-schemas.js', () => ({
-  getWlbSchemaForProjectType: vi.fn(),
-  WLB_HIDDEN_PROJECT_TYPES: ['STR', 'STU'],
-  WLB_MANDATORY_PROJECT_TYPES: ['DEF', 'REF', 'REP']
+  getWlbSchemaForProjectType: vi.fn()
 }))
 
 describe('wholeLifeBenefitsController', () => {

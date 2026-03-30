@@ -2,15 +2,15 @@ import { describe, expect, it } from 'vitest'
 import {
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_TYPES,
-  PROJECT_VALIDATION_MESSAGES
+  PROJECT_VALIDATION_MESSAGES,
+  WLB_MANDATORY_PROJECT_TYPES,
+  WLB_OPTIONAL_PROJECT_TYPES,
+  WLB_HIDDEN_PROJECT_TYPES
 } from '../../../common/constants/projects.js'
 import {
   getWlbSchemaForProjectType,
   wlbRequiredSchema,
-  wlbOptionalSchema,
-  WLB_MANDATORY_PROJECT_TYPES,
-  WLB_OPTIONAL_PROJECT_TYPES,
-  WLB_HIDDEN_PROJECT_TYPES
+  wlbOptionalSchema
 } from './wlb-schemas.js'
 
 const validWlbPayload = {

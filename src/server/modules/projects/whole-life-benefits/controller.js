@@ -17,11 +17,11 @@ import {
   navigateToProjectOverview,
   updateSessionData
 } from '../helpers/project-utils.js'
+import { getWlbSchemaForProjectType } from '../schemas/wlb-schemas.js'
 import {
-  getWlbSchemaForProjectType,
-  WLB_HIDDEN_PROJECT_TYPES,
-  WLB_MANDATORY_PROJECT_TYPES
-} from '../schemas/wlb-schemas.js'
+  WLB_MANDATORY_PROJECT_TYPES,
+  WLB_HIDDEN_PROJECT_TYPES
+} from '../../../common/constants/projects.js'
 
 const VIEW = PROJECT_VIEWS.WHOLE_LIFE_BENEFITS
 const LOCAL_KEY_PREFIX = 'projects.whole_life_benefits'
