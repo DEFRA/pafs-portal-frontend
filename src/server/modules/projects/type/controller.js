@@ -22,6 +22,9 @@ import {
   updateSessionData,
   validatePayload
 } from '../helpers/project-utils.js'
+import clearNfmFields from '../helpers/project-utils-nfm.js'
+import { flushNfmSection } from '../helpers/flush-nfm.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 
 const REFERENCE_NUMBER_PLACEHOLDER = '{referenceNumber}'
 
@@ -282,11 +285,11 @@ class TypeController {
    * Update session with normalized payload data
    * Clears intervention type fields when not required
    */
-  _updateTypeInSession(request) {
+  async _updateTypeInSession(request) {
     const payload = request.payload
     const step = getProjectStep(request)
     const { projectType, projectInterventionTypes } = payload
-
+    const sessionData = getSessionData(request)
     let finalPayload = { ...payload }
 
     // Clear intervention data if not required for project type
@@ -312,6 +315,40 @@ class TypeController {
       }
     }
 
+    // --- NFM FLUSH LOGIC ---
+    // 1. If project type changes from DEF/REP to any other, flush NFM
+    const prevType = sessionData.projectType
+    const isPrevDefRep = prevType === PROJECT_TYPES.DEF || prevType === PROJECT_TYPES.REP
+    const isNewDefRep = projectType === PROJECT_TYPES.DEF || projectType === PROJECT_TYPES.REP
+    if (step === PROJECT_STEPS.TYPE && prevType && isPrevDefRep && !isNewDefRep) {
+      // Remove all NFM fields from session
+      const cleaned = clearNfmFields(sessionData)
+      updateSessionData(request, { ...cleaned, ...finalPayload })
+      // Flush NFM in backend
+      const auth = getAuthSession(request)
+      if (sessionData.referenceNumber && auth?.accessToken) {
+        await flushNfmSection(sessionData.referenceNumber, auth.accessToken)
+      }
+      return
+    }
+
+    // 2. If intervention types change from NFM/SUDS to something else, flush NFM
+    if (step === PROJECT_STEPS.INTERVENTION_TYPE) {
+      const prevInterventions = sessionData.projectInterventionTypes || []
+      const isPrevNfmSuds = prevInterventions.includes(PROJECT_INTERVENTION_TYPES.NFM) || prevInterventions.includes(PROJECT_INTERVENTION_TYPES.SUDS)
+      const isNewNfmSuds = (projectInterventionTypes || []).includes(PROJECT_INTERVENTION_TYPES.NFM) || (projectInterventionTypes || []).includes(PROJECT_INTERVENTION_TYPES.SUDS)
+      if (isPrevNfmSuds && !isNewNfmSuds) {
+        const cleaned = clearNfmFields(sessionData)
+        updateSessionData(request, { ...cleaned, ...finalPayload })
+        // Flush NFM in backend
+        const auth = getAuthSession(request)
+        if (sessionData.referenceNumber && auth?.accessToken) {
+          await flushNfmSection(sessionData.referenceNumber, auth.accessToken)
+        }
+        return
+      }
+    }
+
     updateSessionData(request, finalPayload)
   }
 
@@ -331,8 +368,8 @@ class TypeController {
         ]
       }
 
-      // Save form data to session
-      this._updateTypeInSession(request)
+      // Save form data to session (may flush NFM)
+      await this._updateTypeInSession(request)
       const viewData = this._getViewData(request)
 
       // Validate payload
