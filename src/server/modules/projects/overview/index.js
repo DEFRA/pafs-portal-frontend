@@ -19,7 +19,12 @@ export const projectOverview = {
             pre: [
               { method: requireAuth },
               { method: fetchProjectForOverview },
-              { method: initializeEditSessionPreHandler },
+              {
+                method: (request, h) =>
+                  initializeEditSessionPreHandler(request, h, {
+                    forceRefresh: true
+                  })
+              },
               { method: requireViewPermission }
             ],
             handler: overviewController.getHandler

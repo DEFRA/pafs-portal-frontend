@@ -1,10 +1,6 @@
 // Utility to clear all NFM-related fields from the session
 export default function clearNfmFields(sessionData) {
-  const nfmFieldPrefixes = [
-    'NFM_',
-    'nfm_',
-    'pafs_core_nfm_',
-  ]
+  const nfmFieldPrefixes = ['NFM_', 'nfm_', 'pafs_core_nfm_']
   // All known camelCase NFM fields in session
   const nfmFieldNames = [
     'nfmSelectedMeasures',

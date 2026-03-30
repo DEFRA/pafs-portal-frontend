@@ -16,6 +16,7 @@ import {
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
   getBackLink,
+  getSessionData,
   formatDate,
   buildFinancialYearLabel,
   formatFileSize,
@@ -82,16 +83,7 @@ class OverviewController {
     const backLink = getBackLink(request, {
       targetURL: ROUTES.PROJECT.HOME
     })
-    // Always use fresh backend data from request.pre.projectData (populated by fetchProjectForOverview pre-handler)
-    const projectData = request.pre?.projectData
-    if (!projectData) {
-      // Defensive: fallback to session data if pre-handler failed (should not happen)
-      return this._handleOverviewResponse(request, h, {
-        viewData: { errorCode: 'NO_PROJECT_DATA' },
-        success: false,
-        error: 'No project data available.'
-      })
-    }
+    const projectData = getSessionData(request)
     const viewData = this._getProjectViewData(request, {
       backLink,
       projectData
