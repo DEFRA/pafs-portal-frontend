@@ -22,7 +22,7 @@ import {
   updateSessionData,
   validatePayload
 } from '../helpers/project-utils.js'
-import clearNfmFields from '../helpers/project-utils-nfm.js'
+import clearNfmFields from '../helpers/clear-nfm-fields.js'
 import { flushNfmSection } from '../helpers/flush-nfm.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 
@@ -319,53 +319,47 @@ class TypeController {
   }
 
   /**
-   * Update session with normalized payload data
-   * Clears intervention type fields when not required
+   * Normalize payload based on current step
+   * Clears intervention fields when not required, auto-selects when only one
+   * @private
    */
-  async _updateTypeInSession(request) {
-    const payload = request.payload
-    const step = getProjectStep(request)
-    const { projectType, projectInterventionTypes } = payload
-    const sessionData = getSessionData(request)
+  _normalizePayload(step, payload) {
     let finalPayload = { ...payload }
 
     // Clear intervention data if not required for project type
     if (
       step === PROJECT_STEPS.TYPE &&
-      this._shouldSkipInterventionTypes(projectType)
+      this._shouldSkipInterventionTypes(payload.projectType)
     ) {
-      finalPayload = {
-        ...finalPayload,
-        projectInterventionTypes: [],
-        mainInterventionType: ''
-      }
+      finalPayload.projectInterventionTypes = []
+      finalPayload.mainInterventionType = ''
     }
 
     // Auto-select main intervention type if only one selected
     if (
       step === PROJECT_STEPS.INTERVENTION_TYPE &&
-      this._shouldSkipPrimaryInterventionType(projectInterventionTypes)
+      this._shouldSkipPrimaryInterventionType(payload.projectInterventionTypes)
     ) {
-      finalPayload = {
-        ...finalPayload,
-        mainInterventionType: projectInterventionTypes[0]
-      }
+      finalPayload.mainInterventionType = payload.projectInterventionTypes[0]
     }
 
-    const referenceNumber =
-      sessionData.referenceNumber ||
-      sessionData.slug ||
-      request.params?.referenceNumber
+    return finalPayload
+  }
 
+  /**
+   * Check if NFM should be flushed and return flush context
+   * @private
+   */
+  _checkNfmFlushTrigger(step, sessionData, newPayload) {
     // Handle project type change from DEF/REP
     if (
       step === PROJECT_STEPS.TYPE &&
-      this._didProjectTypeChangeFromDefRep(sessionData.projectType, projectType)
+      this._didProjectTypeChangeFromDefRep(
+        sessionData.projectType,
+        newPayload.projectType
+      )
     ) {
-      const cleaned = clearNfmFields(sessionData)
-      updateSessionData(request, { ...cleaned, ...finalPayload })
-      await this._flushNfmIfAuthorized(request, referenceNumber)
-      return
+      return { shouldFlush: true, cleaned: clearNfmFields(sessionData) }
     }
 
     // Handle intervention types change from NFM/SUDS
@@ -373,11 +367,39 @@ class TypeController {
       step === PROJECT_STEPS.INTERVENTION_TYPE &&
       this._didInterventionTypesChangeFromNfmSuds(
         sessionData.projectInterventionTypes,
-        projectInterventionTypes
+        newPayload.projectInterventionTypes
       )
     ) {
-      const cleaned = clearNfmFields(sessionData)
-      updateSessionData(request, { ...cleaned, ...finalPayload })
+      return { shouldFlush: true, cleaned: clearNfmFields(sessionData) }
+    }
+
+    return { shouldFlush: false }
+  }
+
+  /**
+   * Update session with normalized payload data
+   * Handles payload normalization, session updates, and NFM flushing
+   */
+  async _updateTypeInSession(request) {
+    const payload = request.payload
+    const step = getProjectStep(request)
+    const sessionData = getSessionData(request)
+    const finalPayload = this._normalizePayload(step, payload)
+
+    const referenceNumber =
+      sessionData.referenceNumber ||
+      sessionData.slug ||
+      request.params?.referenceNumber
+
+    // Check for NFM flush triggers
+    const flushTrigger = this._checkNfmFlushTrigger(
+      step,
+      sessionData,
+      finalPayload
+    )
+
+    if (flushTrigger.shouldFlush) {
+      updateSessionData(request, { ...flushTrigger.cleaned, ...finalPayload })
       await this._flushNfmIfAuthorized(request, referenceNumber)
       return
     }

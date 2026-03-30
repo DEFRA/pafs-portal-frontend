@@ -20,7 +20,7 @@ import {
   updateSessionData,
   validatePayload
 } from '../helpers/project-utils.js'
-import clearNfmFields from '../helpers/project-utils-nfm.js'
+import clearNfmFields from '../helpers/clear-nfm-fields.js'
 import { flushNfmSection } from '../helpers/flush-nfm.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 
@@ -29,7 +29,9 @@ vi.mock('../../../common/helpers/error-renderer/index.js')
 vi.mock('../helpers/project-config.js')
 vi.mock('../helpers/project-submission.js')
 vi.mock('../helpers/project-utils.js')
-vi.mock('../helpers/project-utils-nfm.js')
+vi.mock('../helpers/clear-nfm-fields.js', () => ({
+  default: vi.fn()
+}))
 vi.mock('../helpers/flush-nfm.js')
 vi.mock('../../../common/helpers/auth/session-manager.js')
 
