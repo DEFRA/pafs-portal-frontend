@@ -55,7 +55,7 @@ const sanitizeWlbPayload = (payload = {}) => {
  * Whole Life Benefits Controller
  *
  * Single-step edit-only page. Behaviour varies by project type:
- *  - DEF / REF / REP → all 5 fields mandatory
+ *  - DEF / REF / REP → First field (Estimated whole life present value benefits) is mandatory, remaining fields are optional
  *  - ELO / HCR       → all 5 fields optional (labels appended with "(if known)")
  *  - STR / STU       → section hidden, redirect to overview
  */
