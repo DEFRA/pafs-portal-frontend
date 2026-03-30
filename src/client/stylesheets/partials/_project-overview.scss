@@ -43,7 +43,7 @@
   &:hover {
     background: none;
     box-shadow: none;
-    color: govuk.govuk-colour("dark-blue");
+    color: govuk.govuk-colour("blue", $variant: "shade-50");
     text-decoration: underline;
     text-decoration-thickness: 3px;
   }
