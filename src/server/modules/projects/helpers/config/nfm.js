@@ -32,7 +32,6 @@ const AREA_LABEL = 'area.label'
 const VOLUME_LABEL = 'volume.label'
 const VOLUME_HINT = 'volume.hint'
 const LENGTH_LABEL = 'length.label'
-const LENGTH_HINT = 'length.hint'
 const WIDTH_LABEL = 'width.label'
 
 /**
@@ -190,7 +189,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH,
         labelKey: LENGTH_LABEL,
-        hintKey: LENGTH_HINT,
         suffix: 'km'
       }
     ]
@@ -212,7 +210,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH,
         labelKey: LENGTH_LABEL,
-        hintKey: LENGTH_HINT,
         suffix: 'km'
       }
     ]
