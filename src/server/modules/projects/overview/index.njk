@@ -15,6 +15,7 @@
 {% from "views/confidence-assessment-card.njk" import confidenceAssessmentSummaryCard %}
 {% from "views/nfm-card.njk" import nfmSummaryCard %}
 {% from "views/wlc-card.njk" import wlcSummaryCard %}
+{% from "views/wlb-card.njk" import wlbSummaryCard %}
 
 {% block body %}
 
@@ -119,6 +120,8 @@
   {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t) }}
 
   {{ wlcSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_TYPES, t, isReadOnly, formatNumberWithCommas) }}
+
+  {{ wlbSummaryCard(projectData, PROJECT_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) }}
 
   {% if not isReadOnly %}
     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
