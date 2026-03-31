@@ -93,7 +93,9 @@ export const PROJECT_STEPS = {
   NFM_LAND_USE_COASTAL_MARGINS: 'nfm-land-use-coastal-margins',
   NFM_LANDOWNER_CONSENT: 'nfm-landowner-consent',
   NFM_EXPERIENCE: 'nfm-experience',
-  NFM_PROJECT_READINESS: 'nfm-project-readiness'
+  NFM_PROJECT_READINESS: 'nfm-project-readiness',
+  WHOLE_LIFE_COST: 'whole-life-cost',
+  WHOLE_LIFE_BENEFITS: 'whole-life-benefits'
 }
 
 export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'

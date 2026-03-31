@@ -1,0 +1,150 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}{{ t('projects.whole_life_benefits.title') }}{% endblock %}
+
+{% block body %}
+  {# Build error list for summary #}
+  {% set wlbErrorMessages = {
+    'WLB_FIELD_REQUIRED': t('projects.whole_life_benefits.errors.required'),
+    'WLB_FIELD_INVALID': t('projects.whole_life_benefits.errors.invalid'),
+    'WLB_FIELD_OVER_MAX_DIGITS': t('projects.whole_life_benefits.errors.max_digits')
+  } %}
+  {% set errorList = [] %}
+  {% for field in wlbFields %}
+    {% if fieldErrors[field] %}
+      {% set errorList = errorList.concat([{
+        text: wlbErrorMessages[fieldErrors[field]] or fieldErrors[field],
+        href: '#' + field
+      }]) %}
+    {% endif %}
+  {% endfor %}
+
+  {% if errorList.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.error_summary_title'),
+      errorList: errorList
+    }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    <h1 class="govuk-heading-xl">{{ t('projects.whole_life_benefits.heading') }}</h1>
+
+    <p class="govuk-hint">{{ t('projects.whole_life_benefits.hint') }}</p>
+
+    {# Cost inputs table - matching property-affected-flooding layout #}
+    <div class="govuk-form-group{% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS]) %} govuk-form-group--error{% endif %}">
+
+      {% if fieldErrors and (fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS]) %}
+        <span class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span>
+          {{ t('projects.whole_life_benefits.errors.invalid') }}
+        </span>
+      {% endif %}
+
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">
+              {{ t('projects.whole_life_benefits.table.estimated_whole_life_benefits_header' if isMandatory else 'projects.whole_life_benefits.table.estimated_whole_life_benefits_header_optional') }}
+            </th>
+            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_benefits.table.estimated_property_damages_avoided_header') }}</th>
+            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_benefits.table.estimated_environmental_benefits_header') }}</th>
+            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_benefits.table.estimated_recreation_tourism_benefits_header') }}</th>
+            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_benefits.table.estimated_land_value_uplift_benefits_header') }}</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+              <input
+                class="govuk-input govuk-input--width-10{% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] %} govuk-input--error{% endif %}"
+                id="{{ PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS }}"
+                name="{{ PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS }}"
+                type="text"
+                inputmode="numeric"
+                data-number-format="comma"
+                data-wlb-input="true"
+                value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] is not none else '' }}"
+              >
+              {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] %}
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ wlbErrorMessages[fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] }}</span>
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              <input
+                class="govuk-input govuk-input--width-10{% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] %} govuk-input--error{% endif %}"
+                id="{{ PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED }}"
+                name="{{ PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED }}"
+                type="text"
+                inputmode="numeric"
+                data-number-format="comma"
+                data-wlb-input="true"
+                value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] is not none else '' }}"
+              >
+              {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] %}
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ wlbErrorMessages[fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED]] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] }}</span>
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              <input
+                class="govuk-input govuk-input--width-10{% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] %} govuk-input--error{% endif %}"
+                id="{{ PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS }}"
+                name="{{ PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS }}"
+                type="text"
+                inputmode="numeric"
+                data-number-format="comma"
+                data-wlb-input="true"
+                value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] is not none else '' }}"
+              >
+              {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] %}
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ wlbErrorMessages[fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS]] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] }}</span>
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              <input
+                class="govuk-input govuk-input--width-10{% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] %} govuk-input--error{% endif %}"
+                id="{{ PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS }}"
+                name="{{ PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS }}"
+                type="text"
+                inputmode="numeric"
+                data-number-format="comma"
+                data-wlb-input="true"
+                value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] is not none else '' }}"
+              >
+              {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] %}
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ wlbErrorMessages[fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS]] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] }}</span>
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              <input
+                class="govuk-input govuk-input--width-10{% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] %} govuk-input--error{% endif %}"
+                id="{{ PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS }}"
+                name="{{ PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS }}"
+                type="text"
+                inputmode="numeric"
+                data-number-format="comma"
+                data-wlb-input="true"
+                value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] is not none else '' }}"
+              >
+              {% if fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] %}
+                <span class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ wlbErrorMessages[fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS]] or fieldErrors[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] }}</span>
+              {% endif %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+  </form>
+
+{% endblock %}

@@ -1,3 +1,4 @@
+const GROUP_SIZE = 3
 import { SIZE } from '../../../common/constants/common.js'
 import {
   PROJECT_SESSION_KEY,
@@ -311,4 +312,44 @@ export function formatFileSize(bytes) {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
   return `${Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
+}
+
+/**
+ * Format an integer-like value with comma separators.
+ * Returns null when value is empty/invalid.
+ * @param {string|number|bigint|null|undefined} value
+ * @returns {string|null}
+ */
+export function formatNumberWithCommas(value) {
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+
+  const digits = String(value).replaceAll(/\D/g, '')
+  if (!digits) {
+    return null
+  }
+
+  // Safe, linear-time implementation to insert commas
+  // Only works for digit strings, as intended
+  const n = digits.length
+  if (n <= GROUP_SIZE) {
+    return digits
+  }
+  let out = ''
+  let i = n % GROUP_SIZE
+  if (i > 0) {
+    out = digits.slice(0, i)
+    if (n > GROUP_SIZE) {
+      out += ','
+    }
+  }
+  while (i < n) {
+    out += digits.slice(i, i + GROUP_SIZE)
+    i += GROUP_SIZE
+    if (i < n) {
+      out += ','
+    }
+  }
+  return out
 }

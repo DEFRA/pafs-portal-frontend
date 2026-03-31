@@ -34,6 +34,13 @@ describe('Routes Constants', () => {
         '/reset-password/token-expired'
       )
     })
+
+    test('SET_PASSWORD routes are defined', () => {
+      expect(ROUTES.SET_PASSWORD).toBe('/set-password')
+      expect(ROUTES.SET_PASSWORD_TOKEN_EXPIRED).toBe(
+        '/set-password/link-expired'
+      )
+    })
   })
 
   describe('General user routes', () => {
@@ -51,6 +58,32 @@ describe('Routes Constants', () => {
 
     test('ARCHIVE route is defined', () => {
       expect(ROUTES.GENERAL.ARCHIVE).toBe('/archive')
+    })
+
+    test('static page routes are defined', () => {
+      expect(ROUTES.GENERAL.STATIC_PAGES.PRIVACY_NOTICE).toBe('/privacy-notice')
+      expect(ROUTES.GENERAL.STATIC_PAGES.ACCESSIBILITY).toBe('/accessibility')
+      expect(ROUTES.GENERAL.STATIC_PAGES.COOKIES).toBe('/cookies')
+      expect(ROUTES.GENERAL.STATIC_PAGES.COOKIE_SETTINGS).toBe(
+        '/cookie-settings'
+      )
+      expect(ROUTES.GENERAL.STATIC_PAGES.COOKIE_CONSENT_ACCEPT).toBe(
+        '/cookies/accept'
+      )
+      expect(ROUTES.GENERAL.STATIC_PAGES.COOKIE_CONSENT_REJECT).toBe(
+        '/cookies/reject'
+      )
+      expect(ROUTES.GENERAL.STATIC_PAGES.COOKIE_CONSENT_HIDE).toBe(
+        '/cookies/hide-message'
+      )
+    })
+  })
+
+  describe('Project edit routes', () => {
+    test('WHOLE_LIFE_BENEFITS edit route is defined', () => {
+      expect(ROUTES.PROJECT.EDIT.WHOLE_LIFE_BENEFITS).toBe(
+        '/project/{referenceNumber}/whole-life-benefits'
+      )
     })
   })
 

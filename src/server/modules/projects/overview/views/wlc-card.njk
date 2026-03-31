@@ -1,0 +1,67 @@
+{% macro wlcSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_TYPES, t, isReadOnly, formatNumberWithCommas) %}
+  {# STR and STU project types never show WLC section #}
+  {% set projectType = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] %}
+  {% set isHiddenType = projectType == PROJECT_TYPES.STR or projectType == PROJECT_TYPES.STU %}
+
+  {% if not isHiddenType %}
+    {% set pvCosts = projectData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS] %}
+    {% set designCosts = projectData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS] %}
+    {% set riskCosts = projectData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS] %}
+    {% set futureCosts = projectData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS] %}
+    {% set pvCostsFormatted = formatNumberWithCommas(pvCosts) %}
+    {% set designCostsFormatted = formatNumberWithCommas(designCosts) %}
+    {% set riskCostsFormatted = formatNumberWithCommas(riskCosts) %}
+    {% set futureCostsFormatted = formatNumberWithCommas(futureCosts) %}
+    {% set hasWlcData = (pvCosts is not none and pvCosts != '') or (designCosts is not none and designCosts != '') or (riskCosts is not none and riskCosts != '') or (futureCosts is not none and futureCosts != '') %}
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title">{{ t('projects.overview.wlc_summary_card.title') }}</h2>
+        {% if not isReadOnly %}
+          <ul class="govuk-summary-card__actions">
+            <li class="govuk-summary-card__action">
+              <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.WHOLE_LIFE_COST }}">
+                {% if hasWlcData %}{{ t('common.change') }}
+                {% else %}{{ t('common.add') }}
+                {% endif %}
+                <span class="govuk-visually-hidden"> {{ t('projects.overview.wlc_summary_card.title') | lower }}</span>
+              </a>
+            </li>
+          </ul>
+        {% endif %}
+      </div>
+      <div class="govuk-summary-card__content">
+        {% if hasWlcData %}
+          <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.wlc_summary_card.whole_life_pv_costs') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if pvCostsFormatted %}£{{ pvCostsFormatted }}{% else %}&mdash;{% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.wlc_summary_card.design_construction_costs') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if designCostsFormatted %}£{{ designCostsFormatted }}{% else %}&mdash;{% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.wlc_summary_card.risk_contingency_costs') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if riskCostsFormatted %}£{{ riskCostsFormatted }}{% else %}&mdash;{% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.wlc_summary_card.future_costs') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if futureCostsFormatted %}£{{ futureCostsFormatted }}{% else %}&mdash;{% endif %}
+              </dd>
+            </div>
+          </dl>
+        {% else %}
+          <p class="govuk-body">{{ t('projects.overview.wlc_summary_card.not_added') }}</p>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+{% endmacro %}

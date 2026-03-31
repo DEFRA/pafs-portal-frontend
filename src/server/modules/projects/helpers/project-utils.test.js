@@ -19,6 +19,7 @@ import {
   isYearBeyondRange,
   getMonthName,
   formatDate,
+  formatNumberWithCommas,
   formatFileSize,
   getProjectStateTag,
   isConfidenceRestrictedProjectType
@@ -799,6 +800,27 @@ describe('project-utils', () => {
     test('should handle null or undefined', () => {
       expect(formatFileSize(null)).toBe('0 B')
       expect(formatFileSize(undefined)).toBe('0 B')
+    })
+  })
+
+  describe('formatNumberWithCommas', () => {
+    test('should format number-like values with comma separators', () => {
+      expect(formatNumberWithCommas(1234567)).toBe('1,234,567')
+      expect(formatNumberWithCommas('123456789012345678')).toBe(
+        '123,456,789,012,345,678'
+      )
+    })
+
+    test('should strip non-digits before formatting', () => {
+      expect(formatNumberWithCommas('1,234,567')).toBe('1,234,567')
+      expect(formatNumberWithCommas('£1234567')).toBe('1,234,567')
+    })
+
+    test('should return null for empty or invalid values', () => {
+      expect(formatNumberWithCommas(null)).toBeNull()
+      expect(formatNumberWithCommas(undefined)).toBeNull()
+      expect(formatNumberWithCommas('')).toBeNull()
+      expect(formatNumberWithCommas('abc')).toBeNull()
     })
   })
 

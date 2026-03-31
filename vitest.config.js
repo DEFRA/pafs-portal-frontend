@@ -16,7 +16,7 @@ export default defineConfig({
         'coverage',
         'postcss.config.js',
         'stylelint.config.js',
-        'src/client/javascripts/**',
+        // 'src/client/javascripts/**', // Removed to include client JS in coverage
         '**/*.md',
         '**/*.json',
         '**/*.njk',

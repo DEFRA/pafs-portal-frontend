@@ -1,0 +1,76 @@
+{% macro wlbSummaryCard(projectData, PROJECT_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) %}
+  {# STR and STU project types never show WLB section #}
+  {% set projectType = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] %}
+  {% set isHiddenType = projectType == PROJECT_TYPES.STR or projectType == PROJECT_TYPES.STU %}
+
+  {% if not isHiddenType %}
+    {% set Wlb = projectData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS] %}
+    {% set propertyDamages = projectData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_PROPERTY_DAMAGES_AVOIDED] %}
+    {% set environmentalBenefits = projectData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_ENVIRONMENTAL_BENEFITS] %}
+    {% set recreationTourismBenefits = projectData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] %}
+    {% set landValueUpliftBenefits = projectData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS] %}
+    {% set WlbFormatted = formatNumberWithCommas(Wlb) %}
+    {% set propertyDamagesFormatted = formatNumberWithCommas(propertyDamages) %}
+    {% set environmentalBenefitsFormatted = formatNumberWithCommas(environmentalBenefits) %}
+    {% set recreationTourismBenefitsFormatted = formatNumberWithCommas(recreationTourismBenefits) %}
+    {% set landValueUpliftBenefitsFormatted = formatNumberWithCommas(landValueUpliftBenefits) %}
+    {% set hasWlbData = (Wlb is not none and Wlb != '') or (propertyDamages is not none and propertyDamages != '') or (environmentalBenefits is not none and environmentalBenefits != '') or (recreationTourismBenefits is not none and recreationTourismBenefits != '') or (landValueUpliftBenefits is not none and landValueUpliftBenefits != '') %}
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title">{{ t('projects.overview.wlb_summary_card.title') }}</h2>
+        {% if not isReadOnly %}
+          <ul class="govuk-summary-card__actions">
+            <li class="govuk-summary-card__action">
+              <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.WHOLE_LIFE_BENEFITS }}">
+                {% if hasWlbData %}{{ t('common.change') }}
+                {% else %}{{ t('common.add') }}
+                {% endif %}
+                <span class="govuk-visually-hidden"> {{ t('projects.overview.wlb_summary_card.title') | lower }}</span>
+              </a>
+            </li>
+          </ul>
+        {% endif %}
+      </div>
+
+      <div class="govuk-summary-card__content">
+        {% if hasWlbData %}
+          <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.wlb_summary_card.estimated_whole_life_benefits') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if WlbFormatted %}£{{ WlbFormatted }}{% else %}{{ t('projects.overview.common.na') }}{% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.wlb_summary_card.estimated_property_damages_avoided') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if propertyDamagesFormatted %}£{{ propertyDamagesFormatted }}{% else %}{{ t('projects.overview.common.na') }}{% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.wlb_summary_card.estimated_environmental_benefits') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if environmentalBenefitsFormatted %}£{{ environmentalBenefitsFormatted }}{% else %}{{ t('projects.overview.common.na') }}{% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.wlb_summary_card.estimated_recreation_tourism_benefits') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if recreationTourismBenefitsFormatted %}£{{ recreationTourismBenefitsFormatted }}{% else %}{{ t('projects.overview.common.na') }}{% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.wlb_summary_card.estimated_land_value_uplift_benefits') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if landValueUpliftBenefitsFormatted %}£{{ landValueUpliftBenefitsFormatted }}{% else %}{{ t('projects.overview.common.na') }}{% endif %}
+              </dd>
+            </div>
+          </dl>
+        {% else %}
+          <p class="govuk-body">{{ t('projects.overview.wlb_summary_card.not_added') }}</p>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+{% endmacro %}
