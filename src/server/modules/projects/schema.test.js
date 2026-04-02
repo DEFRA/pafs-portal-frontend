@@ -1,4 +1,11 @@
 import { describe, test, expect } from 'vitest'
+
+// Financial year starts in April; compute current and next financial year dynamically
+const now = new Date()
+const currentMonth = now.getMonth() + 1
+const currentYear = now.getFullYear()
+const currentFinancialYear = currentMonth >= 4 ? currentYear : currentYear - 1
+const nextFinancialYear = currentFinancialYear + 1
 import {
   validateProjectName,
   validateAreaId,
@@ -106,15 +113,17 @@ describe('Project Schemas', () => {
   describe('validateFinancialStartYear', () => {
     test('should validate valid financial start year', () => {
       const result = validateFinancialStartYear.validate({
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025'
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]:
+          String(currentFinancialYear)
       })
       expect(result.error).toBeUndefined()
     })
 
     test('should allow optional financial end year', () => {
       const result = validateFinancialStartYear.validate({
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]:
+          String(currentFinancialYear),
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: String(nextFinancialYear)
       })
       expect(result.error).toBeUndefined()
     })
@@ -128,15 +137,17 @@ describe('Project Schemas', () => {
   describe('validateFinancialEndYear', () => {
     test('should validate valid financial years', () => {
       const result = validateFinancialEndYear.validate({
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]:
+          String(currentFinancialYear),
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: String(nextFinancialYear)
       })
       expect(result.error).toBeUndefined()
     })
 
     test('should return error for missing financial end year', () => {
       const result = validateFinancialEndYear.validate({
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025'
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]:
+          String(currentFinancialYear)
       })
       expect(result.error).toBeDefined()
     })

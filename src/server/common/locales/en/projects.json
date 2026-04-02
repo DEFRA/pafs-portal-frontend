@@ -964,10 +964,10 @@
         },
         "divider": "or",
         "statutory_need": {
-          "label": "There is a business-critical statutory need"
+          "label": "There is a business-critical or statutory need"
         },
         "legal_need": {
-          "label": "There is a business-critical legal need"
+          "label": "There is a business-critical or legal need"
         },
         "health_and_safety": {
           "label": "There is a health and safety issue"
