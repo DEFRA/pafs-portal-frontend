@@ -52,6 +52,11 @@ export const router = {
         'projects/archive'
       ])
 
+      // Downloads routes
+      await loadModules(server, join(dirName, 'modules/downloads'), [
+        'individual'
+      ])
+
       // Project routes
       await loadModules(server, join(dirName, 'modules/projects'), [
         'overview',

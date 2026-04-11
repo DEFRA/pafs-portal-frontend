@@ -92,7 +92,7 @@
           {% endif %}
         {% endif %}
         &nbsp; | &nbsp;
-        <a class="govuk-link" href="#" data-testid="download-link">{{ t('projects.overview.common.download') }}</a>
+        <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/downloads" data-testid="download-link">{{ t('projects.overview.common.download') }}</a>
       </dd>
     </div>
   </dl>

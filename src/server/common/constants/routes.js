@@ -82,6 +82,13 @@ export const ROUTES = {
     DOWNLOAD_RMA: '/admin/download-rma'
   },
 
+  // Downloads routes
+  DOWNLOADS: {
+    INDIVIDUAL: '/project/{referenceNumber}/downloads',
+    PROGRAMME: '/downloads/programme',
+    ADMIN: '/admin/downloads'
+  },
+
   PROJECT: {
     OVERVIEW: '/project/{referenceNumber}',
     ARCHIVE: '/project/{referenceNumber}/archive',
