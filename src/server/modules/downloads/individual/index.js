@@ -29,6 +29,24 @@ export const individualDownloads = {
             ],
             handler: individualDownloadsController.getHandler
           }
+        },
+        {
+          method: 'GET',
+          path: ROUTES.DOWNLOADS.MODERATION,
+          options: {
+            pre: [
+              { method: requireAuth },
+              { method: fetchProjectForOverview },
+              {
+                method: (request, h) =>
+                  initializeEditSessionPreHandler(request, h, {
+                    forceRefresh: true
+                  })
+              },
+              { method: requireViewPermission }
+            ],
+            handler: individualDownloadsController.downloadModerationHandler
+          }
         }
       ])
     }

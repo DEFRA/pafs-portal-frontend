@@ -24,9 +24,6 @@ import {
   getProjectStateTag,
   isConfidenceRestrictedProjectType
 } from '../helpers/project-utils.js'
-import { getBenefitAreaDownloadData } from '../helpers/overview/benefit-area.js'
-import { enrichProjectData } from '../helpers/overview/data-enrichment.js'
-import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
 class OverviewController {
   _getProjectViewData(request, options = {}) {
@@ -66,21 +63,6 @@ class OverviewController {
     }
   }
 
-  _handleOverviewResponse(request, h, options = {}) {
-    const overviewTemplate = PROJECT_VIEWS.OVERVIEW
-    const { viewData, success = true, error = '' } = options
-    if (success) {
-      return h.view(overviewTemplate, viewData)
-    }
-    return handleServiceConsumptionError(
-      request,
-      h,
-      error,
-      viewData,
-      overviewTemplate
-    )
-  }
-
   async get(request, h) {
     const backLink = getBackLink(request, {
       targetURL: ROUTES.PROJECT.HOME
@@ -91,17 +73,7 @@ class OverviewController {
       projectData
     })
 
-    const enrichmentResult = await enrichProjectData(request, projectData, [
-      getBenefitAreaDownloadData
-    ])
-
-    viewData.projectData = enrichmentResult.projectData
-
-    return this._handleOverviewResponse(request, h, {
-      viewData,
-      success: enrichmentResult.success,
-      error: enrichmentResult.error
-    })
+    return h.view(PROJECT_VIEWS.OVERVIEW, viewData)
   }
 }
 

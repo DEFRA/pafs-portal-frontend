@@ -85,6 +85,7 @@ export const ROUTES = {
   // Downloads routes
   DOWNLOADS: {
     INDIVIDUAL: '/project/{referenceNumber}/downloads',
+    MODERATION: '/project/{referenceNumber}/downloads/moderation',
     PROGRAMME: '/downloads/programme',
     ADMIN: '/admin/downloads'
   },

@@ -18,24 +18,11 @@ vi.mock('../../projects/helpers/project-utils.js', () => ({
   getProjectStateTag: vi.fn()
 }))
 
-vi.mock('../../projects/helpers/overview/benefit-area.js', () => ({
-  getBenefitAreaDownloadData: vi
-    .fn()
-    .mockImplementation((_req, projectData) =>
-      Promise.resolve({ success: true, projectData })
-    )
+vi.mock('../helpers/moderation-helper.js', () => ({
+  buildModerationResponse: vi.fn()
 }))
 
-vi.mock('../../../common/helpers/auth/session-manager.js', () => ({
-  getAuthSession: vi.fn().mockReturnValue({ accessToken: 'mock-token' })
-}))
-
-vi.mock('../../../common/services/project/project-service.js', () => ({
-  getProjectFundingCalculatorDownloadUrl: vi.fn().mockResolvedValue({
-    success: true,
-    data: { data: { downloadUrl: 'https://mock-s3.example.com/calc.xlsx' } }
-  })
-}))
+import { buildModerationResponse } from '../helpers/moderation-helper.js'
 
 describe('IndividualDownloadsController', () => {
   let mockRequest
@@ -45,11 +32,21 @@ describe('IndividualDownloadsController', () => {
     vi.clearAllMocks()
 
     mockRequest = {
-      t: vi.fn((key) => key)
+      t: vi.fn((key) => key),
+      server: {
+        logger: {
+          info: vi.fn(),
+          warn: vi.fn(),
+          error: vi.fn()
+        }
+      }
     }
 
     mockH = {
-      view: vi.fn()
+      view: vi.fn(),
+      response: vi.fn().mockReturnValue({
+        code: vi.fn().mockReturnThis()
+      })
     }
 
     getBackLink.mockReturnValue({
@@ -771,5 +768,134 @@ describe('IndividualDownloadsController', () => {
         })
       )
     })
+  })
+
+  describe('downloadModerationHandler', () => {
+    const urgentProjectData = {
+      [PROJECT_PAYLOAD_FIELDS.SLUG]: 'ANC501E-000A-001A',
+      [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: 'statutory_need',
+      [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.DRAFT,
+      [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: false,
+      [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: false,
+      name: 'Test Flood Project',
+      rmaName: 'South Yorkshire',
+      rfccName: 'Yorkshire RFCC',
+      eaAreaName: 'North East',
+      moderationFilename: 'ANC501E-000A-001A_moderation_BS.txt'
+    }
+
+    test('should reject non-urgent projects with 404', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: 'not_urgent'
+      })
+
+      await individualDownloadsController.downloadModerationHandler(
+        mockRequest,
+        mockH
+      )
+
+      expect(mockH.response).toHaveBeenCalledWith('Not found')
+      expect(mockH.response().code).toHaveBeenCalledWith(404)
+      expect(buildModerationResponse).not.toHaveBeenCalled()
+    })
+
+    test('should reject project with no urgency reason with 404', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: null
+      })
+
+      await individualDownloadsController.downloadModerationHandler(
+        mockRequest,
+        mockH
+      )
+
+      expect(mockH.response).toHaveBeenCalledWith('Not found')
+      expect(buildModerationResponse).not.toHaveBeenCalled()
+    })
+
+    test('should reject project with undefined urgency reason with 404', async () => {
+      getSessionData.mockReturnValue({})
+
+      await individualDownloadsController.downloadModerationHandler(
+        mockRequest,
+        mockH
+      )
+
+      expect(mockH.response).toHaveBeenCalledWith('Not found')
+      expect(buildModerationResponse).not.toHaveBeenCalled()
+    })
+
+    test('should log a warning when moderation download is rejected', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: 'not_urgent'
+      })
+
+      await individualDownloadsController.downloadModerationHandler(
+        mockRequest,
+        mockH
+      )
+
+      expect(mockRequest.server.logger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({ urgencyReason: 'not_urgent' }),
+        expect.stringContaining('non-urgent')
+      )
+    })
+
+    test('should call buildModerationResponse for a genuinely urgent project', async () => {
+      getSessionData.mockReturnValue(urgentProjectData)
+      buildModerationResponse.mockReturnValue('mock-response')
+
+      const result =
+        await individualDownloadsController.downloadModerationHandler(
+          mockRequest,
+          mockH
+        )
+
+      expect(buildModerationResponse).toHaveBeenCalledOnce()
+      expect(result).toBe('mock-response')
+    })
+
+    test('should pass (h, projectData, logger, statusCodes) to buildModerationResponse', async () => {
+      getSessionData.mockReturnValue(urgentProjectData)
+      buildModerationResponse.mockReturnValue('mock-response')
+
+      await individualDownloadsController.downloadModerationHandler(
+        mockRequest,
+        mockH
+      )
+
+      expect(buildModerationResponse).toHaveBeenCalledWith(
+        mockH,
+        urgentProjectData,
+        mockRequest.server.logger,
+        expect.objectContaining({
+          ok: expect.any(Number),
+          notFound: expect.any(Number)
+        })
+      )
+    })
+
+    test.each([
+      ['statutory_need'],
+      ['legal_need'],
+      ['health_and_safety'],
+      ['emergency_works'],
+      ['time_limited']
+    ])(
+      'should call buildModerationResponse for urgencyReason "%s"',
+      async (urgencyReason) => {
+        getSessionData.mockReturnValue({
+          [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: urgencyReason
+        })
+        buildModerationResponse.mockReturnValue('mock-response')
+
+        await individualDownloadsController.downloadModerationHandler(
+          mockRequest,
+          mockH
+        )
+
+        expect(buildModerationResponse).toHaveBeenCalledOnce()
+      }
+    )
   })
 })

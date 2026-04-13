@@ -7,11 +7,11 @@ import {
 } from '../../projects/helpers/project-utils.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_STATUS
+  PROJECT_STATUS,
+  URGENCY_REASONS
 } from '../../../common/constants/projects.js'
-import { getBenefitAreaDownloadData } from '../../projects/helpers/overview/benefit-area.js'
-import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
-import { getProjectFundingCalculatorDownloadUrl } from '../../../common/services/project/project-service.js'
+import { buildModerationResponse } from '../helpers/moderation-helper.js'
+import { statusCodes } from '../../../common/constants/status-codes.js'
 
 class IndividualDownloadsController {
   _getDownloadViewData(request, options = {}) {
@@ -56,6 +56,10 @@ class IndividualDownloadsController {
       showFundingCalculator,
       hasBenefitAreaFile: Boolean(
         projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME]
+      ),
+      moderationDownloadUrl: ROUTES.DOWNLOADS.MODERATION.replace(
+        '{referenceNumber}',
+        projectData[PROJECT_PAYLOAD_FIELDS.SLUG]
       ),
       columnWidth: 'two-thirds'
     }
@@ -132,50 +136,47 @@ class IndividualDownloadsController {
       }
     })
 
-    const { projectData: enrichedProjectData } =
-      await getBenefitAreaDownloadData(request, projectData)
-
-    // Fetch a fresh presigned URL for the funding calculator on every page load
-    // (no caching: legacy-only, generated on-demand, no DB write)
-    if (
-      this._shouldShowFundingCalculator(
-        Boolean(enrichedProjectData[PROJECT_PAYLOAD_FIELDS.IS_LEGACY]),
-        Boolean(enrichedProjectData[PROJECT_PAYLOAD_FIELDS.IS_REVISED]),
-        enrichedProjectData
-      )
-    ) {
-      try {
-        const authSession = getAuthSession(request)
-        const accessToken = authSession?.accessToken
-        const referenceNumber = enrichedProjectData[PROJECT_PAYLOAD_FIELDS.SLUG]
-        const response = await getProjectFundingCalculatorDownloadUrl(
-          referenceNumber,
-          accessToken
-        )
-        if (response.success && response.data?.data?.downloadUrl) {
-          enrichedProjectData[
-            PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_DOWNLOAD_URL
-          ] = response.data.data.downloadUrl
-        }
-      } catch (error) {
-        request.server.logger.error(
-          { err: error },
-          'Failed to fetch funding calculator download URL'
-        )
-      }
-    }
-
+    // Benefit area download URL and funding calculator download URL are resolved
+    // by the backend enrichment pipeline at session load time — no extra API
+    // calls needed here.
     const viewData = this._getDownloadViewData(request, {
       backLink,
-      projectData: enrichedProjectData
+      projectData
     })
 
     return h.view(DOWNLOADS_VIEWS.INDIVIDUAL, viewData)
+  }
+
+  /**
+   * GET /project/{referenceNumber}/downloads/moderation
+   * Streams the urgency moderation evidence as a plain-text download.
+   * Only served when the project has a non-trivial urgency reason.
+   * Delegates all content generation to moderation-helper (reusable by bulk download).
+   */
+  async downloadModeration(request, h) {
+    const { logger } = request.server
+    const projectData = getSessionData(request)
+    const urgencyReason = projectData[PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]
+
+    // Guard: only serve for genuinely urgent projects
+    if (!urgencyReason || urgencyReason === URGENCY_REASONS.NOT_URGENT) {
+      logger.warn(
+        { urgencyReason },
+        'Moderation download requested for non-urgent project; rejecting'
+      )
+      return h.response('Not found').code(statusCodes.notFound)
+    }
+
+    // Area names (rfccName, eaAreaName, psoName) and moderationFilename are
+    // resolved by the backend API at session load time — no extra service call needed.
+    return buildModerationResponse(h, projectData, logger, statusCodes)
   }
 }
 
 const controller = new IndividualDownloadsController()
 
 export const individualDownloadsController = {
-  getHandler: (request, h) => controller.get(request, h)
+  getHandler: (request, h) => controller.get(request, h),
+  downloadModerationHandler: (request, h) =>
+    controller.downloadModeration(request, h)
 }
