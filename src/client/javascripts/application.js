@@ -125,6 +125,8 @@ globalThis.pafs.numberFormatting = {
   bindCommaFormattingToInputs
 }
 
+setupHeaderNavigation()
+
 bindCommaFormattingToInputs(
   '[data-number-format="comma"], [data-wlc-cost-input="true"]',
   { unformatOnSubmit: true }

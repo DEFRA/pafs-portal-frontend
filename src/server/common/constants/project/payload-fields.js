@@ -135,6 +135,11 @@ export const PROJECT_PAYLOAD_FIELDS = {
   ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS: 'wlbEstimatedLandValueUpliftBenefits',
   IS_LEGACY: 'isLegacy',
   IS_REVISED: 'isRevised',
+  FUNDING_CALCULATOR_FILE_NAME: 'fundingCalculatorFileName',
+  FUNDING_CALCULATOR_FILE_SIZE: 'fundingCalculatorFileSize',
+  FUNDING_CALCULATOR_CONTENT_TYPE: 'fundingCalculatorContentType',
+  FUNDING_CALCULATOR_UPDATED_AT: 'fundingCalculatorUpdatedAt',
+  FUNDING_CALCULATOR_DOWNLOAD_URL: 'fundingCalculatorDownloadUrl',
   WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS: 'wlcEstimatedWholeLifePvCosts',
   WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS:
     'wlcEstimatedDesignConstructionCosts',

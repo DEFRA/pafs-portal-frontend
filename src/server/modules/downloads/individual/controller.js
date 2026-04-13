@@ -9,6 +9,9 @@ import {
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_STATUS
 } from '../../../common/constants/projects.js'
+import { getBenefitAreaDownloadData } from '../../projects/helpers/overview/benefit-area.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
+import { getProjectFundingCalculatorDownloadUrl } from '../../../common/services/project/project-service.js'
 
 class IndividualDownloadsController {
   _getDownloadViewData(request, options = {}) {
@@ -113,22 +116,58 @@ class IndividualDownloadsController {
       return false
     }
 
-    // Check if funding calculator file exists
-    return Boolean(projectData.fundingCalculatorS3Key)
+    // Check if funding calculator file exists (uses DB column, not a synthetic S3 key)
+    return Boolean(
+      projectData[PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_FILE_NAME]
+    )
   }
 
   async get(request, h) {
     const projectData = getSessionData(request)
     const backLink = getBackLink(request, {
       targetURL: ROUTES.PROJECT.OVERVIEW,
+      targetEditURL: ROUTES.PROJECT.OVERVIEW,
       params: {
         referenceNumber: projectData[PROJECT_PAYLOAD_FIELDS.SLUG]
       }
     })
 
+    const { projectData: enrichedProjectData } =
+      await getBenefitAreaDownloadData(request, projectData)
+
+    // Fetch a fresh presigned URL for the funding calculator on every page load
+    // (no caching: legacy-only, generated on-demand, no DB write)
+    if (
+      this._shouldShowFundingCalculator(
+        Boolean(enrichedProjectData[PROJECT_PAYLOAD_FIELDS.IS_LEGACY]),
+        Boolean(enrichedProjectData[PROJECT_PAYLOAD_FIELDS.IS_REVISED]),
+        enrichedProjectData
+      )
+    ) {
+      try {
+        const authSession = getAuthSession(request)
+        const accessToken = authSession?.accessToken
+        const referenceNumber = enrichedProjectData[PROJECT_PAYLOAD_FIELDS.SLUG]
+        const response = await getProjectFundingCalculatorDownloadUrl(
+          referenceNumber,
+          accessToken
+        )
+        if (response.success && response.data?.data?.downloadUrl) {
+          enrichedProjectData[
+            PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_DOWNLOAD_URL
+          ] = response.data.data.downloadUrl
+        }
+      } catch (error) {
+        request.server.logger.error(
+          { err: error },
+          'Failed to fetch funding calculator download URL'
+        )
+      }
+    }
+
     const viewData = this._getDownloadViewData(request, {
       backLink,
-      projectData
+      projectData: enrichedProjectData
     })
 
     return h.view(DOWNLOADS_VIEWS.INDIVIDUAL, viewData)

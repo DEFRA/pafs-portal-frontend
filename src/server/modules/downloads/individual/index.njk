@@ -1,16 +1,22 @@
-{% extends 'layouts/projects.njk' %}
+{% extends 'layouts/page.njk' %}
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
-{% block body %}
+{% block beforeContent %}
+  {% if backLinkURL %}
+    <a href="{{ backLinkURL }}" class="govuk-back-link">{{ backLinkText }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
 
   <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
 
   <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-6">
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key govuk-body-m">{{ t('projects.downloads.project_name') }}</dt>
-      <dd class="govuk-summary-list__value govuk-body-m">{{ projectData.projectName }}</dd>
+      <dd class="govuk-summary-list__value govuk-body-m">{{ projectData.name }}</dd>
     </div>
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key govuk-body-m">{{ t('projects.downloads.reference_number') }}</dt>
@@ -39,8 +45,10 @@
       <section class="gem-c-attachment govuk-!-margin-bottom-6">
         <div class="gem-c-attachment__thumbnail">
           <a href="#" class="govuk-link" tabindex="-1" aria-hidden="true" data-download-type="fcerm1-new">
-            <svg class="gem-c-attachment__thumbnail-image" version="1.1" viewBox="0 0 99 140" width="99" height="140" aria-hidden="true">
-              <path d="M12 12h75v27H12zM12 47h18.75v63H12zM39 47h18.75v63H39zM66 47h21v63H66zM12 118h75v10H12z" stroke-width="0"></path>
+            <svg class="gem-c-attachment__thumbnail-image gem-c-attachment__thumbnail-image--spreadsheet" version="1.1" viewBox="0 0 99 140" width="99" height="140" aria-hidden="true">
+              <path d="M12 12h75v27H12zm0 47h18.75v63H12zm55 2v59H51V61h16m2-2H49v63h20V59z" stroke-width="0"/>
+              <path d="M49 61.05V120H32.8V61.05H49m2-2H30.75v63H51V59zm34 2V120H69.05V61.05H85m2-2H67v63h20V59z" stroke-width="0"/>
+              <path d="M30 68.5h56.5M30 77.34h56.5M30 112.7h56.5M30 95.02h56.5M30 86.18h56.5M30 103.86h56.5" fill="none" stroke-miterlimit="10" stroke-width="2"/>
             </svg>
           </a>
         </div>
@@ -63,15 +71,13 @@
     {% if hasBenefitAreaFile %}
       <section class="gem-c-attachment govuk-!-margin-bottom-6">
         <div class="gem-c-attachment__thumbnail">
-          <a href="#" class="govuk-link" tabindex="-1" aria-hidden="true" data-download-type="benefit-area">
-            <svg class="gem-c-attachment__thumbnail-image" version="1.1" viewBox="0 0 99 140" width="99" height="140" aria-hidden="true">
-              <path d="M12 12h75v27H12zm0 35h18.75v63H12zm27 0h18.75v63H39zm27 0h21v63H66zM12 118h75v10H12z" stroke-width="0"></path>
-            </svg>
+          <a href="{{ projectData.benefitAreaFileDownloadUrl }}" class="govuk-link gem-c-attachment__thumbnail-image" tabindex="-1" aria-hidden="true" download>
+            <img src="/public/assets/images/pub-cover-shapefile.png" width="99" height="140" alt="" aria-hidden="true">
           </a>
         </div>
         <div class="gem-c-attachment__details">
           <h3 class="gem-c-attachment__title">
-            <a href="#" class="govuk-link gem-c-attachment__link" data-download-type="benefit-area">
+            <a href="{{ projectData.benefitAreaFileDownloadUrl }}" class="govuk-link gem-c-attachment__link" download>
               {{ t('projects.downloads.main_downloads.benefit_area') }}
             </a>
           </h3>
@@ -94,8 +100,8 @@
       <section class="gem-c-attachment govuk-!-margin-bottom-6">
         <div class="gem-c-attachment__thumbnail">
           <a href="#" class="govuk-link" tabindex="-1" aria-hidden="true" data-download-type="moderation">
-            <svg class="gem-c-attachment__thumbnail-image" version="1.1" viewBox="0 0 99 140" width="99" height="140" aria-hidden="true">
-              <path d="M12 12h75v27H12zm0 35h75v85H12z" stroke-width="0"></path>
+            <svg class="gem-c-attachment__thumbnail-image gem-c-attachment__thumbnail-image--document" version="1.1" viewBox="0 0 99 140" width="99" height="140" aria-hidden="true">
+              <path d="M12 12h75v27H12zM12 59h9v9h-9zM12 77h9v9h-9zM12 95h9v9h-9zM12 113h9v9h-9zM30 59h57v9H30zM30 77h39v9H30zM30 95h57v9H30zM30 113h48v9H30z" stroke-width="0"/>
             </svg>
           </a>
         </div>
@@ -134,8 +140,10 @@
       <section class="gem-c-attachment govuk-!-margin-bottom-6">
         <div class="gem-c-attachment__thumbnail">
           <a href="#" class="govuk-link" tabindex="-1" aria-hidden="true" data-download-type="fcerm1-legacy">
-            <svg class="gem-c-attachment__thumbnail-image" version="1.1" viewBox="0 0 99 140" width="99" height="140" aria-hidden="true">
-              <path d="M12 12h75v27H12zM12 47h18.75v63H12zM39 47h18.75v63H39zM66 47h21v63H66zM12 118h75v10H12z" stroke-width="0"></path>
+            <svg class="gem-c-attachment__thumbnail-image gem-c-attachment__thumbnail-image--spreadsheet" version="1.1" viewBox="0 0 99 140" width="99" height="140" aria-hidden="true">
+              <path d="M12 12h75v27H12zm0 47h18.75v63H12zm55 2v59H51V61h16m2-2H49v63h20V59z" stroke-width="0"/>
+              <path d="M49 61.05V120H32.8V61.05H49m2-2H30.75v63H51V59zm34 2V120H69.05V61.05H85m2-2H67v63h20V59z" stroke-width="0"/>
+              <path d="M30 68.5h56.5M30 77.34h56.5M30 112.7h56.5M30 95.02h56.5M30 86.18h56.5M30 103.86h56.5" fill="none" stroke-miterlimit="10" stroke-width="2"/>
             </svg>
           </a>
         </div>
@@ -158,15 +166,17 @@
     {% if showFundingCalculator %}
       <section class="gem-c-attachment govuk-!-margin-bottom-6">
         <div class="gem-c-attachment__thumbnail">
-          <a href="#" class="govuk-link" tabindex="-1" aria-hidden="true" data-download-type="funding-calculator">
-            <svg class="gem-c-attachment__thumbnail-image" version="1.1" viewBox="0 0 99 140" width="99" height="140" aria-hidden="true">
-              <path d="M12 12h75v27H12zM12 47h18.75v63H12zM39 47h18.75v63H39zM66 47h21v63H66zM12 118h75v10H12z" stroke-width="0"></path>
+          <a href="{{ projectData.fundingCalculatorDownloadUrl }}" class="govuk-link" tabindex="-1" aria-hidden="true" download>
+            <svg class="gem-c-attachment__thumbnail-image gem-c-attachment__thumbnail-image--spreadsheet" version="1.1" viewBox="0 0 99 140" width="99" height="140" aria-hidden="true">
+              <path d="M12 12h75v27H12zm0 47h18.75v63H12zm55 2v59H51V61h16m2-2H49v63h20V59z" stroke-width="0"/>
+              <path d="M49 61.05V120H32.8V61.05H49m2-2H30.75v63H51V59zm34 2V120H69.05V61.05H85m2-2H67v63h20V59z" stroke-width="0"/>
+              <path d="M30 68.5h56.5M30 77.34h56.5M30 112.7h56.5M30 95.02h56.5M30 86.18h56.5M30 103.86h56.5" fill="none" stroke-miterlimit="10" stroke-width="2"/>
             </svg>
           </a>
         </div>
         <div class="gem-c-attachment__details">
           <h3 class="gem-c-attachment__title">
-            <a href="#" class="govuk-link gem-c-attachment__link" data-download-type="funding-calculator">
+            <a href="{{ projectData.fundingCalculatorDownloadUrl }}" class="govuk-link gem-c-attachment__link" download>
               {{ t('projects.downloads.legacy_downloads.funding_calculator') }}
             </a>
           </h3>

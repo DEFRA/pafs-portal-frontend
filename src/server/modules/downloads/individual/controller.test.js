@@ -18,6 +18,25 @@ vi.mock('../../projects/helpers/project-utils.js', () => ({
   getProjectStateTag: vi.fn()
 }))
 
+vi.mock('../../projects/helpers/overview/benefit-area.js', () => ({
+  getBenefitAreaDownloadData: vi
+    .fn()
+    .mockImplementation((_req, projectData) =>
+      Promise.resolve({ success: true, projectData })
+    )
+}))
+
+vi.mock('../../../common/helpers/auth/session-manager.js', () => ({
+  getAuthSession: vi.fn().mockReturnValue({ accessToken: 'mock-token' })
+}))
+
+vi.mock('../../../common/services/project/project-service.js', () => ({
+  getProjectFundingCalculatorDownloadUrl: vi.fn().mockResolvedValue({
+    success: true,
+    data: { data: { downloadUrl: 'https://mock-s3.example.com/calc.xlsx' } }
+  })
+}))
+
 describe('IndividualDownloadsController', () => {
   let mockRequest
   let mockH
@@ -117,6 +136,7 @@ describe('IndividualDownloadsController', () => {
 
       expect(getBackLink).toHaveBeenCalledWith(mockRequest, {
         targetURL: ROUTES.PROJECT.OVERVIEW,
+        targetEditURL: ROUTES.PROJECT.OVERVIEW,
         params: {
           referenceNumber: 'ABC123'
         }
@@ -431,7 +451,7 @@ describe('IndividualDownloadsController', () => {
         [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.DRAFT,
         [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: false,
         [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: false,
-        fundingCalculatorS3Key: 'some-key'
+        [PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_FILE_NAME]: 'calc.xlsx'
       })
 
       await individualDownloadsController.getHandler(mockRequest, mockH)
@@ -451,7 +471,7 @@ describe('IndividualDownloadsController', () => {
         [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.DRAFT,
         [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
         [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: false,
-        fundingCalculatorS3Key: 's3://bucket/file.xlsx'
+        [PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_FILE_NAME]: 'calc.xlsx'
       })
 
       await individualDownloadsController.getHandler(mockRequest, mockH)
@@ -469,7 +489,7 @@ describe('IndividualDownloadsController', () => {
         [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.DRAFT,
         [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
         [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: false,
-        fundingCalculatorS3Key: null
+        [PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_FILE_NAME]: null
       })
 
       await individualDownloadsController.getHandler(mockRequest, mockH)
@@ -487,7 +507,7 @@ describe('IndividualDownloadsController', () => {
         [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.SUBMITTED,
         [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
         [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: false,
-        fundingCalculatorS3Key: 's3://bucket/file.xlsx'
+        [PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_FILE_NAME]: 'calc.xlsx'
       })
 
       await individualDownloadsController.getHandler(mockRequest, mockH)
@@ -505,7 +525,7 @@ describe('IndividualDownloadsController', () => {
         [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.ARCHIVED,
         [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
         [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: false,
-        fundingCalculatorS3Key: 's3://bucket/file.xlsx'
+        [PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_FILE_NAME]: 'calc.xlsx'
       })
 
       await individualDownloadsController.getHandler(mockRequest, mockH)
@@ -525,7 +545,7 @@ describe('IndividualDownloadsController', () => {
         [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.DRAFT,
         [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
         [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: true,
-        fundingCalculatorS3Key: 's3://bucket/file.xlsx'
+        [PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_FILE_NAME]: 'calc.xlsx'
       })
 
       await individualDownloadsController.getHandler(mockRequest, mockH)
@@ -543,7 +563,7 @@ describe('IndividualDownloadsController', () => {
         [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.SUBMITTED,
         [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
         [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: true,
-        fundingCalculatorS3Key: 's3://bucket/file.xlsx'
+        [PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_FILE_NAME]: 'calc.xlsx'
       })
 
       await individualDownloadsController.getHandler(mockRequest, mockH)
@@ -561,7 +581,7 @@ describe('IndividualDownloadsController', () => {
         [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.ARCHIVED,
         [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
         [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: true,
-        fundingCalculatorS3Key: 's3://bucket/file.xlsx'
+        [PROJECT_PAYLOAD_FIELDS.FUNDING_CALCULATOR_FILE_NAME]: 'calc.xlsx'
       })
 
       await individualDownloadsController.getHandler(mockRequest, mockH)

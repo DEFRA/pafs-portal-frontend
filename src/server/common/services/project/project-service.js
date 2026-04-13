@@ -175,6 +175,21 @@ export async function deleteProject(referenceNumber, accessToken) {
   })
 }
 
+export async function getProjectFundingCalculatorDownloadUrl(
+  referenceNumber,
+  accessToken
+) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(
+    `/api/v1/project/${referenceNumber}/funding-calculator/download`,
+    {
+      method: 'GET',
+      headers
+    }
+  )
+}
+
 /**
  * Update a project's status
  * @param {string} referenceNumber - The project reference number
