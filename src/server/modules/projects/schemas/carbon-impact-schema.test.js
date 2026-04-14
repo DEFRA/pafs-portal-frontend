@@ -3,7 +3,8 @@ import {
   carbonImpactSchema,
   getCarbonImpactSchemaForProjectType,
   CARBON_HIDDEN_PROJECT_TYPES,
-  ALL_CARBON_FIELDS
+  ALL_CARBON_FIELDS,
+  CARBON_STEP_SCHEMAS
 } from './carbon-impact-schema.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
@@ -249,6 +250,212 @@ describe('carbon-impact-schema', () => {
       expect(error.details[0].message).toBe(
         'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
       )
+    })
+  })
+
+  describe('CARBON_STEP_SCHEMAS', () => {
+    describe('CARBON_COST_BUILD per-step schema', () => {
+      test('accepts a valid positive decimal value', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '123.45' })
+        expect(error).toBeUndefined()
+      })
+
+      test('accepts an empty string (optional field)', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '' })
+        expect(error).toBeUndefined()
+      })
+
+      test('accepts null (optional field)', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: null })
+        expect(error).toBeUndefined()
+      })
+
+      test('rejects negative values with specific negative error', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '-10.00' })
+        expect(error).toBeDefined()
+        expect(error.details[0].message).toBe(
+          'The value entered can not be negative'
+        )
+      })
+
+      test('rejects non-numeric values with invalid error', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: 'abc' })
+        expect(error).toBeDefined()
+        expect(error.details[0].message).toBe(
+          'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
+        )
+      })
+
+      test('allows unknown fields (e.g. crumb token)', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '10',
+          crumb: 'some-crumb-token'
+        })
+        expect(error).toBeUndefined()
+      })
+    })
+
+    describe('CARBON_COST_OPERATION per-step schema', () => {
+      test('accepts a valid positive decimal value', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION]: '50.00'
+        })
+        expect(error).toBeUndefined()
+      })
+
+      test('rejects negative values', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION]: '-5' })
+        expect(error).toBeDefined()
+        expect(error.details[0].message).toBe(
+          'The value entered can not be negative'
+        )
+      })
+
+      test('accepts empty string', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION]: '' })
+        expect(error).toBeUndefined()
+      })
+    })
+
+    describe('CARBON_COST_SEQUESTERED per-step schema', () => {
+      test('accepts a valid positive decimal value', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED]: '10.5'
+        })
+        expect(error).toBeUndefined()
+      })
+
+      test('rejects negative values', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED]: '-0.01'
+        })
+        expect(error).toBeDefined()
+        expect(error.details[0].message).toBe(
+          'The value entered can not be negative'
+        )
+      })
+    })
+
+    describe('CARBON_COST_AVOIDED per-step schema', () => {
+      test('accepts a valid positive decimal value', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: '5' })
+        expect(error).toBeUndefined()
+      })
+
+      test('rejects negative values', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: '-100' })
+        expect(error).toBeDefined()
+        expect(error.details[0].message).toBe(
+          'The value entered can not be negative'
+        )
+      })
+
+      test('accepts empty string', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: '' })
+        expect(error).toBeUndefined()
+      })
+    })
+
+    describe('CARBON_SAVINGS_NET_ECONOMIC_BENEFIT per-step schema', () => {
+      test('accepts a valid integer value', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: '200000'
+        })
+        expect(error).toBeUndefined()
+      })
+
+      test('accepts empty string (optional field)', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: ''
+        })
+        expect(error).toBeUndefined()
+      })
+
+      test('rejects decimal values', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: '100.5'
+        })
+        expect(error).toBeDefined()
+        expect(error.details[0].message).toBe(
+          'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
+        )
+      })
+    })
+
+    describe('CARBON_OPERATIONAL_COST_FORECAST per-step schema', () => {
+      test('accepts a valid integer value', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: '150000'
+        })
+        expect(error).toBeUndefined()
+      })
+
+      test('rejects empty string (required field)', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: ''
+        })
+        expect(error).toBeDefined()
+        expect(error.details[0].message).toBe('Please enter the value')
+      })
+
+      test('rejects decimal values', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: '123.45'
+        })
+        expect(error).toBeDefined()
+        expect(error.details[0].message).toBe(
+          'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
+        )
+      })
+
+      test('rejects non-numeric values', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: 'abc'
+        })
+        expect(error).toBeDefined()
+      })
     })
   })
 })
