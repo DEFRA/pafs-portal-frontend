@@ -24,7 +24,6 @@ import {
   getStep,
   hasCarbonPrerequisites,
   INPUT_PAGE_SEQUENCE,
-  formatCurrency,
   STEP_PAYLOAD_LEVEL_MAP,
   STEP_SCHEMA_MAP,
   STEP_TO_CONFIG,
