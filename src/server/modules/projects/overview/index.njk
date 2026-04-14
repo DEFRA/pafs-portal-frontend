@@ -16,6 +16,7 @@
 {% from "views/nfm-card.njk" import nfmSummaryCard %}
 {% from "views/wlc-card.njk" import wlcSummaryCard %}
 {% from "views/wlb-card.njk" import wlbSummaryCard %}
+{% from "views/carbon-impact-card.njk" import carbonImpactSummaryCard %}
 
 {% block body %}
 
@@ -122,6 +123,8 @@
   {{ wlcSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_TYPES, t, isReadOnly, formatNumberWithCommas) }}
 
   {{ wlbSummaryCard(projectData, PROJECT_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) }}
+
+  {{ carbonImpactSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_TYPES, t, isReadOnly, formatNumberWithCommas) }}
 
   {% if not isReadOnly %}
     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">

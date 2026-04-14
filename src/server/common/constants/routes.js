@@ -179,7 +179,20 @@ export const ROUTES = {
         PROJECT_READINESS: `/project/{referenceNumber}/${PROJECT_STEPS.NFM_PROJECT_READINESS}`
       },
       WHOLE_LIFE_COST: `/project/{referenceNumber}/${PROJECT_STEPS.WHOLE_LIFE_COST}`,
-      WHOLE_LIFE_BENEFITS: `/project/{referenceNumber}/${PROJECT_STEPS.WHOLE_LIFE_BENEFITS}`
+      WHOLE_LIFE_BENEFITS: `/project/{referenceNumber}/${PROJECT_STEPS.WHOLE_LIFE_BENEFITS}`,
+      CARBON_IMPACT: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_IMPACT}`,
+      CARBON_REQUIRED_INFORMATION: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_REQUIRED_INFORMATION}`,
+      CARBON_PREPARE: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_PREPARE}`,
+      CARBON_COST_BUILD: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_COST_BUILD}`,
+      CARBON_COST_OPERATION: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_COST_OPERATION}`,
+      WHOLE_LIFE_CARBON: `/project/{referenceNumber}/${PROJECT_STEPS.WHOLE_LIFE_CARBON}`,
+      CARBON_COST_SEQUESTERED: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_COST_SEQUESTERED}`,
+      CARBON_COST_AVOIDED: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_COST_AVOIDED}`,
+      NET_CARBON: `/project/{referenceNumber}/${PROJECT_STEPS.NET_CARBON}`,
+      CARBON_SAVINGS_NET_ECONOMIC_BENEFIT: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT}`,
+      CARBON_OPERATIONAL_COST_FORECAST: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_OPERATIONAL_COST_FORECAST}`,
+      CARBON_SUMMARY: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_SUMMARY}`,
+      CARBON_IMPACT_ASSESSMENT: `/project/{referenceNumber}/${PROJECT_STEPS.CARBON_IMPACT_ASSESSMENT}`
     }
   },
 

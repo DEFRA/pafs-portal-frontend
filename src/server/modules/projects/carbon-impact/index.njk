@@ -1,0 +1,121 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% block pageTitle %}{{ t('projects.carbon_impact.title') }}{% endblock %}
+
+{% block body %}
+
+  {# Build error list for summary #}
+  {% set errorList = [] %}
+  {% for field in carbonFields %}
+    {% if fieldErrors[field] %}
+      {% set errorList = errorList.concat([{
+        text: fieldErrors[field],
+        href: '#' + field
+      }]) %}
+    {% endif %}
+  {% endfor %}
+
+  {% if errorList.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.error_summary_title'),
+      errorList: errorList
+    }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    <h1 class="govuk-heading-xl">{{ t('projects.carbon_impact.heading') }}</h1>
+
+    <p class="govuk-hint">{{ t('projects.carbon_impact.hint') }}</p>
+
+    {# tCO₂ fields section #}
+    <h2 class="govuk-heading-m">{{ t('projects.carbon_impact.tco2_section_heading') }}</h2>
+
+    {{ govukInput({
+      label: { text: t('projects.carbon_impact.fields.carbon_cost_build'), classes: "govuk-label--s" },
+      hint: { text: t('projects.carbon_impact.fields.carbon_cost_build_hint') },
+      id: PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD,
+      name: PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD,
+      value: formData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD] if formData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD] is not none else '',
+      inputmode: "decimal",
+      classes: "govuk-input--width-10",
+      suffix: { text: "tCO₂" },
+      errorMessage: { text: fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD] } if fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD] else undefined
+    }) }}
+
+    {{ govukInput({
+      label: { text: t('projects.carbon_impact.fields.carbon_cost_operation'), classes: "govuk-label--s" },
+      hint: { text: t('projects.carbon_impact.fields.carbon_cost_operation_hint') },
+      id: PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION,
+      name: PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION,
+      value: formData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION] if formData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION] is not none else '',
+      inputmode: "decimal",
+      classes: "govuk-input--width-10",
+      suffix: { text: "tCO₂" },
+      errorMessage: { text: fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION] } if fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION] else undefined
+    }) }}
+
+    {{ govukInput({
+      label: { text: t('projects.carbon_impact.fields.carbon_cost_sequestered'), classes: "govuk-label--s" },
+      hint: { text: t('projects.carbon_impact.fields.carbon_cost_sequestered_hint') },
+      id: PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED,
+      name: PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED,
+      value: formData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED] if formData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED] is not none else '',
+      inputmode: "decimal",
+      classes: "govuk-input--width-10",
+      suffix: { text: "tCO₂" },
+      errorMessage: { text: fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED] } if fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED] else undefined
+    }) }}
+
+    {{ govukInput({
+      label: { text: t('projects.carbon_impact.fields.carbon_cost_avoided'), classes: "govuk-label--s" },
+      hint: { text: t('projects.carbon_impact.fields.carbon_cost_avoided_hint') },
+      id: PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED,
+      name: PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED,
+      value: formData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED] if formData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED] is not none else '',
+      inputmode: "decimal",
+      classes: "govuk-input--width-10",
+      suffix: { text: "tCO₂" },
+      errorMessage: { text: fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED] } if fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED] else undefined
+    }) }}
+
+    {# £ fields section #}
+    <h2 class="govuk-heading-m">{{ t('projects.carbon_impact.financial_section_heading') }}</h2>
+
+    {{ govukInput({
+      label: { text: t('projects.carbon_impact.fields.carbon_savings_net_economic_benefit'), classes: "govuk-label--s" },
+      hint: { text: t('projects.carbon_impact.fields.carbon_savings_net_economic_benefit_hint') },
+      id: PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT,
+      name: PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT,
+      value: formData[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT] if formData[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT] is not none else '',
+      inputmode: "numeric",
+      classes: "govuk-input--width-10",
+      prefix: { text: "£" },
+      errorMessage: { text: fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT] } if fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT] else undefined
+    }) }}
+
+    {{ govukInput({
+      label: { text: t('projects.carbon_impact.fields.carbon_operational_cost_forecast'), classes: "govuk-label--s" },
+      hint: { text: t('projects.carbon_impact.fields.carbon_operational_cost_forecast_hint') },
+      id: PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST,
+      name: PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST,
+      value: formData[PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST] if formData[PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST] is not none else '',
+      inputmode: "numeric",
+      classes: "govuk-input--width-10",
+      prefix: { text: "£" },
+      errorMessage: { text: fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST] } if fieldErrors[PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST] else undefined
+    }) }}
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue')
+      }) }}
+    </div>
+  </form>
+
+{% endblock %}

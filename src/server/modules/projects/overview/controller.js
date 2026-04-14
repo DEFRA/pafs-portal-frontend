@@ -25,6 +25,7 @@ import {
   isConfidenceRestrictedProjectType
 } from '../helpers/project-utils.js'
 import { getBenefitAreaDownloadData } from '../helpers/overview/benefit-area.js'
+import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
 import { enrichProjectData } from '../helpers/overview/data-enrichment.js'
 import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
@@ -92,7 +93,8 @@ class OverviewController {
     })
 
     const enrichmentResult = await enrichProjectData(request, projectData, [
-      getBenefitAreaDownloadData
+      getBenefitAreaDownloadData,
+      getCarbonImpactOverviewData
     ])
 
     viewData.projectData = enrichmentResult.projectData

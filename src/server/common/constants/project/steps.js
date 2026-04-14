@@ -95,7 +95,20 @@ export const PROJECT_STEPS = {
   NFM_EXPERIENCE: 'nfm-experience',
   NFM_PROJECT_READINESS: 'nfm-project-readiness',
   WHOLE_LIFE_COST: 'whole-life-cost',
-  WHOLE_LIFE_BENEFITS: 'whole-life-benefits'
+  WHOLE_LIFE_BENEFITS: 'whole-life-benefits',
+  CARBON_IMPACT: 'carbon-impact',
+  CARBON_REQUIRED_INFORMATION: 'carbon-required-information',
+  CARBON_PREPARE: 'carbon-prepare',
+  CARBON_COST_BUILD: 'carbon-cost-build',
+  CARBON_COST_OPERATION: 'carbon-cost-operation',
+  WHOLE_LIFE_CARBON: 'whole-life-carbon',
+  CARBON_COST_SEQUESTERED: 'carbon-cost-sequestered',
+  CARBON_COST_AVOIDED: 'carbon-cost-avoided',
+  NET_CARBON: 'net-carbon',
+  CARBON_SAVINGS_NET_ECONOMIC_BENEFIT: 'carbon-savings-net-economic-benefit',
+  CARBON_OPERATIONAL_COST_FORECAST: 'carbon-operational-cost-forecast',
+  CARBON_SUMMARY: 'carbon-summary',
+  CARBON_IMPACT_ASSESSMENT: 'carbon-impact-assessment'
 }
 
 export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'

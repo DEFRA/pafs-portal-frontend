@@ -139,5 +139,12 @@ export const PROJECT_PAYLOAD_FIELDS = {
   WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS:
     'wlcEstimatedDesignConstructionCosts',
   WLC_ESTIMATED_RISK_CONTINGENCY_COSTS: 'wlcEstimatedRiskContingencyCosts',
-  WLC_ESTIMATED_FUTURE_COSTS: 'wlcEstimatedFutureCosts'
+  WLC_ESTIMATED_FUTURE_COSTS: 'wlcEstimatedFutureCosts',
+  CARBON_COST_BUILD: 'carbonCostBuild',
+  CARBON_COST_OPERATION: 'carbonCostOperation',
+  CARBON_COST_SEQUESTERED: 'carbonCostSequestered',
+  CARBON_COST_AVOIDED: 'carbonCostAvoided',
+  CARBON_SAVINGS_NET_ECONOMIC_BENEFIT: 'carbonSavingsNetEconomicBenefit',
+  CARBON_OPERATIONAL_COST_FORECAST: 'carbonOperationalCostForecast',
+  CARBON_VALUES_HEXDIGEST: 'carbonValuesHexdigest'
 }

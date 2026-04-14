@@ -176,6 +176,28 @@
       "estimated_environmental_benefits": "Estimated environmental benefits",
       "estimated_recreation_tourism_benefits": "Estimated recreation and tourism benefits",
       "estimated_land_value_uplift_benefits": "Estimated land value uplift and regeneration benefits"
+    },
+    "carbon_impact_summary_card": {
+      "title": "Carbon impact",
+      "not_added": "No carbon impact information added yet",
+      "values_changed": "Calculated values have changed since the section was last completed.",
+      "capital_heading": "Capital",
+      "capital_estimated": "Capital carbon estimated by you (tCO2)",
+      "capital_baseline": "Calculated capital carbon baseline (tCO2)",
+      "capital_target": "Calculated capital carbon target (tCO2)",
+      "capital_cost": "Capital cost calculated for the project",
+      "operational_heading": "Operations and maintenance",
+      "operational_estimated": "Operations and maintenance carbon estimated by you (tCO2)",
+      "operational_baseline": "Calculated operations and maintenance carbon baseline (tCO2)",
+      "operational_target": "Calculated operations and maintenance carbon target (tCO2)",
+      "operational_cost": "Operations and maintenance cost estimated by you",
+      "sequestered_carbon": "Sequestered carbon estimated by you (tCO2)",
+      "avoided_carbon": "Carbon avoided estimated by you (tCO2)",
+      "net_carbon": "Net carbon estimated by you (tCO2)",
+      "net_carbon_with_blanks": "Net carbon with blank values calculated (tCO2)",
+      "net_carbon_economic_benefit": "Net carbon economic benefit estimated by you",
+      "not_provided": "Not provided",
+      "units": "tonnes"
     }
   },
   "start_proposal": {
@@ -1386,5 +1408,148 @@
       "invalid": "Enter a whole number with no decimal point or currency symbols",
       "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
     }
+  },
+  "carbon_required_information": {
+    "title": "Information we require before you can complete the carbon impact section",
+    "heading": "Information we require before you can complete the carbon impact section",
+    "content": {
+      "intro": "To complete the Carbon impact section, we need other sections to be completed first so that we can calculate carbon baseline and carbon target figures:",
+      "important_dates": "Important dates: We use this to estimate the years of construction.",
+      "funding_sources": "Funding sources and spending: We use this to estimate the capital cost of the proposed project, based on spending profiled between ‘Start of construction’ and ‘Ready for service’.",
+      "continue_message": "Select Save and continue to return to the proposal overview and complete the relevant sections."
+    }
+  },
+  "carbon_prepare": {
+    "title": "What to record about your carbon impact",
+    "heading": "What to record about your carbon impact",
+    "content": {
+      "intro": "Carbon impact data, alongside whole‑life costs and benefits, helps to scope and prioritise projects in the pipeline. For subsequent business cases, Carbon impact data is a mandatory requirement.",
+      "guidance_link_text": "Guidance on how to calculate Carbon impact and the use of a supporting tool",
+      "guidance_url": "https://www.gov.uk/government/publications/valuing-the-carbon-net-impacts-of-fcerm-projects",
+      "comprises_label": "Carbon impact data comprises:",
+      "item_1": "Emissions from both the capital and operational stages of the whole-life investment.",
+      "item_2": "Emissions avoided as a result of reduced flood risk and impacts to properties over the whole-life investment as well as from any solutions that sequester carbon.",
+      "item_3": "A net calculation of emissions 1) minus 2) in tonnes CO2e over the whole-life investment period and monetised as an economic benefit for use in the Partnership funding calculator.",
+      "item_4": "An estimated cost for all operation and maintenance activities over the whole-life investment period, to help calculate a carbon baseline and target for these activities."
+    }
+  },
+  "carbon_cost_build": {
+    "title": "How much capital carbon will this project produce?",
+    "heading": "How much capital carbon will this project produce?",
+    "label": "Capital emissions",
+    "intro_1": "Capital emissions are the project carbon impact from the works that build or refurbish assets. They are calculated from quantities of resource used in building or refurbishing assets.",
+    "intro_2": "To provide capital emissions for the Carbon impact data requires a supporting Carbon assessment and is a mandatory requirement for subsequent business cases. The quantities of resource used in building or refurbishing assets will be calculated into tonnes of CO2e in a Carbon assessment. Enter the total recorded ‘capital emissions’ Carbon impact here.",
+    "intro_3": "The EA is able to provide a supporting Carbon assessment tool (ERIC). Alternative carbon assessment tools should have up to date industry emission rates for resources used such as material, plant and transport.",
+    "suffix": "metric tonnes",
+    "after_1": "If you do not have an estimate from a carbon assessment this total must be left blank.",
+    "after_2": "If there is no construction element to this proposed project then you must enter 0. Any calculations and reporting will use 0."
+  },
+  "carbon_cost_operation": {
+    "title": "How much operational carbon will this project produce?",
+    "heading": "How much operational carbon will this project produce?",
+    "label": "Operational emissions",
+    "intro_1": "Operational emissions are from the operation and maintenance of assets over their lifetime that have been built or refurbished by the project. They are calculated alongside capital emissions for the project works from quantities of resources used to operate and maintain assets.",
+    "intro_2": "The quantities of resource used in operation and maintenance of assets will be calculated into tonnes of CO2e in a Carbon assessment. Enter the total recorded ‘operational emissions’ Carbon impact here.",
+    "intro_3": "Any Carbon assessment tool used should be able to calculate emissions for industry standard ‘Life cycle assessment’ (LCA) stages in which all non-capital stages comprise the ‘operational emissions’ Carbon impact.",
+    "suffix": "metric tonnes",
+    "after_1": "If you do not have an estimate from a carbon assessment this total must be left blank.",
+    "after_2": "If there is no operation and maintenance element to this proposed project then you must enter 0. Any calculations and reporting will use 0.",
+    "after_3": "Operational emissions are recorded in metric tonnes and should align with the same carbon assessment assumptions used for the rest of the project."
+  },
+  "carbon_cost_sequestered": {
+    "title": "How much carbon will be sequestered by this project?",
+    "heading": "How much carbon will be sequestered by this project?",
+    "label": "Sequestered emissions",
+    "intro_1": "Sequestered emissions are from any part of the delivered solution that removes and stores carbon from being emitted over the lifetime of the assets that have been built or refurbished by the project.",
+    "intro_2": "They are calculated alongside capital and operational emissions for the project works from quantities of natural assets or technologies that have measurable carbon sequestration rates and have been delivered additionally to what was already in place.",
+    "intro_3": "The quantities of natural assets or technologies and their sequestration rates will be calculated into tonnes of CO2e in a Carbon Assessment. Enter the total recorded ‘sequestered emissions’ Carbon impact here. Any Carbon assessment tool used should be able to calculate sequestered emissions for accredited forms of natural asset or technology-based removals of emissions.",
+    "suffix": "metric tonnes",
+    "after_1": "If you do not have an estimate from a carbon assessment this total must be left blank. Any calculations will use 0 metric tonnes."
+  },
+  "carbon_cost_avoided": {
+    "title": "How much carbon will be avoided by this project?",
+    "heading": "How much carbon will be avoided by this project?",
+    "label": "Avoided emissions",
+    "intro_1": "Avoided emissions are as a result of the level of reduced flood risk and impacts to properties over the whole-life investment.",
+    "intro_2_prefix": "They are calculated using the",
+    "intro_2_link_text": "FCRM Appraisal guide to Carbon impact valuation and supporting tool (opens in a new window)",
+    "intro_3": "For Carbon impact data this total will be profiled over the duration of the asset lifetime. Enter the total recorded ‘avoided emissions’ Carbon impact here.",
+    "suffix": "metric tonnes",
+    "after_1": "If you do not have an estimate from a Carbon impact tool this total must be left blank. Any calculations will use 0 metric tonnes."
+  },
+  "carbon_savings_net_economic_benefit": {
+    "title": "How much net economic benefit is generated from any net carbon savings?",
+    "heading": "How much net economic benefit is generated from any net carbon savings?",
+    "label": "Net economic benefit",
+    "intro_1": "The economic benefit of the Carbon impact should be provided from a monetisation of the net emissions in tonnes CO2.",
+    "intro_2_prefix": "This must be calculated using the",
+    "intro_2_link_text": "FCRM Appraisal guide to Carbon impact valuation and supporting tool (opens in a new window)",
+    "intro_2_suffix": "This includes the use of carbon prices and discounting over the investment period.",
+    "intro_3": "The resulting economic benefit value should be used to consider the carbon impact of project options in appraisal.",
+    "after_1": "If you do not have an estimate from a Carbon impact tool this total must be left blank."
+  },
+  "carbon_operational_cost_forecast": {
+    "title": "How much Operation and Maintenance cost is forecast for the project?",
+    "heading": "How much Operation and Maintenance cost is forecast for the project?",
+    "label": "Operation and Maintenance cost forecast",
+    "intro_1": "The Operation and Maintenance cost is the forecast cost for all operation, maintenance, refurbishment and decommissioning (where required) over the whole-life investment period as used in the appraisal and carbon impact calculations.",
+    "intro_2": "It should be provided in 'todays prices', in other words, at the current price base. It must not be discounted to a present value or inflated for future cost increases. This allows the baseline calculation to be established from current carbon intensity factors.",
+    "after_1": "If there is no operations or maintenance element to this proposed project then you must enter 0. Any calculations and reporting will use 0."
+  },
+  "carbon_whole_life_carbon": {
+    "title": "Whole life carbon",
+    "heading": "This is the whole life carbon calculated for the project",
+    "description": "A whole life calculation of carbon impact is provided for the project from emissions added as 'capital' and 'operational' carbon in tonnes CO2e over the whole-life investment period.",
+    "build_label": "Capital carbon (build)",
+    "operation_label": "Operational carbon",
+    "total_label": "Whole life carbon",
+    "suffix": "metric tonnes"
+  },
+  "carbon_net_carbon": {
+    "title": "Net carbon",
+    "heading": "This is the net carbon calculated for the project",
+    "description": "A net calculation of Carbon impact is provided for the project from emissions added as ‘capital’ and ‘operational’ carbon, minus ‘sequestered’ and ‘avoided’ carbon in tonnes CO2e over the whole-life investment period.",
+    "whole_life_label": "Whole life carbon",
+    "sequestered_label": "Carbon sequestered",
+    "avoided_label": "Carbon avoided",
+    "net_label": "Net carbon",
+    "suffix": "metric tonnes"
+  },
+  "carbon_impact_summary": {
+    "title": "Carbon impact summary",
+    "heading": "Summary of your data",
+    "summary_of_input_data": "Summary of your input data",
+    "build_label": "Capitol carbon(build)",
+    "operation_label": "Operational carbon",
+    "whole_life_label": "Whole life carbon",
+    "sequestered_label": "Carbon sequestered",
+    "avoided_label": "Carbon avoided",
+    "net_label": "Net carbon",
+    "benefit_label": "Net carbon savings economic benefit",
+    "forecast_label": "Operation and maintenance cost forcast",
+    "capital_cost_estimate": "Estimated capital cost",
+    "capital_cost_estimate_hint": "The sum of spending in the years between the start of construction date and ready for service date.",
+    "capital_cost_label": "Capital cost estimate",
+    "units": "tonnes"
+  },
+  "carbon_impact": {
+    "title": "Carbon impact assessment",
+    "heading": "What we have calculated about your Carbon Impact",
+    "lede_1": "The EA maintain historic carbon data for programmes that enable a common baseline value of emissions per unit of cost in 2020 to be calculated for every project that enables the 'capital' and 'operational' Carbon Impact data to be compared against.",
+    "lede_2": "The EA also maintain a carbon reduction target for the programme in line with Government Net Zero Carbon commitments that is calculated for every project and its dates of construction that enables the 'capital' and 'operational' Carbon Impact data to be compared against.",
+    "lede_3": "Based on data provided in your proposal, we have calculated a baseline and target for comparison against any 'capital' and 'operational' carbon values you have provided.",
+    "lede_4": "Any subsequent changes you make to data in other sections used to calculate these values may result in a change which can be viewed on the Proposal overview page before submission.",
+    "capital_carbon_heading": "Capital carbon",
+    "capital_carbon_estimated": "Capital carbon estimated by you",
+    "capital_carbon_baseline": "Calculated capital carbon baseline",
+    "capital_carbon_target": "Calculated capital carbon target",
+    "operational_carbon_heading": "Operations and maintenance carbon",
+    "operational_carbon_estimated": "Operations and maintenance carbon estimated by you",
+    "operational_carbon_baseline": "Calculated operations and maintenance carbon baseline",
+    "operational_carbon_target": "Calculated operations and maintenance carbon target",
+    "net_carbon_heading": "Net carbon",
+    "net_carbon_estimated": "Net carbon estimated by you",
+    "net_carbon_with_blanks": "Net carbon with blank values calculated",
+    "units": "tonnes"
   }
 }

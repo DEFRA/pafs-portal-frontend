@@ -1,0 +1,52 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% block pageTitle %}
+  {{ t(localKeyPrefix + '.title') }}
+{% endblock %}
+
+{% block body %}
+  {% if fieldErrors %}
+    {% set errorList = [] %}
+    {% for field, error in fieldErrors %}
+      {% set errorList = errorList.concat([{ text: error, href: '#' + field }]) %}
+    {% endfor %}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.heading') }}</h1>
+
+    <p class="govuk-body">{{ t(localKeyPrefix + '.intro_1') }}</p>
+    <p class="govuk-body">{{ t(localKeyPrefix + '.intro_2') }}</p>
+    <p class="govuk-body">{{ t(localKeyPrefix + '.intro_3') }}</p>
+
+    {{ govukInput({
+      label: { text: t(localKeyPrefix + '.label') },
+      id: 'carbonCostBuild',
+      name: 'carbonCostBuild',
+      value: formData.carbonCostBuild if formData.carbonCostBuild is not none else '',
+      inputmode: "decimal",
+      classes: "govuk-input--width-10",
+      suffix: { text: t(localKeyPrefix + '.suffix') },
+      errorMessage: { text: fieldErrors.carbonCostBuild } if fieldErrors and fieldErrors.carbonCostBuild else undefined
+    }) }}
+
+    <p class="govuk-body">{{ t(localKeyPrefix + '.after_1') }}</p>
+    <p class="govuk-body">{{ t(localKeyPrefix + '.after_2') }}</p>
+
+    <div class="govuk-button-group">
+      {{ govukButton({ text: t('common.buttons.save_and_continue') }) }}
+    </div>
+  </form>
+{% endblock %}

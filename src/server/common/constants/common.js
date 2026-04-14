@@ -65,7 +65,24 @@ export const PROJECT_VIEWS = {
   NFM_EXPERIENCE: 'modules/projects/nfm/radio-generic',
   NFM_PROJECT_READINESS: 'modules/projects/nfm/radio-generic',
   WHOLE_LIFE_COST: 'modules/projects/whole-life-cost/index',
-  WHOLE_LIFE_BENEFITS: 'modules/projects/whole-life-benefits/index'
+  WHOLE_LIFE_BENEFITS: 'modules/projects/whole-life-benefits/index',
+  CARBON_IMPACT: 'modules/projects/carbon-impact/index',
+  CARBON_REQUIRED_INFORMATION:
+    'modules/projects/carbon-impact/required-information',
+  CARBON_PREPARE: 'modules/projects/carbon-impact/prepare',
+  CARBON_COST_BUILD: 'modules/projects/carbon-impact/carbon-cost-build',
+  CARBON_COST_OPERATION: 'modules/projects/carbon-impact/carbon-cost-operation',
+  WHOLE_LIFE_CARBON: 'modules/projects/carbon-impact/carbon-whole-life-carbon',
+  CARBON_COST_SEQUESTERED:
+    'modules/projects/carbon-impact/carbon-cost-sequestered',
+  CARBON_COST_AVOIDED: 'modules/projects/carbon-impact/carbon-cost-avoided',
+  NET_CARBON: 'modules/projects/carbon-impact/carbon-net-carbon',
+  CARBON_SAVINGS_NET_ECONOMIC_BENEFIT:
+    'modules/projects/carbon-impact/carbon-savings-net-economic-benefit',
+  CARBON_OPERATIONAL_COST_FORECAST:
+    'modules/projects/carbon-impact/carbon-operational-cost-forecast',
+  CARBON_SUMMARY: 'modules/projects/carbon-impact/carbon-impact-summary',
+  CARBON_IMPACT_ASSESSMENT: 'modules/projects/carbon-impact/carbon-impact'
 }
 
 export const GENERAL_VIEWS = {

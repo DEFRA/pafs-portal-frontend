@@ -25,6 +25,10 @@ import {
 } from '../../common/constants/projects.js'
 
 describe('Project Schemas', () => {
+  const thisYear = new Date().getUTCFullYear()
+  const validStartYear = String(thisYear + 1)
+  const validEndYear = String(thisYear + 2)
+
   describe('validateProjectName', () => {
     test('should validate valid project name', () => {
       const result = validateProjectName.validate({
@@ -106,15 +110,15 @@ describe('Project Schemas', () => {
   describe('validateFinancialStartYear', () => {
     test('should validate valid financial start year', () => {
       const result = validateFinancialStartYear.validate({
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025'
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: validStartYear
       })
       expect(result.error).toBeUndefined()
     })
 
     test('should allow optional financial end year', () => {
       const result = validateFinancialStartYear.validate({
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: validStartYear,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: validEndYear
       })
       expect(result.error).toBeUndefined()
     })
@@ -128,15 +132,15 @@ describe('Project Schemas', () => {
   describe('validateFinancialEndYear', () => {
     test('should validate valid financial years', () => {
       const result = validateFinancialEndYear.validate({
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: validStartYear,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: validEndYear
       })
       expect(result.error).toBeUndefined()
     })
 
     test('should return error for missing financial end year', () => {
       const result = validateFinancialEndYear.validate({
-        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025'
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: validStartYear
       })
       expect(result.error).toBeDefined()
     })
