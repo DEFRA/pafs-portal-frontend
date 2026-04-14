@@ -32,10 +32,6 @@ import {
 } from '../../common/constants/projects.js'
 
 describe('Project Schemas', () => {
-  const thisYear = new Date().getUTCFullYear()
-  const validStartYear = String(thisYear + 1)
-  const validEndYear = String(thisYear + 2)
-
   describe('validateProjectName', () => {
     test('should validate valid project name', () => {
       const result = validateProjectName.validate({
