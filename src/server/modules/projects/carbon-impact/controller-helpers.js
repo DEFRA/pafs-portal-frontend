@@ -36,43 +36,66 @@ export const STEP_TO_CONFIG = {
     localKeyPrefix: 'projects.carbon_prepare'
   },
   [PROJECT_STEPS.CARBON_COST_BUILD]: {
-    view: PROJECT_VIEWS.CARBON_COST_BUILD,
+    view: PROJECT_VIEWS.SINGLE_INPUT,
     localKeyPrefix: 'projects.carbon_cost_build',
-    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD
+    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD,
+    inputType: 'suffix',
+    introCount: 3,
+    afterCount: 2
   },
   [PROJECT_STEPS.CARBON_COST_OPERATION]: {
-    view: PROJECT_VIEWS.CARBON_COST_OPERATION,
+    view: PROJECT_VIEWS.SINGLE_INPUT,
     localKeyPrefix: 'projects.carbon_cost_operation',
-    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION
+    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION,
+    inputType: 'suffix',
+    introCount: 3,
+    afterCount: 3
   },
   [PROJECT_STEPS.CARBON_COST_SEQUESTERED]: {
-    view: PROJECT_VIEWS.CARBON_COST_SEQUESTERED,
+    view: PROJECT_VIEWS.SINGLE_INPUT,
     localKeyPrefix: 'projects.carbon_cost_sequestered',
-    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED
+    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED,
+    inputType: 'suffix',
+    introCount: 3,
+    afterCount: 1
   },
   [PROJECT_STEPS.CARBON_COST_AVOIDED]: {
-    view: PROJECT_VIEWS.CARBON_COST_AVOIDED,
+    view: PROJECT_VIEWS.SINGLE_INPUT,
     localKeyPrefix: 'projects.carbon_cost_avoided',
-    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED
+    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED,
+    inputType: 'suffix',
+    introCount: 3,
+    afterCount: 1,
+    hasIntroLink: true
   },
   [PROJECT_STEPS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: {
-    view: PROJECT_VIEWS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT,
+    view: PROJECT_VIEWS.SINGLE_INPUT,
     localKeyPrefix: 'projects.carbon_savings_net_economic_benefit',
-    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT
+    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT,
+    inputType: 'prefix',
+    introCount: 3,
+    afterCount: 1,
+    hasIntroLink: true,
+    hasIntroLinkSuffix: true
   },
   [PROJECT_STEPS.CARBON_OPERATIONAL_COST_FORECAST]: {
-    view: PROJECT_VIEWS.CARBON_OPERATIONAL_COST_FORECAST,
+    view: PROJECT_VIEWS.SINGLE_INPUT,
     localKeyPrefix: 'projects.carbon_operational_cost_forecast',
-    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST
+    fieldName: PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST,
+    inputType: 'prefix',
+    introCount: 2,
+    afterCount: 1
   },
   [PROJECT_STEPS.WHOLE_LIFE_CARBON]: {
-    view: PROJECT_VIEWS.WHOLE_LIFE_CARBON,
+    view: PROJECT_VIEWS.CALCULATED_DISPLAY,
     localKeyPrefix: 'projects.carbon_whole_life_carbon',
+    displayValueKey: 'wholeLifeCarbon',
     isDisplay: true
   },
   [PROJECT_STEPS.NET_CARBON]: {
-    view: PROJECT_VIEWS.NET_CARBON,
+    view: PROJECT_VIEWS.CALCULATED_DISPLAY,
     localKeyPrefix: 'projects.carbon_net_carbon',
+    displayValueKey: 'netCarbon',
     isDisplay: true
   },
   [PROJECT_STEPS.CARBON_SUMMARY]: {

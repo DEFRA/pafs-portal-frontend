@@ -70,6 +70,8 @@ export const PROJECT_VIEWS = {
   CARBON_REQUIRED_INFORMATION:
     'modules/projects/carbon-impact/required-information',
   CARBON_PREPARE: 'modules/projects/carbon-impact/prepare',
+  SINGLE_INPUT: 'modules/projects/carbon-impact/single-input',
+  CALCULATED_DISPLAY: 'modules/projects/carbon-impact/calculated-display',
   CARBON_COST_BUILD: 'modules/projects/carbon-impact/carbon-cost-build',
   CARBON_COST_OPERATION: 'modules/projects/carbon-impact/carbon-cost-operation',
   WHOLE_LIFE_CARBON: 'modules/projects/carbon-impact/carbon-whole-life-carbon',

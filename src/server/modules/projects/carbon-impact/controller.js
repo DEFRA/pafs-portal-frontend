@@ -72,6 +72,25 @@ class CarbonImpactController {
       extraDataToPass.fieldName = fieldName
     }
 
+    if (stepConfig?.introCount != null) {
+      extraDataToPass.introCount = stepConfig.introCount
+    }
+    if (stepConfig?.afterCount != null) {
+      extraDataToPass.afterCount = stepConfig.afterCount
+    }
+    if (stepConfig?.hasIntroLink) {
+      extraDataToPass.hasIntroLink = stepConfig.hasIntroLink
+    }
+    if (stepConfig?.hasIntroLinkSuffix) {
+      extraDataToPass.hasIntroLinkSuffix = stepConfig.hasIntroLinkSuffix
+    }
+    if (stepConfig?.inputType) {
+      extraDataToPass.inputType = stepConfig.inputType
+    }
+    if (stepConfig?.displayValueKey) {
+      extraDataToPass.displayValueKey = stepConfig.displayValueKey
+    }
+
     return buildViewData(request, {
       localKeyPrefix,
       backLinkOptions: {
