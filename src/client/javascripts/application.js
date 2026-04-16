@@ -129,3 +129,82 @@ bindCommaFormattingToInputs(
   '[data-number-format="comma"], [data-wlc-cost-input="true"]',
   { unformatOnSubmit: true }
 )
+
+// ─── Estimated-spend progressive enhancement ────────────────────────────────
+// Hides no-JS-only elements (hint text, Update Totals button) and adds live
+// row / column / grand totals that recalculate on every input event.
+;(function initEstimatedSpend() {
+  if (typeof document === 'undefined') return
+
+  function init() {
+    const form = document.getElementById('estimated-spend-form')
+    if (!form) return // not on the estimated-spend page
+
+    // Hide no-JS elements
+    const noJsHint = document.getElementById('no-js-totals-hint')
+    if (noJsHint) noJsHint.style.display = 'none'
+
+    const updateBtn = document.getElementById('update-totals-btn')
+    if (updateBtn) updateBtn.style.display = 'none'
+
+    // Determine number of year columns from the footer totals
+    const colTotalCells = form.querySelectorAll('[data-col-total]')
+    const numCols = colTotalCells.length
+    if (numCols === 0) return
+
+    function stripCommas(str) {
+      return (str || '').replace(/[^\d]/g, '').trim()
+    }
+
+    function parseVal(input) {
+      const v = stripCommas(input.value)
+      return v === '' ? 0 : parseInt(v, 10) || 0
+    }
+
+    function formatNum(n) {
+      return n === 0 ? '0' : n.toLocaleString('en-GB')
+    }
+
+    function recalc() {
+      const rows = form.querySelectorAll('[data-source-row]')
+      const colTotals = new Array(numCols).fill(0)
+
+      rows.forEach(function (row) {
+        const inputs = row.querySelectorAll('[data-spend-cell]')
+        let rowTotal = 0
+
+        inputs.forEach(function (inp, colIdx) {
+          const v = parseVal(inp)
+          rowTotal += v
+          if (colIdx < numCols) colTotals[colIdx] += v
+        })
+
+        const rowTotalCell = row.querySelector('[data-row-total]')
+        if (rowTotalCell) rowTotalCell.textContent = formatNum(rowTotal)
+      })
+
+      let grandTotal = 0
+      colTotals.forEach(function (ct, colIdx) {
+        grandTotal += ct
+        const el = form.querySelector('[data-col-total="' + colIdx + '"]')
+        if (el) el.textContent = formatNum(ct)
+      })
+
+      const grandEl = form.querySelector('[data-grand-total]')
+      if (grandEl) grandEl.textContent = formatNum(grandTotal)
+    }
+
+    form.querySelectorAll('[data-spend-cell]').forEach(function (inp) {
+      inp.addEventListener('input', recalc)
+    })
+
+    // Run once on load to populate totals from pre-filled values
+    recalc()
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init)
+  } else {
+    init()
+  }
+})()

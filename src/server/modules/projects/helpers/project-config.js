@@ -37,5 +37,8 @@ export {
 // Re-export NFM configuration
 export { NFM_CONFIG } from './config/nfm.js'
 
+// Re-export funding sources configuration
+export { FUNDING_SOURCES_CONFIG } from './config/funding-sources.js'
+
 // Re-export payload level fields
 export { PROJECT_PAYLOAD_LEVEL_FIELDS } from './config/payload-levels.js'

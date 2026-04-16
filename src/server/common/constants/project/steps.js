@@ -95,7 +95,14 @@ export const PROJECT_STEPS = {
   NFM_EXPERIENCE: 'nfm-experience',
   NFM_PROJECT_READINESS: 'nfm-project-readiness',
   WHOLE_LIFE_COST: 'whole-life-cost',
-  WHOLE_LIFE_BENEFITS: 'whole-life-benefits'
+  WHOLE_LIFE_BENEFITS: 'whole-life-benefits',
+  FUNDING_SOURCES: 'funding-sources',
+  FUNDING_SOURCES_ADDITIONAL: 'funding-sources-additional',
+  FUNDING_SOURCES_PUBLIC_CONTRIBUTORS: 'funding-sources-public-contributors',
+  FUNDING_SOURCES_PRIVATE_CONTRIBUTORS: 'funding-sources-private-contributors',
+  FUNDING_SOURCES_OTHER_EA_CONTRIBUTORS:
+    'funding-sources-other-ea-contributors',
+  FUNDING_SOURCES_ESTIMATED_SPEND: 'funding-sources-estimated-spend'
 }
 
 export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'

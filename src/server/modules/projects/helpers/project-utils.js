@@ -353,3 +353,161 @@ export function formatNumberWithCommas(value) {
   }
   return out
 }
+
+const FUNDING_AMOUNT_FIELDS = [
+  'fcermGia',
+  'localLevy',
+  'publicContributions',
+  'privateContributions',
+  'otherEaContributions',
+  'notYetIdentified',
+  'assetReplacementAllowance',
+  'environmentStatutoryFunding',
+  'frequentlyFloodedCommunities',
+  'otherAdditionalGrantInAid',
+  'otherGovernmentDepartment',
+  'recovery',
+  'summerEconomicFund'
+]
+
+/**
+ * Build processed funding values from raw project data.
+ * Merges pafs_core_funding_values with pafs_core_funding_contributors into
+ * rows with publicContributors / privateContributors / otherEaContributors arrays.
+ * All numeric values are converted to plain Numbers so they work reliably
+ * in Nunjucks templates regardless of BigInt or string serialization.
+ *
+ * @param {Object} projectData - Session/project data containing raw DB arrays
+ * @returns {Array} Processed funding value rows
+ */
+export function buildProcessedFundingValues(projectData) {
+  const dbValues = projectData.pafs_core_funding_values || []
+  const dbContributors = projectData.pafs_core_funding_contributors || []
+
+  if (!dbValues.length) return []
+
+  const sortedValues = [...dbValues].sort(
+    (a, b) => Number(a.financialYear) - Number(b.financialYear)
+  )
+
+  const referencedIds = new Set(
+    dbContributors.map((c) => String(c.fundingValueId)).filter(Boolean)
+  )
+
+  const idToYear = new Map()
+  const hasIds = sortedValues.some((fv) => fv.id != null)
+
+  if (hasIds) {
+    for (const fv of sortedValues) {
+      idToYear.set(String(fv.id), Number(fv.financialYear))
+    }
+  } else {
+    const sortedRefIds = [...referencedIds].sort(
+      (a, b) => Number(a) - Number(b)
+    )
+    sortedRefIds.forEach((refId, idx) => {
+      if (idx < sortedValues.length) {
+        idToYear.set(refId, Number(sortedValues[idx].financialYear))
+      }
+    })
+  }
+
+  const contributorsByYear = {}
+  for (const c of dbContributors) {
+    const year = idToYear.get(String(c.fundingValueId))
+    if (year == null) continue
+    const key = String(year)
+    if (!contributorsByYear[key]) contributorsByYear[key] = []
+    contributorsByYear[key].push(c)
+  }
+
+  return sortedValues.map((fv) => {
+    // Convert all amount fields to plain Number to avoid BigInt/string issues in templates
+    const toNum = (v) => (v != null && v !== '' ? Number(v) || 0 : null)
+
+    const row = {
+      financialYear: Number(fv.financialYear),
+      fcermGia: toNum(fv.fcermGia),
+      localLevy: toNum(fv.localLevy),
+      publicContributions: toNum(fv.publicContributions),
+      privateContributions: toNum(fv.privateContributions),
+      otherEaContributions: toNum(fv.otherEaContributions),
+      notYetIdentified: toNum(fv.notYetIdentified),
+      assetReplacementAllowance: toNum(fv.assetReplacementAllowance),
+      environmentStatutoryFunding: toNum(fv.environmentStatutoryFunding),
+      frequentlyFloodedCommunities: toNum(fv.frequentlyFloodedCommunities),
+      otherAdditionalGrantInAid: toNum(fv.otherAdditionalGrantInAid),
+      otherGovernmentDepartment: toNum(fv.otherGovernmentDepartment),
+      recovery: toNum(fv.recovery),
+      summerEconomicFund: toNum(fv.summerEconomicFund)
+    }
+
+    const yearContributors = contributorsByYear[String(row.financialYear)] || []
+    const publicContributors = []
+    const privateContributors = []
+    const otherEaContributors = []
+
+    for (const c of yearContributors) {
+      const entry = {
+        name: c.name,
+        contributorType: c.contributorType,
+        // Keep as string so Nunjucks | int works reliably
+        amount: c.amount != null ? String(c.amount) : ''
+      }
+      if (c.contributorType === 'public_contributions') {
+        publicContributors.push(entry)
+      } else if (c.contributorType === 'private_contributions') {
+        privateContributors.push(entry)
+      } else if (c.contributorType === 'other_ea_contributions') {
+        otherEaContributors.push(entry)
+      }
+    }
+
+    if (publicContributors.length) {
+      row.publicContributors = publicContributors
+    }
+    if (privateContributors.length) {
+      row.privateContributors = privateContributors
+    }
+    if (otherEaContributors.length) {
+      row.otherEaContributors = otherEaContributors
+    }
+
+    return row
+  })
+}
+
+/**
+ * Pre-compute all totals needed by the funding sources overview card,
+ * avoiding Nunjucks loop-scope accumulation issues.
+ *
+ * @param {Array} processedRows - Output of buildProcessedFundingValues
+ * @returns {{ sourceTotals: Object, yearTotals: number[], grandTotal: number }}
+ */
+export function computeFundingSourceTotals(processedRows, projectData = {}) {
+  // Only sum fields whose corresponding boolean flag is selected on the project.
+  // This prevents deselected contributor/source amounts stored in the DB rows
+  // from inflating the displayed totals.
+  const activeFields = FUNDING_AMOUNT_FIELDS.filter((field) =>
+    Boolean(projectData[field])
+  )
+
+  const sourceTotals = {}
+  for (const field of FUNDING_AMOUNT_FIELDS) {
+    sourceTotals[field] = 0
+  }
+
+  const yearTotals = processedRows.map((row) => {
+    let yearTotal = 0
+    for (const field of activeFields) {
+      const val = Number(row[field]) || 0
+      sourceTotals[field] += val
+      yearTotal += val
+    }
+    return yearTotal
+  })
+
+  const grandTotal = yearTotals.reduce((sum, t) => sum + t, 0)
+
+  return { sourceTotals, yearTotals, grandTotal }
+}

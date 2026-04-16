@@ -6,6 +6,7 @@ import { ENVIRONMENTAL_BENEFITS_PAYLOAD_LEVEL_FIELDS } from './payload-levels/en
 import { NFM_PAYLOAD_LEVEL_FIELDS } from './payload-levels/nfm-fields.js'
 import { WLC_PAYLOAD_LEVEL_FIELDS } from './payload-levels/wlc-fields.js'
 import { WLB_PAYLOAD_LEVEL_FIELDS } from './payload-levels/wlb-fields.js'
+import { FUNDING_SOURCES_PAYLOAD_LEVEL_FIELDS } from './payload-levels/funding-sources-fields.js'
 
 /**
  * Complete mapping of payload levels to their required fields for API submission.
@@ -21,5 +22,6 @@ export const PROJECT_PAYLOAD_LEVEL_FIELDS = {
   ...ENVIRONMENTAL_BENEFITS_PAYLOAD_LEVEL_FIELDS,
   ...NFM_PAYLOAD_LEVEL_FIELDS,
   ...WLC_PAYLOAD_LEVEL_FIELDS,
-  ...WLB_PAYLOAD_LEVEL_FIELDS
+  ...WLB_PAYLOAD_LEVEL_FIELDS,
+  ...FUNDING_SOURCES_PAYLOAD_LEVEL_FIELDS
 }

@@ -176,6 +176,32 @@
       "estimated_environmental_benefits": "Estimated environmental benefits",
       "estimated_recreation_tourism_benefits": "Estimated recreation and tourism benefits",
       "estimated_land_value_uplift_benefits": "Estimated land value uplift and regeneration benefits"
+    },
+    "funding_sources_summary_card": {
+      "title": "Funding sources and spending",
+      "not_added": "No funding sources and spending added yet",
+      "funding_source": "Funding source",
+      "total_estimated_spend": "Total estimated spend (£)",
+      "gia": "Grant in aid",
+      "local_levy": "Local levy",
+      "additional_gia": "Additional FCRM Grant-in-Aid",
+      "internal_drainage_boards": "Funds recovered from an internal drainage board by the Environment Agency, known as a precept",
+      "not_yet_identified": "Other funding sources not yet identified",
+      "public_sector_contributors": "Public sector contributors",
+      "private_sector_contributors": "Private sector contributors",
+      "other_ea_contributors": "Other Environment Agency contributors",
+      "total": "Total",
+      "view_funding_sources_and_spending_detail": "View funding sources and spending detail",
+      "funding_source_contributor": "Funding source / contributor",
+      "total_with_pound_symbol": "Total (£)",
+      "asset_replacement_allowance": "Asset replacement allowance",
+      "environment_statutory_funding": "Environment statutory funding",
+      "frequently_flooded_communities": "Frequently flooded communities",
+      "other_additional_grant_in_aid": "Other additional grant in aid",
+      "other_government_department": "Other Government department",
+      "recovery": "Recovery",
+      "summer_economic_fund": "Summer economic fund",
+      "internal_drainage_board_precept": "Internal drainage board precept"
     }
   },
   "start_proposal": {
@@ -1385,6 +1411,92 @@
       "required": "Please enter the value",
       "invalid": "Enter a whole number with no decimal point or currency symbols",
       "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+    }
+  },
+  "funding_sources": {
+    "funding_sources_selection": {
+      "title": "What are the expected funding sources?",
+      "heading": "What are the expected funding sources?",
+      "hint": "Select all that apply",
+      "options": {
+        "grant_in_aid": "Grant in aid",
+        "local_levy": "Local levy",
+        "additional_fcrm_grant_in_aid": "Additional FCERM Grant-in-Aid",
+        "public_contributions": "Public sector contributions",
+        "private_contributions": "Private sector contributions",
+        "other_ea_contributions": "Contributions from other Environment Agency functions or sources",
+        "not_yet_identified": "Other funding sources not yet identified"
+      },
+      "errors": {
+        "required": "The project must have at least one funding source.",
+        "invalid": "The project must have at least one funding source."
+      }
+    },
+    "additional_funding_sources_selection": {
+      "title": "What are the expected additional FCRM Grant in Aid funding sources?",
+      "heading": "What are the expected additional FCRM Grant in Aid funding sources?",
+      "hint": "Select all that apply",
+      "options": {
+        "asset_replacement_allowance": "Asset replacement allowance",
+        "environment_statutory_funding": "Environment statutory funding",
+        "frequently_flooded_communities": "Frequently flooded communities",
+        "other_additional_grant_in_aid": "Other additional FCRM Grant in Aid",
+        "other_government_department": "Other Government department",
+        "recovery": "Recovery",
+        "summer_economic_fund": "Summer economic fund"
+      },
+      "errors": {
+        "required": "The project must have at least one additional FCRM Grant in aid funding source.",
+        "invalid": "The project must have at least one additional FCRM Grant in aid funding source."
+      }
+    },
+    "contributors": {
+      "contributor": "Contributor ",
+      "add_contributor_button": "Add another contributor",
+      "errors": {
+        "required": "Please add at least one contributor",
+        "invalid": "Make sure there is no commas in the contributor name",
+        "duplicate": "Please add each contributor only once"
+      }
+    },
+    "public_sector_contributors": {
+      "title": "Who are the expected public sector contributors?",
+      "heading": "Who are the expected public sector contributors?",
+      "hint": "na"
+    },
+    "private_sector_contributors": {
+      "title": "Who are the expected private sector contributors?",
+      "heading": "Who are the expected private sector contributors?",
+      "hint": "For example, a local business such as Llanmoor Development Company."
+    },
+    "other_ea_contributors": {
+      "title": "What are the expected contributions from other Environment Agency sources?",
+      "heading": "What are the expected contributions from other Environment Agency sources?",
+      "hint": "These are Environment Agency functions or funding streams. For example, Water Framework Directive or Water Resources."
+    },
+    "delete_contributor": {
+      "title": "Are you sure you want to remove Contributor?",
+      "heading": "Are you sure you want to remove Contributor ",
+      "yes": "Yes",
+      "no": "No",
+      "errors": {
+        "required": "Please select an option"
+      }
+    },
+    "estimated_spend": {
+      "title": "What is the estimated spend for each financial year?",
+      "heading": "What is the estimated spend for each financial year?",
+      "hint": "Spending estimates should be in pounds (for example £50,000) and estimated at current prices. Future maintenance costs are not required.",
+      "no_js_hint": "After entering your values, use the 'Update totals' button to recalculate row and column totals.",
+      "table": {
+        "funding _column_header": "Funding source / contributor",
+        "total": "Total (£)"
+      },
+      "errors": {
+        "required": "Each funding source must have an estimated spend for at least one financial year.",
+        "invalid": "Enter a whole number with no decimal point or currency symbols",
+        "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+      }
     }
   }
 }

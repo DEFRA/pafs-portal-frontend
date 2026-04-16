@@ -1,142 +1,204 @@
-{% macro fundingSourcesAndSpendingSummaryCard(values, t, isReadOnly) %}
+{% macro fundingSourcesAndSpendingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) %}
+
+  {% set p = 'projects.overview.funding_sources_summary_card' %}
+  {% set slug = projectData[PROJECT_PAYLOAD_FIELDS.SLUG] %}
+
+  {# Determine whether any funding source has been selected #}
+  {% set hasFundingSources = projectData[PROJECT_PAYLOAD_FIELDS.FCERM_GIA]
+    or projectData[PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY]
+    or projectData['additionalFcermGia']
+    or projectData[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]
+    or projectData[PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]
+    or projectData[PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS]
+    or projectData[PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED] %}
+
+  {% set fundingValues = projectData.processedFundingValues or projectData[PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES] or [] %}
+  {% set hasSpend = fundingValues | length > 0 %}
+
+  {# Build ordered list of active sources for the summary table #}
+  {% set activeSources = [] %}
+
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.FCERM_GIA] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.FCERM_GIA, label: t(p + '.gia') }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY, label: t(p + '.local_levy') }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE, label: t(p + '.asset_replacement_allowance') }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING, label: t(p + '.environment_statutory_funding') }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES, label: t(p + '.frequently_flooded_communities') }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID, label: t(p + '.other_additional_grant_in_aid') }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT, label: t(p + '.other_government_department') }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.RECOVERY] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.RECOVERY, label: t(p + '.recovery') }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND, label: t(p + '.summer_economic_fund') }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS, label: t(p + '.public_sector_contributors'), contributorArrayField: 'publicContributors' }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS, label: t(p + '.private_sector_contributors'), contributorArrayField: 'privateContributors' }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS, label: t(p + '.other_ea_contributors'), contributorArrayField: 'otherEaContributors' }]) %}
+  {% endif %}
+  {% if projectData[PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED] %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED, label: t(p + '.not_yet_identified') }]) %}
+  {% endif %}
 
 <div class="govuk-summary-card">
   <div class="govuk-summary-card__title-wrapper">
-    <h2 class="govuk-summary-card__title">Funding sources and spending</h2>
+    <h2 class="govuk-summary-card__title">{{ t(p + '.title') }}</h2>
     {% if not isReadOnly %}
       <ul class="govuk-summary-card__actions">
         <li class="govuk-summary-card__action">
-          <a class="govuk-link" href="/proposal/create-proposal/funding-sources">
-            {% if fundingSectionStarted %}Change{% else %}Add{% endif %}<span class="govuk-visually-hidden"> the funding sources and spending details</span>
+          <a class="govuk-link" href="/project/{{ slug }}/{{ PROJECT_STEPS.FUNDING_SOURCES }}">
+            {% if hasFundingSources %}{{ t('common.change') }}{% else %}{{ t('common.add') }}{% endif %}
+            <span class="govuk-visually-hidden"> {{ t(p + '.title') | lower }}</span>
           </a>
         </li>
       </ul>
     {% endif %}
   </div>
   <div class="govuk-summary-card__content">
-    {% if fundingSectionStarted %}
-      {% if fundingSummary.selectedSources and (fundingSummary.selectedSources | length) > 0 %}
-        <table class="govuk-table full-table">
-          <thead class="govuk-table__head">
+    {% if hasFundingSources and hasSpend and activeSources | length > 0 %}
+
+      {# Summary totals table (one row per source) #}
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">{{ t(p + '.funding_source') }}</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(p + '.total_estimated_spend') }}</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for source in activeSources %}
+            {% set sourceTotal = projectData.fundingSourceTotals.sourceTotals[source.field] or 0 %}
             <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header">Funding Source</th>
-              <th scope="col" class="govuk-table__header align-right">Total Estimated Spend</th>
+              <td class="govuk-table__cell">{{ source.label }}</td>
+              <td class="govuk-table__cell govuk-table__cell--numeric">
+                {% if sourceTotal > 0 %}£{{ formatNumberWithCommas(sourceTotal) }}{% else %}0{% endif %}
+              </td>
             </tr>
-          </thead>
-          <tbody class="govuk-table__body">
-            {% for source in fundingSummary.selectedSources %}
-              {% set sourceTotal = 0 %}
-              {% for year in fundingYears %}
-                {% set value = (data['funding-values'] and data['funding-values'][year] and data['funding-values'][year][source.key]) or 0 %}
-                {% set sourceTotal = sourceTotal + (value | int) %}
-              {% endfor %}
-              <tr class="govuk-table__row">
-                <td class="govuk-table__cell">{{ source.label }}</td>
-                <td class="govuk-table__cell align-right">£{{ sourceTotal }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+          {% endfor %}
+        </tbody>
+        <tfoot class="govuk-table__foot">
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">{{ t(p + '.total_with_pound_symbol') }}</th>
+            <td class="govuk-table__cell govuk-table__cell--numeric">
+              <strong>{% if projectData.fundingSourceTotals.grandTotal > 0 %}£{{ formatNumberWithCommas(projectData.fundingSourceTotals.grandTotal) }}{% else %}0{% endif %}</strong>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
 
-        <details class="govuk-details govuk-!-margin-top-4" data-module="govuk-details">
-          <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">View funding sources and spending detail</span>
-          </summary>
-          <div class="govuk-details__text">
-            <div class="scroll-horz">
-              <table class="govuk-table funding_sources_and_spending_detail_table">
-                <thead class="govuk-table__head">
-                  <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header financial-year-column">Financial year</th>
-                    {% for source in fundingSummary.selectedSources %}
-                      <th scope="col" class="govuk-table__header align-right data-column">{{ source.label }}</th>
-                    {% endfor %}
-                    <th scope="col" class="govuk-table__header align-right data-total">Total (£)</th>
-                  </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                  {% for year in fundingYears %}
-                    <tr class="govuk-table__row">
-                      <td class="govuk-table__cell financial_year">April {{ year }} to March {{ year + 1 }}</td>
-                      {% set rowTotal = 0 %}
-                      {% for source in fundingSummary.selectedSources %}
-                        {% set value = (data['funding-values'] and data['funding-values'][year] and data['funding-values'][year][source.key]) or 0 %}
-                        {% set numValue = value | int %}
-                        {% set rowTotal = rowTotal + numValue %}
-                        <td class="govuk-table__cell numeric">{{ numValue }}</td>
-                      {% endfor %}
-                      <td class="govuk-table__cell row-total numeric">{{ rowTotal }}</td>
-                    </tr>
+      {# Expandable detail: year-by-year breakdown matching estimated-spend layout #}
+      <details class="govuk-details govuk-!-margin-top-4" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">{{ t(p + '.view_funding_sources_and_spending_detail') }}</span>
+        </summary>
+        <div class="govuk-details__text">
+          <div class="pafs-table-scroll">
+            <table class="govuk-table funding_sources_and_spending_detail_table">
+              <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header" style="min-width: 250px;">{{ t(p + '.funding_source') }}</th>
+                  {% for row in fundingValues %}
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">
+                      {{ row[PROJECT_PAYLOAD_FIELDS.FINANCIAL_YEAR] % 100 }}/{{ (row[PROJECT_PAYLOAD_FIELDS.FINANCIAL_YEAR] + 1) % 100 }}
+                    </th>
                   {% endfor %}
-                </tbody>
-                <tfoot class="govuk-table__foot">
-                  <tr class="govuk-table__row">
-                    <td class="govuk-table__cell">Total (£)</td>
-                    {% set footerGrandTotal = 0 %}
-                    {% for source in fundingSummary.selectedSources %}
-                      {% set columnTotal = 0 %}
-                      {% for year in fundingYears %}
-                        {% set value = (data['funding-values'] and data['funding-values'][year] and data['funding-values'][year][source.key]) or 0 %}
-                        {% set columnTotal = columnTotal + (value | int) %}
+                  <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(p + '.total_with_pound_symbol') }}</th>
+                </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+                {% for source in activeSources %}
+                  {% if source.contributorArrayField %}
+
+                    {# ── Group heading row ── #}
+                    <tr class="govuk-table__row">
+                      <th scope="row" class="govuk-table__header detail-section-header" colspan="{{ fundingValues | length + 2 }}">
+                        <strong>{{ source.label }}</strong>
+                      </th>
+                    </tr>
+
+                    {# Collect unique contributor names for this group #}
+                    {% set contribNames = [] %}
+                    {% for row in fundingValues %}
+                      {% for contrib in (row[source.contributorArrayField] or []) %}
+                        {% if contrib.name and contrib.name not in contribNames %}
+                          {% set contribNames = contribNames.concat([contrib.name]) %}
+                        {% endif %}
                       {% endfor %}
-                      {% set footerGrandTotal = footerGrandTotal + columnTotal %}
-                      <td class="govuk-table__cell numeric">{{ columnTotal }}</td>
                     {% endfor %}
-                    <td class="govuk-table__cell numeric grand-total">{{ footerGrandTotal }}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
 
-            {% set hasContributors = false %}
-            {% if data['public-contributors'] and (data['public-contributors'] | length) > 0 %}
-              {% set hasContributors = true %}
-            {% endif %}
-            {% if data['private-contributors'] and (data['private-contributors'] | length) > 0 %}
-              {% set hasContributors = true %}
-            {% endif %}
-            {% if data['other-ea-contributors'] and (data['other-ea-contributors'] | length) > 0 %}
-              {% set hasContributors = true %}
-            {% endif %}
-
-            {% if hasContributors %}
-              <div id="contributor_detail">
-                <br>
-                {% if data['public-contributors'] and (data['public-contributors'] | length) > 0 %}
-                  <div>
-                    <h3 class="govuk-heading-s">Public sector contributors:</h3>
-                    {% for contributor in data['public-contributors'] %}
-                      <p class="govuk-body">{{ contributor.name }}</p>
+                    {# ── Contributor name rows ── #}
+                    {% for name in contribNames %}
+                      <tr class="govuk-table__row">
+                        <td class="govuk-table__cell detail-contributor-name">{{ name }}</td>
+                        {% set rowTotal = 0 %}
+                        {% for row in fundingValues %}
+                          {% set val = 0 %}
+                          {% for contrib in (row[source.contributorArrayField] or []) %}
+                            {% if contrib.name == name %}
+                              {% set val = contrib.amount | int %}
+                            {% endif %}
+                          {% endfor %}
+                          {% set rowTotal = rowTotal + val %}
+                          <td class="govuk-table__cell govuk-table__cell--numeric">{{ formatNumberWithCommas(val) if val > 0 else '0' }}</td>
+                        {% endfor %}
+                        <td class="govuk-table__cell govuk-table__cell--numeric">{{ formatNumberWithCommas(rowTotal) if rowTotal > 0 else '0' }}</td>
+                      </tr>
                     {% endfor %}
-                  </div>
-                {% endif %}
 
-                {% if data['private-contributors'] and (data['private-contributors'] | length) > 0 %}
-                  <div>
-                    <h3 class="govuk-heading-s">Private sector contributors:</h3>
-                    {% for contributor in data['private-contributors'] %}
-                      <p class="govuk-body">{{ contributor.name }}</p>
-                    {% endfor %}
-                  </div>
-                {% endif %}
+                  {% else %}
 
-                {% if data['other-ea-contributors'] and (data['other-ea-contributors'] | length) > 0 %}
-                  <div>
-                    <h3 class="govuk-heading-s">Other Environment Agency contributors:</h3>
-                    {% for contributor in data['other-ea-contributors'] %}
-                      <p class="govuk-body">{{ contributor.name }}</p>
-                    {% endfor %}
-                  </div>
-                {% endif %}
-              </div>
-            {% endif %}
+                    {# ── Regular source row ── #}
+                    <tr class="govuk-table__row">
+                      <th scope="row" class="govuk-table__header">{{ source.label }}</th>
+                      {% for row in fundingValues %}
+                        {% set val = row[source.field] %}
+                        <td class="govuk-table__cell govuk-table__cell--numeric">{{ formatNumberWithCommas(val) if val > 0 else '0' }}</td>
+                      {% endfor %}
+                      {% set rowTotal = projectData.fundingSourceTotals.sourceTotals[source.field] or 0 %}
+                      <td class="govuk-table__cell govuk-table__cell--numeric">{{ formatNumberWithCommas(rowTotal) if rowTotal > 0 else '0' }}</td>
+                    </tr>
+
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+              <tfoot class="govuk-table__foot">
+                <tr class="govuk-table__row">
+                  <td class="govuk-table__cell"><strong>{{ t(p + '.total_with_pound_symbol') }}</strong></td>
+                  {% for row in fundingValues %}
+                    {% set colTotal = projectData.fundingSourceTotals.yearTotals[loop.index0] or 0 %}
+                    <td class="govuk-table__cell govuk-table__cell--numeric">{{ formatNumberWithCommas(colTotal) if colTotal > 0 else '0' }}</td>
+                  {% endfor %}
+                  {% set gt = projectData.fundingSourceTotals.grandTotal or 0 %}
+                  <td class="govuk-table__cell govuk-table__cell--numeric">{{ formatNumberWithCommas(gt) if gt > 0 else '0' }}</td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
-        </details>
-      {% else %}
-        <p class="govuk-body">No funding sources selected yet</p>
-      {% endif %}
+        </div>
+      </details>
+
+    {% elif hasFundingSources %}
+      <p class="govuk-body">{{ t(p + '.not_added') }}</p>
     {% else %}
-      <p class="govuk-body">No funding sources and spending details added yet</p>
+      <p class="govuk-body">{{ t(p + '.not_added') }}</p>
     {% endif %}
   </div>
 </div>
