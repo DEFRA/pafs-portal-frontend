@@ -120,8 +120,8 @@ class CarbonImpactController {
         PROJECT_STEPS.CARBON_PREPARE
       ].includes(step)
     ) {
-      const stepConfig = STEP_TO_CONFIG[step]
-      return h.view(stepConfig.view, this._buildViewData(request))
+      const infoStepConfig = STEP_TO_CONFIG[step]
+      return h.view(infoStepConfig.view, this._buildViewData(request))
     }
 
     // Input and display pages
@@ -229,7 +229,7 @@ class CarbonImpactController {
    * validate → session update → DB save → redirect.
    * Returns null on success (caller should redirect), or a Hapi response on error.
    */
-  async _handleInputStep(request, h, step, referenceNumber) {
+  async _handleInputStep(request, h, step) {
     const stepConfig = STEP_TO_CONFIG[step]
     const fieldName = stepConfig?.fieldName
 
@@ -320,12 +320,7 @@ class CarbonImpactController {
 
     // Input pages
     if (INPUT_PAGE_SEQUENCE.includes(step)) {
-      const inputResponse = await this._handleInputStep(
-        request,
-        h,
-        step,
-        referenceNumber
-      )
+      const inputResponse = await this._handleInputStep(request, h, step)
       if (inputResponse) {
         return inputResponse
       }

@@ -57,16 +57,21 @@ export const mergeCalculatedValues = (displayData, calcData) => {
   enriched.operationalCarbonTarget = c.operationalCarbonTarget
   enriched.netCarbonEstimate = c.netCarbonEstimate ?? displayData.netCarbon
   enriched.netCarbonWithBlanks = c.netCarbonWithBlanks
-  enriched.allCarbonValuesPresent =
-    c.carbonCostBuild != null &&
-    c.carbonCostOperation != null &&
-    c.carbonCostSequestered != null &&
-    c.carbonCostAvoided != null
+  enriched.allCarbonValuesPresent = hasAllCarbonValues(c)
   enriched.constructionTotalFunding = formatCurrency(c.constructionTotalFunding)
   enriched.capitalCostEstimateDisplay = enriched.constructionTotalFunding
 
   return enriched
 }
+
+/**
+ * Check whether all four carbon cost fields are present
+ */
+export const hasAllCarbonValues = (c) =>
+  c.carbonCostBuild != null &&
+  c.carbonCostOperation != null &&
+  c.carbonCostSequestered != null &&
+  c.carbonCostAvoided != null
 
 /**
  * Apply fallback values when API call fails

@@ -2,6 +2,32 @@ import { PROJECT_PAYLOAD_FIELDS } from '../../../../common/constants/projects.js
 import { getAuthSession } from '../../../../common/helpers/auth/session-manager.js'
 import { getCarbonImpactCalc } from '../../../../common/services/project/project-service.js'
 import { updateSessionData } from '../project-utils.js'
+import { hasAllCarbonValues } from '../../carbon-impact/carbon-display-helpers.js'
+
+const CARBON_DATA_FIELDS = [
+  PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD,
+  PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION,
+  PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED,
+  PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED,
+  PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT,
+  PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST
+]
+
+const hasCarbonData = (projectData) =>
+  CARBON_DATA_FIELDS.some((field) => projectData[field] != null)
+
+const buildCarbonCalc = (c) => ({
+  capitalCarbonBaseline: c.capitalCarbonBaseline,
+  capitalCarbonTarget: c.capitalCarbonTarget,
+  operationalCarbonBaseline: c.operationalCarbonBaseline,
+  operationalCarbonTarget: c.operationalCarbonTarget,
+  netCarbonEstimate: c.netCarbonEstimate,
+  netCarbonWithBlanks: c.netCarbonWithBlanks,
+  constructionTotalFunding: c.constructionTotalFunding,
+  hasValuesChanged: c.hasValuesChanged === true,
+  hexdigest: c.hexdigest,
+  allCarbonValuesPresent: hasAllCarbonValues(c)
+})
 
 /**
  * Data enrichment function: Fetches recalculated carbon impact values from the
@@ -20,17 +46,7 @@ import { updateSessionData } from '../project-utils.js'
  * @returns {Promise<Object>} { success, projectData, error? }
  */
 export async function getCarbonImpactOverviewData(request, projectData) {
-  // Only fetch if the project has carbon data (at least one field populated)
-  const hasCarbonData =
-    projectData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD] != null ||
-    projectData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION] != null ||
-    projectData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED] != null ||
-    projectData[PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED] != null ||
-    projectData[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT] !=
-      null ||
-    projectData[PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST] != null
-
-  if (!hasCarbonData) {
+  if (!hasCarbonData(projectData)) {
     return { success: true, projectData }
   }
 
@@ -42,27 +58,9 @@ export async function getCarbonImpactOverviewData(request, projectData) {
     const calcResult = await getCarbonImpactCalc(referenceNumber, accessToken)
 
     if (calcResult?.success && calcResult?.data) {
-      const c = calcResult.data
-
-      // Enrich projectData with calculated values for the template
       const enrichedData = {
         ...projectData,
-        carbonCalc: {
-          capitalCarbonBaseline: c.capitalCarbonBaseline,
-          capitalCarbonTarget: c.capitalCarbonTarget,
-          operationalCarbonBaseline: c.operationalCarbonBaseline,
-          operationalCarbonTarget: c.operationalCarbonTarget,
-          netCarbonEstimate: c.netCarbonEstimate,
-          netCarbonWithBlanks: c.netCarbonWithBlanks,
-          constructionTotalFunding: c.constructionTotalFunding,
-          hasValuesChanged: c.hasValuesChanged === true,
-          hexdigest: c.hexdigest,
-          allCarbonValuesPresent:
-            c.carbonCostBuild != null &&
-            c.carbonCostOperation != null &&
-            c.carbonCostSequestered != null &&
-            c.carbonCostAvoided != null
-        }
+        carbonCalc: buildCarbonCalc(calcResult.data)
       }
 
       // Update session with enriched data so it's available for the template
