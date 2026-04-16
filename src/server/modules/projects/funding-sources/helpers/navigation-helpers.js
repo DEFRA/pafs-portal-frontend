@@ -29,10 +29,14 @@ export const CONTRIBUTOR_STEP_ROUTE = {
  */
 export function resolveBackLinkOptions(step, sessionData) {
   const config = FUNDING_SOURCES_CONFIG[step]
-  if (!config) return {}
+  if (!config) {
+    return {}
+  }
 
   const { backLinkOptions } = config
-  if (!backLinkOptions) return {}
+  if (!backLinkOptions) {
+    return {}
+  }
 
   if (typeof backLinkOptions.backLinkFn === 'function') {
     const resolved = backLinkOptions.backLinkFn(sessionData)

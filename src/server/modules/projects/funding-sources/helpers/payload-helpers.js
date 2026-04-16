@@ -15,7 +15,9 @@ import {
 export function clearFundingValueFields(request, fields) {
   const sessionData = getSessionData(request)
   const fundingValues = sessionData[PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]
-  if (!Array.isArray(fundingValues) || !fundingValues.length) return
+  if (!Array.isArray(fundingValues) || !fundingValues.length) {
+    return
+  }
 
   const updated = fundingValues.map((row) => {
     const copy = { ...row }
@@ -63,7 +65,9 @@ export function sanitiseFundingValueRow(row) {
 
     if (normalisedArray) {
       cleaned[key] = normalisedArray.map((item) => {
-        if (!item || typeof item !== 'object') return item
+        if (!item || typeof item !== 'object') {
+          return item
+        }
         const out = { ...item }
         if (typeof out.amount === 'string') {
           out.amount = out.amount.replaceAll(',', '').trim()
@@ -102,7 +106,9 @@ export function setSourceTotalsFromContributorArrays(row) {
   const sumAmounts = (arr = []) =>
     arr.reduce((sum, item) => {
       const amount = typeof item?.amount === 'string' ? item.amount.trim() : ''
-      if (!amount) return sum
+      if (!amount) {
+        return sum
+      }
       return sum + (Number.parseInt(amount, 10) || 0)
     }, 0)
 
@@ -144,7 +150,9 @@ export function stripEmptyContributorEntries(row) {
     const arr = row[key]
     if (!Array.isArray(arr)) continue
     row[key] = arr.filter((item) => {
-      if (!item || typeof item !== 'object') return false
+      if (!item || typeof item !== 'object') {
+        return false
+      }
       const amt = typeof item.amount === 'string' ? item.amount.trim() : ''
       return amt !== ''
     })
@@ -163,7 +171,9 @@ export function stripEmptyContributorEntries(row) {
  * @returns {*} Converted value with numeric-keyed objects replaced by arrays
  */
 export function numericKeysToArrays(obj) {
-  if (obj === null || typeof obj !== 'object') return obj
+  if (obj === null || typeof obj !== 'object') {
+    return obj
+  }
 
   const keys = Object.keys(obj)
   const allNumeric = keys.length > 0 && keys.every((k) => /^\d+$/.test(k))
@@ -196,13 +206,19 @@ export function numericKeysToArrays(obj) {
  * @returns {Array} Parsed array of funding value rows
  */
 export function parseFundingValuesPayload(payload) {
-  if (!payload) return []
+  if (!payload) {
+    return []
+  }
 
   // 1. If a nested parser (qs) already created `payload.fundingValues`
   if (payload.fundingValues) {
     const raw = payload.fundingValues
-    if (Array.isArray(raw)) return raw
-    if (typeof raw === 'object') return Object.values(raw)
+    if (Array.isArray(raw)) {
+      return raw
+    }
+    if (typeof raw === 'object') {
+      return Object.values(raw)
+    }
   }
 
   // 2. Reconstruct from flat bracket-notation keys produced by
@@ -220,7 +236,9 @@ export function parseFundingValuesPayload(payload) {
     }
     bracketRe.lastIndex = 0
 
-    if (segments.length === 0) continue
+    if (segments.length === 0) {
+      continue
+    }
 
     let current = root
     for (let i = 0; i < segments.length - 1; i++) {
@@ -232,10 +250,87 @@ export function parseFundingValuesPayload(payload) {
     current[segments[segments.length - 1]] = value
   }
 
-  if (Object.keys(root).length === 0) return []
+  if (Object.keys(root).length === 0) {
+    return []
+  }
 
   // Convert numeric-keyed objects → arrays at every depth
   return numericKeysToArrays(root)
+}
+
+/**
+ * Parse contributors from an array-like payload value.
+ *
+ * @param {*} raw - Raw contributors value from payload
+ * @param {string[]} sessionContributors - Session baseline
+ * @returns {string[]|null} Array of contributors or null if not array-like
+ */
+function _parseArrayContributors(raw, sessionContributors) {
+  if (!Array.isArray(raw)) {
+    return null
+  }
+  const baselineLength = Math.max(raw.length, sessionContributors.length, 1)
+  return Array.from({ length: baselineLength }, (_, i) =>
+    typeof raw[i] === 'string' ? raw[i] : ''
+  )
+}
+
+/**
+ * Parse contributors from an object-keyed payload value.
+ *
+ * @param {*} raw - Raw contributors value from payload
+ * @param {string[]} sessionContributors - Session baseline
+ * @returns {string[]|null} Array of contributors or null if not object-like
+ */
+function _parseObjectContributors(raw, sessionContributors) {
+  if (!raw || typeof raw !== 'object') {
+    return null
+  }
+  const numericKeys = Object.keys(raw)
+    .filter((k) => /^\d+$/.test(k))
+    .map(Number)
+  const highestIndex = numericKeys.length ? Math.max(...numericKeys) : -1
+  const baselineLength = Math.max(
+    highestIndex + 1,
+    sessionContributors.length,
+    1
+  )
+  return Array.from({ length: baselineLength }, (_, i) => {
+    const value = raw[String(i)]
+    return typeof value === 'string' ? value : ''
+  })
+}
+
+/**
+ * Parse contributors from top-level bracket-notation keys.
+ *
+ * @param {object} payload - Raw payload object
+ * @param {string[]} sessionContributors - Session baseline
+ * @returns {string[]|null} Array of contributors or null if no bracket keys found
+ */
+function _parseBracketContributors(payload, sessionContributors) {
+  const topLevelContributorEntries = Object.entries(payload || {}).filter(
+    ([key]) => /^contributors\[\d+\]$/.test(key)
+  )
+  if (!topLevelContributorEntries.length) {
+    return null
+  }
+  const indices = topLevelContributorEntries
+    .map(([key]) => {
+      const match = key.match(/^contributors\[(\d+)\]$/)
+      return Number(match?.[1])
+    })
+    .filter((i) => Number.isInteger(i))
+  const highestIndex = indices.length ? Math.max(...indices) : -1
+  const baselineLength = Math.max(
+    highestIndex + 1,
+    sessionContributors.length,
+    1
+  )
+  return Array.from({ length: baselineLength }, (_, i) => {
+    const value = payload[`contributors[${i}]`]
+    return typeof value === 'string' ? value : ''
+  })
 }
 
 /**
@@ -250,52 +345,19 @@ export function parseFundingValuesPayload(payload) {
 export function parseContributorsPayload(payload, sessionContributors = ['']) {
   const raw = payload?.contributors
 
-  if (Array.isArray(raw)) {
-    const baselineLength = Math.max(raw.length, sessionContributors.length, 1)
-    return Array.from({ length: baselineLength }, (_, i) =>
-      typeof raw[i] === 'string' ? raw[i] : ''
-    )
+  const arrayResult = _parseArrayContributors(raw, sessionContributors)
+  if (arrayResult) {
+    return arrayResult
   }
 
-  if (raw && typeof raw === 'object') {
-    const numericKeys = Object.keys(raw)
-      .filter((k) => /^\d+$/.test(k))
-      .map(Number)
-    const highestIndex = numericKeys.length ? Math.max(...numericKeys) : -1
-    const baselineLength = Math.max(
-      highestIndex + 1,
-      sessionContributors.length,
-      1
-    )
-
-    return Array.from({ length: baselineLength }, (_, i) => {
-      const value = raw[String(i)]
-      return typeof value === 'string' ? value : ''
-    })
+  const objectResult = _parseObjectContributors(raw, sessionContributors)
+  if (objectResult) {
+    return objectResult
   }
 
-  // Some payload parsers keep bracketed field names at top level,
-  // e.g. { 'contributors[0]': 'Name' } instead of { contributors: { 0: 'Name' } }
-  const topLevelContributorEntries = Object.entries(payload || {}).filter(
-    ([key]) => /^contributors\[\d+\]$/.test(key)
-  )
-
-  if (topLevelContributorEntries.length) {
-    const indices = topLevelContributorEntries
-      .map(([key]) => Number(key.match(/^contributors\[(\d+)\]$/)?.[1]))
-      .filter((i) => Number.isInteger(i))
-
-    const highestIndex = indices.length ? Math.max(...indices) : -1
-    const baselineLength = Math.max(
-      highestIndex + 1,
-      sessionContributors.length,
-      1
-    )
-
-    return Array.from({ length: baselineLength }, (_, i) => {
-      const value = payload[`contributors[${i}]`]
-      return typeof value === 'string' ? value : ''
-    })
+  const bracketResult = _parseBracketContributors(payload, sessionContributors)
+  if (bracketResult) {
+    return bracketResult
   }
 
   const baselineLength = Math.max(sessionContributors.length, 1)

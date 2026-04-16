@@ -19,6 +19,52 @@ import {
 const ADDITIONAL_FCRM_GIA_FIELD = 'additionalFcermGia'
 
 /**
+ * Common back link routes for funding sources steps
+ */
+const BACK_LINK_ROUTES = {
+  MAIN: ROUTES.PROJECT.EDIT.FUNDING_SOURCES.FUNDING_SOURCES_SELECTION,
+  ADDITIONAL:
+    ROUTES.PROJECT.EDIT.FUNDING_SOURCES.ADDITIONAL_FUNDING_SOURCES_SELECTION,
+  PUBLIC: ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PUBLIC_SECTOR_CONTRIBUTORS,
+  PRIVATE: ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PRIVATE_SECTOR_CONTRIBUTORS,
+  OTHER_EA:
+    ROUTES.PROJECT.EDIT.FUNDING_SOURCES.OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS
+}
+
+/**
+ * Determine back link for steps that check public contributions
+ */
+function _getBackLinkWithPublic(project) {
+  if (project?.[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]) {
+    return BACK_LINK_ROUTES.PUBLIC
+  }
+  if (project?.[ADDITIONAL_FCRM_GIA_FIELD]) {
+    return BACK_LINK_ROUTES.ADDITIONAL
+  }
+  return BACK_LINK_ROUTES.MAIN
+}
+
+/**
+ * Determine back link for steps that check private contributions
+ */
+function _getBackLinkWithPrivate(project) {
+  if (project?.[PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]) {
+    return BACK_LINK_ROUTES.PRIVATE
+  }
+  return _getBackLinkWithPublic(project)
+}
+
+/**
+ * Determine back link for steps that check other EA contributions
+ */
+function _getBackLinkWithOtherEa(project) {
+  if (project?.[PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS]) {
+    return BACK_LINK_ROUTES.OTHER_EA
+  }
+  return _getBackLinkWithPrivate(project)
+}
+
+/**
  * Configuration for funding sources related steps.
  *
  * Back-link logic for conditional steps uses a `backLinkFn(project)` function that
@@ -78,9 +124,8 @@ export const FUNDING_SOURCES_CONFIG = {
     backLinkOptions: {
       backLinkFn: (project) =>
         project?.[ADDITIONAL_FCRM_GIA_FIELD]
-          ? ROUTES.PROJECT.EDIT.FUNDING_SOURCES
-              .ADDITIONAL_FUNDING_SOURCES_SELECTION
-          : ROUTES.PROJECT.EDIT.FUNDING_SOURCES.FUNDING_SOURCES_SELECTION,
+          ? BACK_LINK_ROUTES.ADDITIONAL
+          : BACK_LINK_ROUTES.MAIN,
       conditionalRedirect: false
     },
     schema: publicContributorNamesSchema,
@@ -99,16 +144,7 @@ export const FUNDING_SOURCES_CONFIG = {
   [PROJECT_STEPS.FUNDING_SOURCES_PRIVATE_CONTRIBUTORS]: {
     localKeyPrefix: 'projects.funding_sources.private_sector_contributors',
     backLinkOptions: {
-      backLinkFn: (project) => {
-        if (project?.[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]) {
-          return ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PUBLIC_SECTOR_CONTRIBUTORS
-        }
-        if (project?.[ADDITIONAL_FCRM_GIA_FIELD]) {
-          return ROUTES.PROJECT.EDIT.FUNDING_SOURCES
-            .ADDITIONAL_FUNDING_SOURCES_SELECTION
-        }
-        return ROUTES.PROJECT.EDIT.FUNDING_SOURCES.FUNDING_SOURCES_SELECTION
-      },
+      backLinkFn: _getBackLinkWithPublic,
       conditionalRedirect: false
     },
     schema: privateContributorNamesSchema,
@@ -128,19 +164,7 @@ export const FUNDING_SOURCES_CONFIG = {
   [PROJECT_STEPS.FUNDING_SOURCES_OTHER_EA_CONTRIBUTORS]: {
     localKeyPrefix: 'projects.funding_sources.other_ea_contributors',
     backLinkOptions: {
-      backLinkFn: (project) => {
-        if (project?.[PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]) {
-          return ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PRIVATE_SECTOR_CONTRIBUTORS
-        }
-        if (project?.[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]) {
-          return ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PUBLIC_SECTOR_CONTRIBUTORS
-        }
-        if (project?.[ADDITIONAL_FCRM_GIA_FIELD]) {
-          return ROUTES.PROJECT.EDIT.FUNDING_SOURCES
-            .ADDITIONAL_FUNDING_SOURCES_SELECTION
-        }
-        return ROUTES.PROJECT.EDIT.FUNDING_SOURCES.FUNDING_SOURCES_SELECTION
-      },
+      backLinkFn: _getBackLinkWithPrivate,
       conditionalRedirect: false
     },
     schema: otherEaContributorNamesSchema,
@@ -162,23 +186,7 @@ export const FUNDING_SOURCES_CONFIG = {
   [PROJECT_STEPS.FUNDING_SOURCES_ESTIMATED_SPEND]: {
     localKeyPrefix: 'projects.funding_sources.estimated_spend',
     backLinkOptions: {
-      backLinkFn: (project) => {
-        if (project?.[PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS]) {
-          return ROUTES.PROJECT.EDIT.FUNDING_SOURCES
-            .OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS
-        }
-        if (project?.[PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]) {
-          return ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PRIVATE_SECTOR_CONTRIBUTORS
-        }
-        if (project?.[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]) {
-          return ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PUBLIC_SECTOR_CONTRIBUTORS
-        }
-        if (project?.[ADDITIONAL_FCRM_GIA_FIELD]) {
-          return ROUTES.PROJECT.EDIT.FUNDING_SOURCES
-            .ADDITIONAL_FUNDING_SOURCES_SELECTION
-        }
-        return ROUTES.PROJECT.EDIT.FUNDING_SOURCES.FUNDING_SOURCES_SELECTION
-      },
+      backLinkFn: _getBackLinkWithOtherEa,
       conditionalRedirect: false
     },
     schema: createFundingValuesSchema,

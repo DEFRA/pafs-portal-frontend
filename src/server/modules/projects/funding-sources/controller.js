@@ -116,7 +116,9 @@ class FundingSourcesController {
       viewData,
       PROJECT_VIEWS.FUNDING_SOURCES
     )
-    if (saveError) return saveError
+    if (saveError) {
+      return saveError
+    }
 
     // If additionalFcermGia was just deselected, reset all individual additional
     // GIA boolean flags in session (so buildEstimatedSpendRows doesn't render their rows)
@@ -216,7 +218,9 @@ class FundingSourcesController {
       viewData,
       PROJECT_VIEWS.FUNDING_SOURCES_ADDITIONAL
     )
-    if (saveError) return saveError
+    if (saveError) {
+      return saveError
+    }
 
     // Clear spend values for any additional GIA sub-source that was just deselected
     const deselectedFields = [
@@ -333,48 +337,13 @@ class FundingSourcesController {
 
     // Validate each name
     const namesField = CONTRIBUTOR_NAMES_FIELD[step]
-    const fieldErrors = {}
-    let hasError = false
     const t = request.t.bind(request)
-    const hasAnyContributor = nonEmptyNames.length > 0
-    if (!hasAnyContributor) {
-      fieldErrors['contributors[0]'] = t(
-        'projects.funding_sources.contributors.errors.required'
-      )
-      hasError = true
-    }
-
-    for (let i = 0; i < cleanNames.length; i++) {
-      if (!cleanNames[i]) continue
-
-      const { error } = config.schema.validate(cleanNames[i], {
-        abortEarly: false
-      })
-      if (error) {
-        const extracted = extractJoiErrors(error)
-        const rawMessage = extracted[Object.keys(extracted)[0]]
-        fieldErrors[`contributors[${i}]`] = localizeContributorErrorMessage(
-          rawMessage,
-          t
-        )
-        hasError = true
-      }
-    }
-
-    // Duplicate name check (case-insensitive) — mark only the duplicate, not the original
-    const seenNames = new Set()
-    for (let i = 0; i < cleanNames.length; i++) {
-      if (!cleanNames[i]) continue
-      const normalised = cleanNames[i].toLowerCase()
-      if (seenNames.has(normalised)) {
-        fieldErrors[`contributors[${i}]`] = t(
-          'projects.funding_sources.contributors.errors.duplicate'
-        )
-        hasError = true
-      } else {
-        seenNames.add(normalised)
-      }
-    }
+    const { fieldErrors, hasError } = this._validateContributorNames(
+      cleanNames,
+      nonEmptyNames,
+      config,
+      t
+    )
 
     if (hasError) {
       updateSessionData(request, { [sessionKey]: cleanNames })
@@ -414,7 +383,9 @@ class FundingSourcesController {
       viewData,
       PROJECT_VIEWS.FUNDING_SOURCES_PUBLIC_CONTRIBUTORS
     )
-    if (saveError) return saveError
+    if (saveError) {
+      return saveError
+    }
 
     const updated = getSessionData(request)
     return h
@@ -536,7 +507,9 @@ class FundingSourcesController {
     if (request.payload.confirm === 'yes') {
       contributors.splice(index, 1)
       // Always leave at least one blank slot so the form can be filled
-      if (!contributors.length) contributors.push('')
+      if (!contributors.length) {
+        contributors.push('')
+      }
       updateSessionData(request, { [sessionKey]: contributors })
     }
 
@@ -544,6 +517,69 @@ class FundingSourcesController {
   }
 
   // ── Step 6: Estimated spend ─────────────────────────────────────────────────
+
+  // ── Funding value row builder ─────────────────────────────────────────────
+
+  _buildFundingValueRow(fv, contributorsByYear) {
+    const row = {
+      financialYear: Number(fv.financialYear),
+      [PROJECT_PAYLOAD_FIELDS.FCERM_GIA]: fv.fcermGia || null,
+      [PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY]: fv.localLevy || null,
+      [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]:
+        fv.publicContributions || null,
+      [PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]:
+        fv.privateContributions || null,
+      [PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS]:
+        fv.otherEaContributions || null,
+      [PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED]: fv.notYetIdentified || null,
+      [PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE]:
+        fv.assetReplacementAllowance || null,
+      [PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING]:
+        fv.environmentStatutoryFunding || null,
+      [PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES]:
+        fv.frequentlyFloodedCommunities || null,
+      [PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID]:
+        fv.otherAdditionalGrantInAid || null,
+      [PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT]:
+        fv.otherGovernmentDepartment || null,
+      [PROJECT_PAYLOAD_FIELDS.RECOVERY]: fv.recovery || null,
+      [PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND]:
+        fv.summerEconomicFund || null
+    }
+
+    const yearContributors = contributorsByYear[String(row.financialYear)] || []
+    const publicContributors = []
+    const privateContributors = []
+    const otherEaContributors = []
+
+    for (const c of yearContributors) {
+      const entry = {
+        name: c.name,
+        contributorType: c.contributorType,
+        amount: c.amount != null ? String(c.amount) : ''
+      }
+      if (c.contributorType === 'public_contributions') {
+        publicContributors.push(entry)
+      } else if (c.contributorType === 'private_contributions') {
+        privateContributors.push(entry)
+      } else if (c.contributorType === 'other_ea_contributions') {
+        otherEaContributors.push(entry)
+      } else {
+        // unrecognized contributor type — ignored
+      }
+    }
+
+    if (publicContributors.length) {
+      row.publicContributors = publicContributors
+    }
+    if (privateContributors.length) {
+      row.privateContributors = privateContributors
+    }
+    if (otherEaContributors.length) {
+      row.otherEaContributors = otherEaContributors
+    }
+    return row
+  }
 
   /**
    * Merge flat pafs_core_funding_values rows with pafs_core_funding_contributors
@@ -556,7 +592,9 @@ class FundingSourcesController {
     const dbValues = sessionData.pafs_core_funding_values || []
     const dbContributors = sessionData.pafs_core_funding_contributors || []
 
-    if (!dbValues.length) return []
+    if (!dbValues.length) {
+      return []
+    }
 
     // Group contributors by their funding value's financial year.
     // The API does not return an `id` on pafs_core_funding_values, so we
@@ -614,68 +652,9 @@ class FundingSourcesController {
       contributorsByYear[key].push(c)
     }
 
-    return sortedValues.map((fv) => {
-      const row = {
-        financialYear: Number(fv.financialYear),
-        [PROJECT_PAYLOAD_FIELDS.FCERM_GIA]: fv.fcermGia || null,
-        [PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY]: fv.localLevy || null,
-        [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]:
-          fv.publicContributions || null,
-        [PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]:
-          fv.privateContributions || null,
-        [PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS]:
-          fv.otherEaContributions || null,
-        [PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED]:
-          fv.notYetIdentified || null,
-        [PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE]:
-          fv.assetReplacementAllowance || null,
-        [PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING]:
-          fv.environmentStatutoryFunding || null,
-        [PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES]:
-          fv.frequentlyFloodedCommunities || null,
-        [PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID]:
-          fv.otherAdditionalGrantInAid || null,
-        [PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT]:
-          fv.otherGovernmentDepartment || null,
-        [PROJECT_PAYLOAD_FIELDS.RECOVERY]: fv.recovery || null,
-        [PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND]:
-          fv.summerEconomicFund || null
-      }
-
-      // Match contributors by financial year
-      const yearContributors =
-        contributorsByYear[String(row.financialYear)] || []
-
-      const publicContributors = []
-      const privateContributors = []
-      const otherEaContributors = []
-
-      for (const c of yearContributors) {
-        const entry = {
-          name: c.name,
-          contributorType: c.contributorType,
-          amount: c.amount != null ? String(c.amount) : ''
-        }
-        if (c.contributorType === 'public_contributions') {
-          publicContributors.push(entry)
-        } else if (c.contributorType === 'private_contributions') {
-          privateContributors.push(entry)
-        } else if (c.contributorType === 'other_ea_contributions') {
-          otherEaContributors.push(entry)
-        }
-      }
-
-      if (publicContributors.length) {
-        row.publicContributors = publicContributors
-      }
-      if (privateContributors.length) {
-        row.privateContributors = privateContributors
-      }
-      if (otherEaContributors.length) {
-        row.otherEaContributors = otherEaContributors
-      }
-      return row
-    })
+    return sortedValues.map((fv) =>
+      this._buildFundingValueRow(fv, contributorsByYear)
+    )
   }
 
   /**
@@ -756,7 +735,9 @@ class FundingSourcesController {
     let grandTotal = 0
 
     for (const row of spendRows) {
-      if (row.kind === 'group-heading') continue
+      if (row.kind === 'group-heading') {
+        continue
+      }
 
       const rowKey =
         row.kind === 'contributor'
@@ -769,20 +750,11 @@ class FundingSourcesController {
         const fvRow = existingValues.find(
           (r) => Number(r[PROJECT_PAYLOAD_FIELDS.FINANCIAL_YEAR]) === year
         )
-        if (!fvRow) continue
-
-        let val = 0
-        if (row.kind === 'source') {
-          val =
-            parseInt(String(fvRow[row.field] || '0').replace(/\D/g, ''), 10) ||
-            0
-        } else if (row.kind === 'contributor') {
-          const items = fvRow[row.contributorArrayField] || []
-          const match = items.find((c) => c.name === row.contributorName)
-          val =
-            parseInt(String(match?.amount || '0').replace(/\D/g, ''), 10) || 0
+        if (!fvRow) {
+          continue
         }
 
+        const val = this._getRowValue(row, fvRow)
         rowTotal += val
         colTotals[colIdx] += val
       }
@@ -790,9 +762,147 @@ class FundingSourcesController {
       rowTotals[rowKey] = rowTotal
     }
 
-    for (const ct of colTotals) grandTotal += ct
+    for (const ct of colTotals) {
+      grandTotal += ct
+    }
 
     return { rowTotals, colTotals, grandTotal }
+  }
+
+  // ── Contributor name validation helper ────────────────────────────────────────
+
+  _validateContributorNames(cleanNames, nonEmptyNames, config, t) {
+    const fieldErrors = {}
+    let hasError = false
+
+    if (nonEmptyNames.length === 0) {
+      fieldErrors['contributors[0]'] = t(
+        'projects.funding_sources.contributors.errors.required'
+      )
+      hasError = true
+    }
+
+    for (let i = 0; i < cleanNames.length; i++) {
+      if (!cleanNames[i]) {
+        continue
+      }
+      const { error } = config.schema.validate(cleanNames[i], {
+        abortEarly: false
+      })
+      if (error) {
+        const extracted = extractJoiErrors(error)
+        const rawMessage = extracted[Object.keys(extracted)[0]]
+        fieldErrors[`contributors[${i}]`] = localizeContributorErrorMessage(
+          rawMessage,
+          t
+        )
+        hasError = true
+      }
+    }
+
+    // Duplicate name check (case-insensitive) — mark only the duplicate, not the original
+    const seenNames = new Set()
+    for (let i = 0; i < cleanNames.length; i++) {
+      if (!cleanNames[i]) {
+        continue
+      }
+      const normalised = cleanNames[i].toLowerCase()
+      if (seenNames.has(normalised)) {
+        fieldErrors[`contributors[${i}]`] = t(
+          'projects.funding_sources.contributors.errors.duplicate'
+        )
+        hasError = true
+      } else {
+        seenNames.add(normalised)
+      }
+    }
+
+    return { fieldErrors, hasError }
+  }
+
+  // ── Row value calculator ────────────────────────────────────────────────────
+
+  _getRowValue(row, fvRow) {
+    if (row.kind === 'source') {
+      return (
+        parseInt(String(fvRow[row.field] || '0').replace(/\D/g, ''), 10) || 0
+      )
+    } else if (row.kind === 'contributor') {
+      const items = fvRow[row.contributorArrayField] || []
+      const match = items.find((c) => c.name === row.contributorName)
+      return parseInt(String(match?.amount || '0').replace(/\D/g, ''), 10) || 0
+    } else {
+      return 0
+    }
+  }
+
+  // ── Contributor coverage check ────────────────────────────────────────────
+
+  _checkContributorCoverage(sessionData, fundingValues) {
+    for (const group of CONTRIBUTOR_SPEND_GROUPS) {
+      if (!sessionData[group.enabledField]) {
+        continue
+      }
+      const names = getContributorNames(sessionData, group)
+      for (const name of names) {
+        const hasAmount = fundingValues.some((row) => {
+          const contributors = row[group.contributorArrayField]
+          return (
+            Array.isArray(contributors) &&
+            contributors.some(
+              (c) =>
+                c.name === name &&
+                c.amount !== null &&
+                c.amount !== undefined &&
+                c.amount !== ''
+            )
+          )
+        })
+        if (!hasAmount) {
+          return 'projects.funding_sources.estimated_spend.errors.required'
+        }
+      }
+    }
+    return null
+  }
+
+  // ── Spend validation error builder ─────────────────────────────────────
+
+  _buildSpendValidationErrors(error, contributorCoverageError, t) {
+    const fieldErrors = {}
+    let globalError = null
+
+    if (contributorCoverageError) {
+      globalError = t(contributorCoverageError)
+    }
+
+    if (!error) {
+      return { fieldErrors, globalError }
+    }
+
+    for (const detail of error.details) {
+      const path = detail.path
+      const isTopLevel =
+        path.length === 0 || (path.length === 1 && typeof path[0] === 'number')
+      if (isTopLevel) {
+        if (!globalError) {
+          globalError = t(
+            'projects.funding_sources.estimated_spend.errors.required'
+          )
+        }
+      } else {
+        const fieldKey = path[path.length - 1]
+        if (fieldKey && !fieldErrors[fieldKey]) {
+          const msgKey =
+            detail.type === 'string.max'
+              ? 'projects.funding_sources.estimated_spend.errors.max_digits'
+              : 'projects.funding_sources.estimated_spend.errors.invalid'
+          fieldErrors[fieldKey] = t(msgKey)
+        }
+      }
+    }
+
+    return { fieldErrors, globalError }
   }
 
   async getEstimatedSpend(request, h) {
@@ -840,32 +950,10 @@ class FundingSourcesController {
     // ── Per-contributor coverage check ────────────────────────────────────────
     // Each named contributor must have at least one amount across all years.
     // (The Joi schema validates individual amount formats but not coverage.)
-    let contributorCoverageError = null
-    for (const group of CONTRIBUTOR_SPEND_GROUPS) {
-      if (!sessionData[group.enabledField]) continue
-      const names = getContributorNames(sessionData, group)
-      for (const name of names) {
-        const hasAmount = fundingValuesForValidation.some((row) => {
-          const contributors = row[group.contributorArrayField]
-          return (
-            Array.isArray(contributors) &&
-            contributors.some(
-              (c) =>
-                c.name === name &&
-                c.amount !== null &&
-                c.amount !== undefined &&
-                c.amount !== ''
-            )
-          )
-        })
-        if (!hasAmount) {
-          contributorCoverageError =
-            'projects.funding_sources.estimated_spend.errors.required'
-          break
-        }
-      }
-      if (contributorCoverageError) break
-    }
+    const contributorCoverageError = this._checkContributorCoverage(
+      sessionData,
+      fundingValuesForValidation
+    )
 
     // Validate the cleaned version (empty contributor entries removed)
     const selectedSources = getSelectedEstimatedSpendSourceFields(sessionData)
@@ -875,39 +963,12 @@ class FundingSourcesController {
     })
 
     if (error || contributorCoverageError) {
-      const fieldErrors = {}
-      let globalError = null
       const t = request.t.bind(request)
-
-      if (contributorCoverageError) {
-        globalError = t(contributorCoverageError)
-      }
-
-      if (error) {
-        for (const detail of error.details) {
-          const path = detail.path
-          if (
-            path.length === 0 ||
-            (path.length === 1 && typeof path[0] === 'number')
-          ) {
-            if (!globalError) {
-              globalError = t(
-                'projects.funding_sources.estimated_spend.errors.required'
-              )
-            }
-          } else {
-            const fieldKey = path[path.length - 1]
-            if (fieldKey && !fieldErrors[fieldKey]) {
-              const msgKey =
-                detail.type === 'string.max'
-                  ? 'projects.funding_sources.estimated_spend.errors.max_digits'
-                  : 'projects.funding_sources.estimated_spend.errors.invalid'
-              fieldErrors[fieldKey] = t(msgKey)
-            }
-          }
-        }
-      }
-
+      const { fieldErrors, globalError } = this._buildSpendValidationErrors(
+        error,
+        contributorCoverageError,
+        t
+      )
       const viewData = this._buildEstimatedSpendViewData(request, {
         existingValues: fundingValues,
         fieldErrors,
@@ -934,7 +995,9 @@ class FundingSourcesController {
       viewData,
       PROJECT_VIEWS.FUNDING_SOURCES_ESTIMATED_SPEND
     )
-    if (saveError) return saveError
+    if (saveError) {
+      return saveError
+    }
 
     return navigateToProjectOverview(referenceNumber, h)
   }

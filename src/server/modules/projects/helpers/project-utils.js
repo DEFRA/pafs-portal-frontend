@@ -384,7 +384,9 @@ export function buildProcessedFundingValues(projectData) {
   const dbValues = projectData.pafs_core_funding_values || []
   const dbContributors = projectData.pafs_core_funding_contributors || []
 
-  if (!dbValues.length) return []
+  if (!dbValues.length) {
+    return []
+  }
 
   const sortedValues = [...dbValues].sort(
     (a, b) => Number(a.financialYear) - Number(b.financialYear)
@@ -415,9 +417,13 @@ export function buildProcessedFundingValues(projectData) {
   const contributorsByYear = {}
   for (const c of dbContributors) {
     const year = idToYear.get(String(c.fundingValueId))
-    if (year == null) continue
+    if (year == null) {
+      continue
+    }
     const key = String(year)
-    if (!contributorsByYear[key]) contributorsByYear[key] = []
+    if (!contributorsByYear[key]) {
+      contributorsByYear[key] = []
+    }
     contributorsByYear[key].push(c)
   }
 
@@ -466,9 +472,11 @@ export function buildProcessedFundingValues(projectData) {
     if (publicContributors.length) {
       row.publicContributors = publicContributors
     }
+
     if (privateContributors.length) {
       row.privateContributors = privateContributors
     }
+
     if (otherEaContributors.length) {
       row.otherEaContributors = otherEaContributors
     }

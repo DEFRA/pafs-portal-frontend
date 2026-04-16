@@ -33,6 +33,41 @@ export function getContributorNames(sessionData, group) {
 }
 
 /**
+ * Build rows for a contributor group (internal helper).
+ */
+function buildContributorGroupRows(
+  rows,
+  src,
+  sessionData,
+  contributorGroup,
+  t
+) {
+  const overviewPrefix = 'projects.overview.funding_sources_summary_card'
+  const contributorNames = getContributorNames(sessionData, contributorGroup)
+
+  if (contributorNames.length) {
+    rows.push({
+      kind: 'group-heading',
+      label: t(`${overviewPrefix}.${contributorGroup.sectionLabelKey}`)
+    })
+
+    contributorNames.forEach((name, contributorIndex) => {
+      rows.push({
+        kind: 'contributor',
+        sourceField: contributorGroup.sourceField,
+        contributorArrayField: contributorGroup.contributorArrayField,
+        contributorType: contributorGroup.contributorType,
+        contributorName: name,
+        contributorIndex,
+        label: name
+      })
+    })
+    return true
+  }
+  return false
+}
+
+/**
  * Build the ordered list of spending rows for the estimated-spend table.
  *
  * Each row is one of:
@@ -70,28 +105,14 @@ export function buildEstimatedSpendRows(sessionData, t) {
       )
 
       if (contributorGroup) {
-        const contributorNames = getContributorNames(
+        const hasContributors = buildContributorGroupRows(
+          rows,
+          src,
           sessionData,
-          contributorGroup
+          contributorGroup,
+          t
         )
-
-        if (contributorNames.length) {
-          rows.push({
-            kind: 'group-heading',
-            label: t(`${overviewPrefix}.${contributorGroup.sectionLabelKey}`)
-          })
-
-          contributorNames.forEach((name, contributorIndex) => {
-            rows.push({
-              kind: 'contributor',
-              sourceField: contributorGroup.sourceField,
-              contributorArrayField: contributorGroup.contributorArrayField,
-              contributorType: contributorGroup.contributorType,
-              contributorName: name,
-              contributorIndex,
-              label: name
-            })
-          })
+        if (hasContributors) {
           continue
         }
       }
@@ -124,7 +145,9 @@ export function getSelectedEstimatedSpendSourceFields(sessionData) {
     CONTRIBUTOR_SPEND_GROUPS.map((g) => g.sourceField)
   )
   return MAIN_SPEND_SOURCES.filter((src) => {
-    if (contributorSourceFields.has(src.field)) return false
+    if (contributorSourceFields.has(src.field)) {
+      return false
+    }
     return Boolean(sessionData[src.field])
   }).map((src) => src.field)
 }
