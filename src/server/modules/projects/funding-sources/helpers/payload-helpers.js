@@ -69,8 +69,9 @@ export function sanitiseFundingValueRow(row) {
         }
         return out
       })
+    } else {
+      // Primitive non-string values (numbers, booleans) — keep as-is
     }
-    // Primitive non-string values (numbers, booleans) — keep as-is
   }
 
   return cleaned
@@ -207,28 +208,36 @@ function _parseNestedFundingValues(raw) {
  * e.g. `fundingValues[0][financialYear]` → { '0': { financialYear: … } }
  * @private
  */
+function _extractBracketSegments(key, bracketRe) {
+  const segments = []
+  let match
+  while ((match = bracketRe.exec(key)) !== null) {
+    segments.push(match[1])
+  }
+  bracketRe.lastIndex = 0
+  return segments
+}
+
+function _setNestedValue(root, segments, value) {
+  let current = root
+  for (let i = 0; i < segments.length - 1; i++) {
+    if (current[segments[i]] === undefined) {
+      current[segments[i]] = {}
+    }
+    current = current[segments[i]]
+  }
+  current[segments.at(-1)] = value
+}
+
 function _buildRootFromBracketKeys(payload) {
   const bracketRe = /\[(\w+)\]/g
   const root = {}
 
   for (const [key, value] of Object.entries(payload)) {
     if (key.startsWith('fundingValues[')) {
-      const segments = []
-      let match
-      while ((match = bracketRe.exec(key)) !== null) {
-        segments.push(match[1])
-      }
-      bracketRe.lastIndex = 0
-
+      const segments = _extractBracketSegments(key, bracketRe)
       if (segments.length > 0) {
-        let current = root
-        for (let i = 0; i < segments.length - 1; i++) {
-          if (current[segments[i]] === undefined) {
-            current[segments[i]] = {}
-          }
-          current = current[segments[i]]
-        }
-        current[segments.at(-1)] = value
+        _setNestedValue(root, segments, value)
       }
     }
   }
