@@ -23,14 +23,15 @@ export const ALL_CARBON_FIELDS = [
   ...CARBON_INTEGER_FIELDS
 ]
 
-const MAX_DIGITS = 18
+const MAX_EMISSION_DIGITS = 16
+const MAX_COST_DIGITS = 18
 const DECIMAL_REGEX = /^\d+(\.\d{1,2})?$/
 const INTEGER_REGEX = /^\d+$/
 
-const CARBON_INVALID_ERROR =
-  'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
-const CARBON_MAX_DIGITS_ERROR =
-  'You have exceeded the maximum number of digits allowed. Please re-enter.'
+const CARBON_EMISSION_INVALID_ERROR =
+  'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
+const CARBON_COST_INVALID_ERROR =
+  'Please enter a whole number with no more than 18 digits.'
 const CARBON_REQUIRED_ERROR = 'Please enter the value'
 
 const validateCarbonDecimal = (value, helpers) => {
@@ -38,7 +39,7 @@ const validateCarbonDecimal = (value, helpers) => {
     return helpers.error('string.pattern.base')
   }
   const intPart = value.split('.')[0]
-  if (intPart.length > MAX_DIGITS) {
+  if (intPart.length > MAX_EMISSION_DIGITS) {
     return helpers.error('string.max')
   }
   return value
@@ -48,7 +49,7 @@ const validateCarbonInteger = (value, helpers) => {
   if (!INTEGER_REGEX.test(value)) {
     return helpers.error('string.pattern.base')
   }
-  if (value.length > MAX_DIGITS) {
+  if (value.length > MAX_COST_DIGITS) {
     return helpers.error('string.max')
   }
   return value
@@ -65,9 +66,9 @@ const optionalDecimalField = Joi.string()
     return validateCarbonDecimal(value, helpers)
   })
   .messages({
-    'string.base': CARBON_INVALID_ERROR,
-    'string.pattern.base': CARBON_INVALID_ERROR,
-    'string.max': CARBON_MAX_DIGITS_ERROR
+    'string.base': CARBON_EMISSION_INVALID_ERROR,
+    'string.pattern.base': CARBON_EMISSION_INVALID_ERROR,
+    'string.max': CARBON_EMISSION_INVALID_ERROR
   })
 
 const optionalIntegerField = Joi.string()
@@ -81,9 +82,9 @@ const optionalIntegerField = Joi.string()
     return validateCarbonInteger(value, helpers)
   })
   .messages({
-    'string.base': CARBON_INVALID_ERROR,
-    'string.pattern.base': CARBON_INVALID_ERROR,
-    'string.max': CARBON_MAX_DIGITS_ERROR
+    'string.base': CARBON_COST_INVALID_ERROR,
+    'string.pattern.base': CARBON_COST_INVALID_ERROR,
+    'string.max': CARBON_COST_INVALID_ERROR
   })
 
 const requiredIntegerField = Joi.string()
@@ -92,9 +93,9 @@ const requiredIntegerField = Joi.string()
   .required()
   .custom(validateCarbonInteger)
   .messages({
-    'string.base': CARBON_INVALID_ERROR,
-    'string.pattern.base': CARBON_INVALID_ERROR,
-    'string.max': CARBON_MAX_DIGITS_ERROR,
+    'string.base': CARBON_COST_INVALID_ERROR,
+    'string.pattern.base': CARBON_COST_INVALID_ERROR,
+    'string.max': CARBON_COST_INVALID_ERROR,
     'any.required': CARBON_REQUIRED_ERROR
   })
 
@@ -119,10 +120,10 @@ const optionalDecimalFieldNegativeCheck = Joi.string()
     return validateCarbonDecimal(value, helpers)
   })
   .messages({
-    'string.base': CARBON_INVALID_ERROR,
+    'string.base': CARBON_EMISSION_INVALID_ERROR,
     'string.negative': CARBON_NEGATIVE_ERROR,
-    'string.pattern.base': CARBON_INVALID_ERROR,
-    'string.max': CARBON_MAX_DIGITS_ERROR
+    'string.pattern.base': CARBON_EMISSION_INVALID_ERROR,
+    'string.max': CARBON_EMISSION_INVALID_ERROR
   })
 
 /**

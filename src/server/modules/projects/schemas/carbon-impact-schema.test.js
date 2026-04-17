@@ -87,7 +87,7 @@ describe('carbon-impact-schema', () => {
     test('accepts valid decimal values up to 2 decimal places', () => {
       const payload = {
         ...validPayload,
-        [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '999999999999999999.99'
+        [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '1234567890123456.99'
       }
 
       const { error } = carbonImpactSchema.validate(payload, {
@@ -119,7 +119,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
+        'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
       )
     })
 
@@ -134,14 +134,14 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
+        'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
       )
     })
 
-    test('rejects decimal values exceeding 18 integer digits', () => {
+    test('rejects decimal values exceeding 16 integer digits', () => {
       const payload = {
         ...validPayload,
-        [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '1234567890123456789.00'
+        [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '12345678901234567.00'
       }
 
       const { error } = carbonImpactSchema.validate(payload, {
@@ -149,7 +149,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'You have exceeded the maximum number of digits allowed. Please re-enter.'
+        'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
       )
     })
 
@@ -164,7 +164,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
+        'Please enter a whole number with no more than 18 digits.'
       )
     })
 
@@ -180,7 +180,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'You have exceeded the maximum number of digits allowed. Please re-enter.'
+        'Please enter a whole number with no more than 18 digits.'
       )
     })
 
@@ -248,7 +248,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
+        'Please enter a whole number with no more than 18 digits.'
       )
     })
   })
@@ -292,7 +292,7 @@ describe('carbon-impact-schema', () => {
         ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: 'abc' })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
+          'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
         )
       })
 
@@ -411,7 +411,7 @@ describe('carbon-impact-schema', () => {
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
+          'Please enter a whole number with no more than 18 digits.'
         )
       })
     })
@@ -444,7 +444,7 @@ describe('carbon-impact-schema', () => {
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Enter a valid number (up to 2 decimal places for tCO₂ fields, whole numbers for £ fields)'
+          'Please enter a whole number with no more than 18 digits.'
         )
       })
 
