@@ -321,6 +321,8 @@ function buildSpendValidationErrors(error, contributorCoverageError, t) {
       fieldErrors[classified.fieldKey] = t(
         `${ERROR_PREFIX}${classified.msgSuffix}`
       )
+    } else {
+      // Duplicate or unclassified detail — intentionally ignored
     }
   }
 
