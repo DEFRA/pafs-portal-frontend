@@ -279,37 +279,48 @@ function checkContributorCoverage(sessionData, fundingValues) {
  * contributor coverage check.
  * @private
  */
+function classifyValidationDetail(detail) {
+  const path = detail.path
+  const isTopLevel =
+    path.length === 0 || (path.length === 1 && typeof path[0] === 'number')
+
+  if (isTopLevel) {
+    return { kind: 'global' }
+  }
+
+  const fieldKey = path[path.length - 1]
+  if (!fieldKey) {
+    return null
+  }
+
+  const msgSuffix = detail.type === 'string.max' ? 'max_digits' : 'invalid'
+  return { kind: 'field', fieldKey, msgSuffix }
+}
+
 function buildSpendValidationErrors(error, contributorCoverageError, t) {
   const fieldErrors = {}
-  let globalError = null
-
-  if (contributorCoverageError) {
-    globalError = t(contributorCoverageError)
-  }
+  let globalError = contributorCoverageError
+    ? t(contributorCoverageError)
+    : null
 
   if (!error) {
     return { fieldErrors, globalError }
   }
 
+  const ERROR_PREFIX = 'projects.funding_sources.estimated_spend.errors.'
+
   for (const detail of error.details) {
-    const path = detail.path
-    const isTopLevel =
-      path.length === 0 || (path.length === 1 && typeof path[0] === 'number')
-    if (isTopLevel) {
-      if (!globalError) {
-        globalError = t(
-          'projects.funding_sources.estimated_spend.errors.required'
-        )
-      }
-    } else {
-      const fieldKey = path[path.length - 1]
-      if (fieldKey && !fieldErrors[fieldKey]) {
-        const msgKey =
-          detail.type === 'string.max'
-            ? 'projects.funding_sources.estimated_spend.errors.max_digits'
-            : 'projects.funding_sources.estimated_spend.errors.invalid'
-        fieldErrors[fieldKey] = t(msgKey)
-      }
+    const classified = classifyValidationDetail(detail)
+
+    if (classified?.kind === 'global' && !globalError) {
+      globalError = t(`${ERROR_PREFIX}required`)
+    } else if (
+      classified?.kind === 'field' &&
+      !fieldErrors[classified.fieldKey]
+    ) {
+      fieldErrors[classified.fieldKey] = t(
+        `${ERROR_PREFIX}${classified.msgSuffix}`
+      )
     }
   }
 
