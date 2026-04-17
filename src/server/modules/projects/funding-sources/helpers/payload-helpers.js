@@ -62,6 +62,9 @@ export function sanitiseFundingValueRow(row) {
       normalisedArray = val
     } else if (val && typeof val === 'object') {
       normalisedArray = Object.values(val)
+    } else {
+      // Primitive non-string values (numbers, booleans) — keep as-is
+      continue
     }
 
     if (normalisedArray) {
@@ -219,7 +222,7 @@ function _parseNestedFundingValues(raw) {
  * @private
  */
 function _buildRootFromBracketKeys(payload) {
-  const bracketRe = /\[([^\]]+)\]/g
+  const bracketRe = /\[(\w+)\]/g
   const root = {}
 
   for (const [key, value] of Object.entries(payload)) {

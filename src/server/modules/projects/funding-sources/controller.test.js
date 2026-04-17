@@ -94,14 +94,19 @@ vi.mock('../helpers/project-submission.js', () => ({
   saveProjectWithErrorHandling: vi.fn()
 }))
 
-vi.mock('../helpers/project-utils.js', () => ({
-  buildViewData: vi.fn(),
-  buildFinancialYearLabel: vi.fn((y) => `${y}/${y + 1}`),
-  formatNumberWithCommas: vi.fn((n) => String(n)),
-  getSessionData: vi.fn(),
-  navigateToProjectOverview: vi.fn(),
-  updateSessionData: vi.fn()
-}))
+vi.mock('../helpers/project-utils.js', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    buildViewData: vi.fn(),
+    buildFinancialYearLabel: vi.fn((y) => `${y}/${y + 1}`),
+    buildIdToYearMap: actual.buildIdToYearMap,
+    buildContributorsByYear: actual.buildContributorsByYear,
+    formatNumberWithCommas: vi.fn((n) => String(n)),
+    getSessionData: vi.fn(),
+    navigateToProjectOverview: vi.fn(),
+    updateSessionData: vi.fn()
+  }
+})
 
 vi.mock('./helpers/navigation-helpers.js', () => ({
   resolveBackLinkOptions: vi.fn().mockReturnValue({}),

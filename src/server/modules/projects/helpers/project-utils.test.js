@@ -24,7 +24,9 @@ import {
   getProjectStateTag,
   isConfidenceRestrictedProjectType,
   buildProcessedFundingValues,
-  computeFundingSourceTotals
+  computeFundingSourceTotals,
+  buildIdToYearMap,
+  buildContributorsByYear
 } from './project-utils.js'
 import {
   PROJECT_SESSION_KEY,
@@ -1204,6 +1206,80 @@ describe('project-utils', () => {
       expect(result.sourceTotals.fcermGia).toBe(1000)
       expect(result.sourceTotals.publicContributions).toBe(0)
       expect(result.grandTotal).toBe(1000)
+    })
+  })
+
+  describe('formatNumberWithCommas short values', () => {
+    test('should return single digit as-is', () => {
+      expect(formatNumberWithCommas(5)).toBe('5')
+    })
+
+    test('should return 2 digits as-is', () => {
+      expect(formatNumberWithCommas(42)).toBe('42')
+    })
+
+    test('should return 3 digits as-is (no comma)', () => {
+      expect(formatNumberWithCommas(123)).toBe('123')
+    })
+
+    test('should return 0 as "0"', () => {
+      expect(formatNumberWithCommas(0)).toBe('0')
+    })
+  })
+
+  describe('buildIdToYearMap', () => {
+    test('maps ids from funding values when ids are present', () => {
+      const sorted = [
+        { id: 10, financialYear: 2025 },
+        { id: 20, financialYear: 2026 }
+      ]
+      const result = buildIdToYearMap(sorted, new Set())
+      expect(result.get('10')).toBe(2025)
+      expect(result.get('20')).toBe(2026)
+    })
+
+    test('uses positional mapping when ids are absent', () => {
+      const sorted = [{ financialYear: 2025 }, { financialYear: 2026 }]
+      const refIds = new Set(['100', '200'])
+      const result = buildIdToYearMap(sorted, refIds)
+      expect(result.get('100')).toBe(2025)
+      expect(result.get('200')).toBe(2026)
+    })
+
+    test('ignores excess reference ids beyond sorted values length', () => {
+      const sorted = [{ financialYear: 2025 }]
+      const refIds = new Set(['100', '200'])
+      const result = buildIdToYearMap(sorted, refIds)
+      expect(result.get('100')).toBe(2025)
+      expect(result.has('200')).toBe(false)
+    })
+  })
+
+  describe('buildContributorsByYear', () => {
+    test('groups contributors by resolved financial year', () => {
+      const idToYear = new Map([
+        ['10', 2025],
+        ['20', 2026]
+      ])
+      const contributors = [
+        { fundingValueId: 10, name: 'A' },
+        { fundingValueId: 20, name: 'B' },
+        { fundingValueId: 10, name: 'C' }
+      ]
+      const result = buildContributorsByYear(contributors, idToYear)
+      expect(result['2025']).toHaveLength(2)
+      expect(result['2026']).toHaveLength(1)
+    })
+
+    test('skips contributors with unresolvable fundingValueId', () => {
+      const idToYear = new Map([['10', 2025]])
+      const contributors = [
+        { fundingValueId: 10, name: 'A' },
+        { fundingValueId: 999, name: 'B' }
+      ]
+      const result = buildContributorsByYear(contributors, idToYear)
+      expect(result['2025']).toHaveLength(1)
+      expect(result['999']).toBeUndefined()
     })
   })
 })

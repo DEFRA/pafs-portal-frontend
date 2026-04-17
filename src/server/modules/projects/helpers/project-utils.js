@@ -372,9 +372,8 @@ const FUNDING_AMOUNT_FIELDS = [
 
 /**
  * Build ID-to-year mapping from funding values
- * @private
  */
-function buildIdToYearMap(sortedValues, referencedIds) {
+export function buildIdToYearMap(sortedValues, referencedIds) {
   const idToYear = new Map()
   const hasIds = sortedValues.some((fv) => fv.id != null)
 
@@ -398,9 +397,8 @@ function buildIdToYearMap(sortedValues, referencedIds) {
 
 /**
  * Group contributors by financial year
- * @private
  */
-function buildContributorsByYear(dbContributors, idToYear) {
+export function buildContributorsByYear(dbContributors, idToYear) {
   const contributorsByYear = {}
   for (const c of dbContributors) {
     const year = idToYear.get(String(c.fundingValueId))
@@ -495,7 +493,7 @@ export function buildProcessedFundingValues(projectData) {
     return []
   }
 
-  const sortedValues = [...dbValues].sort(
+  const sortedValues = [...dbValues].toSorted(
     (a, b) => Number(a.financialYear) - Number(b.financialYear)
   )
 

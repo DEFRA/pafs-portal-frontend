@@ -11,6 +11,8 @@ import { saveProjectWithErrorHandling } from '../../helpers/project-submission.j
 import {
   buildViewData,
   buildFinancialYearLabel,
+  buildIdToYearMap,
+  buildContributorsByYear,
   formatNumberWithCommas,
   getSessionData,
   navigateToProjectOverview,
@@ -33,87 +35,60 @@ import {
 // ─── Standalone helper functions ────────────────────────────────────────────
 
 /**
- * Build a map from funding value ID → financial year.
- * If DB values carry an `id`, use it directly; otherwise align referenced IDs
- * positionally with sorted funding value rows.
+ * Map from funding value camelCase keys to PROJECT_PAYLOAD_FIELDS constants.
  * @private
  */
-function buildIdToYearMap(sortedValues, referencedIds) {
-  const idToYear = new Map()
-  const hasIds = sortedValues.some((fv) => fv.id != null)
+const FUNDING_VALUE_FIELD_MAP = [
+  ['fcermGia', PROJECT_PAYLOAD_FIELDS.FCERM_GIA],
+  ['localLevy', PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY],
+  ['publicContributions', PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS],
+  ['privateContributions', PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS],
+  ['otherEaContributions', PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS],
+  ['notYetIdentified', PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED],
+  [
+    'assetReplacementAllowance',
+    PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE
+  ],
+  [
+    'environmentStatutoryFunding',
+    PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING
+  ],
+  [
+    'frequentlyFloodedCommunities',
+    PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES
+  ],
+  [
+    'otherAdditionalGrantInAid',
+    PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID
+  ],
+  [
+    'otherGovernmentDepartment',
+    PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT
+  ],
+  ['recovery', PROJECT_PAYLOAD_FIELDS.RECOVERY],
+  ['summerEconomicFund', PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND]
+]
 
-  if (hasIds) {
-    for (const fv of sortedValues) {
-      idToYear.set(String(fv.id), Number(fv.financialYear))
-    }
-  } else {
-    const sortedRefIds = [...referencedIds].toSorted(
-      (a, b) => Number(a) - Number(b)
-    )
-    sortedRefIds.forEach((refId, idx) => {
-      if (idx < sortedValues.length) {
-        idToYear.set(refId, Number(sortedValues[idx].financialYear))
-      }
-    })
-  }
-
-  return idToYear
+/**
+ * Contributor type → row array key mapping.
+ * @private
+ */
+const CONTRIBUTOR_TYPE_TO_KEY = {
+  public_contributions: 'publicContributors',
+  private_contributions: 'privateContributors',
+  other_ea_contributions: 'otherEaContributors'
 }
 
 /**
- * Group DB contributors by their resolved financial year.
+ * Categorise a flat array of contributors into typed groups.
  * @private
  */
-function buildContributorsByYear(dbContributors, idToYear) {
-  const contributorsByYear = {}
-  for (const c of dbContributors) {
-    const year = idToYear.get(String(c.fundingValueId))
-    if (year == null) {
-      continue
-    }
-    const key = String(year)
-    if (!contributorsByYear[key]) {
-      contributorsByYear[key] = []
-    }
-    contributorsByYear[key].push(c)
+function categoriseContributors(yearContributors) {
+  const groups = {
+    publicContributors: [],
+    privateContributors: [],
+    otherEaContributors: []
   }
-  return contributorsByYear
-}
-
-/**
- * Build a single funding value row with contributor arrays merged in.
- * @private
- */
-function buildFundingValueRow(fv, contributorsByYear) {
-  const row = {
-    financialYear: Number(fv.financialYear),
-    [PROJECT_PAYLOAD_FIELDS.FCERM_GIA]: fv.fcermGia || null,
-    [PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY]: fv.localLevy || null,
-    [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]:
-      fv.publicContributions || null,
-    [PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]:
-      fv.privateContributions || null,
-    [PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS]:
-      fv.otherEaContributions || null,
-    [PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED]: fv.notYetIdentified || null,
-    [PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE]:
-      fv.assetReplacementAllowance || null,
-    [PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING]:
-      fv.environmentStatutoryFunding || null,
-    [PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES]:
-      fv.frequentlyFloodedCommunities || null,
-    [PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID]:
-      fv.otherAdditionalGrantInAid || null,
-    [PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT]:
-      fv.otherGovernmentDepartment || null,
-    [PROJECT_PAYLOAD_FIELDS.RECOVERY]: fv.recovery || null,
-    [PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND]: fv.summerEconomicFund || null
-  }
-
-  const yearContributors = contributorsByYear[String(row.financialYear)] || []
-  const publicContributors = []
-  const privateContributors = []
-  const otherEaContributors = []
 
   for (const c of yearContributors) {
     const entry = {
@@ -121,26 +96,35 @@ function buildFundingValueRow(fv, contributorsByYear) {
       contributorType: c.contributorType,
       amount: c.amount != null ? String(c.amount) : ''
     }
-    if (c.contributorType === 'public_contributions') {
-      publicContributors.push(entry)
-    }
-    if (c.contributorType === 'private_contributions') {
-      privateContributors.push(entry)
-    }
-    if (c.contributorType === 'other_ea_contributions') {
-      otherEaContributors.push(entry)
+    const key = CONTRIBUTOR_TYPE_TO_KEY[c.contributorType]
+    if (key) {
+      groups[key].push(entry)
     }
   }
 
-  if (publicContributors.length) {
-    row.publicContributors = publicContributors
+  return groups
+}
+
+/**
+ * Build a single funding value row with contributor arrays merged in.
+ * @private
+ */
+function buildFundingValueRow(fv, contributorsByYear) {
+  const row = { financialYear: Number(fv.financialYear) }
+
+  for (const [srcKey, payloadField] of FUNDING_VALUE_FIELD_MAP) {
+    row[payloadField] = fv[srcKey] || null
   }
-  if (privateContributors.length) {
-    row.privateContributors = privateContributors
+
+  const yearContributors = contributorsByYear[String(row.financialYear)] || []
+  const groups = categoriseContributors(yearContributors)
+
+  for (const [key, arr] of Object.entries(groups)) {
+    if (arr.length) {
+      row[key] = arr
+    }
   }
-  if (otherEaContributors.length) {
-    row.otherEaContributors = otherEaContributors
-  }
+
   return row
 }
 
@@ -263,6 +247,18 @@ function hasContributorAmount(fundingValues, contributorArrayField, name) {
 }
 
 /**
+ * Check whether a single contributor group has full amount coverage.
+ * Returns true if every named contributor has at least one non-empty amount.
+ * @private
+ */
+function isGroupFullyCovered(sessionData, fundingValues, group) {
+  const names = getContributorNames(sessionData, group)
+  return names.every((name) =>
+    hasContributorAmount(fundingValues, group.contributorArrayField, name)
+  )
+}
+
+/**
  * Verify every named contributor in enabled groups has at least one amount.
  * @private
  */
@@ -271,13 +267,8 @@ function checkContributorCoverage(sessionData, fundingValues) {
     if (!sessionData[group.enabledField]) {
       continue
     }
-    const names = getContributorNames(sessionData, group)
-    for (const name of names) {
-      if (
-        !hasContributorAmount(fundingValues, group.contributorArrayField, name)
-      ) {
-        return 'projects.funding_sources.estimated_spend.errors.required'
-      }
+    if (!isGroupFullyCovered(sessionData, fundingValues, group)) {
+      return 'projects.funding_sources.estimated_spend.errors.required'
     }
   }
   return null

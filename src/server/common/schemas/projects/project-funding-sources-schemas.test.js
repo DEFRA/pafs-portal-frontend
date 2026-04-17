@@ -165,6 +165,27 @@ describe('project-funding-sources-schemas', () => {
       expect(error.details[0].type).toBe('string.pattern.base')
     })
 
+    test('rejects spend value exceeding 18 digits', () => {
+      const { error } = fundingValueRowSchema.validate(
+        validRow({
+          fcermGia: '1234567890123456789' // 19 digits
+        })
+      )
+
+      expect(error).toBeDefined()
+      expect(error.details[0].type).toBe('string.max')
+    })
+
+    test('accepts spend value with exactly 18 digits', () => {
+      const { error } = fundingValueRowSchema.validate(
+        validRow({
+          fcermGia: '123456789012345678' // 18 digits
+        })
+      )
+
+      expect(error).toBeUndefined()
+    })
+
     test('rejects mismatched contributor type inside contributor array', () => {
       const { error } = fundingValueRowSchema.validate(
         validRow({

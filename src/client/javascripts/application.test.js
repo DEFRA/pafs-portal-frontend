@@ -362,4 +362,34 @@ describe('initEstimatedSpend (progressive enhancement)', () => {
     const grand = document.querySelector('[data-grand-total]')
     expect(grand.textContent).toBe('1,234')
   })
+
+  it('ignores extra input cells beyond numCols', async () => {
+    // 1 col-total but 2 spend-cell inputs → colIdx 1 should be skipped
+    document.body.innerHTML = `
+      <form id="estimated-spend-form">
+        <table>
+          <tbody>
+            <tr data-source-row>
+              <td><input data-spend-cell value="100"></td>
+              <td><input data-spend-cell value="200"></td>
+              <td data-row-total>0</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr><td data-col-total="0">0</td><td data-grand-total>0</td></tr>
+          </tfoot>
+        </table>
+      </form>
+    `
+    await import('./application.js?extracols')
+
+    const col0 = document.querySelector('[data-col-total="0"]')
+    expect(col0.textContent).toBe('100')
+    const grand = document.querySelector('[data-grand-total]')
+    // grand = col0 total only = 100 (200 not added to any col total)
+    expect(grand.textContent).toBe('100')
+    // row total includes both
+    const rowTotal = document.querySelector('[data-row-total]')
+    expect(rowTotal.textContent).toBe('300')
+  })
 })

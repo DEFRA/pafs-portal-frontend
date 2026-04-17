@@ -376,6 +376,18 @@ describe('parseFundingValuesPayload', () => {
     expect(result[1].financialYear).toBe('2026')
   })
 
+  it('falls back to bracket-key parsing when fundingValues is a primitive', () => {
+    // fundingValues is a string → _parseNestedFundingValues returns null
+    const result = parseFundingValuesPayload({ fundingValues: 'not-an-object' })
+    expect(result).toEqual([])
+  })
+
+  it('skips bracket keys that produce no regex segments', () => {
+    // A key that starts with "fundingValues[" but has no valid bracket content
+    const result = parseFundingValuesPayload({ 'fundingValues[': 'oops' })
+    expect(result).toEqual([])
+  })
+
   it('returns empty array when payload has no fundingValues keys', () => {
     const result = parseFundingValuesPayload({ action: 'continue' })
     expect(result).toEqual([])
