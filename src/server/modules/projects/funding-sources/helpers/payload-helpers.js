@@ -49,25 +49,10 @@ export function sanitiseFundingValueRow(row) {
     if (key === PROJECT_PAYLOAD_FIELDS.FINANCIAL_YEAR) {
       // Always store as a number for consistency with DB and template comparison
       cleaned[key] = Number(val) || 0
-      continue
-    }
-
-    if (typeof val === 'string') {
+    } else if (typeof val === 'string') {
       cleaned[key] = val.replaceAll(',', '').trim()
-      continue
-    }
-
-    let normalisedArray = null
-    if (Array.isArray(val)) {
-      normalisedArray = val
-    } else if (val && typeof val === 'object') {
-      normalisedArray = Object.values(val)
-    } else {
-      // Primitive non-string values (numbers, booleans) — keep as-is
-      continue
-    }
-
-    if (normalisedArray) {
+    } else if (Array.isArray(val) || (val && typeof val === 'object')) {
+      const normalisedArray = Array.isArray(val) ? val : Object.values(val)
       cleaned[key] = normalisedArray.map((item) => {
         if (!item || typeof item !== 'object') {
           return item
@@ -85,6 +70,7 @@ export function sanitiseFundingValueRow(row) {
         return out
       })
     }
+    // Primitive non-string values (numbers, booleans) — keep as-is
   }
 
   return cleaned
@@ -226,29 +212,25 @@ function _buildRootFromBracketKeys(payload) {
   const root = {}
 
   for (const [key, value] of Object.entries(payload)) {
-    if (!key.startsWith('fundingValues[')) {
-      continue
-    }
-
-    const segments = []
-    let match
-    while ((match = bracketRe.exec(key)) !== null) {
-      segments.push(match[1])
-    }
-    bracketRe.lastIndex = 0
-
-    if (segments.length === 0) {
-      continue
-    }
-
-    let current = root
-    for (let i = 0; i < segments.length - 1; i++) {
-      if (current[segments[i]] === undefined) {
-        current[segments[i]] = {}
+    if (key.startsWith('fundingValues[')) {
+      const segments = []
+      let match
+      while ((match = bracketRe.exec(key)) !== null) {
+        segments.push(match[1])
       }
-      current = current[segments[i]]
+      bracketRe.lastIndex = 0
+
+      if (segments.length > 0) {
+        let current = root
+        for (let i = 0; i < segments.length - 1; i++) {
+          if (current[segments[i]] === undefined) {
+            current[segments[i]] = {}
+          }
+          current = current[segments[i]]
+        }
+        current[segments.at(-1)] = value
+      }
     }
-    current[segments[segments.length - 1]] = value
   }
 
   return root
@@ -353,7 +335,7 @@ function _parseBracketContributors(payload, sessionContributors) {
   }
   const indices = topLevelContributorEntries
     .map(([key]) => {
-      const match = key.match(/^contributors\[(\d+)\]$/)
+      const match = /^contributors\[(\d+)\]$/.exec(key)
       return Number(match?.[1])
     })
     .filter((i) => Number.isInteger(i))

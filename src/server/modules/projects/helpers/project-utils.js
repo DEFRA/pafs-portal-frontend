@@ -447,7 +447,7 @@ function formatFundingValueRow(fv, contributorsByYear) {
     const entry = {
       name: c.name,
       contributorType: c.contributorType,
-      amount: c.amount != null ? String(c.amount) : ''
+      amount: c.amount == null ? '' : String(c.amount)
     }
     if (c.contributorType === 'public_contributions') {
       publicContributors.push(entry)

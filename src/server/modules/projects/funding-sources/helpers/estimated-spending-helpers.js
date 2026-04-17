@@ -6,6 +6,8 @@ import {
   MAIN_SPEND_SOURCES
 } from '../../../../common/constants/projects.js'
 
+export { CONTRIBUTOR_SPEND_GROUPS } from '../../../../common/constants/projects.js'
+
 /**
  * Retrieve the list of contributor names for a given contributor group.
  * Prefers the in-progress session array, then falls back to the stored
@@ -92,8 +94,11 @@ export function buildEstimatedSpendRows(sessionData, t) {
   for (const src of MAIN_SPEND_SOURCES) {
     // Skip sources that have not been selected in this session
     if (!sessionData[src.field]) {
+      // eslint-disable-next-line no-continue
       continue
     }
+
+    let handled = false
 
     // Additional-GIA sub-sources are always plain source rows
     if (src.additionalGia) {
@@ -102,32 +107,33 @@ export function buildEstimatedSpendRows(sessionData, t) {
         field: src.field,
         label: t(`${overviewPrefix}.${src.labelKey}`)
       })
-      continue
+      handled = true
     }
 
     // Contributor-backed sources render as contributor rows when names exist
-    const contributorGroup = CONTRIBUTOR_SPEND_GROUPS.find(
-      (group) => group.sourceField === src.field
-    )
-    if (contributorGroup) {
-      const hasContributors = buildContributorGroupRows(
-        rows,
-        src,
-        sessionData,
-        contributorGroup,
-        t
+    if (!handled) {
+      const contributorGroup = CONTRIBUTOR_SPEND_GROUPS.find(
+        (group) => group.sourceField === src.field
       )
-      if (hasContributors) {
-        continue
+      if (contributorGroup) {
+        handled = buildContributorGroupRows(
+          rows,
+          src,
+          sessionData,
+          contributorGroup,
+          t
+        )
       }
     }
 
     // Fallback: plain source row
-    rows.push({
-      kind: 'source',
-      field: src.field,
-      label: t(`${overviewPrefix}.${src.labelKey}`)
-    })
+    if (!handled) {
+      rows.push({
+        kind: 'source',
+        field: src.field,
+        label: t(`${overviewPrefix}.${src.labelKey}`)
+      })
+    }
   }
 
   return rows
@@ -180,10 +186,3 @@ export function localizeContributorErrorMessage(rawMessage, t) {
   }
   return rawMessage
 }
-
-/**
- * Return the CONTRIBUTOR_SPEND_GROUPS constant (re-exported for convenience).
- * Controllers can import this to iterate over contributor groups without
- * needing to import the constants module directly.
- */
-export { CONTRIBUTOR_SPEND_GROUPS }

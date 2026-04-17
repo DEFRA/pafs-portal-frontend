@@ -94,7 +94,7 @@ function categoriseContributors(yearContributors) {
     const entry = {
       name: c.name,
       contributorType: c.contributorType,
-      amount: c.amount != null ? String(c.amount) : ''
+      amount: c.amount == null ? '' : String(c.amount)
     }
     const key = CONTRIBUTOR_TYPE_TO_KEY[c.contributorType]
     if (key) {
@@ -174,12 +174,20 @@ function loadEstimatedSpendValues(sessionData) {
  */
 function getRowValue(row, fvRow) {
   if (row.kind === 'source') {
-    return parseInt(String(fvRow[row.field] || '0').replace(/\D/g, ''), 10) || 0
+    return (
+      Number.parseInt(
+        String(fvRow[row.field] || '0').replaceAll(/\D/g, ''),
+        10
+      ) || 0
+    )
   }
   if (row.kind === 'contributor') {
     const items = fvRow[row.contributorArrayField] || []
     const match = items.find((c) => c.name === row.contributorName)
-    return parseInt(String(match?.amount || '0').replace(/\D/g, ''), 10) || 0
+    return (
+      Number.parseInt(String(match?.amount || '0').replaceAll(/\D/g, ''), 10) ||
+      0
+    )
   }
   return 0
 }
@@ -190,7 +198,7 @@ function getRowValue(row, fvRow) {
  * @private
  */
 function calculateServerTotals(spendRows, existingValues, financialYears) {
-  const colTotals = new Array(financialYears.length).fill(0)
+  const colTotals = Array.from({ length: financialYears.length }, () => 0)
   const rowTotals = {}
   let grandTotal = 0
 

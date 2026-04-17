@@ -139,12 +139,12 @@ bindCommaFormattingToInputs(
   }
 
   function stripCommas(str) {
-    return (str || '').replace(/[^\d]/g, '').trim()
+    return (str || '').replaceAll(/[^\d]/g, '').trim()
   }
 
   function parseVal(input) {
     const v = stripCommas(input.value)
-    return v === '' ? 0 : parseInt(v, 10) || 0
+    return v === '' ? 0 : Number.parseInt(v, 10) || 0
   }
 
   function formatNum(n) {
@@ -178,7 +178,7 @@ bindCommaFormattingToInputs(
     let grandTotal = 0
     colTotals.forEach(function (ct, colIdx) {
       grandTotal += ct
-      const el = form.querySelector('[data-col-total="' + colIdx + '"]')
+      const el = form.querySelector(`[data-col-total="${colIdx}"]`)
       if (el) {
         el.textContent = formatNum(ct)
       }
@@ -192,7 +192,7 @@ bindCommaFormattingToInputs(
 
   function recalc(form, numCols) {
     const rows = form.querySelectorAll('[data-source-row]')
-    const colTotals = new Array(numCols).fill(0)
+    const colTotals = Array.from({ length: numCols }, () => 0)
 
     rows.forEach(function (row) {
       processRow(row, form, colTotals, numCols)

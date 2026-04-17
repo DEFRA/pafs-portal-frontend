@@ -294,7 +294,7 @@ class ContributorsController {
   async getDeleteContributor(request, h, step) {
     const sessionData = getSessionData(request)
     const config = FUNDING_SOURCES_CONFIG[step]
-    const index = parseInt(request.params.index, 10)
+    const index = Number.parseInt(request.params.index, 10)
     const sessionKey = CONTRIBUTOR_SESSION_KEY[step]
     const namesField = CONTRIBUTOR_NAMES_FIELD[step]
     const contributors = loadContributors(sessionData, sessionKey, namesField)
@@ -330,7 +330,7 @@ class ContributorsController {
     const sessionData = getSessionData(request)
     const config = FUNDING_SOURCES_CONFIG[step]
     const { referenceNumber } = request.params
-    const index = parseInt(request.params.index, 10)
+    const index = Number.parseInt(request.params.index, 10)
     const sessionKey = CONTRIBUTOR_SESSION_KEY[step]
     const namesField = CONTRIBUTOR_NAMES_FIELD[step]
     const contributors = [
