@@ -22,7 +22,12 @@ vi.mock('../helpers/moderation-helper.js', () => ({
   buildModerationResponse: vi.fn()
 }))
 
+vi.mock('../../../common/helpers/auth/session-manager.js', () => ({
+  getAuthSession: vi.fn()
+}))
+
 import { buildModerationResponse } from '../helpers/moderation-helper.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 
 describe('IndividualDownloadsController', () => {
   let mockRequest
@@ -897,5 +902,293 @@ describe('IndividualDownloadsController', () => {
         expect(buildModerationResponse).toHaveBeenCalledOnce()
       }
     )
+  })
+
+  describe('_shouldShowModerationDownload', () => {
+    test('should show moderation download for legacy submitted urgent project', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.SLUG]: 'WXC501E-002A-005A',
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.SUBMITTED,
+        [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
+        [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: false,
+        [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: 'statutory_need'
+      })
+
+      await individualDownloadsController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ showModerationDownload: true })
+      )
+    })
+
+    test('should NOT show moderation download for non-legacy urgent project', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.SUBMITTED,
+        [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: false,
+        [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: false,
+        [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: 'statutory_need'
+      })
+
+      await individualDownloadsController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ showModerationDownload: false })
+      )
+    })
+
+    test('should NOT show moderation download for legacy revised urgent submitted project', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.SUBMITTED,
+        [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
+        [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: true,
+        [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: 'statutory_need'
+      })
+
+      await individualDownloadsController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ showModerationDownload: false })
+      )
+    })
+
+    test('should NOT show moderation download for legacy draft urgent project', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
+        [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: false,
+        [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: 'statutory_need'
+      })
+
+      await individualDownloadsController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ showModerationDownload: false })
+      )
+    })
+
+    test('should NOT show moderation download for legacy submitted non-urgent project', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_STATE]: PROJECT_STATUS.SUBMITTED,
+        [PROJECT_PAYLOAD_FIELDS.IS_LEGACY]: true,
+        [PROJECT_PAYLOAD_FIELDS.IS_REVISED]: false,
+        [PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]: 'not_urgent'
+      })
+
+      await individualDownloadsController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ showModerationDownload: false })
+      )
+    })
+  })
+
+  describe('downloadFcerm1LegacyHandler', () => {
+    let mockResponseChain
+    let localMockH
+
+    beforeEach(() => {
+      mockResponseChain = {
+        code: vi.fn().mockReturnThis(),
+        type: vi.fn().mockReturnThis(),
+        header: vi.fn().mockReturnThis()
+      }
+      localMockH = {
+        response: vi.fn().mockReturnValue(mockResponseChain)
+      }
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.SLUG]: 'WXC501E-002A-005A'
+      })
+    })
+
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
+    test('should return 401 when session is null', async () => {
+      getAuthSession.mockReturnValue(null)
+
+      await individualDownloadsController.downloadFcerm1LegacyHandler(
+        mockRequest,
+        localMockH
+      )
+
+      expect(localMockH.response).toHaveBeenCalledWith('Unauthorised')
+      expect(mockResponseChain.code).toHaveBeenCalledWith(401)
+    })
+
+    test('should return 401 when accessToken is null', async () => {
+      getAuthSession.mockReturnValue({ accessToken: null })
+
+      await individualDownloadsController.downloadFcerm1LegacyHandler(
+        mockRequest,
+        localMockH
+      )
+
+      expect(localMockH.response).toHaveBeenCalledWith('Unauthorised')
+      expect(mockResponseChain.code).toHaveBeenCalledWith(401)
+    })
+
+    test('should log warning when no access token', async () => {
+      getAuthSession.mockReturnValue({ accessToken: null })
+
+      await individualDownloadsController.downloadFcerm1LegacyHandler(
+        mockRequest,
+        localMockH
+      )
+
+      expect(mockRequest.server.logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('access token')
+      )
+    })
+
+    test('should return 500 on network error', async () => {
+      getAuthSession.mockReturnValue({ accessToken: 'valid-token' })
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockRejectedValue(new Error('Network failure'))
+      )
+
+      await individualDownloadsController.downloadFcerm1LegacyHandler(
+        mockRequest,
+        localMockH
+      )
+
+      expect(localMockH.response).toHaveBeenCalledWith(
+        'Error generating download'
+      )
+      expect(mockResponseChain.code).toHaveBeenCalledWith(500)
+    })
+
+    test('should log error on network failure', async () => {
+      const networkError = new Error('Network failure')
+      getAuthSession.mockReturnValue({ accessToken: 'valid-token' })
+      vi.stubGlobal('fetch', vi.fn().mockRejectedValue(networkError))
+
+      await individualDownloadsController.downloadFcerm1LegacyHandler(
+        mockRequest,
+        localMockH
+      )
+
+      expect(mockRequest.server.logger.error).toHaveBeenCalledWith(
+        expect.objectContaining({ err: networkError }),
+        expect.stringContaining('Network error')
+      )
+    })
+
+    test('should return backend status when backend returns non-ok', async () => {
+      getAuthSession.mockReturnValue({ accessToken: 'valid-token' })
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({ ok: false, status: 404 })
+      )
+
+      await individualDownloadsController.downloadFcerm1LegacyHandler(
+        mockRequest,
+        localMockH
+      )
+
+      expect(localMockH.response).toHaveBeenCalledWith('Download unavailable')
+      expect(mockResponseChain.code).toHaveBeenCalledWith(404)
+    })
+
+    test('should log warning when backend returns non-ok', async () => {
+      getAuthSession.mockReturnValue({ accessToken: 'valid-token' })
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({ ok: false, status: 503 })
+      )
+
+      await individualDownloadsController.downloadFcerm1LegacyHandler(
+        mockRequest,
+        localMockH
+      )
+
+      expect(mockRequest.server.logger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 503 }),
+        expect.stringContaining('Backend returned error')
+      )
+    })
+
+    test('should return xlsx buffer with filename from content-disposition', async () => {
+      getAuthSession.mockReturnValue({ accessToken: 'valid-token' })
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
+          headers: {
+            get: vi.fn((name) =>
+              name === 'content-disposition'
+                ? 'attachment; filename="WXC501E-002A-005A_legacy.xlsx"'
+                : null
+            )
+          }
+        })
+      )
+
+      await individualDownloadsController.downloadFcerm1LegacyHandler(
+        mockRequest,
+        localMockH
+      )
+
+      expect(localMockH.response).toHaveBeenCalledWith(expect.any(Buffer))
+      expect(mockResponseChain.code).toHaveBeenCalledWith(200)
+      expect(mockResponseChain.type).toHaveBeenCalledWith(
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      )
+      expect(mockResponseChain.header).toHaveBeenCalledWith(
+        'Content-Disposition',
+        'attachment; filename="WXC501E-002A-005A_legacy.xlsx"'
+      )
+    })
+
+    test('should use default filename when content-disposition is absent', async () => {
+      getAuthSession.mockReturnValue({ accessToken: 'valid-token' })
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: true,
+          arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(4)),
+          headers: { get: vi.fn().mockReturnValue(null) }
+        })
+      )
+
+      await individualDownloadsController.downloadFcerm1LegacyHandler(
+        mockRequest,
+        localMockH
+      )
+
+      expect(mockResponseChain.header).toHaveBeenCalledWith(
+        'Content-Disposition',
+        'attachment; filename="WXC501E-002A-005A_proposal.xlsx"'
+      )
+    })
+
+    test('should send correct Bearer token in Authorization header', async () => {
+      getAuthSession.mockReturnValue({ accessToken: 'my-jwt-token' })
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(4)),
+        headers: { get: vi.fn().mockReturnValue(null) }
+      })
+      vi.stubGlobal('fetch', mockFetch)
+
+      await individualDownloadsController.downloadFcerm1LegacyHandler(
+        mockRequest,
+        localMockH
+      )
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('WXC501E-002A-005A'),
+        expect.objectContaining({
+          headers: { Authorization: 'Bearer my-jwt-token' }
+        })
+      )
+    })
   })
 })

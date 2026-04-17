@@ -68,11 +68,6 @@ function buildAdminNavigation(path) {
         path.startsWith(ROUTES.ADMIN.ORGANISATIONS + '/')
     },
     {
-      text: translate('common.navigation.download_projects'),
-      href: ROUTES.ADMIN.DOWNLOAD_PROJECTS,
-      current: path === ROUTES.ADMIN.DOWNLOAD_PROJECTS
-    },
-    {
       text: translate('common.navigation.download_rma'),
       href: ROUTES.ADMIN.DOWNLOAD_RMA,
       current: path === ROUTES.ADMIN.DOWNLOAD_RMA

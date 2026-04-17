@@ -21,7 +21,7 @@
       "archive": "Archive",
       "revert_to_draft": "Revert to draft",
       "revert_to_revise": "Revert to revise",
-      "download": "Download",
+      "download": "Download Proposal",
       "delete": "Delete",
       "not_submitted": "Not yet submitted",
       "not_provided": "Not provided",
@@ -957,7 +957,7 @@
     "urgency_reason": {
       "title": "Is the project urgent for any of the following reasons?",
       "heading": "Is the project urgent for any of the following reasons?",
-      "hint": "Urgency proposals must be agreed with your local Partnership and Strategic Overview (PSO) officer before submission.",
+      "hint": "Urgent proposals must be agreed with your local Partnership and Strategic Overview (PSO) officer before submission.",
       "options": {
         "not_urgent": {
           "label": "The project is not urgent"
@@ -1388,36 +1388,36 @@
     }
   },
   "downloads": {
-    "heading": "Download project documents",
+    "heading": "Download proposal documents",
     "project_name": "Project name",
     "reference_number": "Reference number",
     "status": "Status",
     "not_submitted": "Not yet submitted",
     "main_downloads": {
-      "heading": "Current project documents",
-      "description": "Download the latest versions of your project documents in the current format.",
+      "heading": "Current proposal documents",
+      "description": "Download the latest versions of your proposal documents in the current format.",
       "fcerm1_new": "FCERM1 spreadsheet",
-      "fcerm1_new_hint": "Excel spreadsheet with current project data in the latest format",
-      "benefit_area": "Project benefit area file",
-      "benefit_area_hint": "ZIP file containing the project benefit area geographical data",
+      "fcerm1_new_hint": "Excel spreadsheet with current proposal data in the latest format",
+      "benefit_area": "Proposal benefit area file",
+      "benefit_area_hint": "ZIP file containing the proposal benefit area geographical data",
       "moderation": "Urgency moderation evidence",
       "moderation_hint": "Plain text file with urgency justification details",
       "no_downloads": "No documents available for download"
     },
     "legacy_downloads": {
-      "heading": "Legacy project documents",
+      "heading": "Legacy proposal documents",
       "inset_text": "These documents are from the previous system and contain data in the old format. They are provided for reference and historical purposes.",
-      "fcerm1_legacy": "Download FCERM1 spreadsheet (legacy format)",
-      "fcerm1_legacy_hint": "Excel spreadsheet with project data in the old format from the previous system",
-      "funding_calculator": "Download funding calculator",
+      "fcerm1_legacy": "FCERM1 spreadsheet (legacy format)",
+      "fcerm1_legacy_hint": "Excel spreadsheet with proposal data in the old format from the previous system",
+      "funding_calculator": "Funding calculator",
       "funding_calculator_hint": "Excel spreadsheet with funding calculations from the previous system"
     },
     "help": {
       "heading": "About these downloads",
-      "description": "These documents contain detailed information about your project proposal.",
+      "description": "These documents contain detailed information about your proposal.",
       "what_is_fcerm1": {
         "summary": "What is the FCERM1 spreadsheet?",
-        "text": "The FCERM1 is a standardized Excel spreadsheet that contains all the key information about your flood and coastal erosion risk management project. It is used for project appraisal, funding applications, and reporting purposes."
+        "text": "The FCERM1 is a standardized Excel spreadsheet that contains all the key information about your flood and coastal erosion risk management proposal. It is used for proposal appraisal, funding applications, and reporting purposes."
       },
       "legacy_vs_new": {
         "summary": "What's the difference between legacy and current format?",

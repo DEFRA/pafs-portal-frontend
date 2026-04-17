@@ -347,4 +347,63 @@ describe('buildModerationResponse', () => {
       'attachment; filename="ANC501E-000A-001A_moderation.txt"'
     )
   })
+
+  test('Should use empty string referenceNumber when both slug and referenceNumber are absent', () => {
+    const projectData = {
+      ...URGENT_PROJECT,
+      slug: undefined,
+      referenceNumber: undefined,
+      moderationFilename: null
+    }
+
+    buildModerationResponse(mockH, projectData, mockLogger, mockStatusCodes)
+
+    expect(mockResponse.header).toHaveBeenCalledWith(
+      'Content-Disposition',
+      'attachment; filename="_moderation.txt"'
+    )
+  })
+
+  test('Should default projectName to empty string when name is absent', () => {
+    const projectData = { ...URGENT_PROJECT, name: undefined }
+
+    buildModerationResponse(mockH, projectData, mockLogger, mockStatusCodes)
+
+    const body = mockH.response.mock.calls[0][0]
+    expect(typeof body).toBe('string')
+  })
+
+  test('Should default rmaName, eaAreaName, rfccName to null when absent', () => {
+    const projectData = {
+      ...URGENT_PROJECT,
+      rmaName: undefined,
+      eaAreaName: undefined,
+      rfccName: undefined
+    }
+
+    buildModerationResponse(mockH, projectData, mockLogger, mockStatusCodes)
+
+    const body = mockH.response.mock.calls[0][0]
+    expect(body).toContain('* Risk Management Authority')
+    expect(body).toContain('* Environment Agency Area')
+    expect(body).toContain('* Regional Flood and Coastal Committee')
+  })
+
+  test('Should default urgencyReason to empty string when absent', () => {
+    const projectData = { ...URGENT_PROJECT, urgencyReason: undefined }
+
+    buildModerationResponse(mockH, projectData, mockLogger, mockStatusCodes)
+
+    const body = mockH.response.mock.calls[0][0]
+    expect(typeof body).toBe('string')
+  })
+
+  test('Should default urgencyDetails to empty string when absent', () => {
+    const projectData = { ...URGENT_PROJECT, urgencyDetails: undefined }
+
+    buildModerationResponse(mockH, projectData, mockLogger, mockStatusCodes)
+
+    const body = mockH.response.mock.calls[0][0]
+    expect(typeof body).toBe('string')
+  })
 })

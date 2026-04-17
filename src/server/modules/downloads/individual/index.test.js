@@ -60,11 +60,11 @@ describe('individualDownloads plugin', () => {
       }
     })
 
-    test('should register exactly two routes', () => {
+    test('should register exactly three routes', () => {
       individualDownloads.plugin.register(mockServer)
 
       expect(mockServer.route).toHaveBeenCalledTimes(1)
-      expect(registeredRoutes).toHaveLength(2)
+      expect(registeredRoutes).toHaveLength(3)
     })
 
     test('should pass an array of routes to server.route', () => {

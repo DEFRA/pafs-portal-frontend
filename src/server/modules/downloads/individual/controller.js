@@ -1,3 +1,4 @@
+import { config } from '../../../../config/config.js'
 import { DOWNLOADS_VIEWS } from '../../../common/constants/common.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
@@ -12,6 +13,9 @@ import {
 } from '../../../common/constants/projects.js'
 import { buildModerationResponse } from '../helpers/moderation-helper.js'
 import { statusCodes } from '../../../common/constants/status-codes.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
+
+const BACKEND_URL = config.get('backendApi.url')
 
 class IndividualDownloadsController {
   _getDownloadViewData(request, options = {}) {
@@ -36,6 +40,20 @@ class IndividualDownloadsController {
       isRevised,
       projectData
     )
+    const showModerationDownload = this._shouldShowModerationDownload(
+      isLegacy,
+      isRevised,
+      projectState,
+      projectData
+    )
+
+    const referenceNumber = projectData[PROJECT_PAYLOAD_FIELDS.SLUG]
+    const fcerm1LegacyDownloadUrl = showLegacyTemplate
+      ? ROUTES.DOWNLOADS.FCERM1_LEGACY.replace(
+          '{referenceNumber}',
+          referenceNumber
+        )
+      : null
 
     return {
       pageTitle: request.t('projects.downloads.heading'),
@@ -54,6 +72,8 @@ class IndividualDownloadsController {
       showNewTemplate,
       showLegacyTemplate,
       showFundingCalculator,
+      showModerationDownload,
+      fcerm1LegacyDownloadUrl,
       hasBenefitAreaFile: Boolean(
         projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME]
       ),
@@ -102,6 +122,32 @@ class IndividualDownloadsController {
     }
 
     // Legacy draft/archived: show legacy template alongside new
+    return true
+  }
+
+  _shouldShowModerationDownload(
+    isLegacy,
+    isRevised,
+    projectState,
+    projectData
+  ) {
+    // Only for urgent projects
+    const urgencyReason = projectData[PROJECT_PAYLOAD_FIELDS.URGENCY_REASON]
+    if (!urgencyReason || urgencyReason === URGENCY_REASONS.NOT_URGENT) {
+      return false
+    }
+
+    // Only for legacy submitted (not revised) projects
+    if (!isLegacy) {
+      return false
+    }
+    if (isRevised) {
+      return false
+    }
+    if (projectState !== PROJECT_STATUS.SUBMITTED) {
+      return false
+    }
+
     return true
   }
 
@@ -171,6 +217,71 @@ class IndividualDownloadsController {
     // resolved by the backend API at session load time — no extra service call needed.
     return buildModerationResponse(h, projectData, logger, statusCodes)
   }
+
+  /**
+   * GET /project/{referenceNumber}/downloads/fcerm1/legacy
+   * Proxies the FCERM1 legacy Excel report from the backend API.
+   * Only served when showLegacyTemplate is true for the project.
+   */
+  async downloadFcerm1Legacy(request, h) {
+    const { logger } = request.server
+    const projectData = getSessionData(request)
+    const referenceNumber = projectData[PROJECT_PAYLOAD_FIELDS.SLUG]
+
+    const session = getAuthSession(request)
+    const accessToken = session?.accessToken
+
+    if (!accessToken) {
+      logger.warn('FCERM1 legacy download attempted without access token')
+      return h.response('Unauthorised').code(statusCodes.unauthorized)
+    }
+
+    const url = `${BACKEND_URL}/api/v1/project/${referenceNumber}/fcerm1/legacy`
+
+    logger.info(
+      { referenceNumber },
+      'Proxying FCERM1 legacy download from backend'
+    )
+
+    let backendResponse
+    try {
+      backendResponse = await fetch(url, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      })
+    } catch (err) {
+      logger.error(
+        { err, referenceNumber },
+        'Network error fetching FCERM1 legacy from backend'
+      )
+      return h
+        .response('Error generating download')
+        .code(statusCodes.internalServerError)
+    }
+
+    if (!backendResponse.ok) {
+      logger.warn(
+        { status: backendResponse.status, referenceNumber },
+        'Backend returned error for FCERM1 legacy download'
+      )
+      return h.response('Download unavailable').code(backendResponse.status)
+    }
+
+    const arrayBuffer = await backendResponse.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    const contentDisposition = backendResponse.headers.get(
+      'content-disposition'
+    )
+    const filenameMatch = /filename="([^"]+)"/.exec(contentDisposition ?? '')
+    const filename = filenameMatch?.[1] ?? `${referenceNumber}_proposal.xlsx`
+
+    return h
+      .response(buffer)
+      .code(statusCodes.ok)
+      .type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+      .header('Content-Disposition', `attachment; filename="${filename}"`)
+      .header('Content-Length', buffer.length)
+  }
 }
 
 const controller = new IndividualDownloadsController()
@@ -178,5 +289,7 @@ const controller = new IndividualDownloadsController()
 export const individualDownloadsController = {
   getHandler: (request, h) => controller.get(request, h),
   downloadModerationHandler: (request, h) =>
-    controller.downloadModeration(request, h)
+    controller.downloadModeration(request, h),
+  downloadFcerm1LegacyHandler: (request, h) =>
+    controller.downloadFcerm1Legacy(request, h)
 }

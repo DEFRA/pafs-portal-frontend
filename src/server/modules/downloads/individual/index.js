@@ -7,6 +7,18 @@ import {
 import { individualDownloadsController } from './controller.js'
 import { requireViewPermission } from '../../projects/helpers/permissions.js'
 
+const PRE_HANDLERS = [
+  { method: requireAuth },
+  { method: fetchProjectForOverview },
+  {
+    method: (request, h) =>
+      initializeEditSessionPreHandler(request, h, {
+        forceRefresh: true
+      })
+  },
+  { method: requireViewPermission }
+]
+
 export const individualDownloads = {
   plugin: {
     name: 'Downloads - Individual Project',
@@ -16,17 +28,7 @@ export const individualDownloads = {
           method: 'GET',
           path: ROUTES.DOWNLOADS.INDIVIDUAL,
           options: {
-            pre: [
-              { method: requireAuth },
-              { method: fetchProjectForOverview },
-              {
-                method: (request, h) =>
-                  initializeEditSessionPreHandler(request, h, {
-                    forceRefresh: true
-                  })
-              },
-              { method: requireViewPermission }
-            ],
+            pre: PRE_HANDLERS,
             handler: individualDownloadsController.getHandler
           }
         },
@@ -34,18 +36,16 @@ export const individualDownloads = {
           method: 'GET',
           path: ROUTES.DOWNLOADS.MODERATION,
           options: {
-            pre: [
-              { method: requireAuth },
-              { method: fetchProjectForOverview },
-              {
-                method: (request, h) =>
-                  initializeEditSessionPreHandler(request, h, {
-                    forceRefresh: true
-                  })
-              },
-              { method: requireViewPermission }
-            ],
+            pre: PRE_HANDLERS,
             handler: individualDownloadsController.downloadModerationHandler
+          }
+        },
+        {
+          method: 'GET',
+          path: ROUTES.DOWNLOADS.FCERM1_LEGACY,
+          options: {
+            pre: PRE_HANDLERS,
+            handler: individualDownloadsController.downloadFcerm1LegacyHandler
           }
         }
       ])
