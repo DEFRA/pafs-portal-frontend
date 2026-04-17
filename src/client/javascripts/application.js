@@ -160,7 +160,7 @@ bindCommaFormattingToInputs(
     return rowTotal
   }
 
-  function processRow(row, form, colTotals, numCols) {
+  function processRow(row, _form, colTotals, numCols) {
     const inputs = row.querySelectorAll('[data-spend-cell]')
     let rowTotal = 0
 

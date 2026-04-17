@@ -37,7 +37,7 @@ export function getContributorNames(sessionData, group) {
  */
 function buildContributorGroupRows(
   rows,
-  src,
+  _src,
   sessionData,
   contributorGroup,
   t
@@ -90,39 +90,44 @@ export function buildEstimatedSpendRows(sessionData, t) {
   const overviewPrefix = 'projects.overview.funding_sources_summary_card'
 
   for (const src of MAIN_SPEND_SOURCES) {
+    // Skip sources that have not been selected in this session
+    if (!sessionData[src.field]) {
+      continue
+    }
+
+    // Additional-GIA sub-sources are always plain source rows
     if (src.additionalGia) {
-      // Only include if the specific additional-GIA sub-source was selected
-      if (sessionData[src.field]) {
-        rows.push({
-          kind: 'source',
-          field: src.field,
-          label: t(`${overviewPrefix}.${src.labelKey}`)
-        })
-      }
-    } else if (sessionData[src.field]) {
-      const contributorGroup = CONTRIBUTOR_SPEND_GROUPS.find(
-        (group) => group.sourceField === src.field
-      )
-
-      if (contributorGroup) {
-        const hasContributors = buildContributorGroupRows(
-          rows,
-          src,
-          sessionData,
-          contributorGroup,
-          t
-        )
-        if (hasContributors) {
-          continue
-        }
-      }
-
       rows.push({
         kind: 'source',
         field: src.field,
         label: t(`${overviewPrefix}.${src.labelKey}`)
       })
+      continue
     }
+
+    // Contributor-backed sources render as contributor rows when names exist
+    const contributorGroup = CONTRIBUTOR_SPEND_GROUPS.find(
+      (group) => group.sourceField === src.field
+    )
+    if (contributorGroup) {
+      const hasContributors = buildContributorGroupRows(
+        rows,
+        src,
+        sessionData,
+        contributorGroup,
+        t
+      )
+      if (hasContributors) {
+        continue
+      }
+    }
+
+    // Fallback: plain source row
+    rows.push({
+      kind: 'source',
+      field: src.field,
+      label: t(`${overviewPrefix}.${src.labelKey}`)
+    })
   }
 
   return rows

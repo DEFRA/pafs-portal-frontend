@@ -57,11 +57,12 @@ export function sanitiseFundingValueRow(row) {
       continue
     }
 
-    const normalisedArray = Array.isArray(val)
-      ? val
-      : val && typeof val === 'object'
-        ? Object.values(val)
-        : null
+    let normalisedArray = null
+    if (Array.isArray(val)) {
+      normalisedArray = val
+    } else if (val && typeof val === 'object') {
+      normalisedArray = Object.values(val)
+    }
 
     if (normalisedArray) {
       cleaned[key] = normalisedArray.map((item) => {
@@ -96,12 +97,15 @@ export function sanitiseFundingValueRow(row) {
  * @returns {object} The same row with source total fields updated in place
  */
 export function setSourceTotalsFromContributorArrays(row) {
-  const toArray = (val) =>
-    Array.isArray(val)
-      ? val
-      : val && typeof val === 'object'
-        ? Object.values(val)
-        : []
+  const toArray = (val) => {
+    if (Array.isArray(val)) {
+      return val
+    }
+    if (val && typeof val === 'object') {
+      return Object.values(val)
+    }
+    return []
+  }
 
   const sumAmounts = (arr = []) =>
     arr.reduce((sum, item) => {
@@ -148,7 +152,9 @@ export function stripEmptyContributorEntries(row) {
   ]
   for (const key of CONTRIBUTOR_ARRAY_KEYS) {
     const arr = row[key]
-    if (!Array.isArray(arr)) continue
+    if (!Array.isArray(arr)) {
+      continue
+    }
     row[key] = arr.filter((item) => {
       if (!item || typeof item !== 'object') {
         return false
@@ -158,7 +164,9 @@ export function stripEmptyContributorEntries(row) {
     })
     // If the array is now empty, remove the key entirely so the
     // optional Joi array schema doesn't iterate over zero items.
-    if (row[key].length === 0) delete row[key]
+    if (row[key].length === 0) {
+      delete row[key]
+    }
   }
   return row
 }
@@ -179,7 +187,7 @@ export function numericKeysToArrays(obj) {
   const allNumeric = keys.length > 0 && keys.every((k) => /^\d+$/.test(k))
 
   if (allNumeric) {
-    const sorted = keys.sort((a, b) => Number(a) - Number(b))
+    const sorted = keys.toSorted((a, b) => Number(a) - Number(b))
     return sorted.map((k) => numericKeysToArrays(obj[k]))
   }
 
@@ -188,6 +196,59 @@ export function numericKeysToArrays(obj) {
     result[key] = numericKeysToArrays(val)
   }
   return result
+}
+
+/**
+ * Try to parse already-nested fundingValues from the payload.
+ * Returns an array if successful, or null if the value is not array/object.
+ * @private
+ */
+function _parseNestedFundingValues(raw) {
+  if (Array.isArray(raw)) {
+    return raw
+  }
+  if (typeof raw === 'object') {
+    return Object.values(raw)
+  }
+  return null
+}
+
+/**
+ * Reconstruct a nested fundingValues object from flat bracket-notation keys.
+ * e.g. `fundingValues[0][financialYear]` → { '0': { financialYear: … } }
+ * @private
+ */
+function _buildRootFromBracketKeys(payload) {
+  const bracketRe = /\[([^\]]+)\]/g
+  const root = {}
+
+  for (const [key, value] of Object.entries(payload)) {
+    if (!key.startsWith('fundingValues[')) {
+      continue
+    }
+
+    const segments = []
+    let match
+    while ((match = bracketRe.exec(key)) !== null) {
+      segments.push(match[1])
+    }
+    bracketRe.lastIndex = 0
+
+    if (segments.length === 0) {
+      continue
+    }
+
+    let current = root
+    for (let i = 0; i < segments.length - 1; i++) {
+      if (current[segments[i]] === undefined) {
+        current[segments[i]] = {}
+      }
+      current = current[segments[i]]
+    }
+    current[segments[segments.length - 1]] = value
+  }
+
+  return root
 }
 
 /**
@@ -212,43 +273,15 @@ export function parseFundingValuesPayload(payload) {
 
   // 1. If a nested parser (qs) already created `payload.fundingValues`
   if (payload.fundingValues) {
-    const raw = payload.fundingValues
-    if (Array.isArray(raw)) {
-      return raw
-    }
-    if (typeof raw === 'object') {
-      return Object.values(raw)
+    const result = _parseNestedFundingValues(payload.fundingValues)
+    if (result) {
+      return result
     }
   }
 
   // 2. Reconstruct from flat bracket-notation keys produced by
   //    Node's built-in `querystring.parse`.
-  const bracketRe = /\[([^\]]*)\]/g
-  const root = {}
-
-  for (const [key, value] of Object.entries(payload)) {
-    if (!key.startsWith('fundingValues[')) continue
-
-    const segments = []
-    let match
-    while ((match = bracketRe.exec(key)) !== null) {
-      segments.push(match[1])
-    }
-    bracketRe.lastIndex = 0
-
-    if (segments.length === 0) {
-      continue
-    }
-
-    let current = root
-    for (let i = 0; i < segments.length - 1; i++) {
-      if (current[segments[i]] === undefined) {
-        current[segments[i]] = {}
-      }
-      current = current[segments[i]]
-    }
-    current[segments[segments.length - 1]] = value
-  }
+  const root = _buildRootFromBracketKeys(payload)
 
   if (Object.keys(root).length === 0) {
     return []

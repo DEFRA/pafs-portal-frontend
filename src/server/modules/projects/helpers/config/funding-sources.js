@@ -17,6 +17,7 @@ import {
  * on the main funding sources selection page.
  */
 const ADDITIONAL_FCRM_GIA_FIELD = 'additionalFcermGia'
+const CONTRIBUTOR_NAMES_FIELD_TYPE = 'contributor-names'
 
 /**
  * Common back link routes for funding sources steps
@@ -129,7 +130,7 @@ export const FUNDING_SOURCES_CONFIG = {
       conditionalRedirect: false
     },
     schema: publicContributorNamesSchema,
-    fieldType: 'contributor-names',
+    fieldType: CONTRIBUTOR_NAMES_FIELD_TYPE,
     fieldName: PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTOR_NAMES,
     deleteRoute:
       ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PUBLIC_SECTOR_CONTRIBUTORS_DELETE,
@@ -148,7 +149,7 @@ export const FUNDING_SOURCES_CONFIG = {
       conditionalRedirect: false
     },
     schema: privateContributorNamesSchema,
-    fieldType: 'contributor-names',
+    fieldType: CONTRIBUTOR_NAMES_FIELD_TYPE,
     fieldName: PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTOR_NAMES,
     deleteRoute:
       ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PRIVATE_SECTOR_CONTRIBUTORS_DELETE,
@@ -168,7 +169,7 @@ export const FUNDING_SOURCES_CONFIG = {
       conditionalRedirect: false
     },
     schema: otherEaContributorNamesSchema,
-    fieldType: 'contributor-names',
+    fieldType: CONTRIBUTOR_NAMES_FIELD_TYPE,
     fieldName: PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTOR_NAMES,
     deleteRoute:
       ROUTES.PROJECT.EDIT.FUNDING_SOURCES
