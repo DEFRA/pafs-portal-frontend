@@ -10,8 +10,8 @@
     }
   },
   "overview": {
-    "title": "Proposal Overview",
-    "heading": "Proposal Overview",
+    "title": "Proposal overview",
+    "heading": "Proposal overview",
     "common": {
       "npn": "National Proposal Number",
       "last_updated": "Last updated",
@@ -21,7 +21,7 @@
       "archive": "Archive",
       "revert_to_draft": "Revert to draft",
       "revert_to_revise": "Revert to revise",
-      "download": "Download Proposal",
+      "download": "Download proposal",
       "delete": "Delete",
       "not_submitted": "Not yet submitted",
       "not_provided": "Not provided",
