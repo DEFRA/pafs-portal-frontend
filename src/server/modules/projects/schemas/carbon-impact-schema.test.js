@@ -433,7 +433,9 @@ describe('carbon-impact-schema', () => {
           [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: ''
         })
         expect(error).toBeDefined()
-        expect(error.details[0].message).toBe('Please enter the value')
+        expect(error.details[0].message).toBe(
+          'You must enter a value. If there is no operation or maintenance element enter 0. Otherwise enter an estimate above 0.'
+        )
       })
 
       test('rejects decimal values', () => {

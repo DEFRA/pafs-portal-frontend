@@ -32,7 +32,8 @@ const CARBON_EMISSION_INVALID_ERROR =
   'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
 const CARBON_COST_INVALID_ERROR =
   'Please enter a whole number with no more than 18 digits.'
-const CARBON_REQUIRED_ERROR = 'Please enter the value'
+const CARBON_OPERATIONAL_COST_FORECAST_REQUIRED_ERROR =
+  'You must enter a value. If there is no operation or maintenance element enter 0. Otherwise enter an estimate above 0.'
 
 const validateCarbonDecimal = (value, helpers) => {
   if (!DECIMAL_REGEX.test(value)) {
@@ -87,7 +88,7 @@ const optionalIntegerField = Joi.string()
     'string.max': CARBON_COST_INVALID_ERROR
   })
 
-const requiredIntegerField = Joi.string()
+const requiredOperationalCostForecastField = Joi.string()
   .trim()
   .empty('')
   .required()
@@ -96,7 +97,7 @@ const requiredIntegerField = Joi.string()
     'string.base': CARBON_COST_INVALID_ERROR,
     'string.pattern.base': CARBON_COST_INVALID_ERROR,
     'string.max': CARBON_COST_INVALID_ERROR,
-    'any.required': CARBON_REQUIRED_ERROR
+    'any.required': CARBON_OPERATIONAL_COST_FORECAST_REQUIRED_ERROR
   })
 
 /**
@@ -153,7 +154,7 @@ export const CARBON_STEP_SCHEMAS = {
   }).options({ allowUnknown: true }),
   [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: Joi.object({
     [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]:
-      requiredIntegerField
+      requiredOperationalCostForecastField
   }).options({ allowUnknown: true })
 }
 
@@ -170,7 +171,7 @@ export const carbonImpactSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]:
     optionalIntegerField,
   [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]:
-    requiredIntegerField
+    requiredOperationalCostForecastField
 }).options({ allowUnknown: true })
 
 /**
