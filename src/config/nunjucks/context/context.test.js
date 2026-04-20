@@ -323,12 +323,12 @@ describe('Nunjucks context builder', () => {
 
     test('navigation reflects current path', () => {
       const result = contextImport.context({
-        path: '/download',
+        path: '/downloads',
         yar: { get: vi.fn(() => ({ user: { id: 1 } })) }
       })
 
       const downloadNav = result.navigation.find(
-        (item) => item.href === '/download'
+        (item) => item.href === '/downloads'
       )
       expect(downloadNav?.current).toBe(true)
     })

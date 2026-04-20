@@ -24,7 +24,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.download_all',
-          href: '/download'
+          href: '/downloads'
         },
         {
           current: false,
@@ -42,9 +42,9 @@ describe('#buildNavigation', () => {
           href: '/'
         },
         {
-          current: true,
+          current: false,
           text: 'common.navigation.download_all',
-          href: '/download'
+          href: '/downloads'
         },
         {
           current: false,
@@ -64,7 +64,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.download_all',
-          href: '/download'
+          href: '/downloads'
         },
         {
           current: true,
@@ -84,7 +84,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.download_all',
-          href: '/download'
+          href: '/downloads'
         },
         {
           current: false,
@@ -397,7 +397,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.download_all',
-          href: '/download'
+          href: '/downloads'
         },
         {
           current: false,

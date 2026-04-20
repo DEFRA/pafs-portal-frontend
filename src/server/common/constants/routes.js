@@ -16,7 +16,6 @@ export const ROUTES = {
   GENERAL: {
     HOME: '/',
     PROPOSALS: '/',
-    DOWNLOAD: '/download',
     ARCHIVE: '/archive',
     STATIC_PAGES: {
       PRIVACY_NOTICE: '/privacy-notice',
@@ -88,7 +87,7 @@ export const ROUTES = {
     MODERATION: '/project/{referenceNumber}/downloads/moderation',
     FCERM1_LEGACY: '/project/{referenceNumber}/downloads/fcerm1/legacy',
     FCERM1_NEW: '/project/{referenceNumber}/downloads/fcerm1/new',
-    PROGRAMME: '/downloads/programme',
+    PROGRAMME: '/downloads',
     ADMIN: '/admin/downloads'
   },
 

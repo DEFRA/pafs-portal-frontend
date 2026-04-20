@@ -28,8 +28,8 @@ function buildGeneralNavigation(path) {
     },
     {
       text: translate('common.navigation.download_all'),
-      href: ROUTES.GENERAL.DOWNLOAD,
-      current: path === ROUTES.GENERAL.DOWNLOAD
+      href: ROUTES.DOWNLOADS.PROGRAMME,
+      current: path === ROUTES.DOWNLOADS.PROGRAMME
     },
     {
       text: translate('common.navigation.archive'),
