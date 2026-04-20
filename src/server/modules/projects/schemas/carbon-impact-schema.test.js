@@ -194,7 +194,9 @@ describe('carbon-impact-schema', () => {
         abortEarly: false
       })
       expect(error).toBeDefined()
-      expect(error.details[0].message).toBe('Please enter the value')
+      expect(error.details[0].message).toBe(
+        'You must enter a value. If there is no operation or maintenance element enter 0. Otherwise enter an estimate above 0.'
+      )
     })
 
     test('allows empty and null optional tCO₂ fields', () => {
