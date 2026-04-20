@@ -18,7 +18,9 @@ vi.mock('../../projects/helpers/permissions.js', () => ({
 vi.mock('./controller.js', () => ({
   individualDownloadsController: {
     getHandler: vi.fn(),
-    downloadModerationHandler: vi.fn()
+    downloadModerationHandler: vi.fn(),
+    downloadFcerm1LegacyHandler: vi.fn(),
+    downloadFcerm1NewHandler: vi.fn()
   }
 }))
 
@@ -60,11 +62,11 @@ describe('individualDownloads plugin', () => {
       }
     })
 
-    test('should register exactly three routes', () => {
+    test('should register exactly four routes', () => {
       individualDownloads.plugin.register(mockServer)
 
       expect(mockServer.route).toHaveBeenCalledTimes(1)
-      expect(registeredRoutes).toHaveLength(3)
+      expect(registeredRoutes).toHaveLength(4)
     })
 
     test('should pass an array of routes to server.route', () => {
@@ -190,6 +192,104 @@ describe('individualDownloads plugin', () => {
           expect(pre).toHaveProperty('method')
           expect(typeof pre.method).toBe('function')
         })
+      })
+    })
+
+    describe('FCERM1 legacy download route (route[2])', () => {
+      let route
+
+      beforeEach(() => {
+        individualDownloads.plugin.register(mockServer)
+        route = registeredRoutes[2]
+      })
+
+      test('should be a GET route', () => {
+        expect(route.method).toBe('GET')
+      })
+
+      test('should have the correct path', () => {
+        expect(route.path).toBe(ROUTES.DOWNLOADS.FCERM1_LEGACY)
+      })
+
+      test('should have exactly 4 pre-handlers', () => {
+        expect(route.options.pre).toHaveLength(4)
+      })
+
+      test('should have requireAuth as first pre-handler', () => {
+        expect(route.options.pre[0].method).toBe(requireAuth)
+      })
+
+      test('should have fetchProjectForOverview as second pre-handler', () => {
+        expect(route.options.pre[1].method).toBe(fetchProjectForOverview)
+      })
+
+      test('third pre-handler should call initializeEditSessionPreHandler with forceRefresh: true', async () => {
+        const mockRequest = {}
+        const mockH = {}
+        await route.options.pre[2].method(mockRequest, mockH)
+
+        expect(initializeEditSessionPreHandler).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          { forceRefresh: true }
+        )
+      })
+
+      test('should have requireViewPermission as fourth pre-handler', () => {
+        expect(route.options.pre[3].method).toBe(requireViewPermission)
+      })
+
+      test('should have a handler function defined', () => {
+        expect(typeof route.options.handler).toBe('function')
+      })
+    })
+
+    describe('FCERM1 new download route (route[3])', () => {
+      let route
+
+      beforeEach(() => {
+        individualDownloads.plugin.register(mockServer)
+        route = registeredRoutes[3]
+      })
+
+      test('should be a GET route', () => {
+        expect(route.method).toBe('GET')
+      })
+
+      test('should have the correct path', () => {
+        expect(route.path).toBe(ROUTES.DOWNLOADS.FCERM1_NEW)
+      })
+
+      test('should have exactly 4 pre-handlers', () => {
+        expect(route.options.pre).toHaveLength(4)
+      })
+
+      test('should have requireAuth as first pre-handler', () => {
+        expect(route.options.pre[0].method).toBe(requireAuth)
+      })
+
+      test('should have fetchProjectForOverview as second pre-handler', () => {
+        expect(route.options.pre[1].method).toBe(fetchProjectForOverview)
+      })
+
+      test('third pre-handler should call initializeEditSessionPreHandler with forceRefresh: true', async () => {
+        const mockRequest = {}
+        const mockH = {}
+        await route.options.pre[2].method(mockRequest, mockH)
+
+        expect(initializeEditSessionPreHandler).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          { forceRefresh: true }
+        )
+      })
+
+      test('should have requireViewPermission as fourth pre-handler', () => {
+        expect(route.options.pre[3].method).toBe(requireViewPermission)
+      })
+
+      test('should have a handler function defined', () => {
+        expect(typeof route.options.handler).toBe('function')
       })
     })
   })

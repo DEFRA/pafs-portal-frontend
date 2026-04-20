@@ -47,6 +47,14 @@ export const individualDownloads = {
             pre: PRE_HANDLERS,
             handler: individualDownloadsController.downloadFcerm1LegacyHandler
           }
+        },
+        {
+          method: 'GET',
+          path: ROUTES.DOWNLOADS.FCERM1_NEW,
+          options: {
+            pre: PRE_HANDLERS,
+            handler: individualDownloadsController.downloadFcerm1NewHandler
+          }
         }
       ])
     }

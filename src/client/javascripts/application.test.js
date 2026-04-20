@@ -13,7 +13,8 @@ import {
   formatInputValueWithCommas,
   unformatInputValue,
   bindCommaFormattingToInputs,
-  setupHeaderNavigation
+  setupHeaderNavigation,
+  initProgrammeDownloadPolling
 } from './application.js'
 
 describe('number formatting helpers', () => {
@@ -204,5 +205,247 @@ describe('setupHeaderNavigation', () => {
     setupHeaderNavigation()
 
     expect(() => button.dispatchEvent(new Event('click'))).not.toThrow()
+  })
+})
+
+// ── initProgrammeDownloadPolling ──────────────────────────────────────────────
+// Uses fake timers + vi.stubGlobal for fetch so we can control every async step.
+
+describe('initProgrammeDownloadPolling', () => {
+  function buildDOM({
+    status = 'generating',
+    isAdmin = 'false',
+    pollUrl = '/download/poll'
+  } = {}) {
+    document.body.innerHTML = `
+      <div data-module="programme-download"
+           data-download-status="${status}"
+           data-poll-url="${pollUrl}"
+           data-is-admin="${isAdmin}">
+        <p id="js-progress-message">Starting...</p>
+        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="">
+          <div id="js-progress-bar" style="width:0%"></div>
+        </div>
+        <p id="js-progress-count"></p>
+      </div>
+    `
+  }
+
+  function makeFetch(responses) {
+    let call = 0
+    return vi.fn(() => {
+      const r = responses[Math.min(call++, responses.length - 1)]
+      return Promise.resolve({
+        ok: r.ok ?? true,
+        json: () => Promise.resolve(r.data ?? {})
+      })
+    })
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.stubGlobal('fetch', vi.fn())
+    // jsdom doesn't implement location.reload — stub it
+    vi.stubGlobal('location', { reload: vi.fn() })
+    document.body.innerHTML = ''
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.unstubAllGlobals()
+  })
+
+  it('does nothing when no [data-module="programme-download"] element exists', () => {
+    initProgrammeDownloadPolling()
+    vi.advanceTimersByTime(6000)
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('does nothing when status is not "generating"', () => {
+    buildDOM({ status: 'ready' })
+    initProgrammeDownloadPolling()
+    vi.advanceTimersByTime(6000)
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('does nothing when pollUrl is absent', () => {
+    buildDOM({ pollUrl: '' })
+    initProgrammeDownloadPolling()
+    vi.advanceTimersByTime(6000)
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it('polls the pollUrl every 3 seconds while still generating', async () => {
+    buildDOM()
+    vi.stubGlobal(
+      'fetch',
+      makeFetch([
+        { data: { status: 'generating', progressMessage: 'Loading...' } }
+      ])
+    )
+
+    initProgrammeDownloadPolling()
+
+    await vi.advanceTimersByTimeAsync(3000)
+    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(fetch).toHaveBeenCalledWith(
+      '/download/poll',
+      expect.objectContaining({ credentials: 'same-origin' })
+    )
+
+    await vi.advanceTimersByTimeAsync(3000)
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
+
+  it('updates js-progress-message with progressMessage from poll response', async () => {
+    buildDOM()
+    vi.stubGlobal(
+      'fetch',
+      makeFetch([
+        {
+          data: {
+            status: 'generating',
+            progressMessage: 'Processing 5 of 10...'
+          }
+        }
+      ])
+    )
+
+    initProgrammeDownloadPolling()
+    await vi.advanceTimersByTimeAsync(3000)
+
+    expect(document.getElementById('js-progress-message').textContent).toBe(
+      'Processing 5 of 10...'
+    )
+  })
+
+  it('updates admin progress bar and count when isAdmin=true', async () => {
+    buildDOM({ isAdmin: 'true' })
+    vi.stubGlobal(
+      'fetch',
+      makeFetch([
+        {
+          data: {
+            status: 'generating',
+            progressMessage: 'Batch 5...',
+            progressCurrent: 50,
+            progressTotal: 100
+          }
+        }
+      ])
+    )
+
+    initProgrammeDownloadPolling()
+    await vi.advanceTimersByTimeAsync(3000)
+
+    const bar = document.getElementById('js-progress-bar')
+    const count = document.getElementById('js-progress-count')
+    expect(bar.style.width).toBe('50%')
+    expect(
+      bar.closest('[role="progressbar"]').getAttribute('aria-valuenow')
+    ).toBe('50')
+    expect(count.textContent).toBe('50 of 100 (50%)')
+  })
+
+  it('does not update progress bar for non-admin', async () => {
+    buildDOM({ isAdmin: 'false' })
+    vi.stubGlobal(
+      'fetch',
+      makeFetch([
+        {
+          data: {
+            status: 'generating',
+            progressMessage: 'Working...',
+            progressCurrent: 5,
+            progressTotal: 10
+          }
+        }
+      ])
+    )
+
+    initProgrammeDownloadPolling()
+    await vi.advanceTimersByTimeAsync(3000)
+
+    // bar width should remain at its initial value
+    expect(document.getElementById('js-progress-bar').style.width).toBe('0%')
+  })
+
+  it('reloads the page when status changes from generating to ready', async () => {
+    buildDOM()
+    vi.stubGlobal('fetch', makeFetch([{ data: { status: 'ready' } }]))
+
+    initProgrammeDownloadPolling()
+    await vi.advanceTimersByTimeAsync(3000)
+
+    expect(globalThis.location.reload).toHaveBeenCalled()
+  })
+
+  it('reloads the page when status changes to failed', async () => {
+    buildDOM()
+    vi.stubGlobal('fetch', makeFetch([{ data: { status: 'failed' } }]))
+
+    initProgrammeDownloadPolling()
+    await vi.advanceTimersByTimeAsync(3000)
+
+    expect(globalThis.location.reload).toHaveBeenCalled()
+  })
+
+  it('stops polling after 3 consecutive non-ok responses', async () => {
+    buildDOM()
+    vi.stubGlobal('fetch', makeFetch([{ ok: false, data: {} }]))
+
+    initProgrammeDownloadPolling()
+
+    await vi.advanceTimersByTimeAsync(3000)
+    await vi.advanceTimersByTimeAsync(3000)
+    await vi.advanceTimersByTimeAsync(3000)
+    const callsAfter3 = fetch.mock.calls.length
+
+    await vi.advanceTimersByTimeAsync(3000)
+    // interval cleared — no further calls
+    expect(fetch.mock.calls.length).toBe(callsAfter3)
+  })
+
+  it('stops polling after 3 consecutive fetch errors', async () => {
+    buildDOM()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.reject(new Error('network error')))
+    )
+
+    initProgrammeDownloadPolling()
+
+    await vi.advanceTimersByTimeAsync(3000)
+    await vi.advanceTimersByTimeAsync(3000)
+    await vi.advanceTimersByTimeAsync(3000)
+    const callsAfter3 = fetch.mock.calls.length
+
+    await vi.advanceTimersByTimeAsync(3000)
+    expect(fetch.mock.calls.length).toBe(callsAfter3)
+  })
+
+  it('resets consecutive error count after a successful poll', async () => {
+    buildDOM()
+    vi.stubGlobal(
+      'fetch',
+      makeFetch([
+        { ok: false, data: {} },
+        { ok: false, data: {} },
+        { data: { status: 'generating' } }, // success resets counter
+        { ok: false, data: {} }
+      ])
+    )
+
+    initProgrammeDownloadPolling()
+
+    await vi.advanceTimersByTimeAsync(3000) // fail 1
+    await vi.advanceTimersByTimeAsync(3000) // fail 2
+    await vi.advanceTimersByTimeAsync(3000) // success → reset
+    await vi.advanceTimersByTimeAsync(3000) // fail 1 again (not 3rd)
+
+    // Should still be polling (not stopped)
+    const callCount = fetch.mock.calls.length
+    await vi.advanceTimersByTimeAsync(3000)
+    expect(fetch.mock.calls.length).toBe(callCount + 1)
   })
 })

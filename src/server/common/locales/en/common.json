@@ -7,6 +7,7 @@
   "sign_in": "Sign in",
   "sign_out": "Sign out",
   "signed_in_as": "Signed in as:",
+  "download_programme": "Download",
   "switch_to_admin": "Switch to Admin journey",
   "switch_to_user": "Switch to User journey",
   "error_summary_title": "There is a problem",
@@ -36,6 +37,7 @@
     "projects": "Projects",
     "submissions": "Submissions",
     "organisations": "Organisations",
+    "download_projects": "Download projects",
     "download_rma": "Download RMA"
   },
   "phase_banner": {

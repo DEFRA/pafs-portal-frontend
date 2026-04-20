@@ -127,6 +127,83 @@ globalThis.pafs.numberFormatting = {
 
 setupHeaderNavigation()
 
+// ── Programme download – progressive enhancement polling ─────────────────────
+//
+// When the page shows a "generating" state the module polls a JSON endpoint
+// every 3 seconds and updates the UI without a full page reload.
+// Without JS the view falls back to a <noscript> meta-refresh.
+//
+// Activated by: [data-module="programme-download"][data-download-status="generating"]
+
+export function initProgrammeDownloadPolling() {
+  const el = document.querySelector('[data-module="programme-download"]')
+  if (!el || el.dataset.downloadStatus !== 'generating') return
+
+  const pollUrl = el.dataset.pollUrl
+  const isAdmin = el.dataset.isAdmin === 'true'
+  if (!pollUrl) return
+
+  const progressMessage = document.getElementById('js-progress-message')
+  const progressCount = document.getElementById('js-progress-count')
+  const progressBar = document.getElementById('js-progress-bar')
+
+  let consecutiveErrors = 0
+
+  async function poll() {
+    try {
+      const res = await fetch(pollUrl, {
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin'
+      })
+
+      if (!res.ok) {
+        consecutiveErrors++
+        if (consecutiveErrors >= 3) clearInterval(timer)
+        return
+      }
+
+      consecutiveErrors = 0
+      const data = await res.json()
+
+      // Update the progress text/bar while still generating
+      if (data.status === 'generating') {
+        if (progressMessage && data.progressMessage) {
+          progressMessage.textContent = data.progressMessage
+        }
+
+        if (isAdmin && data.progressTotal > 0) {
+          const pct = Math.round(
+            (data.progressCurrent / data.progressTotal) * 100
+          )
+
+          if (progressBar) {
+            progressBar.style.width = pct + '%'
+            progressBar
+              .closest('[role="progressbar"]')
+              ?.setAttribute('aria-valuenow', pct)
+          }
+
+          if (progressCount) {
+            progressCount.textContent = `${data.progressCurrent} of ${data.progressTotal} (${pct}%)`
+          }
+        }
+        return
+      }
+
+      // Status changed – do a full reload to render the correct server-side partial
+      clearInterval(timer)
+      window.location.reload()
+    } catch (_err) {
+      consecutiveErrors++
+      if (consecutiveErrors >= 3) clearInterval(timer)
+    }
+  }
+
+  const timer = setInterval(poll, 3000)
+}
+
+initProgrammeDownloadPolling()
+
 bindCommaFormattingToInputs(
   '[data-number-format="comma"], [data-wlc-cost-input="true"]',
   { unformatOnSubmit: true }

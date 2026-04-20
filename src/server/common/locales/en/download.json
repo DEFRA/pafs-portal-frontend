@@ -1,4 +1,106 @@
 {
   "title": "Download",
-  "heading": "Download"
+  "heading": "Download",
+
+  "programme": {
+    "title": "Area programme download",
+    "heading": "Area programme download",
+    "generate_error": "There was a problem starting the download. Please try again.",
+    "file_error": "There was a problem downloading the file. Please try again.",
+
+    "counts": {
+      "heading": "Proposals in your area",
+      "total": "Total proposals",
+      "submitted": "Submitted",
+      "draft": "Draft",
+      "completed": "Under review",
+      "archived": "Archived"
+    },
+
+    "empty": {
+      "description": "You have not generated an area programme download yet. Generate a programme to download all proposals in your area as an Excel spreadsheet.",
+      "why_summary": "Why do I need to generate the programme?",
+      "why_detail": "The programme is generated on demand and includes all proposals in your assigned areas at the time of generation. Because it can take a while to build, you generate it when you need it rather than having it rebuilt automatically."
+    },
+
+    "generating": {
+      "heading": "Generating your area programme",
+      "default_message": "Your programme is being generated. This may take a few minutes.",
+      "email_notice": "You will receive an email when your programme is ready to download.",
+      "requested_on": "Generation started:",
+      "of": "of"
+    },
+
+    "ready": {
+      "heading": "Your area programme is ready",
+      "generated_on": "Generated on:",
+      "included_proposals": "Includes",
+      "proposals": "proposals",
+      "fcerm1_label": "FCERM1 proposals spreadsheet",
+      "benefit_areas_label": "Benefit area shapefiles",
+      "moderations_label": "Moderation forms"
+    },
+
+    "failed": {
+      "title": "Generation failed",
+      "body": "There was a problem generating the programme. Please try again. If the problem persists, contact support."
+    },
+
+    "button": {
+      "generate": "Generate programme",
+      "generate_again": "Generate programme again",
+      "regenerate": "Regenerate programme"
+    }
+  },
+
+  "admin": {
+    "title": "Download all projects",
+    "heading": "Download all projects",
+    "scope_tag": "System-wide",
+    "generate_error": "There was a problem starting the download. Please try again.",
+    "file_error": "There was a problem downloading the file. Please try again.",
+
+    "counts": {
+      "heading": "Current project counts",
+      "total": "Total projects",
+      "submitted": "Submitted",
+      "draft": "Draft",
+      "completed": "Under review",
+      "archived": "Archived",
+      "note": "Archived projects are excluded from the system-wide download."
+    },
+
+    "empty": {
+      "description": "The complete FCERM1 for all non-archived projects has not yet been generated. Generate it to produce a single spreadsheet covering every project in the system."
+    },
+
+    "generating": {
+      "heading": "Generating system-wide FCERM1",
+      "default_message": "The complete FCERM1 is being generated.",
+      "email_notice": "You will receive an email when the file is ready to download.",
+      "requested_on": "Generation started:",
+      "of": "of",
+      "progress_label": "FCERM1 generation progress"
+    },
+
+    "ready": {
+      "heading": "System-wide FCERM1 is ready",
+      "generated_on": "Generated on:",
+      "included_proposals": "Includes",
+      "proposals": "projects",
+      "fcerm1_label": "All projects – FCERM1 spreadsheet",
+      "fcerm1_hint": "Contains all non-archived projects across every area"
+    },
+
+    "failed": {
+      "title": "Generation failed",
+      "body": "There was a problem generating the FCERM1. Please try again. If the problem persists, contact support."
+    },
+
+    "button": {
+      "generate": "Generate FCERM1 for all projects",
+      "generate_again": "Generate again",
+      "regenerate": "Regenerate FCERM1"
+    }
+  }
 }

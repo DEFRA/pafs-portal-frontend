@@ -40,7 +40,8 @@ export const router = {
         'accounts',
         'organisations',
         'projects',
-        'download-rma'
+        'download-rma',
+        'programme-download'
       ])
 
       // General user routes

@@ -1400,8 +1400,6 @@
       "fcerm1_new_hint": "Excel spreadsheet with current proposal data in the latest format",
       "benefit_area": "Proposal benefit area file",
       "benefit_area_hint": "ZIP file containing the proposal benefit area geographical data",
-      "moderation": "Urgency moderation evidence",
-      "moderation_hint": "Plain text file with urgency justification details",
       "no_downloads": "No documents available for download"
     },
     "legacy_downloads": {
@@ -1410,7 +1408,9 @@
       "fcerm1_legacy": "FCERM1 spreadsheet (legacy format)",
       "fcerm1_legacy_hint": "Excel spreadsheet with proposal data in the old format from the previous system",
       "funding_calculator": "Funding calculator",
-      "funding_calculator_hint": "Excel spreadsheet with funding calculations from the previous system"
+      "funding_calculator_hint": "Excel spreadsheet with funding calculations from the previous system",
+      "moderation": "Urgency moderation evidence",
+      "moderation_hint": "Plain text file with urgency justification details"
     },
     "help": {
       "heading": "About these downloads",

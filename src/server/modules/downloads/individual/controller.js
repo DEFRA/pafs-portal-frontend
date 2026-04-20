@@ -54,6 +54,12 @@ class IndividualDownloadsController {
           referenceNumber
         )
       : null
+    const fcerm1NewDownloadUrl = showNewTemplate
+      ? ROUTES.DOWNLOADS.FCERM1_NEW.replace(
+          '{referenceNumber}',
+          referenceNumber
+        )
+      : null
 
     return {
       pageTitle: request.t('projects.downloads.heading'),
@@ -74,6 +80,7 @@ class IndividualDownloadsController {
       showFundingCalculator,
       showModerationDownload,
       fcerm1LegacyDownloadUrl,
+      fcerm1NewDownloadUrl,
       hasBenefitAreaFile: Boolean(
         projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME]
       ),
@@ -219,11 +226,14 @@ class IndividualDownloadsController {
   }
 
   /**
-   * GET /project/{referenceNumber}/downloads/fcerm1/legacy
-   * Proxies the FCERM1 legacy Excel report from the backend API.
-   * Only served when showLegacyTemplate is true for the project.
+   * Shared proxy for both FCERM1 format downloads.
+   * Fetches the XLSX from the backend API and streams it to the browser.
+   *
+   * @param {object} request - Hapi request
+   * @param {object} h       - Hapi response toolkit
+   * @param {'legacy'|'new'} format - FCERM1 format variant
    */
-  async downloadFcerm1Legacy(request, h) {
+  async _proxyFcerm1Download(request, h, format) {
     const { logger } = request.server
     const projectData = getSessionData(request)
     const referenceNumber = projectData[PROJECT_PAYLOAD_FIELDS.SLUG]
@@ -232,15 +242,15 @@ class IndividualDownloadsController {
     const accessToken = session?.accessToken
 
     if (!accessToken) {
-      logger.warn('FCERM1 legacy download attempted without access token')
+      logger.warn(`FCERM1 ${format} download attempted without access token`)
       return h.response('Unauthorised').code(statusCodes.unauthorized)
     }
 
-    const url = `${BACKEND_URL}/api/v1/project/${referenceNumber}/fcerm1/legacy`
+    const url = `${BACKEND_URL}/api/v1/project/${referenceNumber}/fcerm1/${format}`
 
     logger.info(
-      { referenceNumber },
-      'Proxying FCERM1 legacy download from backend'
+      { referenceNumber, format },
+      'Proxying FCERM1 download from backend'
     )
 
     let backendResponse
@@ -250,8 +260,8 @@ class IndividualDownloadsController {
       })
     } catch (err) {
       logger.error(
-        { err, referenceNumber },
-        'Network error fetching FCERM1 legacy from backend'
+        { err, referenceNumber, format },
+        `Network error fetching FCERM1 ${format} from backend`
       )
       return h
         .response('Error generating download')
@@ -260,8 +270,8 @@ class IndividualDownloadsController {
 
     if (!backendResponse.ok) {
       logger.warn(
-        { status: backendResponse.status, referenceNumber },
-        'Backend returned error for FCERM1 legacy download'
+        { status: backendResponse.status, referenceNumber, format },
+        `Backend returned error for FCERM1 ${format} download`
       )
       return h.response('Download unavailable').code(backendResponse.status)
     }
@@ -273,7 +283,9 @@ class IndividualDownloadsController {
       'content-disposition'
     )
     const filenameMatch = /filename="([^"]+)"/.exec(contentDisposition ?? '')
-    const filename = filenameMatch?.[1] ?? `${referenceNumber}_proposal.xlsx`
+    // Sanitize: strip characters that could break out of the header value
+    const rawFilename = filenameMatch?.[1] ?? `${referenceNumber}_proposal.xlsx`
+    const filename = rawFilename.replaceAll(/[\r\n\0]/g, '')
 
     return h
       .response(buffer)
@@ -281,6 +293,24 @@ class IndividualDownloadsController {
       .type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       .header('Content-Disposition', `attachment; filename="${filename}"`)
       .header('Content-Length', buffer.length)
+  }
+
+  /**
+   * GET /project/{referenceNumber}/downloads/fcerm1/legacy
+   * Proxies the FCERM1 legacy Excel report from the backend API.
+   * Only served when showLegacyTemplate is true for the project.
+   */
+  async downloadFcerm1Legacy(request, h) {
+    return this._proxyFcerm1Download(request, h, 'legacy')
+  }
+
+  /**
+   * GET /project/{referenceNumber}/downloads/fcerm1/new
+   * Proxies the new-format FCERM1 Excel report from the backend API.
+   * Only served when showNewTemplate is true for the project.
+   */
+  async downloadFcerm1New(request, h) {
+    return this._proxyFcerm1Download(request, h, 'new')
   }
 }
 
@@ -291,5 +321,7 @@ export const individualDownloadsController = {
   downloadModerationHandler: (request, h) =>
     controller.downloadModeration(request, h),
   downloadFcerm1LegacyHandler: (request, h) =>
-    controller.downloadFcerm1Legacy(request, h)
+    controller.downloadFcerm1Legacy(request, h),
+  downloadFcerm1NewHandler: (request, h) =>
+    controller.downloadFcerm1New(request, h)
 }

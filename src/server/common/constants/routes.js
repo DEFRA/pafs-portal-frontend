@@ -87,6 +87,7 @@ export const ROUTES = {
     INDIVIDUAL: '/project/{referenceNumber}/downloads',
     MODERATION: '/project/{referenceNumber}/downloads/moderation',
     FCERM1_LEGACY: '/project/{referenceNumber}/downloads/fcerm1/legacy',
+    FCERM1_NEW: '/project/{referenceNumber}/downloads/fcerm1/new',
     PROGRAMME: '/downloads/programme',
     ADMIN: '/admin/downloads'
   },
