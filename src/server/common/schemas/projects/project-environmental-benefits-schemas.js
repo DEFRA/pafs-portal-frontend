@@ -17,23 +17,58 @@ const booleanSchema = Joi.boolean().required().messages({
 
 /**
  * Number schema for environmental benefits quantity fields
- * - Minimum value: 0.01
- * - Maximum 2 decimal places
- * - No automatic rounding (strict validation)
+ * - Minimum value: 0 (0 allowed as specified in requirements)
+ * - Up to 16 digits before decimal, 2 digits after decimal
+ * - Accepts both string and number inputs for maximum compatibility
+ * - Uses regex pattern validation for large numbers to avoid JS precision issues
  */
-const quantitySchema = Joi.number()
-  .min(0.01)
-  .precision(2)
+const quantitySchema = Joi.string()
+  .trim()
+  .custom((value, helpers) => {
+    // Check basic format first
+    if (!/^\d+(?:\.\d+)?$/.test(value)) {
+      return helpers.error('number.base')
+    }
+    
+    const [integerPart, decimalPart] = value.split('.')
+    
+    // Check 16 digits before decimal constraint
+    if (integerPart.length > 16) {
+      return helpers.error('number.precision')
+    }
+    
+    // Check decimal places constraint - must be exactly 1 or 2 digits
+    if (decimalPart && decimalPart.length > 2) {
+      return helpers.error('number.precision')
+    }
+    
+    const num = Number.parseFloat(value)
+    if (Number.isNaN(num) || num < 0) {
+      return helpers.error('number.base')
+    }
+    
+    // For very large numbers, check if integer part exceeds JavaScript's safe range
+    const [integerStr] = value.split('.')
+    const integerValue = Number.parseInt(integerStr, 10)
+    if (integerValue > Number.MAX_SAFE_INTEGER) {
+      return helpers.error('number.precision')
+    }
+    
+    // Return the original string value to preserve precision for Decimal database fields
+    return value
+  })
   .required()
-  .strict()
-  .prefs({ convert: false })
   .messages({
     'any.required':
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_REQUIRED,
     'number.base':
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_INVALID,
+    'string.pattern.base':
+      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_INVALID,
     'number.min':
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_MIN,
+    'number.max':
+      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION,
     'number.precision':
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION
   })

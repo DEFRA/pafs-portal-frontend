@@ -420,7 +420,7 @@
       "description": "These are properties that are at risk today",
       "no_properties_checkbox": "My project does not benefit any properties at risk of flooding",
       "errors": {
-        "invalid_value": "Enter the number of properties affected by flooding"
+        "invalid_value": "Please enter a whole number up to 18 digits (0 allowed)"
       },
       "table": {
         "maintaining_existing": "Maintaining flood protection",
@@ -439,7 +439,7 @@
       "description": "These are properties that are at risk today.",
       "no_properties_checkbox": "My project does not benefit any properties at risk of coastal erosion",
       "errors": {
-        "invalid_value": "Enter the number of properties affected by coastal erosion"
+        "invalid_value": "Please enter a whole number up to 18 digits (0 allowed)"
       },
       "table": {
         "maintaining_existing": "Maintaining coastal erosion protection",
@@ -451,18 +451,18 @@
     "twenty_percent_deprived": {
       "title": "Properties in 20% most deprived areas",
       "heading": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
-      "hint": "Enter a number between 0 and 100",
+      "hint": "Enter a whole number between 1 and 100",
       "errors": {
-        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places",
+        "invalid": "Please enter a whole number between 1 to 100.",
         "required": "Enter the percentage of properties benefitting in the 20% most deprived areas"
       }
     },
     "forty_percent_deprived": {
       "title": "Properties in 40% most deprived areas",
       "heading": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
-      "hint": "Enter a number between 0 and 100",
+      "hint": "Enter a whole number between 1 and 100",
       "errors": {
-        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places",
+        "invalid": "Please enter a whole number between 1 to 100.",
         "required": "Enter the percentage of properties benefitting in the 40% most deprived areas"
       }
     },
@@ -1035,10 +1035,10 @@
       "heading": "How many hectares of intertidal wetland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "woodland": {
@@ -1062,10 +1062,10 @@
       "heading": "How many hectares of woodland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "wet_woodland": {
@@ -1089,10 +1089,10 @@
       "heading": "How many hectares of wet woodlands habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "wetland_or_wet_grassland": {
@@ -1116,10 +1116,10 @@
       "heading": "How many hectares of wetland or wet grassland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "grassland": {
@@ -1143,10 +1143,10 @@
       "heading": "How many hectares of grassland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "heathland": {
@@ -1170,10 +1170,10 @@
       "heading": "How many hectares of heathland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "ponds_lakes": {
@@ -1199,8 +1199,8 @@
       "validation": {
         "required": "You must include the number of hectares your project will create.",
         "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "arable_land": {
@@ -1226,8 +1226,8 @@
       "validation": {
         "required": "You must include the number of hectares your project will create.",
         "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "comprehensive_restoration": {
@@ -1251,10 +1251,10 @@
       "heading": "How many kilometres of comprehensive river restoration will be enhanced or created?",
       "suffix": "km",
       "validation": {
-        "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must enter a valid number for kilometres.",
-        "min": "The number of kilometres must be greater than 0.",
-        "precision": "The number of kilometres must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "partial_restoration": {
@@ -1278,10 +1278,10 @@
       "heading": "How many kilometres of partial restoration will be enhanced or created?",
       "suffix": "km",
       "validation": {
-        "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must enter a valid number for kilometres.",
-        "min": "The number of kilometres must be greater than 0.",
-        "precision": "The number of kilometres must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "create_habitat_watercourse": {
@@ -1305,10 +1305,10 @@
       "heading": "How many kilometres of single major physical improvement the project will be enhanced or created?",
       "suffix": "km",
       "validation": {
-        "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must enter a valid number for kilometres.",
-        "min": "The number of kilometres must be greater than 0.",
-        "precision": "The number of kilometres must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
       }
     },
     "footer": {
@@ -1385,6 +1385,9 @@
       "required": "Please enter the value",
       "invalid": "Enter a whole number with no decimal point or currency symbols",
       "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+    },
+    "validation_messages": {
+      "ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
     }
   }
 }

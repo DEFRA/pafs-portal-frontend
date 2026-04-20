@@ -38,14 +38,28 @@ export const mainRiskSchema = Joi.string()
   })
 
 /**
- * Property value schema - non-negative integer or empty string
+ * Maximum digits allowed for property values
+ */
+const MAX_PROPERTY_DIGITS = 18
+
+/**
+ * Property value schema - whole number up to 18 digits (0 allowed)
  */
 const propertyValueSchema = Joi.alternatives()
-  .try(Joi.number().integer().min(0), Joi.string().allow('').pattern(/^\d*$/))
+  .try(
+    Joi.number()
+      .integer()
+      .min(0)
+      .max(10 ** MAX_PROPERTY_DIGITS - 1),
+    Joi.string()
+      .allow('')
+      .pattern(new RegExp(`^\\d{0,${MAX_PROPERTY_DIGITS}}$`))
+  )
   .optional()
   .label('Property Value')
   .messages({
     'number.min': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID,
+    'number.max': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID,
     'number.integer': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID,
     'string.pattern.base': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID
   })
@@ -96,14 +110,13 @@ export const propertiesBenefitInvestmentCoastalErosionSchema =
   )
 
 /**
- * Percentage schema - accepts 0-100 with up to 2 decimal places
- * Can be number or string representation
- * No negatives, no values above 100, numbers only (no text or symbols)
+ * Percentage schema - whole numbers 1-100
+ * No decimals, no zero, no negatives, no values above 100
  */
 
 const percentageSchemaRequired = (errorMessages) =>
   Joi.string()
-    .pattern(/^(?:100(?:\.0{1,2})?|[1-9]?\d(?:\.\d{1,2})?)$/)
+    .pattern(/^([1-9]\d?|100)$/)
     .required()
     .label('Percentage')
     .messages(errorMessages)
