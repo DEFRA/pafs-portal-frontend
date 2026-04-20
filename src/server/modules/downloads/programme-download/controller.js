@@ -1,3 +1,4 @@
+import { statusCodes } from '../../../common/constants/status-codes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import {
   getUserProgrammeStatus,
@@ -58,7 +59,7 @@ export const downloadGetController = {
       ? 'download.admin.heading'
       : 'download.programme.heading'
 
-    return h.view('modules/general/download/index', {
+    return h.view('modules/downloads/programme-download/index', {
       pageTitle: request.t(titleKey),
       heading: request.t(headingKey),
       user: session?.user,
@@ -121,13 +122,13 @@ export const downloadPollController = {
       const result = await svc.getStatus(accessToken)
 
       if (result.success) {
-        return h.response(result.data).code(200)
+        return h.response(result.data).code(statusCodes.ok)
       }
 
-      return h.response({ status: 'empty' }).code(200)
+      return h.response({ status: 'empty' }).code(statusCodes.ok)
     } catch (err) {
       request.server.logger.warn({ err }, 'Poll failed')
-      return h.response({ status: 'empty' }).code(200)
+      return h.response({ status: 'empty' }).code(statusCodes.ok)
     }
   }
 }

@@ -16,6 +16,7 @@ import { statusCodes } from '../../../common/constants/status-codes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 
 const BACKEND_URL = config.get('backendApi.url')
+const REFERENCE_NUMBER_PLACEHOLDER = '{referenceNumber}'
 
 class IndividualDownloadsController {
   _getDownloadViewData(request, options = {}) {
@@ -50,13 +51,13 @@ class IndividualDownloadsController {
     const referenceNumber = projectData[PROJECT_PAYLOAD_FIELDS.SLUG]
     const fcerm1LegacyDownloadUrl = showLegacyTemplate
       ? ROUTES.DOWNLOADS.FCERM1_LEGACY.replace(
-          '{referenceNumber}',
+          REFERENCE_NUMBER_PLACEHOLDER,
           referenceNumber
         )
       : null
     const fcerm1NewDownloadUrl = showNewTemplate
       ? ROUTES.DOWNLOADS.FCERM1_NEW.replace(
-          '{referenceNumber}',
+          REFERENCE_NUMBER_PLACEHOLDER,
           referenceNumber
         )
       : null
@@ -85,7 +86,7 @@ class IndividualDownloadsController {
         projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME]
       ),
       moderationDownloadUrl: ROUTES.DOWNLOADS.MODERATION.replace(
-        '{referenceNumber}',
+        REFERENCE_NUMBER_PLACEHOLDER,
         projectData[PROJECT_PAYLOAD_FIELDS.SLUG]
       ),
       columnWidth: 'two-thirds'

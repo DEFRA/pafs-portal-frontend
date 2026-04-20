@@ -77,7 +77,7 @@ describe('#downloadGetController', () => {
     expect(getUserProgrammeStatus).toHaveBeenCalledWith('tok-123')
     expect(getAdminProgrammeStatus).not.toHaveBeenCalled()
     expect(h.view).toHaveBeenCalledWith(
-      'modules/general/download/index',
+      'modules/downloads/programme-download/index',
       expect.objectContaining({
         isAdmin: false,
         pageTitle: 'download.programme.title',
@@ -101,7 +101,7 @@ describe('#downloadGetController', () => {
     expect(getAdminProgrammeStatus).toHaveBeenCalledWith('tok-123')
     expect(getUserProgrammeStatus).not.toHaveBeenCalled()
     expect(h.view).toHaveBeenCalledWith(
-      'modules/general/download/index',
+      'modules/downloads/programme-download/index',
       expect.objectContaining({
         isAdmin: true,
         pageTitle: 'download.admin.title',
@@ -119,7 +119,7 @@ describe('#downloadGetController', () => {
     await downloadGetController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
-      'modules/general/download/index',
+      'modules/downloads/programme-download/index',
       expect.objectContaining({ downloadStatus: null })
     )
   })
@@ -133,7 +133,7 @@ describe('#downloadGetController', () => {
     await downloadGetController.handler(request, h)
 
     expect(h.view).toHaveBeenCalledWith(
-      'modules/general/download/index',
+      'modules/downloads/programme-download/index',
       expect.objectContaining({ downloadStatus: null })
     )
     expect(request.server.logger.warn).toHaveBeenCalled()

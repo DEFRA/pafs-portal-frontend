@@ -13,7 +13,9 @@
       "total": "Total proposals",
       "submitted": "Submitted",
       "draft": "Draft",
-      "completed": "Under review",
+      "revise": "Revise (legacy)",
+      "approved": "Approved",
+      "completed": "Completed",
       "archived": "Archived"
     },
 
@@ -65,7 +67,9 @@
       "total": "Total projects",
       "submitted": "Submitted",
       "draft": "Draft",
-      "completed": "Under review",
+      "revise": "Revise (legacy)",
+      "approved": "Approved",
+      "completed": "Completed",
       "archived": "Archived",
       "note": "Archived projects are excluded from the system-wide download."
     },

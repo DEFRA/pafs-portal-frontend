@@ -40,14 +40,12 @@ export const router = {
         'accounts',
         'organisations',
         'projects',
-        'download-rma',
-        'programme-download'
+        'download-rma'
       ])
 
       // General user routes
       await loadModules(server, join(dirName, 'modules/general'), [
         'home',
-        'download',
         'accounts',
         'static',
         'projects/archive'
@@ -55,7 +53,8 @@ export const router = {
 
       // Downloads routes
       await loadModules(server, join(dirName, 'modules/downloads'), [
-        'individual'
+        'individual',
+        'programme-download'
       ])
 
       // Project routes
