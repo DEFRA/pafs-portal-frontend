@@ -88,7 +88,9 @@ function convertEmptyToNull(value) {
  * @returns {string|null} Original string value or null
  */
 function keepAsDecimalString(value) {
-  if (value === null || value === undefined || value === '') return null
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
   return String(value)
 }
 

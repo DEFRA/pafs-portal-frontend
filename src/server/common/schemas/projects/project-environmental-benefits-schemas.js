@@ -15,6 +15,9 @@ const booleanSchema = Joi.boolean().required().messages({
   'boolean.base': PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_INVALID
 })
 
+const ERR_PRECISION = 'number.precision'
+const ERR_BASE = 'number.base'
+
 /**
  * Number schema for environmental benefits quantity fields
  * - Minimum value: 0 (0 allowed as specified in requirements)
@@ -27,31 +30,31 @@ const quantitySchema = Joi.string()
   .custom((value, helpers) => {
     // Check basic format first
     if (!/^\d+(?:\.\d+)?$/.test(value)) {
-      return helpers.error('number.base')
+      return helpers.error(ERR_BASE)
     }
 
     const [integerPart, decimalPart] = value.split('.')
 
     // Check 16 digits before decimal constraint
     if (integerPart.length > 16) {
-      return helpers.error('number.precision')
+      return helpers.error(ERR_PRECISION)
     }
 
     // Check decimal places constraint - must be exactly 1 or 2 digits
     if (decimalPart && decimalPart.length > 2) {
-      return helpers.error('number.precision')
+      return helpers.error(ERR_PRECISION)
     }
 
     const num = Number.parseFloat(value)
     if (Number.isNaN(num) || num < 0) {
-      return helpers.error('number.base')
+      return helpers.error(ERR_BASE)
     }
 
     // For very large numbers, check if integer part exceeds JavaScript's safe range
     const [integerStr] = value.split('.')
     const integerValue = Number.parseInt(integerStr, 10)
     if (integerValue > Number.MAX_SAFE_INTEGER) {
-      return helpers.error('number.precision')
+      return helpers.error(ERR_PRECISION)
     }
 
     // Return the original string value to preserve precision for Decimal database fields

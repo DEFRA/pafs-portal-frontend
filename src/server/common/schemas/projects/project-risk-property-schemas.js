@@ -43,6 +43,11 @@ export const mainRiskSchema = Joi.string()
 const MAX_PROPERTY_DIGITS = 18
 
 /**
+ * Regex pattern for digit-only strings up to MAX_PROPERTY_DIGITS (18) characters (0 allowed)
+ */
+const PROPERTY_DIGITS_PATTERN = /^\d{0,18}$/
+
+/**
  * Property value schema - whole number up to 18 digits (0 allowed)
  */
 const propertyValueSchema = Joi.alternatives()
@@ -51,9 +56,7 @@ const propertyValueSchema = Joi.alternatives()
       .integer()
       .min(0)
       .max(10 ** MAX_PROPERTY_DIGITS - 1),
-    Joi.string()
-      .allow('')
-      .pattern(new RegExp(`^\\d{0,${MAX_PROPERTY_DIGITS}}$`))
+    Joi.string().allow('').pattern(PROPERTY_DIGITS_PATTERN)
   )
   .optional()
   .label('Property Value')
