@@ -82,6 +82,17 @@ export const loginPostController = {
 
       setAuthSession(request, result.data)
 
+      const returnTo = request.yar.get('returnTo')
+      request.yar.set('returnTo', null)
+      if (
+        returnTo &&
+        typeof returnTo === 'string' &&
+        returnTo.startsWith('/') &&
+        !returnTo.startsWith('//')
+      ) {
+        return h.redirect(returnTo)
+      }
+
       if (result.data.user.admin) {
         return h.redirect(ROUTES.ADMIN.JOURNEY_SELECTION)
       }

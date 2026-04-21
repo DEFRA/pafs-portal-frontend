@@ -138,6 +138,92 @@ describe('#downloadGetController', () => {
     )
     expect(request.server.logger.warn).toHaveBeenCalled()
   })
+
+  test('passes correct routes object to view', async () => {
+    getAuthSession.mockReturnValue(makeSession(false))
+    getUserProgrammeStatus.mockResolvedValue({ success: true, data: {} })
+
+    const request = makeRequest()
+    const h = makeH()
+    await downloadGetController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'modules/downloads/programme-download/index',
+      expect.objectContaining({
+        routes: {
+          generate: '/downloads/generate',
+          poll: '/downloads/poll',
+          fcerm1: '/downloads/file/fcerm1',
+          benefitAreas: '/downloads/file/benefit-areas',
+          moderations: '/downloads/file/moderations'
+        }
+      })
+    )
+  })
+
+  test('passes flash notification to view when present', async () => {
+    getAuthSession.mockReturnValue(makeSession(false))
+    getUserProgrammeStatus.mockResolvedValue({ success: true, data: null })
+
+    const flashNotification = { type: 'success', text: 'Done' }
+    const request = makeRequest()
+    request.yar.flash.mockReturnValue([flashNotification])
+    const h = makeH()
+    await downloadGetController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'modules/downloads/programme-download/index',
+      expect.objectContaining({ flash: flashNotification })
+    )
+  })
+
+  test('passes null flash to view when no notification', async () => {
+    getAuthSession.mockReturnValue(makeSession(false))
+    getUserProgrammeStatus.mockResolvedValue({ success: true, data: null })
+
+    const request = makeRequest()
+    request.yar.flash.mockReturnValue([])
+    const h = makeH()
+    await downloadGetController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'modules/downloads/programme-download/index',
+      expect.objectContaining({ flash: null })
+    )
+  })
+
+  test('passes user from session to view', async () => {
+    const session = makeSession(false)
+    getAuthSession.mockReturnValue(session)
+    getUserProgrammeStatus.mockResolvedValue({ success: true, data: null })
+
+    const request = makeRequest()
+    const h = makeH()
+    await downloadGetController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'modules/downloads/programme-download/index',
+      expect.objectContaining({ user: session.user })
+    )
+  })
+
+  test('handles null session gracefully', async () => {
+    getAuthSession.mockReturnValue(null)
+    getUserProgrammeStatus.mockResolvedValue({ success: false })
+
+    const request = makeRequest()
+    const h = makeH()
+    await downloadGetController.handler(request, h)
+
+    expect(h.view).toHaveBeenCalledWith(
+      'modules/downloads/programme-download/index',
+      expect.objectContaining({
+        isAdmin: false,
+        user: undefined,
+        downloadStatus: null
+      })
+    )
+  })
 })
 
 // ── downloadGenerateController ────────────────────────────────────────────────
@@ -145,7 +231,7 @@ describe('#downloadGetController', () => {
 describe('#downloadGenerateController', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  test('regular user: calls generateUserProgramme and redirects to /download', async () => {
+  test('regular user: calls generateUserProgramme and redirects to /downloads', async () => {
     getAuthSession.mockReturnValue(makeSession(false))
     generateUserProgramme.mockResolvedValue({ success: true })
 
@@ -155,10 +241,10 @@ describe('#downloadGenerateController', () => {
 
     expect(generateUserProgramme).toHaveBeenCalledWith('tok-123')
     expect(generateAdminProgramme).not.toHaveBeenCalled()
-    expect(h.redirect).toHaveBeenCalledWith('/download')
+    expect(h.redirect).toHaveBeenCalledWith('/downloads')
   })
 
-  test('admin user: calls generateAdminProgramme and redirects to /download', async () => {
+  test('admin user: calls generateAdminProgramme and redirects to /downloads', async () => {
     getAuthSession.mockReturnValue(makeSession(true))
     generateAdminProgramme.mockResolvedValue({ success: true })
 
@@ -168,7 +254,7 @@ describe('#downloadGenerateController', () => {
 
     expect(generateAdminProgramme).toHaveBeenCalledWith('tok-123')
     expect(generateUserProgramme).not.toHaveBeenCalled()
-    expect(h.redirect).toHaveBeenCalledWith('/download')
+    expect(h.redirect).toHaveBeenCalledWith('/downloads')
   })
 
   test('flashes error and redirects when API returns unsuccessful', async () => {
@@ -183,7 +269,7 @@ describe('#downloadGenerateController', () => {
       'notification',
       expect.objectContaining({ type: 'error' })
     )
-    expect(h.redirect).toHaveBeenCalledWith('/download')
+    expect(h.redirect).toHaveBeenCalledWith('/downloads')
   })
 
   test('flashes error and redirects when API throws', async () => {
@@ -199,7 +285,7 @@ describe('#downloadGenerateController', () => {
       expect.objectContaining({ type: 'error' })
     )
     expect(request.server.logger.error).toHaveBeenCalled()
-    expect(h.redirect).toHaveBeenCalledWith('/download')
+    expect(h.redirect).toHaveBeenCalledWith('/downloads')
   })
 })
 
@@ -300,7 +386,7 @@ describe('#downloadFileController', () => {
     expect(h.redirect).toHaveBeenCalledWith('https://s3.example.com/admin.xlsx')
   })
 
-  test('flashes error and redirects to /download when URL is missing', async () => {
+  test('flashes error and redirects to /downloads when URL is missing', async () => {
     getAuthSession.mockReturnValue(makeSession(false))
     getUserProgrammeFileUrl.mockResolvedValue({
       success: true,
@@ -315,7 +401,7 @@ describe('#downloadFileController', () => {
       'notification',
       expect.objectContaining({ type: 'error' })
     )
-    expect(h.redirect).toHaveBeenCalledWith('/download')
+    expect(h.redirect).toHaveBeenCalledWith('/downloads')
   })
 
   test('flashes error and redirects when API throws', async () => {
@@ -331,6 +417,6 @@ describe('#downloadFileController', () => {
       expect.objectContaining({ type: 'error' })
     )
     expect(request.server.logger.error).toHaveBeenCalled()
-    expect(h.redirect).toHaveBeenCalledWith('/download')
+    expect(h.redirect).toHaveBeenCalledWith('/downloads')
   })
 })

@@ -85,7 +85,7 @@
       "reducing_coastal_erosion": "Reducing coastal erosion risk",
       "percent_properties_20_deprived": "Percentage of properties in 20% most deprived areas",
       "percent_properties_40_deprived": "Percentage of properties in 40% most deprived areas",
-      "current_flood_fluvial_risk": "Current flood risk (fluvial and coastal)",
+      "current_flood_fluvial_risk": "Current flood risk (fluvial and tidal)",
       "current_flood_surface_water_risk": "Current flood risk (surface water)",
       "current_coastal_erosion_risk": "Current coastal erosion risk",
       "flood_risk": {
@@ -428,7 +428,7 @@
         "reducing_less_50": "Reducing flood risk (less than 50%)",
         "increasing_resilience": "Increasing flood resilience",
         "maintaining_existing_question": "How many properties are estimated to benefit from maintaining existing assets?",
-        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more?",
+        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more (excluding property flood resilience)?",
         "reducing_less_50_question": "How many properties are estimated to benefit from a reduction in flood probability of less than 50% (excluding property flood resilience)?",
         "increasing_resilience_question": "How many properties will benefit from an individual property intervention?"
       }
@@ -468,7 +468,7 @@
     },
     "current_flood_fluvial_risk": {
       "title": "Current flood risk",
-      "heading": "What is the current flood risk (fluvial and coastal) in the area the project is likely to benefit?",
+      "heading": "What is the current flood risk (fluvial and tidal) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
         "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
@@ -1323,6 +1323,12 @@
       "resend_to_aims_pd": "Resend to AIMS PD",
       "proposal_in_aims_pd": "Proposal in AIMS PD"
     },
+    "notifications": {
+      "marked_in_aims_pd": "Submission has been marked as received in AIMS PD."
+    },
+    "errors": {
+      "mark_failed": "Failed to mark submission as received in AIMS PD. Please try again."
+    },
     "footer": {
       "label": "How to manage failed submissions",
       "check_aims_pd": "Check if the proposal has arrived in AIMS PD",
@@ -1379,7 +1385,7 @@
       "estimated_property_damages_avoided_header": "What are the estimated property damages avoided (if known)?",
       "estimated_environmental_benefits_header": "What are the estimated environmental benefits (if known)?",
       "estimated_recreation_tourism_benefits_header": "What are the estimated recreation and tourism benefits (if known)?",
-      "estimated_land_value_uplift_benefits_header": "What are the estimated land value uplift benefits (if known)?"
+      "estimated_land_value_uplift_benefits_header": "What are the estimated land value uplift and regeneration benefits (if known)?"
     },
     "errors": {
       "required": "Please enter the value",

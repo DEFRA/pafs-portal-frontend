@@ -1,4 +1,5 @@
 import inert from '@hapi/inert'
+import Boom from '@hapi/boom'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
@@ -77,6 +78,19 @@ export const router = {
 
       // Static assets
       await server.register([serveStaticFiles])
+
+      // Catch-all: any path not matched above returns a 404.
+      // Without this, Hapi returns a raw 500 for unregistered routes because
+      // the 404 Boom is generated outside the normal route lifecycle and
+      // the error view rendering falls back to a generic 500.
+      server.route({
+        method: '*',
+        path: '/{p*}',
+        options: { auth: false },
+        handler() {
+          return Boom.notFound()
+        }
+      })
     }
   }
 }

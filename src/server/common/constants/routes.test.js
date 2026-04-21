@@ -104,6 +104,12 @@ describe('Routes Constants', () => {
       expect(ROUTES.ADMIN.SUBMISSIONS).toBe('/admin/submissions')
     })
 
+    test('SUBMISSIONS_MARK_IN_AIMS_PD route is defined', () => {
+      expect(ROUTES.ADMIN.SUBMISSIONS_MARK_IN_AIMS_PD).toBe(
+        '/admin/submissions/{referenceNumber}/mark-in-aims-pd'
+      )
+    })
+
     test('ORGANISATIONS route is defined', () => {
       expect(ROUTES.ADMIN.ORGANISATIONS).toBe('/admin/organisations')
     })

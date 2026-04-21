@@ -28,7 +28,8 @@ describe('AreasPreloader Plugin', () => {
     }
 
     mockRequest = {
-      server: mockServer
+      server: mockServer,
+      route: { path: '/projects' }
     }
 
     mockH = {

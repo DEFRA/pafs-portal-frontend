@@ -76,6 +76,8 @@ export const ROUTES = {
     },
     PROJECTS: '/admin/projects',
     SUBMISSIONS: '/admin/submissions',
+    SUBMISSIONS_MARK_IN_AIMS_PD:
+      '/admin/submissions/{referenceNumber}/mark-in-aims-pd',
     ORGANISATIONS: '/admin/organisations',
     DOWNLOAD_PROJECTS: '/admin/download-projects',
     DOWNLOAD_RMA: '/admin/download-rma'

@@ -2,6 +2,7 @@ export const PROJECT_STATUS = {
   REVISE: 'revise',
   DRAFT: 'draft',
   SUBMITTED: 'submitted',
+  APPROVED: 'approved',
   COMPLETED: 'completed',
   ARCHIVED: 'archived'
 }

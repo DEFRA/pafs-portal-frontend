@@ -1,5 +1,6 @@
 import { statusCodes } from '../../../common/constants/status-codes.js'
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
+import { ROUTES } from '../../../common/constants/routes.js'
 import {
   getUserProgrammeStatus,
   generateUserProgramme,
@@ -18,14 +19,12 @@ function resolveDownloadService(isAdmin) {
   if (isAdmin) {
     return {
       getStatus: getAdminProgrammeStatus,
-      generate: generateAdminProgramme,
-      getFileUrl: () => getAdminProgrammeFileUrl
+      generate: generateAdminProgramme
     }
   }
   return {
     getStatus: getUserProgrammeStatus,
-    generate: generateUserProgramme,
-    getFileUrl: () => getUserProgrammeFileUrl
+    generate: generateUserProgramme
   }
 }
 
@@ -65,7 +64,14 @@ export const downloadGetController = {
       user: session?.user,
       isAdmin,
       downloadStatus,
-      flash: request.yar.flash('notification')?.[0] ?? null
+      flash: request.yar.flash('notification')?.[0] ?? null,
+      routes: {
+        generate: `${ROUTES.DOWNLOADS.PROGRAMME}/generate`,
+        poll: `${ROUTES.DOWNLOADS.PROGRAMME}/poll`,
+        fcerm1: `${ROUTES.DOWNLOADS.PROGRAMME}/file/fcerm1`,
+        benefitAreas: `${ROUTES.DOWNLOADS.PROGRAMME}/file/benefit-areas`,
+        moderations: `${ROUTES.DOWNLOADS.PROGRAMME}/file/moderations`
+      }
     })
   }
 }
@@ -102,7 +108,7 @@ export const downloadGenerateController = {
       })
     }
 
-    return h.redirect('/download')
+    return h.redirect(ROUTES.DOWNLOADS.PROGRAMME)
   }
 }
 
@@ -165,6 +171,6 @@ export const downloadFileController = {
       type: 'error',
       text: request.t('download.programme.file_error')
     })
-    return h.redirect('/download')
+    return h.redirect(ROUTES.DOWNLOADS.PROGRAMME)
   }
 }
