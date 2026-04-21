@@ -37,7 +37,9 @@ function isValidReturnUrl(url) {
  * @private
  */
 function saveReturnUrl(request) {
-  if (request.method !== 'get' || !request.url) return
+  if (request.method !== 'get' || !request.url) {
+    return
+  }
   const returnTo = request.url.pathname + (request.url.search || '')
   if (isValidReturnUrl(returnTo)) {
     request.yar.set('returnTo', returnTo)

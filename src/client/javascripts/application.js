@@ -135,13 +135,51 @@ setupHeaderNavigation()
 //
 // Activated by: [data-module="programme-download"][data-download-status="generating"]
 
+const MAX_CONSECUTIVE_ERRORS = 3
+const POLL_INTERVAL_MS = 3000
+
+function updateAdminProgress(data, progressBar, progressCount) {
+  if (!data.progressTotal || data.progressTotal <= 0) {
+    return
+  }
+  const pct = Math.round((data.progressCurrent / data.progressTotal) * 100)
+  if (progressBar) {
+    progressBar.style.width = pct + '%'
+    progressBar
+      .closest('[role="progressbar"]')
+      ?.setAttribute('aria-valuenow', pct)
+  }
+  if (progressCount) {
+    progressCount.textContent = `${data.progressCurrent} of ${data.progressTotal} (${pct}%)`
+  }
+}
+
+function handleGeneratingStatus(
+  data,
+  isAdmin,
+  progressMessage,
+  progressBar,
+  progressCount
+) {
+  if (progressMessage && data.progressMessage) {
+    progressMessage.textContent = data.progressMessage
+  }
+  if (isAdmin) {
+    updateAdminProgress(data, progressBar, progressCount)
+  }
+}
+
 export function initProgrammeDownloadPolling() {
   const el = document.querySelector('[data-module="programme-download"]')
-  if (!el || el.dataset.downloadStatus !== 'generating') return
+  if (el?.dataset.downloadStatus !== 'generating') {
+    return
+  }
 
   const pollUrl = el.dataset.pollUrl
   const isAdmin = el.dataset.isAdmin === 'true'
-  if (!pollUrl) return
+  if (!pollUrl) {
+    return
+  }
 
   const progressMessage = document.getElementById('js-progress-message')
   const progressCount = document.getElementById('js-progress-count')
@@ -158,48 +196,39 @@ export function initProgrammeDownloadPolling() {
 
       if (!res.ok) {
         consecutiveErrors++
-        if (consecutiveErrors >= 3) clearInterval(timer)
+        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          clearInterval(timer)
+        }
         return
       }
 
       consecutiveErrors = 0
       const data = await res.json()
 
-      // Update the progress text/bar while still generating
       if (data.status === 'generating') {
-        if (progressMessage && data.progressMessage) {
-          progressMessage.textContent = data.progressMessage
-        }
-
-        if (isAdmin && data.progressTotal > 0) {
-          const pct = Math.round(
-            (data.progressCurrent / data.progressTotal) * 100
-          )
-
-          if (progressBar) {
-            progressBar.style.width = pct + '%'
-            progressBar
-              .closest('[role="progressbar"]')
-              ?.setAttribute('aria-valuenow', pct)
-          }
-
-          if (progressCount) {
-            progressCount.textContent = `${data.progressCurrent} of ${data.progressTotal} (${pct}%)`
-          }
-        }
+        handleGeneratingStatus(
+          data,
+          isAdmin,
+          progressMessage,
+          progressBar,
+          progressCount
+        )
         return
       }
 
       // Status changed – do a full reload to render the correct server-side partial
       clearInterval(timer)
-      window.location.reload()
-    } catch (_err) {
+      globalThis.location.reload()
+    } catch (err) {
+      console.error('Programme download poll error', err)
       consecutiveErrors++
-      if (consecutiveErrors >= 3) clearInterval(timer)
+      if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+        clearInterval(timer)
+      }
     }
   }
 
-  const timer = setInterval(poll, 3000)
+  const timer = setInterval(poll, POLL_INTERVAL_MS)
 }
 
 initProgrammeDownloadPolling()

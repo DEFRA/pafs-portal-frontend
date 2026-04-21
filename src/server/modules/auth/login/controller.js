@@ -11,19 +11,56 @@ import {
 } from '../../../common/helpers/error-renderer/index.js'
 import { invalidateAccountsCacheOnAuth } from '../helpers/cache-invalidation.js'
 
+function renderLogin(request, h, overrides = {}) {
+  return h.view(AUTH_VIEWS.LOGIN, {
+    pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
+    errorCode: '',
+    warningCode: '',
+    supportCode: '',
+    fieldErrors: {},
+    ERROR_CODES: VIEW_ERROR_CODES,
+    ...overrides
+  })
+}
+
+function handleLoginFailure(request, h, result, email) {
+  if (result.validationErrors) {
+    return renderLogin(request, h, {
+      fieldErrors: extractApiValidationErrors(result),
+      email
+    })
+  }
+  const apiError = extractApiError(result)
+  return renderLogin(request, h, {
+    errorCode: apiError?.errorCode,
+    warningCode: apiError?.warningCode || '',
+    supportCode: apiError?.supportCode || '',
+    email
+  })
+}
+
+function resolvePostLoginRedirect(request, result) {
+  const returnTo = request.yar.get('returnTo')
+  request.yar.set('returnTo', null)
+  if (
+    returnTo &&
+    typeof returnTo === 'string' &&
+    returnTo.startsWith('/') &&
+    !returnTo.startsWith('//')
+  ) {
+    return returnTo
+  }
+  return result.data.user.admin
+    ? ROUTES.ADMIN.JOURNEY_SELECTION
+    : ROUTES.GENERAL.HOME
+}
+
 export const loginController = {
   handler(request, h) {
     const flashAuthError = request.yar.flash('authError')
     const authError = flashAuthError?.[0] || ''
 
-    return h.view(AUTH_VIEWS.LOGIN, {
-      pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
-      errorCode: authError,
-      warningCode: '',
-      supportCode: '',
-      fieldErrors: {},
-      ERROR_CODES: VIEW_ERROR_CODES
-    })
+    return renderLogin(request, h, { errorCode: authError })
   }
 }
 
@@ -36,14 +73,9 @@ export const loginPostController = {
       { abortEarly: false }
     )
     if (error) {
-      return h.view(AUTH_VIEWS.LOGIN, {
-        pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
+      return renderLogin(request, h, {
         fieldErrors: extractJoiErrors(error),
-        errorCode: '',
-        warningCode: '',
-        supportCode: '',
-        email,
-        ERROR_CODES: VIEW_ERROR_CODES
+        email
       })
     }
 
@@ -51,62 +83,18 @@ export const loginPostController = {
       const result = await login(value.email, value.password)
 
       if (!result.success) {
-        // Check for backend validation errors first
-        if (result.validationErrors) {
-          return h.view(AUTH_VIEWS.LOGIN, {
-            pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
-            errorCode: '',
-            fieldErrors: extractApiValidationErrors(result),
-            warningCode: '',
-            supportCode: '',
-            email,
-            ERROR_CODES: VIEW_ERROR_CODES
-          })
-        }
-
-        // Handle auth/general errors
-        const apiError = extractApiError(result)
-        return h.view(AUTH_VIEWS.LOGIN, {
-          pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
-          fieldErrors: {},
-          errorCode: apiError?.errorCode,
-          warningCode: apiError?.warningCode || '',
-          supportCode: apiError?.supportCode || '',
-          email,
-          ERROR_CODES: VIEW_ERROR_CODES
-        })
+        return handleLoginFailure(request, h, result, email)
       }
 
-      // Invalidate accounts cache before setting new session
       await invalidateAccountsCacheOnAuth(request, 'login')
-
       setAuthSession(request, result.data)
 
-      const returnTo = request.yar.get('returnTo')
-      request.yar.set('returnTo', null)
-      if (
-        returnTo &&
-        typeof returnTo === 'string' &&
-        returnTo.startsWith('/') &&
-        !returnTo.startsWith('//')
-      ) {
-        return h.redirect(returnTo)
-      }
-
-      if (result.data.user.admin) {
-        return h.redirect(ROUTES.ADMIN.JOURNEY_SELECTION)
-      }
-      return h.redirect(ROUTES.GENERAL.HOME)
+      return h.redirect(resolvePostLoginRedirect(request, result))
     } catch (err) {
       request.server.logger.error({ err }, 'Login error')
-      return h.view(AUTH_VIEWS.LOGIN, {
-        pageTitle: request.t(LOCALE_KEYS.SIGN_IN),
+      return renderLogin(request, h, {
         errorCode: VIEW_ERROR_CODES.NETWORK_ERROR,
-        warningCode: '',
-        supportCode: '',
-        fieldErrors: {},
-        email,
-        ERROR_CODES: VIEW_ERROR_CODES
+        email
       })
     }
   }
