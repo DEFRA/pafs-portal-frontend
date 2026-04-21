@@ -34,10 +34,6 @@ const MSG_SELECT_AT_LEAST_ONE_LAND_TYPE = 'Select at least one land type'
 const MSG_ENTER_LENGTH_IN_KM = 'Enter the length in km'
 
 const maxTwoDecimalPlaces = (value, helpers) => {
-  if (value === null || value === '' || value === undefined) {
-    return value
-  }
-
   // Use helpers.original (raw string before Joi coercion) to validate format accurately.
   // String(value) would reflect the JS float which loses precision for large numbers.
   const rawStr = String(helpers.original ?? value)
