@@ -14,6 +14,7 @@ import {
   NFM_EXPERIENCE_LEVEL_OPTIONS
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import {
   getBackLink,
   getSessionData,
@@ -28,7 +29,10 @@ import {
 class OverviewController {
   _getProjectViewData(request, options = {}) {
     const { backLink, projectData } = options
-    const isReadOnly = !EDITABLE_STATUSES.includes(projectData.projectState)
+    const session = getAuthSession(request)
+    const isEaUser = Boolean(session?.user?.isEa)
+    const isReadOnly =
+      !EDITABLE_STATUSES.includes(projectData.projectState) || isEaUser
     const isLegacy = Boolean(projectData.isLegacy)
     const isConfidenceRestricted = isConfidenceRestrictedProjectType(
       projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]

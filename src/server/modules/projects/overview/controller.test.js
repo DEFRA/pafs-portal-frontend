@@ -13,7 +13,13 @@ import {
   isConfidenceRestrictedProjectType
 } from '../helpers/project-utils.js'
 
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
+
 // Mock dependencies
+vi.mock('../../../common/helpers/auth/session-manager.js', () => ({
+  getAuthSession: vi.fn()
+}))
+
 vi.mock('../helpers/project-utils.js', () => ({
   getSessionData: vi.fn(),
   getBackLink: vi.fn(),
@@ -39,6 +45,8 @@ describe('OverviewController', () => {
     mockH = {
       view: vi.fn()
     }
+
+    getAuthSession.mockReturnValue({ user: {} })
 
     getBackLink.mockReturnValue({
       href: '/projects/home',
@@ -684,6 +692,72 @@ describe('OverviewController', () => {
         expect.any(String),
         expect.objectContaining({
           ERROR_CODES: expect.any(Object)
+        })
+      )
+    })
+  })
+
+  describe('EA user access', () => {
+    test('should set isReadOnly to true for EA user with DRAFT state', async () => {
+      getAuthSession.mockReturnValue({ user: { isEa: true } })
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isReadOnly: true
+        })
+      )
+    })
+
+    test('should set isReadOnly to true for EA user with REVISE state', async () => {
+      getAuthSession.mockReturnValue({ user: { isEa: true } })
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.REVISE
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isReadOnly: true
+        })
+      )
+    })
+
+    test('should set isReadOnly to false for non-EA user with DRAFT state', async () => {
+      getAuthSession.mockReturnValue({ user: { isEa: false } })
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isReadOnly: false
+        })
+      )
+    })
+
+    test('should set isReadOnly to false for user without isEa flag with DRAFT state', async () => {
+      getAuthSession.mockReturnValue({ user: {} })
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isReadOnly: false
         })
       )
     })
