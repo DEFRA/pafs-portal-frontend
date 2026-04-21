@@ -3,7 +3,7 @@
   "heading": "Download",
   "programme": {
     "title": "Download all proposals",
-    "heading": "Proposals download",
+    "heading": "Download all proposals",
     "generate_error": "There was a problem starting the download. Please try again.",
     "file_error": "There was a problem downloading the file. Please try again.",
     "counts": {
@@ -29,7 +29,7 @@
       "of": "of"
     },
     "ready": {
-      "heading": "Your programme is ready",
+      "heading": "Your proposals are ready",
       "generated_on": "Generated on:",
       "included_proposals": "Includes",
       "proposals": "proposals",

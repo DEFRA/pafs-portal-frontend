@@ -94,8 +94,8 @@
   },
   "add_user": {
     "start": {
-      "title": "Add a new user",
-      "heading": "Add a new user",
+      "title": "Add new user",
+      "heading": "Add new user",
       "intro": "You will create a new user account. The user will receive an email notification once their account is created.",
       "before_start": "Before you start",
       "need_to_provide": "You will need to provide:",
