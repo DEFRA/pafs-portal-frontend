@@ -29,31 +29,31 @@ const quantitySchema = Joi.string()
     if (!/^\d+(?:\.\d+)?$/.test(value)) {
       return helpers.error('number.base')
     }
-    
+
     const [integerPart, decimalPart] = value.split('.')
-    
+
     // Check 16 digits before decimal constraint
     if (integerPart.length > 16) {
       return helpers.error('number.precision')
     }
-    
+
     // Check decimal places constraint - must be exactly 1 or 2 digits
     if (decimalPart && decimalPart.length > 2) {
       return helpers.error('number.precision')
     }
-    
+
     const num = Number.parseFloat(value)
     if (Number.isNaN(num) || num < 0) {
       return helpers.error('number.base')
     }
-    
+
     // For very large numbers, check if integer part exceeds JavaScript's safe range
     const [integerStr] = value.split('.')
     const integerValue = Number.parseInt(integerStr, 10)
     if (integerValue > Number.MAX_SAFE_INTEGER) {
       return helpers.error('number.precision')
     }
-    
+
     // Return the original string value to preserve precision for Decimal database fields
     return value
   })

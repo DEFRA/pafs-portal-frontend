@@ -19,19 +19,17 @@ import {
 
 const MSG_ENTER_AREA_IN_HECTARES = 'Enter the area in hectares'
 const MSG_AREA_GREATER_THAN_ZERO = 'Area must be a number greater than 0'
-const MSG_AREA_PRECISION_2DP = 'Area must have up to 2 decimal places'
+const MSG_PRECISION =
+  'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)'
 const MSG_AREA_NON_NEGATIVE = 'Area must be a number greater than or equal to 0'
 const MSG_LAND_USE_AREA_BEFORE = 'Enter the area before natural flood measures'
 const MSG_LAND_USE_AREA_AFTER = 'Enter the area after natural flood measures'
 
 const MSG_VOLUME_GREATER_THAN_ZERO = 'Volume must be a number greater than 0'
-const MSG_VOLUME_PRECISION_2DP = 'Volume must have up to 2 decimal places'
 
 const MSG_LENGTH_GREATER_THAN_ZERO = 'Length must be a number greater than 0'
-const MSG_LENGTH_PRECISION_2DP = 'Length must have up to 2 decimal places'
 
 const MSG_WIDTH_GREATER_THAN_ZERO = 'Width must be a number greater than 0'
-const MSG_WIDTH_PRECISION_2DP = 'Width must have up to 2 decimal places'
 const MSG_SELECT_AT_LEAST_ONE_LAND_TYPE = 'Select at least one land type'
 const MSG_ENTER_LENGTH_IN_KM = 'Enter the length in km'
 
@@ -40,20 +38,15 @@ const maxTwoDecimalPlaces = (value, helpers) => {
     return value
   }
 
-  // Convert to string to check decimal places accurately
-  const valueStr = String(value)
-  const decimalIndex = valueStr.indexOf('.')
-
-  // If no decimal point, it's valid (whole number)
-  if (decimalIndex === -1) {
-    return value
+  // Use helpers.original (raw string before Joi coercion) to validate format accurately.
+  // String(value) would reflect the JS float which loses precision for large numbers.
+  const rawStr = String(helpers.original ?? value)
+  if (/^\d{1,16}(\.\d{1,2})?$/.test(rawStr)) {
+    // Return the raw string (not the coerced float) to preserve precision.
+    // Callers must NOT call parseFloat on this value before sending to the backend.
+    return rawStr
   }
-
-  // Count decimal places
-  const decimalPlaces = valueStr.length - decimalIndex - 1
-
-  // Allow up to 2 decimal places
-  return decimalPlaces <= 2 ? value : helpers.error('number.precision')
+  return helpers.error('number.precision')
 }
 
 /**
@@ -83,6 +76,7 @@ export const nfmSelectedMeasuresSchema = Joi.object({
  */
 export const nfmRiverRestorationSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: Joi.number()
+    .unsafe()
     .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
@@ -90,10 +84,11 @@ export const nfmRiverRestorationSchema = Joi.object({
     .messages({
       'number.base': MSG_AREA_GREATER_THAN_ZERO,
       'number.positive': MSG_AREA_GREATER_THAN_ZERO,
-      'number.precision': MSG_AREA_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: Joi.number()
+    .unsafe()
     .positive()
     .custom(maxTwoDecimalPlaces)
     .allow(null, '')
@@ -101,7 +96,7 @@ export const nfmRiverRestorationSchema = Joi.object({
     .messages({
       'number.base': MSG_VOLUME_GREATER_THAN_ZERO,
       'number.positive': MSG_VOLUME_GREATER_THAN_ZERO,
-      'number.precision': MSG_VOLUME_PRECISION_2DP
+      'number.precision': MSG_PRECISION
     })
 }).unknown(true)
 
@@ -111,6 +106,7 @@ export const nfmRiverRestorationSchema = Joi.object({
  */
 export const nfmLeakyBarriersSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: Joi.number()
+    .unsafe()
     .positive()
     .custom(maxTwoDecimalPlaces)
     .allow(null, '')
@@ -118,9 +114,10 @@ export const nfmLeakyBarriersSchema = Joi.object({
     .messages({
       'number.base': MSG_VOLUME_GREATER_THAN_ZERO,
       'number.positive': MSG_VOLUME_GREATER_THAN_ZERO,
-      'number.precision': MSG_VOLUME_PRECISION_2DP
+      'number.precision': MSG_PRECISION
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]: Joi.number()
+    .unsafe()
     .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
@@ -128,10 +125,11 @@ export const nfmLeakyBarriersSchema = Joi.object({
     .messages({
       'number.base': MSG_LENGTH_GREATER_THAN_ZERO,
       'number.positive': MSG_LENGTH_GREATER_THAN_ZERO,
-      'number.precision': MSG_LENGTH_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': MSG_ENTER_LENGTH_IN_KM
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]: Joi.number()
+    .unsafe()
     .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
@@ -139,7 +137,7 @@ export const nfmLeakyBarriersSchema = Joi.object({
     .messages({
       'number.base': MSG_WIDTH_GREATER_THAN_ZERO,
       'number.positive': MSG_WIDTH_GREATER_THAN_ZERO,
-      'number.precision': MSG_WIDTH_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': 'Enter the breadth in m'
     })
 }).unknown(true)
@@ -150,6 +148,7 @@ export const nfmLeakyBarriersSchema = Joi.object({
  */
 export const nfmOfflineStorageSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: Joi.number()
+    .unsafe()
     .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
@@ -157,17 +156,18 @@ export const nfmOfflineStorageSchema = Joi.object({
     .messages({
       'number.base': MSG_AREA_GREATER_THAN_ZERO,
       'number.positive': MSG_AREA_GREATER_THAN_ZERO,
-      'number.precision': MSG_AREA_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: Joi.number()
+    .unsafe()
     .positive()
     .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .messages({
       'number.base': MSG_VOLUME_GREATER_THAN_ZERO,
       'number.positive': MSG_VOLUME_GREATER_THAN_ZERO,
-      'number.precision': MSG_VOLUME_PRECISION_2DP
+      'number.precision': MSG_PRECISION
     })
 }).unknown(true)
 
@@ -177,6 +177,7 @@ export const nfmOfflineStorageSchema = Joi.object({
  */
 export const nfmWoodlandSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]: Joi.number()
+    .unsafe()
     .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
@@ -184,7 +185,7 @@ export const nfmWoodlandSchema = Joi.object({
     .messages({
       'number.base': MSG_AREA_GREATER_THAN_ZERO,
       'number.positive': MSG_AREA_GREATER_THAN_ZERO,
-      'number.precision': MSG_AREA_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': MSG_ENTER_AREA_IN_HECTARES
     })
 }).unknown(true)
@@ -195,6 +196,7 @@ export const nfmWoodlandSchema = Joi.object({
  */
 export const nfmHeadwaterDrainageSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA]: Joi.number()
+    .unsafe()
     .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
@@ -202,7 +204,7 @@ export const nfmHeadwaterDrainageSchema = Joi.object({
     .messages({
       'number.base': MSG_AREA_GREATER_THAN_ZERO,
       'number.positive': MSG_AREA_GREATER_THAN_ZERO,
-      'number.precision': MSG_AREA_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': MSG_ENTER_AREA_IN_HECTARES
     })
 }).unknown(true)
@@ -213,6 +215,7 @@ export const nfmHeadwaterDrainageSchema = Joi.object({
  */
 export const nfmRunoffManagementSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: Joi.number()
+    .unsafe()
     .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
@@ -220,17 +223,18 @@ export const nfmRunoffManagementSchema = Joi.object({
     .messages({
       'number.base': MSG_AREA_GREATER_THAN_ZERO,
       'number.positive': MSG_AREA_GREATER_THAN_ZERO,
-      'number.precision': MSG_AREA_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: Joi.number()
+    .unsafe()
     .positive()
     .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .messages({
       'number.base': MSG_VOLUME_GREATER_THAN_ZERO,
       'number.positive': MSG_VOLUME_GREATER_THAN_ZERO,
-      'number.precision': MSG_VOLUME_PRECISION_2DP
+      'number.precision': MSG_PRECISION
     })
 }).unknown(true)
 
@@ -240,6 +244,7 @@ export const nfmRunoffManagementSchema = Joi.object({
  */
 export const nfmSaltmarshSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: Joi.number()
+    .unsafe()
     .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
@@ -247,17 +252,18 @@ export const nfmSaltmarshSchema = Joi.object({
     .messages({
       'number.base': MSG_AREA_GREATER_THAN_ZERO,
       'number.positive': MSG_AREA_GREATER_THAN_ZERO,
-      'number.precision': MSG_AREA_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: Joi.number()
+    .unsafe()
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
       'number.base': 'Length must be a number',
       'number.positive': 'Length must be a positive number',
-      'number.precision': MSG_LENGTH_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': MSG_ENTER_LENGTH_IN_KM
     })
 }).unknown(true)
@@ -268,6 +274,7 @@ export const nfmSaltmarshSchema = Joi.object({
  */
 export const nfmSandDuneSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: Joi.number()
+    .unsafe()
     .empty('')
     .positive()
     .custom(maxTwoDecimalPlaces)
@@ -275,17 +282,18 @@ export const nfmSandDuneSchema = Joi.object({
     .messages({
       'number.base': MSG_AREA_GREATER_THAN_ZERO,
       'number.positive': MSG_AREA_GREATER_THAN_ZERO,
-      'number.precision': MSG_AREA_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': MSG_ENTER_AREA_IN_HECTARES
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: Joi.number()
+    .unsafe()
     .positive()
     .custom(maxTwoDecimalPlaces)
     .required()
     .messages({
       'number.base': 'Length must be a number',
       'number.positive': 'Length must be a positive number',
-      'number.precision': MSG_LENGTH_PRECISION_2DP,
+      'number.precision': MSG_PRECISION,
       'any.required': MSG_ENTER_LENGTH_IN_KM
     })
 }).unknown(true)
@@ -316,6 +324,7 @@ export const nfmLandUseChangeSchema = Joi.object({
 const createLandUseDetailSchema = (beforeField, afterField) =>
   Joi.object({
     [beforeField]: Joi.number()
+      .unsafe()
       .empty('')
       .min(0)
       .custom(maxTwoDecimalPlaces)
@@ -323,10 +332,11 @@ const createLandUseDetailSchema = (beforeField, afterField) =>
       .messages({
         'number.base': MSG_AREA_NON_NEGATIVE,
         'number.min': MSG_AREA_NON_NEGATIVE,
-        'number.precision': MSG_AREA_PRECISION_2DP,
+        'number.precision': MSG_PRECISION,
         'any.required': MSG_LAND_USE_AREA_BEFORE
       }),
     [afterField]: Joi.number()
+      .unsafe()
       .empty('')
       .min(0)
       .custom(maxTwoDecimalPlaces)
@@ -334,7 +344,7 @@ const createLandUseDetailSchema = (beforeField, afterField) =>
       .messages({
         'number.base': MSG_AREA_NON_NEGATIVE,
         'number.min': MSG_AREA_NON_NEGATIVE,
-        'number.precision': MSG_AREA_PRECISION_2DP,
+        'number.precision': MSG_PRECISION,
         'any.required': MSG_LAND_USE_AREA_AFTER
       })
   }).unknown(true)

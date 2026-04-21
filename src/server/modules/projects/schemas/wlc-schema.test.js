@@ -60,7 +60,7 @@ describe('wlc-schema', () => {
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Enter a whole number with no decimal point or currency symbols'
+      'Please enter a whole number up to 18 digits (0 allowed)'
     )
   })
 
@@ -74,7 +74,7 @@ describe('wlc-schema', () => {
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'You have exceeded the maximum number of digits allowed. Please re-enter.'
+      'Please enter a whole number up to 18 digits (0 allowed)'
     )
   })
 
@@ -86,7 +86,9 @@ describe('wlc-schema', () => {
 
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
-    expect(error.details[0].message).toBe('Please enter the value')
+    expect(error.details[0].message).toBe(
+      'Please enter a whole number up to 18 digits (0 allowed)'
+    )
   })
 
   test('optional schema allows empty and null values', () => {
@@ -110,7 +112,7 @@ describe('wlc-schema', () => {
     const { error } = wlcOptionalSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Enter a whole number with no decimal point or currency symbols'
+      'Please enter a whole number up to 18 digits (0 allowed)'
     )
   })
 

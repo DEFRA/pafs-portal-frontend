@@ -279,7 +279,7 @@ describe('NFM Land-use Schemas', () => {
     expect(result.error).toBeDefined()
     expect(result.error.details[0].type).toBe('number.precision')
     expect(result.error.details[0].message).toBe(
-      'Area must have up to 2 decimal places'
+      'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)'
     )
   })
 

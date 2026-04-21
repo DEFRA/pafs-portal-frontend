@@ -635,7 +635,7 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
         }
       },
       "enclosed_livestock_farmland": {
@@ -650,7 +650,7 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
         }
       },
       "enclosed_dairying_farmland": {
@@ -665,7 +665,7 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
         }
       },
       "semi_natural_grassland": {
@@ -680,7 +680,7 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
         }
       },
       "woodland": {
@@ -695,7 +695,7 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
         }
       },
       "mountain_moors_and_heath": {
@@ -710,7 +710,7 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
         }
       },
       "peatland_restoration": {
@@ -725,7 +725,7 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
         }
       },
       "rivers_wetlands_freshwater_habitats": {
@@ -740,7 +740,7 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
         }
       },
       "coastal_margins": {
@@ -755,7 +755,7 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"
         }
       }
     },
@@ -1364,9 +1364,9 @@
       "if_known": "if known"
     },
     "errors": {
-      "required": "Please enter the value",
-      "invalid": "Enter a whole number with no decimal point or currency symbols",
-      "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+      "required": "Please enter a whole number up to 18 digits (0 allowed)",
+      "invalid": "Please enter a whole number up to 18 digits (0 allowed)",
+      "max_digits": "Please enter a whole number up to 18 digits (0 allowed)"
     }
   },
   "whole_life_benefits": {
@@ -1382,9 +1382,9 @@
       "estimated_land_value_uplift_benefits_header": "What are the estimated land value uplift benefits (if known)?"
     },
     "errors": {
-      "required": "Please enter the value",
-      "invalid": "Enter a whole number with no decimal point or currency symbols",
-      "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+      "required": "Please enter a whole number up to 18 digits (0 allowed)",
+      "invalid": "Please enter a whole number up to 18 digits (0 allowed)",
+      "max_digits": "Please enter a whole number up to 18 digits (0 allowed)"
     },
     "validation_messages": {
       "ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)"

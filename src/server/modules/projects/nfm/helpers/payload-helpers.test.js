@@ -61,7 +61,7 @@ describe('NFM Payload Helpers', () => {
   })
 
   describe('processPayload - NFM_RIVER_RESTORATION', () => {
-    test('should convert string values to floats', () => {
+    test('should keep string values for decimal precision', () => {
       const payload = {
         [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: '10.5',
         [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: '500.25'
@@ -70,10 +70,10 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_RIVER_RESTORATION, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]).toBe(
-        10.5
+        '10.5'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]).toBe(
-        500.25
+        '500.25'
       )
     })
 
@@ -86,7 +86,7 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_RIVER_RESTORATION, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]).toBe(
-        10.5
+        '10.5'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]).toBe(
         null
@@ -102,10 +102,10 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_RIVER_RESTORATION, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]).toBe(
-        10.5
+        '10.5'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]).toBe(
-        500.25
+        '500.25'
       )
     })
 
@@ -118,7 +118,7 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_RIVER_RESTORATION, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]).toBe(
-        10.5
+        '10.5'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]).toBe(
         null
@@ -127,7 +127,7 @@ describe('NFM Payload Helpers', () => {
   })
 
   describe('processPayload - NFM_LEAKY_BARRIERS', () => {
-    test('should convert string values to floats', () => {
+    test('should keep string values for decimal precision', () => {
       const payload = {
         [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: '100.5',
         [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]: '5.25',
@@ -137,13 +137,13 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_LEAKY_BARRIERS, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]).toBe(
-        100.5
+        '100.5'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]).toBe(
-        5.25
+        '5.25'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]).toBe(
-        2.75
+        '2.75'
       )
     })
 
@@ -160,10 +160,10 @@ describe('NFM Payload Helpers', () => {
         null
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]).toBe(
-        5.25
+        '5.25'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]).toBe(
-        2.75
+        '2.75'
       )
     })
 
@@ -177,13 +177,13 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_LEAKY_BARRIERS, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]).toBe(
-        100.5
+        '100.5'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]).toBe(
-        5.25
+        '5.25'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]).toBe(
-        2.75
+        '2.75'
       )
     })
 
@@ -200,16 +200,16 @@ describe('NFM Payload Helpers', () => {
         null
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]).toBe(
-        5.25
+        '5.25'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]).toBe(
-        2.75
+        '2.75'
       )
     })
   })
 
   describe('processPayload - NFM_OFFLINE_STORAGE', () => {
-    test('should convert area and volume strings to floats', () => {
+    test('should keep area and volume as strings for decimal precision', () => {
       const payload = {
         [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: '12.75',
         [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: '350.5'
@@ -218,10 +218,10 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_OFFLINE_STORAGE, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]).toBe(
-        12.75
+        '12.75'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]).toBe(
-        350.5
+        '350.5'
       )
     })
 
@@ -234,7 +234,7 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_OFFLINE_STORAGE, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]).toBe(
-        12.75
+        '12.75'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]).toBe(
         null
@@ -250,7 +250,7 @@ describe('NFM Payload Helpers', () => {
 
       processPayload(PROJECT_STEPS.NFM_WOODLAND, payload)
 
-      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]).toBe(7.25)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]).toBe('7.25')
     })
   })
 
@@ -450,15 +450,15 @@ describe('NFM Payload Helpers', () => {
 
       expect(
         payload[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]
-      ).toBe(11.2)
+      ).toBe('11.2')
       expect(
         payload[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]
-      ).toBe(9.4)
+      ).toBe('9.4')
     })
   })
 
   describe('processPayload - NFM_RUNOFF_MANAGEMENT', () => {
-    test('should convert string values to floats', () => {
+    test('should keep string values for decimal precision', () => {
       const payload = {
         [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: '15.5',
         [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: '750.25'
@@ -467,10 +467,10 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]).toBe(
-        15.5
+        '15.5'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]).toBe(
-        750.25
+        '750.25'
       )
     })
 
@@ -483,7 +483,7 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]).toBe(
-        15.5
+        '15.5'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]).toBe(
         null
@@ -499,7 +499,7 @@ describe('NFM Payload Helpers', () => {
       processPayload(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT, payload)
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]).toBe(
-        15.5
+        '15.5'
       )
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]).toBe(
         null
@@ -508,7 +508,7 @@ describe('NFM Payload Helpers', () => {
   })
 
   describe('processPayload - NFM_SALTMARSH', () => {
-    test('should convert string values to floats', () => {
+    test('should keep string values for decimal precision', () => {
       const payload = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]: '20.5',
         [PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]: '3.75'
@@ -516,8 +516,8 @@ describe('NFM Payload Helpers', () => {
 
       processPayload(PROJECT_STEPS.NFM_SALTMARSH, payload)
 
-      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe(20.5)
-      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(3.75)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe('20.5')
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe('3.75')
     })
 
     test('should convert empty string to null for optional length', () => {
@@ -528,7 +528,7 @@ describe('NFM Payload Helpers', () => {
 
       processPayload(PROJECT_STEPS.NFM_SALTMARSH, payload)
 
-      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe(20.5)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe('20.5')
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(null)
     })
 
@@ -540,13 +540,13 @@ describe('NFM Payload Helpers', () => {
 
       processPayload(PROJECT_STEPS.NFM_SALTMARSH, payload)
 
-      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe(20.5)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA]).toBe('20.5')
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(null)
     })
   })
 
   describe('processPayload - NFM_SAND_DUNE', () => {
-    test('should convert string values to floats', () => {
+    test('should keep string values for decimal precision', () => {
       const payload = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]: '25.5',
         [PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]: '4.25'
@@ -554,8 +554,8 @@ describe('NFM Payload Helpers', () => {
 
       processPayload(PROJECT_STEPS.NFM_SAND_DUNE, payload)
 
-      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(25.5)
-      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(4.25)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe('25.5')
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe('4.25')
     })
 
     test('should convert empty string to null for optional length', () => {
@@ -566,7 +566,7 @@ describe('NFM Payload Helpers', () => {
 
       processPayload(PROJECT_STEPS.NFM_SAND_DUNE, payload)
 
-      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(25.5)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe('25.5')
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(null)
     })
 
@@ -578,7 +578,7 @@ describe('NFM Payload Helpers', () => {
 
       processPayload(PROJECT_STEPS.NFM_SAND_DUNE, payload)
 
-      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(25.5)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe('25.5')
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(null)
     })
   })
