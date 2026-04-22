@@ -883,6 +883,14 @@ describe('EnvironmentalBenefitsController', () => {
       expect(result).toBe('precision')
     })
 
+    test('should return "whole_number_precision" for QUANTITY_WHOLE_NUMBER_PRECISION error code', () => {
+      const controller = new EnvironmentalBenefitsController()
+      const result = controller._getValidationMessageKey(
+        'ENVIRONMENTAL_BENEFITS_QUANTITY_WHOLE_NUMBER_PRECISION'
+      )
+      expect(result).toBe('whole_number_precision')
+    })
+
     test('should return "required" as default for unknown error code', () => {
       const controller = new EnvironmentalBenefitsController()
       const result = controller._getValidationMessageKey('UNKNOWN_ERROR')

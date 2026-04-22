@@ -239,6 +239,33 @@ describe('NFM Measure Schemas', () => {
 
     expect(result.error).toBeUndefined()
   })
+
+  test('rejects area value in scientific notation (fails internal regex)', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: '1e5'
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
+  })
+
+  test('rejects area whole number exceeding 18 digits (number.integer.max)', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: '9'.repeat(19)
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.integer.max')
+  })
+
+  test('rejects area with more than 16 digits before the decimal point (number.precision)', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: '1'.repeat(17) + '.5'
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
+  })
 })
 
 describe('NFM Land-use Schemas', () => {

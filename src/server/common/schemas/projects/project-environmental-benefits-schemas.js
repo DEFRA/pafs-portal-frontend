@@ -20,6 +20,17 @@ const ERR_WHOLE_NUMBER_PRECISION = 'number.integer.max'
 const ERR_BASE = 'number.base'
 
 /**
+ * Maximum digits allowed for whole-number values — matches Decimal(20,2) DB column
+ */
+const MAX_WHOLE_NUMBER_DIGITS = 18
+
+/**
+ * Maximum digits allowed before the decimal point for decimal values
+ * (leaves 2 digits for the fractional part within Decimal(20,2))
+ */
+const MAX_INTEGER_PART_DIGITS = 16
+
+/**
  * Number schema for environmental benefits quantity fields
  * - Whole numbers (no decimal): up to 18 digits — matches Decimal(20,2) DB column
  * - Decimal numbers: up to 16 digits before decimal, up to 2 digits after
@@ -37,12 +48,17 @@ const quantitySchema = Joi.string()
 
     if (decimalPart === undefined) {
       // Whole number: max 18 digits
-      if (integerPart.length > 18) {
+      if (integerPart.length > MAX_WHOLE_NUMBER_DIGITS) {
         return helpers.error(ERR_WHOLE_NUMBER_PRECISION)
       }
-    } else if (integerPart.length > 16 || decimalPart.length > 2) {
+    } else if (
+      integerPart.length > MAX_INTEGER_PART_DIGITS ||
+      decimalPart.length > 2
+    ) {
       // Decimal number: max 16 digits before decimal, max 2 after
       return helpers.error(ERR_PRECISION)
+    } else {
+      // Decimal is within precision limits — no error
     }
 
     // Return the original string value to preserve precision for Decimal database fields
