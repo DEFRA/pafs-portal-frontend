@@ -8,6 +8,8 @@
 {% block body %}
   {% set beforeError = fieldErrors[beforeFieldName] %}
   {% set afterError = fieldErrors[afterFieldName] %}
+  {% set beforeErrorText = t(localKeyPrefix + '.validation.' + beforeError) if beforeError else undefined %}
+  {% set afterErrorText = t(localKeyPrefix + '.validation.' + afterError) if afterError else undefined %}
   {% set showBothErrors = beforeError and afterError and beforeError != afterError %}
 
   {% if beforeError or afterError %}
@@ -15,16 +17,16 @@
       titleText: t('common.error_summary_title'),
       errorList: showBothErrors and [
         {
-          text: beforeError,
+          text: beforeErrorText,
           href: '#' + beforeFieldName
         },
         {
-          text: afterError,
+          text: afterErrorText,
           href: '#' + afterFieldName
         }
       ] or [
         {
-          text: beforeError or afterError,
+          text: beforeErrorText or afterErrorText,
           href: '#' + (beforeFieldName if beforeError else afterFieldName)
         }
       ]
@@ -50,8 +52,8 @@
         },
         classes: "govuk-input--width-10",
         errorMessage: {
-          text: fieldErrors[beforeFieldName]
-        } if fieldErrors[beforeFieldName] else undefined
+          text: beforeErrorText
+        } if beforeError else undefined
       }) }}
 
       {{ govukInput({
@@ -68,8 +70,8 @@
         },
         classes: "govuk-input--width-10",
         errorMessage: {
-          text: fieldErrors[afterFieldName]
-        } if fieldErrors[afterFieldName] else undefined
+          text: afterErrorText
+        } if afterError else undefined
       }) }}
     </div>
 

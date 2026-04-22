@@ -340,6 +340,9 @@ class EnvironmentalBenefitsController {
     if (errorCode?.includes('QUANTITY_MIN')) {
       return 'min'
     }
+    if (errorCode?.includes('QUANTITY_WHOLE_NUMBER_PRECISION')) {
+      return 'whole_number_precision'
+    }
     if (errorCode?.includes('QUANTITY_PRECISION')) {
       return 'precision'
     }

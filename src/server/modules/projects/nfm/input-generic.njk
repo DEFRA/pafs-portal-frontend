@@ -7,11 +7,19 @@
 {% block pageTitle %}{{ t(localKeyPrefix + '.title') }}{% endblock %}
 
 {% block body %}
-  {% if errors and errors.length > 0 %}
-    {{ govukErrorSummary({
-      titleText: t('common.error_summary_title'),
-      errorList: errors
-    }) }}
+  {% if fieldErrors %}
+    {% set errorList = [] %}
+    {% for field in inputFields %}
+      {% if fieldErrors[field.name] %}
+        {% set _ = errorList.push({ text: t(localKeyPrefix + '.errors.' + fieldErrors[field.name]), href: '#' + field.name }) %}
+      {% endif %}
+    {% endfor %}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
   {% endif %}
 
   <form method="post" novalidate>
@@ -38,7 +46,7 @@
           },
           classes: "govuk-input--width-10",
           errorMessage: fieldErrors[field.name] and {
-            text: fieldErrors[field.name]
+            text: t(localKeyPrefix + '.errors.' + fieldErrors[field.name])
           }
         }) }}
       {% endfor %}

@@ -105,17 +105,40 @@ describe('quantitySchema (via hectaresOfIntertidalHabitatCreatedOrEnhancedSchema
     expect(value).toBe('1234567890123456')
   })
 
-  it('returns PRECISION error for integer value exceeding MAX_SAFE_INTEGER even within 16 digits', () => {
-    // 9999999999999999 has 16 digits but > MAX_SAFE_INTEGER (9007199254740991)
-    const { error } = schema.validate('9999999999999999')
+  it('accepts a value with exactly 16 integer digits', () => {
+    const { error, value } = schema.validate('1234567890123456')
+    expect(error).toBeUndefined()
+    expect(value).toBe('1234567890123456')
+  })
+
+  it('accepts a whole number with exactly 18 digits', () => {
+    const { error, value } = schema.validate('123456789012345678')
+    expect(error).toBeUndefined()
+    expect(value).toBe('123456789012345678')
+  })
+
+  it('accepts a whole number with 18 nines', () => {
+    const { error, value } = schema.validate('999999999999999999')
+    expect(error).toBeUndefined()
+    expect(value).toBe('999999999999999999')
+  })
+
+  it('accepts 16 integer digits all nines with 2 decimal places', () => {
+    const { error, value } = schema.validate('9999999999999999.24')
+    expect(error).toBeUndefined()
+    expect(value).toBe('9999999999999999.24')
+  })
+
+  it('returns PRECISION error for whole number with 19 digits', () => {
+    const { error } = schema.validate('1234567890123456789') // 19 digits
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION
+      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_WHOLE_NUMBER_PRECISION
     )
   })
 
-  it('returns PRECISION error when more than 16 integer digits', () => {
-    const { error } = schema.validate('12345678901234567') // 17 digits
+  it('returns PRECISION error for decimal with more than 16 integer digits', () => {
+    const { error } = schema.validate('12345678901234567.1') // 17 before decimal
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION

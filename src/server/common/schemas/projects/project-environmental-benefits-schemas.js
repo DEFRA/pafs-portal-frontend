@@ -16,14 +16,14 @@ const booleanSchema = Joi.boolean().required().messages({
 })
 
 const ERR_PRECISION = 'number.precision'
+const ERR_WHOLE_NUMBER_PRECISION = 'number.integer.max'
 const ERR_BASE = 'number.base'
 
 /**
  * Number schema for environmental benefits quantity fields
- * - Minimum value: 0 (0 allowed as specified in requirements)
- * - Up to 16 digits before decimal, 2 digits after decimal
- * - Accepts both string and number inputs for maximum compatibility
- * - Uses regex pattern validation for large numbers to avoid JS precision issues
+ * - Whole numbers (no decimal): up to 18 digits — matches Decimal(20,2) DB column
+ * - Decimal numbers: up to 16 digits before decimal, up to 2 digits after
+ * - Accepts string inputs to avoid JS precision issues for large numbers
  */
 const quantitySchema = Joi.string()
   .trim()
@@ -35,25 +35,13 @@ const quantitySchema = Joi.string()
 
     const [integerPart, decimalPart] = value.split('.')
 
-    // Check 16 digits before decimal constraint
-    if (integerPart.length > 16) {
-      return helpers.error(ERR_PRECISION)
-    }
-
-    // Check decimal places constraint - must be exactly 1 or 2 digits
-    if (decimalPart && decimalPart.length > 2) {
-      return helpers.error(ERR_PRECISION)
-    }
-
-    const num = Number.parseFloat(value)
-    if (Number.isNaN(num) || num < 0) {
-      return helpers.error(ERR_BASE)
-    }
-
-    // For very large numbers, check if integer part exceeds JavaScript's safe range
-    const [integerStr] = value.split('.')
-    const integerValue = Number.parseInt(integerStr, 10)
-    if (integerValue > Number.MAX_SAFE_INTEGER) {
+    if (decimalPart === undefined) {
+      // Whole number: max 18 digits
+      if (integerPart.length > 18) {
+        return helpers.error(ERR_WHOLE_NUMBER_PRECISION)
+      }
+    } else if (integerPart.length > 16 || decimalPart.length > 2) {
+      // Decimal number: max 16 digits before decimal, max 2 after
       return helpers.error(ERR_PRECISION)
     }
 
@@ -73,7 +61,9 @@ const quantitySchema = Joi.string()
     'number.max':
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION,
     'number.precision':
-      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION
+      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION,
+    'number.integer.max':
+      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_WHOLE_NUMBER_PRECISION
   })
 
 // Main environmental benefits gate

@@ -49,22 +49,23 @@ const PROPERTY_DIGITS_PATTERN = /^\d{0,18}$/
 
 /**
  * Property value schema - whole number up to 18 digits (0 allowed)
+ * Accepts both string and number inputs (numbers are converted to string for pattern check)
  */
 const propertyValueSchema = Joi.alternatives()
   .try(
-    Joi.number()
-      .integer()
-      .min(0)
-      .max(10 ** MAX_PROPERTY_DIGITS - 1),
-    Joi.string().allow('').pattern(PROPERTY_DIGITS_PATTERN)
+    Joi.number().integer().min(0).messages({
+      'number.base': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID,
+      'number.integer': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID,
+      'number.min': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID
+    }),
+    Joi.string().allow('').pattern(PROPERTY_DIGITS_PATTERN).messages({
+      'string.pattern.base': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID
+    })
   )
   .optional()
   .label('Property Value')
   .messages({
-    'number.min': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID,
-    'number.max': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID,
-    'number.integer': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID,
-    'string.pattern.base': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID
+    'alternatives.match': PROJECT_VALIDATION_MESSAGES.PROPERTY_VALUE_INVALID
   })
 
 /**
