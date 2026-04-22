@@ -34,11 +34,9 @@ const maxTwoDecimalPlaces = (value, helpers) => {
     if (integerPart.length > 18) {
       return helpers.error('number.integer.max')
     }
-  } else {
+  } else if (integerPart.length > 16 || decimalPart.length > 2) {
     // Decimal number: max 16 digits before decimal, max 2 after
-    if (integerPart.length > 16 || decimalPart.length > 2) {
-      return helpers.error('number.precision')
-    }
+    return helpers.error('number.precision')
   }
 
   // Return the raw string (not the coerced float) to preserve precision.
