@@ -45,16 +45,18 @@ function resolveCurrentStep(request) {
  * Check whether any main funding source has been selected.
  * @private
  */
+const FUNDING_SOURCE_FIELDS = [
+  PROJECT_PAYLOAD_FIELDS.FCERM_GIA,
+  PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY,
+  'additionalFcermGia',
+  PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS,
+  PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS,
+  PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS,
+  PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED
+]
+
 function hasAnyFundingSource(sessionData) {
-  return Boolean(
-    sessionData[PROJECT_PAYLOAD_FIELDS.FCERM_GIA] ||
-    sessionData[PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY] ||
-    sessionData.additionalFcermGia ||
-    sessionData[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS] ||
-    sessionData[PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS] ||
-    sessionData[PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS] ||
-    sessionData[PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED]
-  )
+  return FUNDING_SOURCE_FIELDS.some((field) => Boolean(sessionData[field]))
 }
 
 /**
@@ -103,6 +105,47 @@ const CONTRIBUTOR_PAGE_CONFIG = {
  *
  * If the gate fails, user is redirected to the funding sources selection page.
  */
+/**
+ * Gate logic for the estimated spend page.
+ * @private
+ */
+function gateEstimatedSpend(sessionData, referenceNumber, selectionUrl, h) {
+  if (!hasAnyFundingSource(sessionData)) {
+    return h.redirect(selectionUrl).takeover()
+  }
+
+  // Edge case: a contributor type is selected but has no named contributors.
+  // Redirect to the first contributor naming page that needs names.
+  for (const cfg of Object.values(CONTRIBUTOR_PAGE_CONFIG)) {
+    if (!sessionData[cfg.enabledField]) {
+      continue
+    }
+    const csv = sessionData[cfg.namesField]
+    const hasNames = typeof csv === 'string' && csv.trim().length > 0
+    if (!hasNames) {
+      return h
+        .redirect(
+          cfg.namingRoute.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
+        )
+        .takeover()
+    }
+  }
+
+  return h.continue
+}
+
+/**
+ * Gate logic for contributor naming / delete pages.
+ * @private
+ */
+function gateContributorPage(sessionData, step, selectionUrl, h) {
+  const contributorCfg = CONTRIBUTOR_PAGE_CONFIG[step]
+  if (contributorCfg && !sessionData[contributorCfg.enabledField]) {
+    return h.redirect(selectionUrl).takeover()
+  }
+  return h.continue
+}
+
 export function requireFundingSourceGate(request, h) {
   const sessionData = getSessionData(request)
   const { referenceNumber } = request.params
@@ -117,46 +160,16 @@ export function requireFundingSourceGate(request, h) {
 
   // ── Additional funding sources page ──
   if (step === 'additional') {
-    if (!sessionData.additionalFcermGia) {
-      return h.redirect(selectionUrl).takeover()
-    }
-    return h.continue
+    return sessionData.additionalFcermGia
+      ? h.continue
+      : h.redirect(selectionUrl).takeover()
   }
 
   // ── Estimated spend page ──
   if (step === 'estimated-spend') {
-    if (!hasAnyFundingSource(sessionData)) {
-      return h.redirect(selectionUrl).takeover()
-    }
-
-    // Edge case: a contributor type is selected but has no named contributors.
-    // Redirect to the first contributor naming page that needs names.
-    for (const cfg of Object.values(CONTRIBUTOR_PAGE_CONFIG)) {
-      if (!sessionData[cfg.enabledField]) {
-        continue
-      }
-      const csv = sessionData[cfg.namesField]
-      const hasNames = typeof csv === 'string' && csv.trim().length > 0
-      if (!hasNames) {
-        return h
-          .redirect(
-            cfg.namingRoute.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
-          )
-          .takeover()
-      }
-    }
-
-    return h.continue
+    return gateEstimatedSpend(sessionData, referenceNumber, selectionUrl, h)
   }
 
   // ── Contributor pages (naming + delete) ──
-  const contributorCfg = CONTRIBUTOR_PAGE_CONFIG[step]
-  if (contributorCfg) {
-    if (!sessionData[contributorCfg.enabledField]) {
-      return h.redirect(selectionUrl).takeover()
-    }
-    return h.continue
-  }
-
-  return h.continue
+  return gateContributorPage(sessionData, step, selectionUrl, h)
 }

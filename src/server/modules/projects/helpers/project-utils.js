@@ -507,30 +507,33 @@ function fillMissingYears(processedRows, startYear, endYear) {
   return filled.toSorted((a, b) => a.financialYear - b.financialYear)
 }
 
-export function buildProcessedFundingValues(projectData) {
-  const dbValues = projectData.pafs_core_funding_values || []
-  const dbContributors = projectData.pafs_core_funding_contributors || []
+/**
+ * Resolve safe start/end years from project data.
+ * Falls back to the current financial year when explicit values are missing.
+ * @private
+ */
+function resolveYearRange(projectData) {
+  const rawStart = Number(projectData.financialStartYear || 0)
+  const rawEnd = Number(projectData.financialEndYear || 0)
+  const hasExplicitRange = rawStart > 0 && rawEnd > 0
 
-  const rawStartYear = Number(projectData.financialStartYear || 0)
-  const rawEndYear = Number(projectData.financialEndYear || 0)
-
-  // Determine whether the project has explicit year boundaries
-  const hasExplicitRange = rawStartYear > 0 && rawEndYear > 0
-
-  // Use explicit values when available, otherwise fall back safely
-  let startYear = rawStartYear
-  let endYear = rawEndYear
-  if (!startYear || startYear <= 0) {
+  let startYear = rawStart
+  let endYear = rawEnd
+  if (startYear <= 0) {
     startYear = getCurrentFinancialYearStartYear()
   }
-  if (!endYear || endYear <= 0) {
+  if (endYear <= 0) {
     endYear = startYear
   }
 
-  if (!dbValues.length && !rawStartYear) {
-    return []
-  }
+  return { rawStart, hasExplicitRange, startYear, endYear }
+}
 
+/**
+ * Build and merge funding value rows with contributor arrays.
+ * @private
+ */
+function buildMergedRows(dbValues, dbContributors) {
   const sortedValues = [...dbValues].toSorted(
     (a, b) => Number(a.financialYear) - Number(b.financialYear)
   )
@@ -542,12 +545,22 @@ export function buildProcessedFundingValues(projectData) {
   const idToYear = buildIdToYearMap(sortedValues, referencedIds)
   const contributorsByYear = buildContributorsByYear(dbContributors, idToYear)
 
-  let rows = sortedValues.map((fv) =>
-    formatFundingValueRow(fv, contributorsByYear)
-  )
+  return sortedValues.map((fv) => formatFundingValueRow(fv, contributorsByYear))
+}
+
+export function buildProcessedFundingValues(projectData) {
+  const dbValues = projectData.pafs_core_funding_values || []
+  const dbContributors = projectData.pafs_core_funding_contributors || []
+  const { rawStart, hasExplicitRange, startYear, endYear } =
+    resolveYearRange(projectData)
+
+  if (!dbValues.length && !rawStart) {
+    return []
+  }
+
+  let rows = buildMergedRows(dbValues, dbContributors)
 
   // Filter out years outside the financial year range (legacy data may have stale rows)
-  // Only filter when the project has explicitly set both boundaries
   if (hasExplicitRange) {
     rows = rows.filter(
       (r) => r.financialYear >= startYear && r.financialYear <= endYear
