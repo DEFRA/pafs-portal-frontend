@@ -278,9 +278,7 @@ describe('NFM Land-use Schemas', () => {
 
     expect(result.error).toBeDefined()
     expect(result.error.details[0].type).toBe('number.precision')
-    expect(result.error.details[0].message).toBe(
-      'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)'
-    )
+    expect(result.error.details[0].message).toBe('precision')
   })
 
   test('shows required messages when before and after are blank', () => {
@@ -296,10 +294,10 @@ describe('NFM Land-use Schemas', () => {
     expect(result.error.details).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          message: 'Enter the area before natural flood measures'
+          message: 'required_before'
         }),
         expect.objectContaining({
-          message: 'Enter the area after natural flood measures'
+          message: 'required_after'
         })
       ])
     )
@@ -312,9 +310,7 @@ describe('NFM Land-use Schemas', () => {
     })
 
     expect(nonNumericResult.error).toBeDefined()
-    expect(nonNumericResult.error.details[0].message).toBe(
-      'Area must be a number greater than or equal to 0'
-    )
+    expect(nonNumericResult.error.details[0].message).toBe('invalid')
 
     const negativeResult = nfmLandUseEnclosedArableFarmlandSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]: -1,
@@ -322,9 +318,7 @@ describe('NFM Land-use Schemas', () => {
     })
 
     expect(negativeResult.error).toBeDefined()
-    expect(negativeResult.error.details[0].message).toBe(
-      'Area must be a number greater than or equal to 0'
-    )
+    expect(negativeResult.error.details[0].message).toBe('invalid')
   })
 })
 

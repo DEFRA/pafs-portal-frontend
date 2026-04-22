@@ -18,6 +18,17 @@ import {
 } from '../../../common/constants/projects.js'
 // Note: PROJECT_VALIDATION_MESSAGES is still used for NFM radio/checkbox schemas (selected_measures, landowner_consent, experience, project_readiness)
 
+/**
+ * Maximum digits allowed for whole-number values — matches Decimal(20,2) DB column
+ */
+const MAX_WHOLE_NUMBER_DIGITS = 18
+
+/**
+ * Maximum digits allowed before the decimal point for decimal values
+ * (leaves 2 digits for the fractional part within Decimal(20,2))
+ */
+const MAX_INTEGER_PART_DIGITS = 16
+
 const maxTwoDecimalPlaces = (value, helpers) => {
   // Use helpers.original (raw string before Joi coercion) to validate format accurately.
   // String(value) would reflect the JS float which loses precision for large numbers.
@@ -31,10 +42,13 @@ const maxTwoDecimalPlaces = (value, helpers) => {
 
   if (decimalPart === undefined) {
     // Whole number: max 18 digits
-    if (integerPart.length > 18) {
+    if (integerPart.length > MAX_WHOLE_NUMBER_DIGITS) {
       return helpers.error('number.integer.max')
     }
-  } else if (integerPart.length > 16 || decimalPart.length > 2) {
+  } else if (
+    integerPart.length > MAX_INTEGER_PART_DIGITS ||
+    decimalPart.length > 2
+  ) {
     // Decimal number: max 16 digits before decimal, max 2 after
     return helpers.error('number.precision')
   }
