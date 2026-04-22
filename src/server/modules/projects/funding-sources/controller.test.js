@@ -102,7 +102,9 @@ vi.mock('../helpers/project-utils.js', async (importOriginal) => {
     buildIdToYearMap: actual.buildIdToYearMap,
     buildContributorsByYear: actual.buildContributorsByYear,
     formatNumberWithCommas: vi.fn((n) => String(n)),
+    getCurrentFinancialYearStartYear: actual.getCurrentFinancialYearStartYear,
     getSessionData: vi.fn(),
+    getUniqueContributorNamesFromDb: actual.getUniqueContributorNamesFromDb,
     navigateToProjectOverview: vi.fn(),
     updateSessionData: vi.fn()
   }
@@ -132,13 +134,16 @@ vi.mock('./helpers/payload-helpers.js', () => ({
   parseContributorsPayload: vi.fn().mockReturnValue(['Alice'])
 }))
 
-vi.mock('./helpers/estimated-spending-helpers.js', () => ({
-  buildEstimatedSpendRows: vi.fn().mockReturnValue([]),
-  getContributorNames: vi.fn().mockReturnValue([]),
-  getSelectedEstimatedSpendSourceFields: vi.fn().mockReturnValue([]),
-  localizeContributorErrorMessage: vi.fn((msg) => msg),
-  CONTRIBUTOR_SPEND_GROUPS: []
-}))
+vi.mock('./helpers/estimated-spending-helpers.js', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    buildEstimatedSpendRows: vi.fn().mockReturnValue([]),
+    getContributorNames: vi.fn().mockReturnValue([]),
+    getSelectedEstimatedSpendSourceFields: vi.fn().mockReturnValue([]),
+    localizeContributorErrorMessage: vi.fn((msg) => msg),
+    CONTRIBUTOR_SPEND_GROUPS: actual.CONTRIBUTOR_SPEND_GROUPS
+  }
+})
 
 // ─── Import mocked modules for assertion ─────────────────────────────────────
 
@@ -493,6 +498,24 @@ describe('publicContributorsController', () => {
       expect(updateSessionData).toHaveBeenCalledWith(
         request,
         expect.objectContaining({ _publicContributorsSession: [''] })
+      )
+    })
+
+    it('falls back to pafs_core_funding_contributors when session and CSV are empty', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: true,
+        pafs_core_funding_contributors: [
+          { contributorType: 'public_contributions', name: 'Legacy Alice' },
+          { contributorType: 'public_contributions', name: 'Legacy Bob' },
+          { contributorType: 'private_contributions', name: 'Ignored' }
+        ]
+      })
+      await publicContributorsController.getHandler(request, h)
+      expect(updateSessionData).toHaveBeenCalledWith(
+        request,
+        expect.objectContaining({
+          _publicContributorsSession: ['Legacy Alice', 'Legacy Bob']
+        })
       )
     })
   })
@@ -1294,7 +1317,7 @@ describe('_buildFundingValuesFromProjectData (via getEstimatedSpend)', () => {
     buildEstimatedSpendRows.mockReturnValue([])
   })
 
-  it('returns empty array when pafs_core_funding_values is empty', async () => {
+  it('returns placeholder rows for year range when pafs_core_funding_values is empty', async () => {
     getSessionData.mockReturnValue({
       [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2025,
       [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: 2025,
@@ -1305,7 +1328,9 @@ describe('_buildFundingValuesFromProjectData (via getEstimatedSpend)', () => {
     expect(buildViewData).toHaveBeenCalledWith(
       request,
       expect.objectContaining({
-        additionalData: expect.objectContaining({ existingValues: [] })
+        additionalData: expect.objectContaining({
+          existingValues: [{ financialYear: 2025 }]
+        })
       })
     )
   })

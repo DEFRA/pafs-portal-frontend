@@ -485,11 +485,49 @@ function formatFundingValueRow(fv, contributorsByYear) {
  * @param {Object} projectData - Session/project data containing raw DB arrays
  * @returns {Array} Processed funding value rows
  */
+/**
+ * Ensure the processed funding rows cover every year from startYear to endYear.
+ * Inserts empty placeholder rows for any missing years.
+ * @private
+ */
+function fillMissingYears(processedRows, startYear, endYear) {
+  if (!startYear || !endYear || startYear > endYear) {
+    return processedRows
+  }
+
+  const existingYears = new Set(processedRows.map((r) => r.financialYear))
+  const filled = [...processedRows]
+
+  for (let y = startYear; y <= endYear; y++) {
+    if (!existingYears.has(y)) {
+      filled.push({ financialYear: y })
+    }
+  }
+
+  return filled.toSorted((a, b) => a.financialYear - b.financialYear)
+}
+
 export function buildProcessedFundingValues(projectData) {
   const dbValues = projectData.pafs_core_funding_values || []
   const dbContributors = projectData.pafs_core_funding_contributors || []
 
-  if (!dbValues.length) {
+  const rawStartYear = Number(projectData.financialStartYear || 0)
+  const rawEndYear = Number(projectData.financialEndYear || 0)
+
+  // Determine whether the project has explicit year boundaries
+  const hasExplicitRange = rawStartYear > 0 && rawEndYear > 0
+
+  // Use explicit values when available, otherwise fall back safely
+  let startYear = rawStartYear
+  let endYear = rawEndYear
+  if (!startYear || startYear <= 0) {
+    startYear = getCurrentFinancialYearStartYear()
+  }
+  if (!endYear || endYear <= 0) {
+    endYear = startYear
+  }
+
+  if (!dbValues.length && !rawStartYear) {
     return []
   }
 
@@ -504,7 +542,19 @@ export function buildProcessedFundingValues(projectData) {
   const idToYear = buildIdToYearMap(sortedValues, referencedIds)
   const contributorsByYear = buildContributorsByYear(dbContributors, idToYear)
 
-  return sortedValues.map((fv) => formatFundingValueRow(fv, contributorsByYear))
+  let rows = sortedValues.map((fv) =>
+    formatFundingValueRow(fv, contributorsByYear)
+  )
+
+  // Filter out years outside the financial year range (legacy data may have stale rows)
+  // Only filter when the project has explicitly set both boundaries
+  if (hasExplicitRange) {
+    rows = rows.filter(
+      (r) => r.financialYear >= startYear && r.financialYear <= endYear
+    )
+  }
+
+  return fillMissingYears(rows, startYear, endYear)
 }
 
 /**
@@ -514,6 +564,47 @@ export function buildProcessedFundingValues(projectData) {
  * @param {Array} processedRows - Output of buildProcessedFundingValues
  * @returns {{ sourceTotals: Object, yearTotals: number[], grandTotal: number }}
  */
+/**
+ * Map contributor array field → the corresponding source total field.
+ * Used to derive contributor totals from the per-contributor arrays when
+ * the legacy system stored amounts only in pafs_core_funding_contributors.
+ * @private
+ */
+const CONTRIBUTOR_ARRAY_TO_SOURCE = {
+  publicContributors: 'publicContributions',
+  privateContributors: 'privateContributions',
+  otherEaContributors: 'otherEaContributions'
+}
+
+/**
+ * Check whether a contributor source field has any non-null value in the
+ * pafs_core_funding_values rows.  When all values are null / 0 for that
+ * field we fall back to summing the contributor array amounts instead.
+ * @private
+ */
+function hasFundingValueData(processedRows, field) {
+  return processedRows.some(
+    (row) => row[field] != null && Number(row[field]) !== 0
+  )
+}
+
+/**
+ * Sum contributor array amounts for a single year row.
+ * @private
+ */
+function sumContributorArray(row, arrayField) {
+  const items = row[arrayField]
+  if (!Array.isArray(items)) {
+    return 0
+  }
+  return items.reduce(
+    (sum, c) =>
+      sum +
+      (Number.parseInt(String(c.amount || '0').replaceAll(/\D/g, ''), 10) || 0),
+    0
+  )
+}
+
 export function computeFundingSourceTotals(processedRows, projectData = {}) {
   // Only sum fields whose corresponding boolean flag is selected on the project.
   // This prevents deselected contributor/source amounts stored in the DB rows
@@ -521,6 +612,19 @@ export function computeFundingSourceTotals(processedRows, projectData = {}) {
   const activeFields = FUNDING_AMOUNT_FIELDS.filter((field) =>
     Boolean(projectData[field])
   )
+
+  // Determine which contributor fields need fallback to contributor arrays
+  const contributorFallbacks = new Map()
+  for (const [arrayField, sourceField] of Object.entries(
+    CONTRIBUTOR_ARRAY_TO_SOURCE
+  )) {
+    if (
+      activeFields.includes(sourceField) &&
+      !hasFundingValueData(processedRows, sourceField)
+    ) {
+      contributorFallbacks.set(sourceField, arrayField)
+    }
+  }
 
   const sourceTotals = {}
   for (const field of FUNDING_AMOUNT_FIELDS) {
@@ -530,7 +634,12 @@ export function computeFundingSourceTotals(processedRows, projectData = {}) {
   const yearTotals = processedRows.map((row) => {
     let yearTotal = 0
     for (const field of activeFields) {
-      const val = Number(row[field]) || 0
+      let val
+      if (contributorFallbacks.has(field)) {
+        val = sumContributorArray(row, contributorFallbacks.get(field))
+      } else {
+        val = Number(row[field]) || 0
+      }
       sourceTotals[field] += val
       yearTotal += val
     }
@@ -540,4 +649,35 @@ export function computeFundingSourceTotals(processedRows, projectData = {}) {
   const grandTotal = yearTotals.reduce((sum, t) => sum + t, 0)
 
   return { sourceTotals, yearTotals, grandTotal }
+}
+
+/**
+ * Extract unique contributor names from pafs_core_funding_contributors for a
+ * given contributor type.  Used as a fallback when the project-level
+ * contributor names CSV field is empty (legacy data).
+ *
+ * @param {Array} dbContributors - Raw pafs_core_funding_contributors array
+ * @param {string} contributorType - e.g. 'public_contributions'
+ * @returns {string[]} Unique, trimmed, non-empty names
+ */
+export function getUniqueContributorNamesFromDb(
+  dbContributors,
+  contributorType
+) {
+  if (!Array.isArray(dbContributors) || !dbContributors.length) {
+    return []
+  }
+  const seen = new Set()
+  const names = []
+  for (const c of dbContributors) {
+    if (c.contributorType !== contributorType) {
+      continue
+    }
+    const name = (c.name || '').trim()
+    if (name && !seen.has(name.toLowerCase())) {
+      seen.add(name.toLowerCase())
+      names.push(name)
+    }
+  }
+  return names
 }

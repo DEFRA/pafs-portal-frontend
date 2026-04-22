@@ -32,8 +32,16 @@ vi.mock('../../../common/constants/routes.js', () => ({
   }
 }))
 
+vi.mock('./helpers/require-financial-years.js', () => ({
+  requireFinancialYears: vi.fn()
+}))
+
+vi.mock('./helpers/require-funding-source-gate.js', () => ({
+  requireFundingSourceGate: vi.fn()
+}))
+
 vi.mock('../helpers/route-helpers.js', () => ({
-  createEditRoutePair: vi.fn((path, controller) => [
+  createEditRoutePair: vi.fn((path, controller, pre) => [
     { method: 'GET', path, handler: controller.getHandler },
     { method: 'POST', path, handler: controller.postHandler }
   ])
@@ -79,6 +87,8 @@ vi.mock('./controller.js', () => ({
 }))
 
 import { createEditRoutePair } from '../helpers/route-helpers.js'
+import { requireFinancialYears } from './helpers/require-financial-years.js'
+import { requireFundingSourceGate } from './helpers/require-funding-source-gate.js'
 import {
   fundingSourcesSelectionController,
   additionalFundingSourcesController,
@@ -139,7 +149,11 @@ describe('projectFundingSources plugin', () => {
       projectFundingSources.plugin.register(mockServer)
       expect(createEditRoutePair).toHaveBeenCalledWith(
         '/project/{referenceNumber}/funding-sources',
-        fundingSourcesSelectionController
+        fundingSourcesSelectionController,
+        [
+          { method: requireFinancialYears },
+          { method: requireFundingSourceGate }
+        ]
       )
     })
 
@@ -147,7 +161,11 @@ describe('projectFundingSources plugin', () => {
       projectFundingSources.plugin.register(mockServer)
       expect(createEditRoutePair).toHaveBeenCalledWith(
         '/project/{referenceNumber}/funding-sources/additional',
-        additionalFundingSourcesController
+        additionalFundingSourcesController,
+        [
+          { method: requireFinancialYears },
+          { method: requireFundingSourceGate }
+        ]
       )
     })
 
@@ -155,7 +173,11 @@ describe('projectFundingSources plugin', () => {
       projectFundingSources.plugin.register(mockServer)
       expect(createEditRoutePair).toHaveBeenCalledWith(
         '/project/{referenceNumber}/funding-sources/public-contributors',
-        publicContributorsController
+        publicContributorsController,
+        [
+          { method: requireFinancialYears },
+          { method: requireFundingSourceGate }
+        ]
       )
     })
 
@@ -163,7 +185,11 @@ describe('projectFundingSources plugin', () => {
       projectFundingSources.plugin.register(mockServer)
       expect(createEditRoutePair).toHaveBeenCalledWith(
         '/project/{referenceNumber}/funding-sources/public-contributors/delete/{index}',
-        publicContributorsDeleteController
+        publicContributorsDeleteController,
+        [
+          { method: requireFinancialYears },
+          { method: requireFundingSourceGate }
+        ]
       )
     })
 
@@ -171,7 +197,11 @@ describe('projectFundingSources plugin', () => {
       projectFundingSources.plugin.register(mockServer)
       expect(createEditRoutePair).toHaveBeenCalledWith(
         '/project/{referenceNumber}/funding-sources/private-contributors',
-        privateContributorsController
+        privateContributorsController,
+        [
+          { method: requireFinancialYears },
+          { method: requireFundingSourceGate }
+        ]
       )
     })
 
@@ -179,7 +209,11 @@ describe('projectFundingSources plugin', () => {
       projectFundingSources.plugin.register(mockServer)
       expect(createEditRoutePair).toHaveBeenCalledWith(
         '/project/{referenceNumber}/funding-sources/private-contributors/delete/{index}',
-        privateContributorsDeleteController
+        privateContributorsDeleteController,
+        [
+          { method: requireFinancialYears },
+          { method: requireFundingSourceGate }
+        ]
       )
     })
 
@@ -187,7 +221,11 @@ describe('projectFundingSources plugin', () => {
       projectFundingSources.plugin.register(mockServer)
       expect(createEditRoutePair).toHaveBeenCalledWith(
         '/project/{referenceNumber}/funding-sources/other-ea-contributors',
-        otherEaContributorsController
+        otherEaContributorsController,
+        [
+          { method: requireFinancialYears },
+          { method: requireFundingSourceGate }
+        ]
       )
     })
 
@@ -195,7 +233,11 @@ describe('projectFundingSources plugin', () => {
       projectFundingSources.plugin.register(mockServer)
       expect(createEditRoutePair).toHaveBeenCalledWith(
         '/project/{referenceNumber}/funding-sources/other-ea-contributors/delete/{index}',
-        otherEaContributorsDeleteController
+        otherEaContributorsDeleteController,
+        [
+          { method: requireFinancialYears },
+          { method: requireFundingSourceGate }
+        ]
       )
     })
 
@@ -203,7 +245,11 @@ describe('projectFundingSources plugin', () => {
       projectFundingSources.plugin.register(mockServer)
       expect(createEditRoutePair).toHaveBeenCalledWith(
         '/project/{referenceNumber}/funding-sources/estimated-spend',
-        estimatedSpendController
+        estimatedSpendController,
+        [
+          { method: requireFinancialYears },
+          { method: requireFundingSourceGate }
+        ]
       )
     })
 

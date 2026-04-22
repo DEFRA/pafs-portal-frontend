@@ -5,6 +5,7 @@ import {
   CONTRIBUTOR_SPEND_GROUPS,
   MAIN_SPEND_SOURCES
 } from '../../../../common/constants/projects.js'
+import { getUniqueContributorNamesFromDb } from '../../helpers/project-utils.js'
 
 export { CONTRIBUTOR_SPEND_GROUPS } from '../../../../common/constants/projects.js'
 
@@ -29,6 +30,16 @@ export function getContributorNames(sessionData, group) {
       .split(',')
       .map((name) => name.trim())
       .filter(Boolean)
+  }
+
+  // Fallback: extract unique names from pafs_core_funding_contributors (legacy data)
+  const dbContributors = sessionData.pafs_core_funding_contributors || []
+  const fallbackNames = getUniqueContributorNamesFromDb(
+    dbContributors,
+    group.contributorType
+  )
+  if (fallbackNames.length) {
+    return fallbackNames
   }
 
   return []
@@ -94,7 +105,6 @@ export function buildEstimatedSpendRows(sessionData, t) {
   for (const src of MAIN_SPEND_SOURCES) {
     // Skip sources that have not been selected in this session
     if (!sessionData[src.field]) {
-      // eslint-disable-next-line no-continue
       continue
     }
 

@@ -78,7 +78,9 @@ export const PROJECT_VIEWS = {
   FUNDING_SOURCES_CONTRIBUTOR_DELETE:
     'modules/projects/funding-sources/delete-contributor',
   FUNDING_SOURCES_ESTIMATED_SPEND:
-    'modules/projects/funding-sources/estimated-spend'
+    'modules/projects/funding-sources/estimated-spend',
+  FUNDING_SOURCES_MISSING_FINANCIAL_YEARS:
+    'modules/projects/funding-sources/missing-financial-years'
 }
 
 export const GENERAL_VIEWS = {

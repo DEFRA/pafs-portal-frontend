@@ -15,7 +15,7 @@
   {% set fundingValues = projectData.processedFundingValues or projectData[PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES] or [] %}
   {% set hasSpend = fundingValues | length > 0 %}
 
-  {# Build ordered list of active sources for the summary table #}
+  {# Build ordered list of active sources for the DETAIL (expanded) table #}
   {% set activeSources = [] %}
 
   {% if projectData[PROJECT_PAYLOAD_FIELDS.FCERM_GIA] %}
@@ -25,25 +25,25 @@
     {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY, label: t(p + '.local_levy') }]) %}
   {% endif %}
   {% if projectData[PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE] %}
-    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE, label: t(p + '.asset_replacement_allowance') }]) %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE, label: t(p + '.asset_replacement_allowance'), additionalGia: true }]) %}
   {% endif %}
   {% if projectData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING] %}
-    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING, label: t(p + '.environment_statutory_funding') }]) %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING, label: t(p + '.environment_statutory_funding'), additionalGia: true }]) %}
   {% endif %}
   {% if projectData[PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES] %}
-    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES, label: t(p + '.frequently_flooded_communities') }]) %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES, label: t(p + '.frequently_flooded_communities'), additionalGia: true }]) %}
   {% endif %}
   {% if projectData[PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID] %}
-    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID, label: t(p + '.other_additional_grant_in_aid') }]) %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID, label: t(p + '.other_additional_grant_in_aid'), additionalGia: true }]) %}
   {% endif %}
   {% if projectData[PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT] %}
-    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT, label: t(p + '.other_government_department') }]) %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT, label: t(p + '.other_government_department'), additionalGia: true }]) %}
   {% endif %}
   {% if projectData[PROJECT_PAYLOAD_FIELDS.RECOVERY] %}
-    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.RECOVERY, label: t(p + '.recovery') }]) %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.RECOVERY, label: t(p + '.recovery'), additionalGia: true }]) %}
   {% endif %}
   {% if projectData[PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND] %}
-    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND, label: t(p + '.summer_economic_fund') }]) %}
+    {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND, label: t(p + '.summer_economic_fund'), additionalGia: true }]) %}
   {% endif %}
   {% if projectData[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS] %}
     {% set activeSources = activeSources.concat([{ field: PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS, label: t(p + '.public_sector_contributors'), contributorArrayField: 'publicContributors' }]) %}
@@ -75,7 +75,21 @@
   <div class="govuk-summary-card__content">
     {% if hasFundingSources and hasSpend and activeSources | length > 0 %}
 
-      {# Summary totals table (one row per source) #}
+      {# Summary totals table – additional GIA sources aggregated into one row #}
+      {# Build summary sources: non-GIA sources + single aggregated GIA row #}
+      {% set summarySources = [] %}
+      {% set additionalGiaTotal = 0 %}
+      {% set hasAdditionalGia = false %}
+
+      {% for source in activeSources %}
+        {% if source.additionalGia %}
+          {% set hasAdditionalGia = true %}
+          {% set additionalGiaTotal = additionalGiaTotal + (projectData.fundingSourceTotals.sourceTotals[source.field] or 0) %}
+        {% else %}
+          {% set summarySources = summarySources.concat([source]) %}
+        {% endif %}
+      {% endfor %}
+
       <table class="govuk-table">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
@@ -84,14 +98,39 @@
           </tr>
         </thead>
         <tbody class="govuk-table__body">
-          {% for source in activeSources %}
-            {% set sourceTotal = projectData.fundingSourceTotals.sourceTotals[source.field] or 0 %}
+          {% for source in summarySources %}
+            {% if not source.contributorArrayField %}
+              {% set sourceTotal = projectData.fundingSourceTotals.sourceTotals[source.field] or 0 %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">{{ source.label }}</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">
+                  {% if sourceTotal > 0 %}£{{ formatNumberWithCommas(sourceTotal) }}{% else %}0{% endif %}
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+
+          {# Single aggregated Additional FCRM Grant-in-Aid row #}
+          {% if hasAdditionalGia %}
             <tr class="govuk-table__row">
-              <td class="govuk-table__cell">{{ source.label }}</td>
+              <td class="govuk-table__cell">{{ t(p + '.additional_gia') }}</td>
               <td class="govuk-table__cell govuk-table__cell--numeric">
-                {% if sourceTotal > 0 %}£{{ formatNumberWithCommas(sourceTotal) }}{% else %}0{% endif %}
+                {% if additionalGiaTotal > 0 %}£{{ formatNumberWithCommas(additionalGiaTotal) }}{% else %}0{% endif %}
               </td>
             </tr>
+          {% endif %}
+
+          {# Contributor sources #}
+          {% for source in summarySources %}
+            {% if source.contributorArrayField %}
+              {% set sourceTotal = projectData.fundingSourceTotals.sourceTotals[source.field] or 0 %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">{{ source.label }}</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">
+                  {% if sourceTotal > 0 %}£{{ formatNumberWithCommas(sourceTotal) }}{% else %}0{% endif %}
+                </td>
+              </tr>
+            {% endif %}
           {% endfor %}
         </tbody>
         <tfoot class="govuk-table__foot">

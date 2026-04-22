@@ -14,6 +14,7 @@ import { saveProjectWithErrorHandling } from '../../helpers/project-submission.j
 import {
   buildViewData,
   getSessionData,
+  getUniqueContributorNamesFromDb,
   navigateToProjectOverview,
   updateSessionData
 } from '../../helpers/project-utils.js'
@@ -23,7 +24,10 @@ import {
   CONTRIBUTOR_STEP_ROUTE
 } from './navigation-helpers.js'
 import { parseContributorsPayload } from './payload-helpers.js'
-import { localizeContributorErrorMessage } from './estimated-spending-helpers.js'
+import {
+  localizeContributorErrorMessage,
+  CONTRIBUTOR_SPEND_GROUPS
+} from './estimated-spending-helpers.js'
 
 // ─── Contributor name validation ────────────────────────────────────────────
 
@@ -89,9 +93,9 @@ function validateContributorNames(cleanNames, nonEmptyNames, config, t) {
 // ─── Shared helper: load contributors from session or CSV ───────────────────
 
 /**
- * Load contributor names from session key or database CSV fallback.
+ * Load contributor names from session key, database CSV, or contributors table fallback.
  */
-function loadContributors(sessionData, sessionKey, namesField) {
+function loadContributors(sessionData, sessionKey, namesField, step) {
   let contributors = sessionData[sessionKey] || []
 
   if (!contributors.length) {
@@ -101,6 +105,20 @@ function loadContributors(sessionData, sessionKey, namesField) {
         .split(',')
         .map((name) => name.trim())
         .filter(Boolean)
+    }
+  }
+
+  // Fallback: extract unique names from pafs_core_funding_contributors (legacy data)
+  if (!contributors.length && step) {
+    const group = CONTRIBUTOR_SPEND_GROUPS.find(
+      (g) => g.sessionKey === sessionKey
+    )
+    if (group) {
+      const dbContributors = sessionData.pafs_core_funding_contributors || []
+      contributors = getUniqueContributorNamesFromDb(
+        dbContributors,
+        group.contributorType
+      )
     }
   }
 
@@ -147,7 +165,12 @@ class ContributorsController {
 
     const sessionKey = CONTRIBUTOR_SESSION_KEY[step]
     const namesField = CONTRIBUTOR_NAMES_FIELD[step]
-    const contributors = loadContributors(sessionData, sessionKey, namesField)
+    const contributors = loadContributors(
+      sessionData,
+      sessionKey,
+      namesField,
+      step
+    )
 
     updateSessionData(request, { [sessionKey]: contributors })
 
@@ -297,7 +320,12 @@ class ContributorsController {
     const index = Number.parseInt(request.params.index, 10)
     const sessionKey = CONTRIBUTOR_SESSION_KEY[step]
     const namesField = CONTRIBUTOR_NAMES_FIELD[step]
-    const contributors = loadContributors(sessionData, sessionKey, namesField)
+    const contributors = loadContributors(
+      sessionData,
+      sessionKey,
+      namesField,
+      step
+    )
     const contributorName = contributors[index] || ''
     const contributorNumber = index + 1
 
@@ -334,7 +362,7 @@ class ContributorsController {
     const sessionKey = CONTRIBUTOR_SESSION_KEY[step]
     const namesField = CONTRIBUTOR_NAMES_FIELD[step]
     const contributors = [
-      ...loadContributors(sessionData, sessionKey, namesField)
+      ...loadContributors(sessionData, sessionKey, namesField, step)
     ]
     const contributorName = contributors[index] || ''
     const contributorNumber = index + 1

@@ -14,6 +14,7 @@ import {
   buildIdToYearMap,
   buildContributorsByYear,
   formatNumberWithCommas,
+  getCurrentFinancialYearStartYear,
   getSessionData,
   navigateToProjectOverview,
   updateSessionData
@@ -129,6 +130,53 @@ function buildFundingValueRow(fv, contributorsByYear) {
 }
 
 /**
+ * Ensure the funding value rows cover every year from startYear to endYear.
+ * Inserts empty placeholder rows (with just financialYear) for missing years.
+ * @private
+ */
+function fillMissingYearRows(rows, startYear, endYear) {
+  if (!startYear || !endYear || startYear > endYear) {
+    return rows
+  }
+
+  const existingYears = new Set(rows.map((r) => Number(r.financialYear)))
+  const filled = [...rows]
+
+  for (let y = startYear; y <= endYear; y++) {
+    if (!existingYears.has(y)) {
+      filled.push({ financialYear: y })
+    }
+  }
+
+  return filled.toSorted(
+    (a, b) => Number(a.financialYear) - Number(b.financialYear)
+  )
+}
+
+/**
+ * Resolve safe start / end financial years from session data.
+ * Falls back to the current financial year when values are missing or invalid.
+ * @private
+ */
+function resolveSafeFinancialYears(sessionData) {
+  let startYear = Number(
+    sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR] || 0
+  )
+  let endYear = Number(
+    sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR] || 0
+  )
+
+  if (!startYear || startYear <= 0) {
+    startYear = getCurrentFinancialYearStartYear()
+  }
+  if (!endYear || endYear <= 0) {
+    endYear = startYear
+  }
+
+  return { startYear, endYear }
+}
+
+/**
  * Merge flat pafs_core_funding_values rows with pafs_core_funding_contributors
  * into the combined fundingValues format used by the form and upsert payload.
  * @private
@@ -137,7 +185,18 @@ function buildFundingValuesFromProjectData(sessionData) {
   const dbValues = sessionData.pafs_core_funding_values || []
   const dbContributors = sessionData.pafs_core_funding_contributors || []
 
-  if (!dbValues.length) {
+  const { startYear, endYear } = resolveSafeFinancialYears(sessionData)
+
+  // Check whether project has explicitly set both boundaries
+  const rawStart = Number(
+    sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR] || 0
+  )
+  const rawEnd = Number(
+    sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR] || 0
+  )
+  const hasExplicitRange = rawStart > 0 && rawEnd > 0
+
+  if (!dbValues.length && !startYear) {
     return []
   }
 
@@ -152,7 +211,19 @@ function buildFundingValuesFromProjectData(sessionData) {
   const idToYear = buildIdToYearMap(sortedValues, referencedIds)
   const contributorsByYear = buildContributorsByYear(dbContributors, idToYear)
 
-  return sortedValues.map((fv) => buildFundingValueRow(fv, contributorsByYear))
+  let rows = sortedValues.map((fv) =>
+    buildFundingValueRow(fv, contributorsByYear)
+  )
+
+  // Filter out years outside the financial year range (legacy data may have stale rows)
+  // Only filter when the project has explicitly set both boundaries
+  if (hasExplicitRange) {
+    rows = rows.filter(
+      (r) => r.financialYear >= startYear && r.financialYear <= endYear
+    )
+  }
+
+  return fillMissingYearRows(rows, startYear, endYear)
 }
 
 /**
@@ -352,12 +423,7 @@ function buildEstimatedSpendViewData(
   const config = FUNDING_SOURCES_CONFIG[step]
   const backLinkOptions = resolveBackLinkOptions(step, sessionData)
 
-  const startYear = Number(
-    sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR] || 0
-  )
-  const endYear = Number(
-    sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR] || startYear
-  )
+  const { startYear, endYear } = resolveSafeFinancialYears(sessionData)
   const financialYears = []
   for (let y = startYear; y <= endYear; y++) {
     financialYears.push({ value: y, label: buildFinancialYearLabel(y) })

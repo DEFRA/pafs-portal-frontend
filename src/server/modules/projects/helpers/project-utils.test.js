@@ -26,7 +26,8 @@ import {
   buildProcessedFundingValues,
   computeFundingSourceTotals,
   buildIdToYearMap,
-  buildContributorsByYear
+  buildContributorsByYear,
+  getUniqueContributorNamesFromDb
 } from './project-utils.js'
 import {
   PROJECT_SESSION_KEY,
@@ -1280,6 +1281,186 @@ describe('project-utils', () => {
       const result = buildContributorsByYear(contributors, idToYear)
       expect(result['2025']).toHaveLength(1)
       expect(result['999']).toBeUndefined()
+    })
+  })
+
+  // ─── getUniqueContributorNamesFromDb ─────────────────────────────────────
+
+  describe('getUniqueContributorNamesFromDb', () => {
+    test('returns empty array for empty input', () => {
+      expect(
+        getUniqueContributorNamesFromDb([], 'public_contributions')
+      ).toEqual([])
+    })
+
+    test('returns empty array for null input', () => {
+      expect(
+        getUniqueContributorNamesFromDb(null, 'public_contributions')
+      ).toEqual([])
+    })
+
+    test('returns empty array for undefined input', () => {
+      expect(
+        getUniqueContributorNamesFromDb(undefined, 'public_contributions')
+      ).toEqual([])
+    })
+
+    test('extracts names matching the given contributor type', () => {
+      const contributors = [
+        { contributorType: 'public_contributions', name: 'Alice' },
+        { contributorType: 'private_contributions', name: 'Bob' },
+        { contributorType: 'public_contributions', name: 'Charlie' }
+      ]
+      const result = getUniqueContributorNamesFromDb(
+        contributors,
+        'public_contributions'
+      )
+      expect(result).toEqual(['Alice', 'Charlie'])
+    })
+
+    test('returns empty array when no names match the type', () => {
+      const contributors = [
+        { contributorType: 'private_contributions', name: 'Bob' }
+      ]
+      const result = getUniqueContributorNamesFromDb(
+        contributors,
+        'public_contributions'
+      )
+      expect(result).toEqual([])
+    })
+
+    test('deduplicates names case-insensitively', () => {
+      const contributors = [
+        { contributorType: 'public_contributions', name: 'Alice' },
+        { contributorType: 'public_contributions', name: 'alice' },
+        { contributorType: 'public_contributions', name: 'ALICE' }
+      ]
+      const result = getUniqueContributorNamesFromDb(
+        contributors,
+        'public_contributions'
+      )
+      expect(result).toEqual(['Alice'])
+    })
+
+    test('skips empty and null names', () => {
+      const contributors = [
+        { contributorType: 'public_contributions', name: '' },
+        { contributorType: 'public_contributions', name: null },
+        { contributorType: 'public_contributions', name: '  ' },
+        { contributorType: 'public_contributions', name: 'Alice' }
+      ]
+      const result = getUniqueContributorNamesFromDb(
+        contributors,
+        'public_contributions'
+      )
+      expect(result).toEqual(['Alice'])
+    })
+
+    test('trims whitespace from names', () => {
+      const contributors = [
+        { contributorType: 'public_contributions', name: '  Alice  ' }
+      ]
+      const result = getUniqueContributorNamesFromDb(
+        contributors,
+        'public_contributions'
+      )
+      expect(result).toEqual(['Alice'])
+    })
+  })
+
+  // ─── computeFundingSourceTotals – contributor fallback ───────────────────
+
+  describe('computeFundingSourceTotals – contributor array fallback', () => {
+    test('falls back to contributor arrays when source field is all zeros', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          publicContributions: 0,
+          publicContributors: [
+            { name: 'Alice', amount: '1000' },
+            { name: 'Bob', amount: '500' }
+          ]
+        }
+      ]
+      const projectData = { publicContributions: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.publicContributions).toBe(1500)
+      expect(result.grandTotal).toBe(1500)
+    })
+
+    test('falls back to contributor arrays when source field is null', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          publicContributions: null,
+          publicContributors: [{ name: 'A', amount: '200' }]
+        }
+      ]
+      const projectData = { publicContributions: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.publicContributions).toBe(200)
+    })
+
+    test('does not fall back when source field has non-zero value', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          publicContributions: 700,
+          publicContributors: [{ name: 'A', amount: '999' }]
+        }
+      ]
+      const projectData = { publicContributions: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      // Uses the regular field value, not the contributor array
+      expect(result.sourceTotals.publicContributions).toBe(700)
+    })
+
+    test('handles contributor array with non-numeric amounts', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          privateContributions: 0,
+          privateContributors: [
+            { name: 'A', amount: '£1,000' },
+            { name: 'B', amount: '' }
+          ]
+        }
+      ]
+      const projectData = { privateContributions: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.privateContributions).toBe(1000)
+    })
+
+    test('handles missing contributor array gracefully', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          otherEaContributions: 0
+        }
+      ]
+      const projectData = { otherEaContributions: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.otherEaContributions).toBe(0)
+    })
+
+    test('falls back for multiple contributor types simultaneously', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          publicContributions: 0,
+          privateContributions: 0,
+          publicContributors: [{ name: 'A', amount: '100' }],
+          privateContributors: [{ name: 'B', amount: '200' }]
+        }
+      ]
+      const projectData = {
+        publicContributions: true,
+        privateContributions: true
+      }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.publicContributions).toBe(100)
+      expect(result.sourceTotals.privateContributions).toBe(200)
+      expect(result.grandTotal).toBe(300)
     })
   })
 })

@@ -67,6 +67,36 @@ describe('getContributorNames', () => {
     // session array is empty ([]) so falls through to CSV
     expect(result).toEqual(['CSV Name'])
   })
+
+  it('falls back to pafs_core_funding_contributors when session and CSV are empty', () => {
+    const sessionData = {
+      pafs_core_funding_contributors: [
+        { contributorType: 'public_contributions', name: 'Alice' },
+        { contributorType: 'private_contributions', name: 'Ignored' },
+        { contributorType: 'public_contributions', name: 'Bob' }
+      ]
+    }
+    const groupWithType = {
+      ...group,
+      contributorType: 'public_contributions'
+    }
+    const result = getContributorNames(sessionData, groupWithType)
+    expect(result).toEqual(['Alice', 'Bob'])
+  })
+
+  it('returns empty array when contributors table fallback finds no matches', () => {
+    const sessionData = {
+      pafs_core_funding_contributors: [
+        { contributorType: 'private_contributions', name: 'Bob' }
+      ]
+    }
+    const groupWithType = {
+      ...group,
+      contributorType: 'public_contributions'
+    }
+    const result = getContributorNames(sessionData, groupWithType)
+    expect(result).toEqual([])
+  })
 })
 
 // ─── buildEstimatedSpendRows ──────────────────────────────────────────────────────────

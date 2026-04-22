@@ -1497,6 +1497,13 @@
         "invalid": "Enter a whole number with no decimal point or currency symbols",
         "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
       }
+    },
+    "missing_financial_years": {
+      "title": "Financial years required",
+      "heading": "Financial years are required to continue",
+      "warning": "You cannot manage funding sources until the start financial year and end financial year have been set.",
+      "body": "Please return to the project overview and set the start financial year and end financial year before continuing with funding sources.",
+      "return_to_overview_button": "Return to overview"
     }
   }
 }
