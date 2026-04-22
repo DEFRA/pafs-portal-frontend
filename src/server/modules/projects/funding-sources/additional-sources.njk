@@ -1,0 +1,114 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% set p = 'projects.funding_sources.additional_funding_sources_selection' %}
+
+{% block pageTitle %}{{ t(p + '.title') }}{% endblock %}
+
+{% block body %}
+
+  {% if fieldErrors %}
+    {% set errorList = [] %}
+    {% if fieldErrors['value'] %}
+      {% set errorList = errorList.concat([{ text: t(p + '.errors.required'), href: '#assetReplacementAllowance' }]) %}
+    {% endif %}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    {% set checkboxError = false %}
+    {% if fieldErrors and fieldErrors['value'] %}
+      {% set checkboxError = { text: t(p + '.errors.required') } %}
+    {% endif %}
+
+    <div class="govuk-form-group{% if checkboxError %} govuk-form-group--error{% endif %}">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+          <h1 class="govuk-fieldset__heading">{{ t(p + '.heading') }}</h1>
+        </legend>
+        <div class="govuk-hint">{{ t(p + '.hint') }}</div>
+        {% if checkboxError %}
+          <p class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ checkboxError.text }}
+          </p>
+        {% endif %}
+        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="{{ PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE }}"
+              name="{{ PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE }}" type="checkbox" value="true"
+              {% if formData[PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE] === true %}checked{% endif %}>
+            <label class="govuk-label govuk-checkboxes__label" for="{{ PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE }}">
+              {{ t(p + '.options.asset_replacement_allowance') }}
+            </label>
+          </div>
+
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="{{ PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING }}"
+              name="{{ PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING }}" type="checkbox" value="true"
+              {% if formData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING] === true %}checked{% endif %}>
+            <label class="govuk-label govuk-checkboxes__label" for="{{ PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING }}">
+              {{ t(p + '.options.environment_statutory_funding') }}
+            </label>
+          </div>
+
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="{{ PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES }}"
+              name="{{ PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES }}" type="checkbox" value="true"
+              {% if formData[PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES] === true %}checked{% endif %}>
+            <label class="govuk-label govuk-checkboxes__label" for="{{ PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES }}">
+              {{ t(p + '.options.frequently_flooded_communities') }}
+            </label>
+          </div>
+
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="{{ PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID }}"
+              name="{{ PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID }}" type="checkbox" value="true"
+              {% if formData[PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID] === true %}checked{% endif %}>
+            <label class="govuk-label govuk-checkboxes__label" for="{{ PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID }}">
+              {{ t(p + '.options.other_additional_grant_in_aid') }}
+            </label>
+          </div>
+
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="{{ PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT }}"
+              name="{{ PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT }}" type="checkbox" value="true"
+              {% if formData[PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT] === true %}checked{% endif %}>
+            <label class="govuk-label govuk-checkboxes__label" for="{{ PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT }}">
+              {{ t(p + '.options.other_government_department') }}
+            </label>
+          </div>
+
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="{{ PROJECT_PAYLOAD_FIELDS.RECOVERY }}"
+              name="{{ PROJECT_PAYLOAD_FIELDS.RECOVERY }}" type="checkbox" value="true"
+              {% if formData[PROJECT_PAYLOAD_FIELDS.RECOVERY] === true %}checked{% endif %}>
+            <label class="govuk-label govuk-checkboxes__label" for="{{ PROJECT_PAYLOAD_FIELDS.RECOVERY }}">
+              {{ t(p + '.options.recovery') }}
+            </label>
+          </div>
+
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="{{ PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND }}"
+              name="{{ PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND }}" type="checkbox" value="true"
+              {% if formData[PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND] === true %}checked{% endif %}>
+            <label class="govuk-label govuk-checkboxes__label" for="{{ PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND }}">
+              {{ t(p + '.options.summer_economic_fund') }}
+            </label>
+          </div>
+
+        </div>
+      </fieldset>
+    </div>
+
+    {{ govukButton({ text: t('common.buttons.save_and_continue') }) }}
+  </form>
+{% endblock %}

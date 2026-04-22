@@ -22,7 +22,12 @@ import {
   formatNumberWithCommas,
   formatFileSize,
   getProjectStateTag,
-  isConfidenceRestrictedProjectType
+  isConfidenceRestrictedProjectType,
+  buildProcessedFundingValues,
+  computeFundingSourceTotals,
+  buildIdToYearMap,
+  buildContributorsByYear,
+  getUniqueContributorNamesFromDb
 } from './project-utils.js'
 import {
   PROJECT_SESSION_KEY,
@@ -913,6 +918,549 @@ describe('project-utils', () => {
 
     test('should return false for unknown project type', () => {
       expect(isConfidenceRestrictedProjectType('UNKNOWN_TYPE')).toBe(false)
+    })
+  })
+
+  // ─── buildProcessedFundingValues ───────────────────────────────────────────
+
+  describe('buildProcessedFundingValues', () => {
+    test('returns empty array when pafs_core_funding_values is absent', () => {
+      expect(buildProcessedFundingValues({})).toEqual([])
+    })
+
+    test('returns empty array when pafs_core_funding_values is empty', () => {
+      expect(
+        buildProcessedFundingValues({ pafs_core_funding_values: [] })
+      ).toEqual([])
+    })
+
+    test('converts financialYear to a Number', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [{ financialYear: '2025' }]
+      })
+      expect(result[0].financialYear).toBe(2025)
+      expect(typeof result[0].financialYear).toBe('number')
+    })
+
+    test('converts numeric amount fields to Number via toNum', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [{ financialYear: 2025, fcermGia: '1000' }]
+      })
+      expect(result[0].fcermGia).toBe(1000)
+    })
+
+    test('sets null for absent amount fields', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [{ financialYear: 2025 }]
+      })
+      expect(result[0].fcermGia).toBeNull()
+      expect(result[0].localLevy).toBeNull()
+    })
+
+    test('sorts rows by financialYear ascending', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [
+          { financialYear: 2027, fcermGia: '300' },
+          { financialYear: 2025, fcermGia: '100' },
+          { financialYear: 2026, fcermGia: '200' }
+        ]
+      })
+      expect(result.map((r) => r.financialYear)).toEqual([2025, 2026, 2027])
+    })
+
+    test('attaches public contributors when IDs match', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [{ id: 1, financialYear: 2025 }],
+        pafs_core_funding_contributors: [
+          {
+            fundingValueId: 1,
+            name: 'Alice',
+            contributorType: 'public_contributions',
+            amount: '500'
+          }
+        ]
+      })
+      expect(result[0].publicContributors).toEqual([
+        {
+          name: 'Alice',
+          contributorType: 'public_contributions',
+          amount: '500'
+        }
+      ])
+    })
+
+    test('attaches private contributors correctly', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [{ id: 1, financialYear: 2025 }],
+        pafs_core_funding_contributors: [
+          {
+            fundingValueId: 1,
+            name: 'Corp',
+            contributorType: 'private_contributions',
+            amount: '200'
+          }
+        ]
+      })
+      expect(result[0].privateContributors).toEqual([
+        {
+          name: 'Corp',
+          contributorType: 'private_contributions',
+          amount: '200'
+        }
+      ])
+    })
+
+    test('attaches otherEa contributors correctly', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [{ id: 1, financialYear: 2025 }],
+        pafs_core_funding_contributors: [
+          {
+            fundingValueId: 1,
+            name: 'EA Org',
+            contributorType: 'other_ea_contributions',
+            amount: '100'
+          }
+        ]
+      })
+      expect(result[0].otherEaContributors).toEqual([
+        {
+          name: 'EA Org',
+          contributorType: 'other_ea_contributions',
+          amount: '100'
+        }
+      ])
+    })
+
+    test('omits contributor arrays when there are no contributors for a year', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [{ id: 1, financialYear: 2025 }]
+      })
+      expect(result[0].publicContributors).toBeUndefined()
+      expect(result[0].privateContributors).toBeUndefined()
+      expect(result[0].otherEaContributors).toBeUndefined()
+    })
+
+    test('uses positional fallback when funding values have no ids', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [{ financialYear: 2025, fcermGia: '1000' }],
+        pafs_core_funding_contributors: [
+          {
+            fundingValueId: 10,
+            name: 'Bob',
+            contributorType: 'private_contributions',
+            amount: '200'
+          }
+        ]
+      })
+      // The positional fallback should map fundingValueId 10 → year 2025
+      expect(result[0].privateContributors).toEqual([
+        { name: 'Bob', contributorType: 'private_contributions', amount: '200' }
+      ])
+    })
+
+    test('skips contributors whose fundingValueId cannot be resolved', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [{ id: 1, financialYear: 2025 }],
+        pafs_core_funding_contributors: [
+          {
+            fundingValueId: 999,
+            name: 'Ghost',
+            contributorType: 'public_contributions',
+            amount: '999'
+          }
+        ]
+      })
+      expect(result[0].publicContributors).toBeUndefined()
+    })
+
+    test('stores contributor amount as string (null becomes empty string)', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [{ id: 1, financialYear: 2025 }],
+        pafs_core_funding_contributors: [
+          {
+            fundingValueId: 1,
+            name: 'Alice',
+            contributorType: 'public_contributions',
+            amount: null
+          }
+        ]
+      })
+      expect(result[0].publicContributors[0].amount).toBe('')
+    })
+
+    test('handles multiple rows with multiple contributors', () => {
+      const result = buildProcessedFundingValues({
+        pafs_core_funding_values: [
+          { id: 1, financialYear: 2025, fcermGia: '100' },
+          { id: 2, financialYear: 2026, fcermGia: '200' }
+        ],
+        pafs_core_funding_contributors: [
+          {
+            fundingValueId: 1,
+            name: 'A',
+            contributorType: 'public_contributions',
+            amount: '10'
+          },
+          {
+            fundingValueId: 2,
+            name: 'B',
+            contributorType: 'private_contributions',
+            amount: '20'
+          }
+        ]
+      })
+      expect(result).toHaveLength(2)
+      expect(result[0].publicContributors).toHaveLength(1)
+      expect(result[1].privateContributors).toHaveLength(1)
+    })
+  })
+
+  // ─── computeFundingSourceTotals ────────────────────────────────────────────
+
+  describe('computeFundingSourceTotals', () => {
+    test('returns zero totals for empty rows', () => {
+      const result = computeFundingSourceTotals([], {})
+      expect(result.grandTotal).toBe(0)
+      expect(result.yearTotals).toEqual([])
+      expect(result.sourceTotals.fcermGia).toBe(0)
+    })
+
+    test('returns zero totals when no projectData fields are active', () => {
+      const rows = [{ financialYear: 2025, fcermGia: 1000, localLevy: 500 }]
+      const result = computeFundingSourceTotals(rows, {})
+      expect(result.grandTotal).toBe(0)
+      expect(result.yearTotals).toEqual([0])
+      expect(result.sourceTotals.fcermGia).toBe(0)
+    })
+
+    test('sums only active (selected) fields', () => {
+      const rows = [{ financialYear: 2025, fcermGia: 1000, localLevy: 500 }]
+      const projectData = { fcermGia: true } // localLevy not selected
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.fcermGia).toBe(1000)
+      expect(result.sourceTotals.localLevy).toBe(0)
+      expect(result.yearTotals).toEqual([1000])
+      expect(result.grandTotal).toBe(1000)
+    })
+
+    test('sums multiple active fields across multiple rows', () => {
+      const rows = [
+        { financialYear: 2025, fcermGia: 1000, localLevy: 200 },
+        { financialYear: 2026, fcermGia: 500, localLevy: 300 }
+      ]
+      const projectData = { fcermGia: true, localLevy: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.fcermGia).toBe(1500)
+      expect(result.sourceTotals.localLevy).toBe(500)
+      expect(result.yearTotals).toEqual([1200, 800])
+      expect(result.grandTotal).toBe(2000)
+    })
+
+    test('treats null/undefined values as zero', () => {
+      const rows = [{ financialYear: 2025, fcermGia: null }]
+      const projectData = { fcermGia: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.fcermGia).toBe(0)
+      expect(result.grandTotal).toBe(0)
+    })
+
+    test('initialises sourceTotals for all 13 FUNDING_AMOUNT_FIELDS', () => {
+      const result = computeFundingSourceTotals([], {})
+      const expectedFields = [
+        'fcermGia',
+        'localLevy',
+        'publicContributions',
+        'privateContributions',
+        'otherEaContributions',
+        'notYetIdentified',
+        'assetReplacementAllowance',
+        'environmentStatutoryFunding',
+        'frequentlyFloodedCommunities',
+        'otherAdditionalGrantInAid',
+        'otherGovernmentDepartment',
+        'recovery',
+        'summerEconomicFund'
+      ]
+      for (const field of expectedFields) {
+        expect(result.sourceTotals).toHaveProperty(field, 0)
+      }
+    })
+
+    test('defaults projectData to empty object when not provided', () => {
+      const rows = [{ financialYear: 2025, fcermGia: 1000 }]
+      const result = computeFundingSourceTotals(rows)
+      // No active fields → all zeros
+      expect(result.grandTotal).toBe(0)
+    })
+
+    test('does not count deselected contributor fields', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          fcermGia: 1000,
+          publicContributions: 500
+        }
+      ]
+      // Only fcermGia selected, publicContributions not
+      const projectData = { fcermGia: true, publicContributions: false }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.fcermGia).toBe(1000)
+      expect(result.sourceTotals.publicContributions).toBe(0)
+      expect(result.grandTotal).toBe(1000)
+    })
+  })
+
+  describe('formatNumberWithCommas short values', () => {
+    test('should return single digit as-is', () => {
+      expect(formatNumberWithCommas(5)).toBe('5')
+    })
+
+    test('should return 2 digits as-is', () => {
+      expect(formatNumberWithCommas(42)).toBe('42')
+    })
+
+    test('should return 3 digits as-is (no comma)', () => {
+      expect(formatNumberWithCommas(123)).toBe('123')
+    })
+
+    test('should return 0 as "0"', () => {
+      expect(formatNumberWithCommas(0)).toBe('0')
+    })
+  })
+
+  describe('buildIdToYearMap', () => {
+    test('maps ids from funding values when ids are present', () => {
+      const sorted = [
+        { id: 10, financialYear: 2025 },
+        { id: 20, financialYear: 2026 }
+      ]
+      const result = buildIdToYearMap(sorted, new Set())
+      expect(result.get('10')).toBe(2025)
+      expect(result.get('20')).toBe(2026)
+    })
+
+    test('uses positional mapping when ids are absent', () => {
+      const sorted = [{ financialYear: 2025 }, { financialYear: 2026 }]
+      const refIds = new Set(['100', '200'])
+      const result = buildIdToYearMap(sorted, refIds)
+      expect(result.get('100')).toBe(2025)
+      expect(result.get('200')).toBe(2026)
+    })
+
+    test('ignores excess reference ids beyond sorted values length', () => {
+      const sorted = [{ financialYear: 2025 }]
+      const refIds = new Set(['100', '200'])
+      const result = buildIdToYearMap(sorted, refIds)
+      expect(result.get('100')).toBe(2025)
+      expect(result.has('200')).toBe(false)
+    })
+  })
+
+  describe('buildContributorsByYear', () => {
+    test('groups contributors by resolved financial year', () => {
+      const idToYear = new Map([
+        ['10', 2025],
+        ['20', 2026]
+      ])
+      const contributors = [
+        { fundingValueId: 10, name: 'A' },
+        { fundingValueId: 20, name: 'B' },
+        { fundingValueId: 10, name: 'C' }
+      ]
+      const result = buildContributorsByYear(contributors, idToYear)
+      expect(result['2025']).toHaveLength(2)
+      expect(result['2026']).toHaveLength(1)
+    })
+
+    test('skips contributors with unresolvable fundingValueId', () => {
+      const idToYear = new Map([['10', 2025]])
+      const contributors = [
+        { fundingValueId: 10, name: 'A' },
+        { fundingValueId: 999, name: 'B' }
+      ]
+      const result = buildContributorsByYear(contributors, idToYear)
+      expect(result['2025']).toHaveLength(1)
+      expect(result['999']).toBeUndefined()
+    })
+  })
+
+  // ─── getUniqueContributorNamesFromDb ─────────────────────────────────────
+
+  describe('getUniqueContributorNamesFromDb', () => {
+    test('returns empty array for empty input', () => {
+      expect(
+        getUniqueContributorNamesFromDb([], 'public_contributions')
+      ).toEqual([])
+    })
+
+    test('returns empty array for null input', () => {
+      expect(
+        getUniqueContributorNamesFromDb(null, 'public_contributions')
+      ).toEqual([])
+    })
+
+    test('returns empty array for undefined input', () => {
+      expect(
+        getUniqueContributorNamesFromDb(undefined, 'public_contributions')
+      ).toEqual([])
+    })
+
+    test('extracts names matching the given contributor type', () => {
+      const contributors = [
+        { contributorType: 'public_contributions', name: 'Alice' },
+        { contributorType: 'private_contributions', name: 'Bob' },
+        { contributorType: 'public_contributions', name: 'Charlie' }
+      ]
+      const result = getUniqueContributorNamesFromDb(
+        contributors,
+        'public_contributions'
+      )
+      expect(result).toEqual(['Alice', 'Charlie'])
+    })
+
+    test('returns empty array when no names match the type', () => {
+      const contributors = [
+        { contributorType: 'private_contributions', name: 'Bob' }
+      ]
+      const result = getUniqueContributorNamesFromDb(
+        contributors,
+        'public_contributions'
+      )
+      expect(result).toEqual([])
+    })
+
+    test('deduplicates names case-insensitively', () => {
+      const contributors = [
+        { contributorType: 'public_contributions', name: 'Alice' },
+        { contributorType: 'public_contributions', name: 'alice' },
+        { contributorType: 'public_contributions', name: 'ALICE' }
+      ]
+      const result = getUniqueContributorNamesFromDb(
+        contributors,
+        'public_contributions'
+      )
+      expect(result).toEqual(['Alice'])
+    })
+
+    test('skips empty and null names', () => {
+      const contributors = [
+        { contributorType: 'public_contributions', name: '' },
+        { contributorType: 'public_contributions', name: null },
+        { contributorType: 'public_contributions', name: '  ' },
+        { contributorType: 'public_contributions', name: 'Alice' }
+      ]
+      const result = getUniqueContributorNamesFromDb(
+        contributors,
+        'public_contributions'
+      )
+      expect(result).toEqual(['Alice'])
+    })
+
+    test('trims whitespace from names', () => {
+      const contributors = [
+        { contributorType: 'public_contributions', name: '  Alice  ' }
+      ]
+      const result = getUniqueContributorNamesFromDb(
+        contributors,
+        'public_contributions'
+      )
+      expect(result).toEqual(['Alice'])
+    })
+  })
+
+  // ─── computeFundingSourceTotals – contributor fallback ───────────────────
+
+  describe('computeFundingSourceTotals – contributor array fallback', () => {
+    test('falls back to contributor arrays when source field is all zeros', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          publicContributions: 0,
+          publicContributors: [
+            { name: 'Alice', amount: '1000' },
+            { name: 'Bob', amount: '500' }
+          ]
+        }
+      ]
+      const projectData = { publicContributions: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.publicContributions).toBe(1500)
+      expect(result.grandTotal).toBe(1500)
+    })
+
+    test('falls back to contributor arrays when source field is null', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          publicContributions: null,
+          publicContributors: [{ name: 'A', amount: '200' }]
+        }
+      ]
+      const projectData = { publicContributions: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.publicContributions).toBe(200)
+    })
+
+    test('does not fall back when source field has non-zero value', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          publicContributions: 700,
+          publicContributors: [{ name: 'A', amount: '999' }]
+        }
+      ]
+      const projectData = { publicContributions: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      // Uses the regular field value, not the contributor array
+      expect(result.sourceTotals.publicContributions).toBe(700)
+    })
+
+    test('handles contributor array with non-numeric amounts', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          privateContributions: 0,
+          privateContributors: [
+            { name: 'A', amount: '£1,000' },
+            { name: 'B', amount: '' }
+          ]
+        }
+      ]
+      const projectData = { privateContributions: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.privateContributions).toBe(1000)
+    })
+
+    test('handles missing contributor array gracefully', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          otherEaContributions: 0
+        }
+      ]
+      const projectData = { otherEaContributions: true }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.otherEaContributions).toBe(0)
+    })
+
+    test('falls back for multiple contributor types simultaneously', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          publicContributions: 0,
+          privateContributions: 0,
+          publicContributors: [{ name: 'A', amount: '100' }],
+          privateContributors: [{ name: 'B', amount: '200' }]
+        }
+      ]
+      const projectData = {
+        publicContributions: true,
+        privateContributions: true
+      }
+      const result = computeFundingSourceTotals(rows, projectData)
+      expect(result.sourceTotals.publicContributions).toBe(100)
+      expect(result.sourceTotals.privateContributions).toBe(200)
+      expect(result.grandTotal).toBe(300)
     })
   })
 })

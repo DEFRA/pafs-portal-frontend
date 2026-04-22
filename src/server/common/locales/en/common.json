@@ -22,6 +22,7 @@
   "optional": "Optional",
   "add": "Add",
   "change": "Change",
+  "remove": "Remove",
   "delete": "Delete",
   "yes": "Yes",
   "no": "No",
@@ -57,7 +58,8 @@
     "save_and_continue": "Save and continue",
     "submit_proposal": "Submit proposal",
     "save_changes": "Save changes",
-    "upload_and_continue": "Upload and continue"
+    "upload_and_continue": "Upload and continue",
+    "update_totals": "Update totals"
   },
   "footer": {
     "contact_html": "Any issues contact the Defra IT Service Desk on <a href=\"tel:08008766458\" class=\"govuk-footer__link\">0800 8766458</a>",

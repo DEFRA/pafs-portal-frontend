@@ -23,7 +23,9 @@ import {
   buildFinancialYearLabel,
   formatFileSize,
   getProjectStateTag,
-  isConfidenceRestrictedProjectType
+  isConfidenceRestrictedProjectType,
+  buildProcessedFundingValues,
+  computeFundingSourceTotals
 } from '../helpers/project-utils.js'
 
 class OverviewController {
@@ -76,6 +78,16 @@ class OverviewController {
       backLink,
       projectData
     })
+
+    if (viewData.projectData) {
+      viewData.projectData.processedFundingValues = buildProcessedFundingValues(
+        viewData.projectData
+      )
+      viewData.projectData.fundingSourceTotals = computeFundingSourceTotals(
+        viewData.projectData.processedFundingValues,
+        viewData.projectData
+      )
+    }
 
     return h.view(PROJECT_VIEWS.OVERVIEW, viewData)
   }

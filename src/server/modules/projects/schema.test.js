@@ -447,3 +447,82 @@ describe('Project Schemas', () => {
     })
   })
 })
+
+// ─── Funding source schema re-exports ────────────────────────────────────────
+
+import {
+  fundingSourcesSelectedSchema,
+  additionalFcrmGiaSelectedSchema,
+  publicContributorNamesSchema,
+  privateContributorNamesSchema,
+  otherEaContributorNamesSchema,
+  fundingValueRowSchema,
+  createFundingValuesSchema
+} from './schema.js'
+
+describe('Funding source schema re-exports (schema.js)', () => {
+  test('fundingSourcesSelectedSchema is exported and is a Joi schema', () => {
+    expect(fundingSourcesSelectedSchema).toBeDefined()
+    expect(typeof fundingSourcesSelectedSchema.validate).toBe('function')
+  })
+
+  test('additionalFcrmGiaSelectedSchema is exported and is a Joi schema', () => {
+    expect(additionalFcrmGiaSelectedSchema).toBeDefined()
+    expect(typeof additionalFcrmGiaSelectedSchema.validate).toBe('function')
+  })
+
+  test('publicContributorNamesSchema is exported and is a Joi schema', () => {
+    expect(publicContributorNamesSchema).toBeDefined()
+    expect(typeof publicContributorNamesSchema.validate).toBe('function')
+  })
+
+  test('privateContributorNamesSchema is exported and is a Joi schema', () => {
+    expect(privateContributorNamesSchema).toBeDefined()
+    expect(typeof privateContributorNamesSchema.validate).toBe('function')
+  })
+
+  test('otherEaContributorNamesSchema is exported and is a Joi schema', () => {
+    expect(otherEaContributorNamesSchema).toBeDefined()
+    expect(typeof otherEaContributorNamesSchema.validate).toBe('function')
+  })
+
+  test('fundingValueRowSchema is exported and is a Joi schema', () => {
+    expect(fundingValueRowSchema).toBeDefined()
+    expect(typeof fundingValueRowSchema.validate).toBe('function')
+  })
+
+  test('createFundingValuesSchema is a function that returns a Joi schema', () => {
+    expect(typeof createFundingValuesSchema).toBe('function')
+    const schema = createFundingValuesSchema()
+    expect(typeof schema.validate).toBe('function')
+  })
+
+  test('fundingSourcesSelectedSchema accepts at least one selected source', () => {
+    const { error } = fundingSourcesSelectedSchema.validate({
+      fcermGia: true,
+      localLevy: false,
+      additionalFcermGia: false,
+      publicContributions: false,
+      privateContributions: false,
+      otherEaContributions: false,
+      notYetIdentified: false
+    })
+    expect(error).toBeUndefined()
+  })
+
+  test('publicContributorNamesSchema rejects empty string', () => {
+    const { error } = publicContributorNamesSchema.validate('')
+    expect(error).toBeDefined()
+  })
+
+  test('createFundingValuesSchema rejects empty array', () => {
+    const schema = createFundingValuesSchema([])
+    const { error } = schema.validate([])
+    expect(error).toBeDefined()
+  })
+
+  test('fundingValueRowSchema accepts a valid row with a financialYear', () => {
+    const { error } = fundingValueRowSchema.validate({ financialYear: 2025 })
+    expect(error).toBeUndefined()
+  })
+})

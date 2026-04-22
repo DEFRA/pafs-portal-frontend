@@ -85,6 +85,85 @@ describe('Routes Constants', () => {
         '/project/{referenceNumber}/whole-life-benefits'
       )
     })
+
+    describe('FUNDING_SOURCES edit routes', () => {
+      test('FUNDING_SOURCES_SELECTION route is defined', () => {
+        expect(
+          ROUTES.PROJECT.EDIT.FUNDING_SOURCES.FUNDING_SOURCES_SELECTION
+        ).toContain('{referenceNumber}')
+      })
+
+      test('ADDITIONAL_FUNDING_SOURCES_SELECTION route is defined', () => {
+        expect(
+          ROUTES.PROJECT.EDIT.FUNDING_SOURCES
+            .ADDITIONAL_FUNDING_SOURCES_SELECTION
+        ).toContain('{referenceNumber}')
+      })
+
+      test('PUBLIC_SECTOR_CONTRIBUTORS route is defined', () => {
+        expect(
+          ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PUBLIC_SECTOR_CONTRIBUTORS
+        ).toContain('{referenceNumber}')
+      })
+
+      test('PUBLIC_SECTOR_CONTRIBUTORS_DELETE route contains /delete', () => {
+        expect(
+          ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PUBLIC_SECTOR_CONTRIBUTORS_DELETE
+        ).toMatch(/delete/)
+      })
+
+      test('PRIVATE_SECTOR_CONTRIBUTORS route is defined', () => {
+        expect(
+          ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PRIVATE_SECTOR_CONTRIBUTORS
+        ).toContain('{referenceNumber}')
+      })
+
+      test('PRIVATE_SECTOR_CONTRIBUTORS_DELETE route contains /delete', () => {
+        expect(
+          ROUTES.PROJECT.EDIT.FUNDING_SOURCES.PRIVATE_SECTOR_CONTRIBUTORS_DELETE
+        ).toMatch(/delete/)
+      })
+
+      test('OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS route is defined', () => {
+        expect(
+          ROUTES.PROJECT.EDIT.FUNDING_SOURCES
+            .OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS
+        ).toContain('{referenceNumber}')
+      })
+
+      test('OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS_DELETE route contains /delete', () => {
+        expect(
+          ROUTES.PROJECT.EDIT.FUNDING_SOURCES
+            .OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS_DELETE
+        ).toMatch(/delete/)
+      })
+
+      test('ESTIMATED_SPEND route is defined', () => {
+        expect(ROUTES.PROJECT.EDIT.FUNDING_SOURCES.ESTIMATED_SPEND).toContain(
+          '{referenceNumber}'
+        )
+      })
+
+      test('all FUNDING_SOURCES routes contain the referenceNumber param', () => {
+        const fs = ROUTES.PROJECT.EDIT.FUNDING_SOURCES
+        for (const route of Object.values(fs)) {
+          expect(route).toContain('{referenceNumber}')
+        }
+      })
+
+      test('delete routes are derived from their base routes', () => {
+        const fs = ROUTES.PROJECT.EDIT.FUNDING_SOURCES
+        expect(fs.PUBLIC_SECTOR_CONTRIBUTORS_DELETE).toContain(
+          fs.PUBLIC_SECTOR_CONTRIBUTORS
+        )
+        expect(fs.PRIVATE_SECTOR_CONTRIBUTORS_DELETE).toContain(
+          fs.PRIVATE_SECTOR_CONTRIBUTORS
+        )
+        expect(fs.OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS_DELETE).toContain(
+          fs.OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS
+        )
+      })
+    })
   })
 
   describe('Admin routes', () => {

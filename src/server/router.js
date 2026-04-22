@@ -73,7 +73,8 @@ export const router = {
         'environmental-benefits',
         'nfm',
         'whole-life-cost',
-        'whole-life-benefits'
+        'whole-life-benefits',
+        'funding-sources'
       ])
 
       // Static assets
