@@ -138,10 +138,16 @@ export function getActiveCount(accessToken, cacheService) {
   return getAccountsCount(ACCOUNT_STATUS.ACTIVE, accessToken, cacheService)
 }
 
-export async function validateEmail(email, excludeUserId = null) {
+export async function validateEmail(
+  email,
+  excludeUserId = null,
+  accessToken = null
+) {
   const payload = excludeUserId ? { email, excludeUserId } : { email }
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
   return apiRequest('/api/v1/validate-email', {
     method: 'POST',
+    headers,
     body: JSON.stringify(payload)
   })
 }

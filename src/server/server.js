@@ -20,7 +20,34 @@ import { contentSecurityPolicy } from './common/helpers/content-security-policy.
 import { i18nPlugin } from './common/helpers/i18n/index.js'
 import { areasPreloader } from './common/helpers/areas/areas-preloader.js'
 
+const INSECURE_COOKIE_DEFAULT =
+  'the-password-must-be-at-least-32-characters-long'
+
+export function collectProductionCookieErrors(isProduction, getConfigValue) {
+  if (!isProduction) {
+    return []
+  }
+  const cookiePassword = getConfigValue('session.cookie.password')
+  if (!cookiePassword || cookiePassword === INSECURE_COOKIE_DEFAULT) {
+    return [
+      'SESSION_COOKIE_PASSWORD must be changed from the insecure default value in production'
+    ]
+  }
+  return []
+}
+
+function validateProductionConfig() {
+  const errors = collectProductionCookieErrors(
+    config.get('isProduction'),
+    (key) => config.get(key)
+  )
+  if (errors.length > 0) {
+    throw new Error(`Server startup aborted — ${errors.join(', ')}`)
+  }
+}
+
 export async function createServer() {
+  validateProductionConfig()
   setupProxy()
   const server = hapi.server({
     host: config.get('host'),

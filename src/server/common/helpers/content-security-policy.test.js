@@ -15,7 +15,7 @@ describe('#contentSecurityPolicy', () => {
 
       expect(options.defaultSrc).toEqual(['self'])
       expect(options.fontSrc).toEqual(['self', 'data:'])
-      expect(options.connectSrc).toEqual(['self', 'wss', 'data:'])
+      expect(options.connectSrc).toEqual(['self'])
       expect(options.mediaSrc).toEqual(['self'])
       expect(options.styleSrc).toEqual(['self'])
       expect(options.scriptSrc).toEqual([
