@@ -65,7 +65,22 @@ export const PROJECT_VIEWS = {
   NFM_EXPERIENCE: 'modules/projects/nfm/radio-generic',
   NFM_PROJECT_READINESS: 'modules/projects/nfm/radio-generic',
   WHOLE_LIFE_COST: 'modules/projects/whole-life-cost/index',
-  WHOLE_LIFE_BENEFITS: 'modules/projects/whole-life-benefits/index'
+  WHOLE_LIFE_BENEFITS: 'modules/projects/whole-life-benefits/index',
+  FUNDING_SOURCES: 'modules/projects/funding-sources/index',
+  FUNDING_SOURCES_ADDITIONAL:
+    'modules/projects/funding-sources/additional-sources',
+  FUNDING_SOURCES_PUBLIC_CONTRIBUTORS:
+    'modules/projects/funding-sources/contributors',
+  FUNDING_SOURCES_PRIVATE_CONTRIBUTORS:
+    'modules/projects/funding-sources/contributors',
+  FUNDING_SOURCES_OTHER_EA_CONTRIBUTORS:
+    'modules/projects/funding-sources/contributors',
+  FUNDING_SOURCES_CONTRIBUTOR_DELETE:
+    'modules/projects/funding-sources/delete-contributor',
+  FUNDING_SOURCES_ESTIMATED_SPEND:
+    'modules/projects/funding-sources/estimated-spend',
+  FUNDING_SOURCES_MISSING_FINANCIAL_YEARS:
+    'modules/projects/funding-sources/missing-financial-years'
 }
 
 export const GENERAL_VIEWS = {

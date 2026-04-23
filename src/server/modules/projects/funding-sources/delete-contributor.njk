@@ -1,0 +1,46 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% set p = 'projects.funding_sources.delete_contributor' %}
+
+{% block pageTitle %}{{ t(p + '.title') }}{% endblock %}
+
+{% block body %}
+
+  {% if fieldErrors and fieldErrors['confirm'] %}
+    {{ govukErrorSummary({
+      titleText: t('common.error_summary_title'),
+      errorList: [{ text: t(p + '.errors.required'), href: '#confirm' }]
+    }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    {% set confirmError = false %}
+    {% if fieldErrors and fieldErrors['confirm'] %}
+      {% set confirmError = { text: t(p + '.errors.required') } %}
+    {% endif %}
+
+    {{ govukRadios({
+      name: 'confirm',
+      id: 'confirm',
+      fieldset: {
+        legend: {
+          html: '<h1 class="govuk-fieldset__heading govuk-heading-xl">' + t(p + '.heading') + contributorNumber + '?</h1>',
+          classes: 'govuk-fieldset__legend--xl',
+          isPageHeading: true
+        }
+      },
+      errorMessage: confirmError,
+      items: [
+        { value: 'yes', text: t(p + '.yes') },
+        { value: 'no', text: t(p + '.no') }
+      ]
+    }) }}
+
+    {{ govukButton({ text: t('common.buttons.save_and_continue') }) }}
+  </form>
+{% endblock %}

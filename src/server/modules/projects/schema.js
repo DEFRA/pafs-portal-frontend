@@ -99,3 +99,13 @@ export {
   nfmExperienceLevelSchema,
   nfmProjectReadinessSchema
 } from './schemas/nfm-schemas.js'
+
+export {
+  fundingSourcesSelectedSchema,
+  additionalFcrmGiaSelectedSchema,
+  publicContributorNamesSchema,
+  privateContributorNamesSchema,
+  otherEaContributorNamesSchema,
+  fundingValueRowSchema,
+  createFundingValuesSchema
+} from '../../common/schemas/projects/project-funding-sources-schemas.js'

@@ -1,0 +1,214 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% set p = 'projects.funding_sources.estimated_spend' %}
+
+{% block pageTitle %}{{ t(p + '.title') }}{% endblock %}
+
+{% block body %}
+
+  {# ─── Error summary ──────────────────────────────────────────────────────── #}
+  {% set errorList = [] %}
+  {% if globalError %}
+    {% set errorList = errorList.concat([{
+      text: globalError,
+      href: '#funding-values-table'
+    }]) %}
+  {% endif %}
+  {% if fieldErrors %}
+    {% for row in spendRows %}
+      {% set key = row.field or row.sourceField %}
+      {% if key and fieldErrors[key] %}
+        {% set errorList = errorList.concat([{
+          text: fieldErrors[key],
+          href: '#' + key + '-0'
+        }]) %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  {% if errorList.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: t('common.error_summary_title'),
+      errorList: errorList
+    }) }}
+  {% endif %}
+
+  {# ─── Form ───────────────────────────────────────────────────────────────── #}
+  <form method="post" novalidate id="estimated-spend-form">
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    {# financialYear hidden inputs — ONE per year column, outside the row loop #}
+    {% for year in financialYears %}
+      <input type="hidden" name="fundingValues[{{ loop.index0 }}][financialYear]" value="{{ year.value }}">
+    {% endfor %}
+
+    <div class="govuk-form-group{% if globalError %} govuk-form-group--error{% endif %}">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+          <h1 class="govuk-fieldset__heading">{{ t(p + '.heading') }}</h1>
+        </legend>
+        <p class="govuk-body">{{ t(p + '.hint') }}</p>
+
+        {# No-JS guidance — visible by default, JS hides it #}
+        <div class="govuk-inset-text" id="no-js-totals-hint">
+          {{ t(p + '.no_js_hint') }}
+        </div>
+
+        <span id="funding-values-table"></span>
+        <div class="pafs-table-scroll">
+          <table class="govuk-table funding-values-table">
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header" style="min-width: 250px;">{{ t(p + '.table.funding _column_header') }}</th>
+                {% for year in financialYears %}
+                  <th scope="col" class="govuk-table__header govuk-table__header--numeric">
+                    {{ year.value % 100 }}/{{ (year.value + 1) % 100 }}
+                  </th>
+                {% endfor %}
+                <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ t(p + '.table.total') }}</th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+              {% for row in spendRows %}
+
+                {# ── Group heading row (e.g. "Public sector contributors") ── #}
+                {% if row.kind == 'group-heading' %}
+                  <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header section-header" colspan="{{ financialYears | length + 2 }}">
+                      <strong>{{ row.label }}</strong>
+                    </th>
+                  </tr>
+
+                {# ── Source row (GIA, local levy, additional GIA sub-sources, not-yet-identified) ── #}
+                {% elif row.kind == 'source' %}
+                  <tr class="govuk-table__row" data-source-row>
+                    <th scope="row" class="govuk-table__header">{{ row.label }}</th>
+                    {% for year in financialYears %}
+                      {% set yearIdx = loop.index0 %}
+                      {% set cellValue = '' %}
+                      {% for existing in existingValues %}
+                        {% if existing.financialYear | string == year.value | string %}
+                          {% if existing[row.field] is not none and existing[row.field] != '' %}
+                            {% set cellValue = existing[row.field] %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+
+                      {% set cellError = fieldErrors and fieldErrors[row.field] %}
+
+                      <td class="govuk-table__cell govuk-table__cell--numeric">
+                        <input
+                          class="govuk-input govuk-input--width-10{% if cellError %} govuk-input--error{% endif %}"
+                          id="{{ row.field }}-{{ yearIdx }}"
+                          name="fundingValues[{{ yearIdx }}][{{ row.field }}]"
+                          type="text"
+                          inputmode="numeric"
+                          data-spend-cell
+                          data-number-format="comma"
+                          value="{{ formatNumberWithCommas(cellValue) if cellValue else '' }}"
+                          aria-label="{{ row.label }} {{ year.value % 100 }}/{{ (year.value + 1) % 100 }}"
+                          style="text-align: right;"
+                        >
+                      </td>
+                    {% endfor %}
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-row-total>
+                      {% set rowKey = row.field %}
+                      {% if serverTotals and serverTotals.rowTotals[rowKey] %}
+                        {{ formatNumberWithCommas(serverTotals.rowTotals[rowKey]) }}
+                      {% else %}
+                        0
+                      {% endif %}
+                    </td>
+                  </tr>
+
+                {# ── Contributor row (named contributor under a group) ── #}
+                {% elif row.kind == 'contributor' %}
+                  <tr class="govuk-table__row" data-source-row>
+                    <td class="govuk-table__cell" style="padding-left: 30px; font-weight: normal;">{{ row.label }}</td>
+                    {% for year in financialYears %}
+                      {% set yearIdx = loop.index0 %}
+                      {% set cellValue = '' %}
+                      {% for existing in existingValues %}
+                        {% if existing.financialYear | string == year.value | string %}
+                          {% set contributorItems = existing[row.contributorArrayField] or [] %}
+                          {% for item in contributorItems %}
+                            {% if item.name == row.contributorName and item.amount is not none and item.amount != '' %}
+                              {% set cellValue = item.amount %}
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      {% endfor %}
+
+                      {% set cellError = fieldErrors and fieldErrors[row.sourceField] %}
+
+                      <td class="govuk-table__cell govuk-table__cell--numeric">
+                        <input type="hidden" name="fundingValues[{{ yearIdx }}][{{ row.contributorArrayField }}][{{ row.contributorIndex }}][name]" value="{{ row.contributorName }}">
+                        <input type="hidden" name="fundingValues[{{ yearIdx }}][{{ row.contributorArrayField }}][{{ row.contributorIndex }}][contributorType]" value="{{ row.contributorType }}">
+                        <input
+                          class="govuk-input govuk-input--width-10{% if cellError %} govuk-input--error{% endif %}"
+                          id="{{ row.sourceField }}-{{ row.contributorIndex }}-{{ yearIdx }}"
+                          name="fundingValues[{{ yearIdx }}][{{ row.contributorArrayField }}][{{ row.contributorIndex }}][amount]"
+                          type="text"
+                          inputmode="numeric"
+                          data-spend-cell
+                          data-number-format="comma"
+                          value="{{ formatNumberWithCommas(cellValue) if cellValue else '' }}"
+                          aria-label="{{ row.label }} {{ year.value % 100 }}/{{ (year.value + 1) % 100 }}"
+                          style="text-align: right;"
+                        >
+                      </td>
+                    {% endfor %}
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-row-total>
+                      {% set rowKey = row.contributorArrayField + '-' + row.contributorIndex %}
+                      {% if serverTotals and serverTotals.rowTotals[rowKey] %}
+                        {{ formatNumberWithCommas(serverTotals.rowTotals[rowKey]) }}
+                      {% else %}
+                        0
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endif %}
+
+              {% endfor %}
+            </tbody>
+            <tfoot class="govuk-table__foot">
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell"><strong>{{ t(p + '.table.total') }}</strong></td>
+                {% for year in financialYears %}
+                  <td class="govuk-table__cell govuk-table__cell--numeric" data-col-total="{{ loop.index0 }}">
+                    {% if serverTotals and serverTotals.colTotals[loop.index0] %}
+                      {{ formatNumberWithCommas(serverTotals.colTotals[loop.index0]) }}
+                    {% else %}
+                      0
+                    {% endif %}
+                  </td>
+                {% endfor %}
+                <td class="govuk-table__cell govuk-table__cell--numeric" data-grand-total>
+                  {% if serverTotals and serverTotals.grandTotal %}
+                    {{ formatNumberWithCommas(serverTotals.grandTotal) }}
+                  {% else %}
+                    0
+                  {% endif %}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue'),
+        name: 'action',
+        value: 'continue'
+      }) }}
+      {# Update Totals: visible by default for no-JS, JS hides it #}
+      <button class="govuk-button govuk-button--secondary" type="submit" name="action" value="update-totals" id="update-totals-btn" data-module="govuk-button">
+        {{ t('common.buttons.update_totals') }}
+      </button>
+    </div>
+  </form>
+
+{% endblock %}

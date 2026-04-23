@@ -113,3 +113,17 @@ export {
   createHabitatWatercourseSchema,
   kilometresOfWatercourseEnhancedOrCreatedSingleSchema
 } from './projects/project-environmental-benefits-schemas.js'
+
+// Funding source schemas
+export {
+  MAIN_FUNDING_SOURCE_FIELDS,
+  ADDITIONAL_GIA_FUNDING_SOURCE_FIELDS,
+  SPENDING_FUNDING_SOURCE_FIELDS,
+  fundingSourcesSelectedSchema,
+  additionalFcrmGiaSelectedSchema,
+  publicContributorNamesSchema,
+  privateContributorNamesSchema,
+  otherEaContributorNamesSchema,
+  fundingValueRowSchema,
+  createFundingValuesSchema
+} from './projects/project-funding-sources-schemas.js'

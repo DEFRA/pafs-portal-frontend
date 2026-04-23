@@ -28,6 +28,18 @@ import {
   PROJECT_INTERVENTION_TYPES,
   PROJECT_PAYLOAD_FIELDS
 } from '../constants/projects.js'
+import {
+  MAIN_FUNDING_SOURCE_FIELDS,
+  ADDITIONAL_GIA_FUNDING_SOURCE_FIELDS,
+  SPENDING_FUNDING_SOURCE_FIELDS,
+  fundingSourcesSelectedSchema,
+  additionalFcrmGiaSelectedSchema,
+  publicContributorNamesSchema,
+  privateContributorNamesSchema,
+  otherEaContributorNamesSchema,
+  fundingValueRowSchema,
+  createFundingValuesSchema
+} from './projects.js'
 
 describe('Project Schemas', () => {
   describe('projectReferenceNumberSchema', () => {
@@ -1018,6 +1030,144 @@ describe('Project Schemas', () => {
 
       const { error } = projectFinancialStartYearSchema.validate(2024)
       expect(error).toBeUndefined()
+    })
+  })
+
+  // ─── Funding source schema exports ──────────────────────────────────────────
+
+  describe('Funding source field arrays', () => {
+    test('MAIN_FUNDING_SOURCE_FIELDS is a non-empty array', () => {
+      expect(Array.isArray(MAIN_FUNDING_SOURCE_FIELDS)).toBe(true)
+      expect(MAIN_FUNDING_SOURCE_FIELDS.length).toBeGreaterThan(0)
+    })
+
+    test('ADDITIONAL_GIA_FUNDING_SOURCE_FIELDS is a non-empty array', () => {
+      expect(Array.isArray(ADDITIONAL_GIA_FUNDING_SOURCE_FIELDS)).toBe(true)
+      expect(ADDITIONAL_GIA_FUNDING_SOURCE_FIELDS.length).toBeGreaterThan(0)
+    })
+
+    test('SPENDING_FUNDING_SOURCE_FIELDS includes all additional GIA fields', () => {
+      expect(Array.isArray(SPENDING_FUNDING_SOURCE_FIELDS)).toBe(true)
+      for (const field of ADDITIONAL_GIA_FUNDING_SOURCE_FIELDS) {
+        expect(SPENDING_FUNDING_SOURCE_FIELDS).toContain(field)
+      }
+    })
+  })
+
+  describe('fundingSourcesSelectedSchema', () => {
+    test('is a Joi schema object', () => {
+      expect(fundingSourcesSelectedSchema).toBeDefined()
+      expect(typeof fundingSourcesSelectedSchema.validate).toBe('function')
+    })
+
+    test('passes when at least one funding source is true', () => {
+      const payload = Object.fromEntries(
+        MAIN_FUNDING_SOURCE_FIELDS.map((f) => [f, false])
+      )
+      payload[MAIN_FUNDING_SOURCE_FIELDS[0]] = true
+      const { error } = fundingSourcesSelectedSchema.validate(payload)
+      expect(error).toBeUndefined()
+    })
+
+    test('fails when no funding source is selected', () => {
+      const payload = Object.fromEntries(
+        MAIN_FUNDING_SOURCE_FIELDS.map((f) => [f, false])
+      )
+      const { error } = fundingSourcesSelectedSchema.validate(payload)
+      expect(error).toBeDefined()
+    })
+  })
+
+  describe('additionalFcrmGiaSelectedSchema', () => {
+    test('is a Joi schema object', () => {
+      expect(additionalFcrmGiaSelectedSchema).toBeDefined()
+      expect(typeof additionalFcrmGiaSelectedSchema.validate).toBe('function')
+    })
+
+    test('passes when at least one additional GIA field is true', () => {
+      const payload = Object.fromEntries(
+        ADDITIONAL_GIA_FUNDING_SOURCE_FIELDS.map((f) => [f, false])
+      )
+      payload[ADDITIONAL_GIA_FUNDING_SOURCE_FIELDS[0]] = true
+      const { error } = additionalFcrmGiaSelectedSchema.validate(payload)
+      expect(error).toBeUndefined()
+    })
+
+    test('fails when no additional GIA field is selected', () => {
+      const payload = Object.fromEntries(
+        ADDITIONAL_GIA_FUNDING_SOURCE_FIELDS.map((f) => [f, false])
+      )
+      const { error } = additionalFcrmGiaSelectedSchema.validate(payload)
+      expect(error).toBeDefined()
+    })
+  })
+
+  describe('publicContributorNamesSchema', () => {
+    test('is a Joi schema with validate function', () => {
+      expect(typeof publicContributorNamesSchema.validate).toBe('function')
+    })
+
+    test('passes with a valid contributor name string', () => {
+      const { error } = publicContributorNamesSchema.validate('Alice')
+      expect(error).toBeUndefined()
+    })
+  })
+
+  describe('privateContributorNamesSchema', () => {
+    test('is a Joi schema with validate function', () => {
+      expect(typeof privateContributorNamesSchema.validate).toBe('function')
+    })
+
+    test('passes with a valid contributor name', () => {
+      const { error } = privateContributorNamesSchema.validate('Corp Ltd')
+      expect(error).toBeUndefined()
+    })
+  })
+
+  describe('otherEaContributorNamesSchema', () => {
+    test('is a Joi schema with validate function', () => {
+      expect(typeof otherEaContributorNamesSchema.validate).toBe('function')
+    })
+
+    test('passes with a valid contributor name', () => {
+      const { error } = otherEaContributorNamesSchema.validate('EA Partner')
+      expect(error).toBeUndefined()
+    })
+  })
+
+  describe('fundingValueRowSchema', () => {
+    test('is a Joi schema with validate function', () => {
+      expect(typeof fundingValueRowSchema.validate).toBe('function')
+    })
+
+    test('passes with a valid financial year', () => {
+      const { error } = fundingValueRowSchema.validate({ financialYear: 2025 })
+      expect(error).toBeUndefined()
+    })
+  })
+
+  describe('createFundingValuesSchema', () => {
+    test('is a factory function', () => {
+      expect(typeof createFundingValuesSchema).toBe('function')
+    })
+
+    test('returns a Joi schema when called', () => {
+      const schema = createFundingValuesSchema([])
+      expect(typeof schema.validate).toBe('function')
+    })
+
+    test('passes with valid rows when called with selected sources', () => {
+      const schema = createFundingValuesSchema(['fcermGia'])
+      const { error } = schema.validate([
+        { financialYear: 2025, fcermGia: '1000' }
+      ])
+      expect(error).toBeUndefined()
+    })
+
+    test('fails with an empty array of rows (min 1 required)', () => {
+      const schema = createFundingValuesSchema([])
+      const { error } = schema.validate([])
+      expect(error).toBeDefined()
     })
   })
 })

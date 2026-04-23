@@ -142,10 +142,11 @@ describe('project-edit-session', () => {
 
       expect(mockRequest.yar.set).toHaveBeenCalledWith(PROJECT_SESSION_KEY, {
         ...projectData,
+        additionalFcermGia: false,
         journeyStarted: true,
         isEdit: true,
         referenceNumber: 'REF123',
-        originalData: { ...projectData }
+        originalData: { ...projectData, additionalFcermGia: false }
       })
       expect(result.isEdit).toBe(true)
       expect(result.journeyStarted).toBe(true)
@@ -164,7 +165,10 @@ describe('project-edit-session', () => {
       const result = initializeEditSession(mockRequest, projectData)
 
       expect(result).toMatchObject(projectData)
-      expect(result.originalData).toEqual(projectData)
+      expect(result.originalData).toEqual({
+        ...projectData,
+        additionalFcermGia: false
+      })
     })
 
     test('should create deep copy of original data', () => {
@@ -176,7 +180,10 @@ describe('project-edit-session', () => {
       const result = initializeEditSession(mockRequest, projectData)
 
       // Verify it's a copy not a reference
-      expect(result.originalData).toEqual(projectData)
+      expect(result.originalData).toEqual({
+        ...projectData,
+        additionalFcermGia: false
+      })
       expect(result.originalData).not.toBe(projectData)
     })
 

@@ -24,7 +24,13 @@ vi.mock('../helpers/project-utils.js', () => ({
   buildFinancialYearLabel: vi.fn(),
   formatFileSize: vi.fn(),
   getProjectStateTag: vi.fn(),
-  isConfidenceRestrictedProjectType: vi.fn()
+  isConfidenceRestrictedProjectType: vi.fn(),
+  buildProcessedFundingValues: vi.fn().mockReturnValue([]),
+  computeFundingSourceTotals: vi.fn().mockReturnValue({
+    sourceTotals: {},
+    yearTotals: [],
+    grandTotal: 0
+  })
 }))
 
 vi.mock('../helpers/overview/data-enrichment.js')

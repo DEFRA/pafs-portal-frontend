@@ -1,0 +1,88 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}{{ t(localKeyPrefix + '.title') }}{% endblock %}
+
+{% block body %}
+
+  {# Build error list for summary #}
+  {% if fieldErrors %}
+    {% set errorList = [] %}
+    {% for i in range(0, contributors.length) %}
+      {% set key = 'contributors[' + i + ']' %}
+      {% if fieldErrors[key] %}
+        {% set errorList = errorList.concat([{
+          text: fieldErrors[key],
+          href: '#contributor-' + i
+        }]) %}
+      {% endif %}
+    {% endfor %}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 class="govuk-fieldset__heading">{{ t(localKeyPrefix + '.heading') }}</h1>
+      </legend>
+      {% if t(localKeyPrefix + '.hint') and t(localKeyPrefix + '.hint') !== 'na' %}
+        <p class="govuk-hint">{{ t(localKeyPrefix + '.hint') }}</p>
+      {% endif %}
+
+    {% for i in range(0, contributors.length) %}
+      {% set key = 'contributors[' + i + ']' %}
+      {% set inputError = false %}
+      {% if fieldErrors and fieldErrors[key] %}
+        {% set inputError = { text: fieldErrors[key] } %}
+      {% endif %}
+
+      <div class="govuk-form-group{% if inputError %} govuk-form-group--error{% endif %}">
+        <label class="govuk-label govuk-label--s" for="contributor-{{ i }}">
+          {{ t('projects.funding_sources.contributors.contributor') }}{{ i + 1 }}
+        </label>
+        {% if inputError %}
+          <p class="govuk-error-message" id="contributor-{{ i }}-error">
+            <span class="govuk-visually-hidden">Error:</span> {{ inputError.text }}
+          </p>
+        {% endif %}
+        <input
+          class="govuk-input govuk-input--width-20{% if inputError %} govuk-input--error{% endif %}"
+          id="contributor-{{ i }}"
+          name="contributors[{{ i }}]"
+          type="text"
+          value="{{ contributors[i] or '' }}"
+          {% if inputError %}aria-describedby="contributor-{{ i }}-error"{% endif %}
+        >
+        {% if contributors.length > 1 %}
+          <a href="{{ deleteRoute.replace('{referenceNumber}', referenceNumber) }}/{{ i }}" class="govuk-link govuk-!-font-size-19 govuk-!-margin-left-2">
+            {{ t('common.remove') }} <span class="govuk-visually-hidden">{{ t('projects.funding_sources.contributors.contributor') }}{{ i + 1 }}</span>
+          </a>
+        {% endif %}
+      </div>
+    {% endfor %}
+    </fieldset>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('common.buttons.save_and_continue'),
+        name: 'action',
+        value: 'continue'
+      }) }}
+      {{ govukButton({
+        text: t('projects.funding_sources.contributors.add_contributor_button'),
+        classes: 'govuk-button--secondary',
+        name: 'action',
+        value: 'add'
+      }) }}
+    </div>
+  </form>
+{% endblock %}
