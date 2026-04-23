@@ -442,7 +442,7 @@
       "description": "These are properties that are at risk today",
       "no_properties_checkbox": "My project does not benefit any properties at risk of flooding",
       "errors": {
-        "invalid_value": "Enter the number of properties affected by flooding"
+        "invalid_value": "Please enter a whole number up to 18 digits (0 allowed)"
       },
       "table": {
         "maintaining_existing": "Maintaining flood protection",
@@ -461,7 +461,7 @@
       "description": "These are properties that are at risk today.",
       "no_properties_checkbox": "My project does not benefit any properties at risk of coastal erosion",
       "errors": {
-        "invalid_value": "Enter the number of properties affected by coastal erosion"
+        "invalid_value": "Please enter a whole number up to 18 digits (0 allowed)"
       },
       "table": {
         "maintaining_existing": "Maintaining coastal erosion protection",
@@ -473,18 +473,18 @@
     "twenty_percent_deprived": {
       "title": "Properties in 20% most deprived areas",
       "heading": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
-      "hint": "Enter a number between 0 and 100",
+      "hint": "Enter a whole number between 1 and 100",
       "errors": {
-        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places",
+        "invalid": "Please enter a whole number between 1 to 100.",
         "required": "Enter the percentage of properties benefitting in the 20% most deprived areas"
       }
     },
     "forty_percent_deprived": {
       "title": "Properties in 40% most deprived areas",
       "heading": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
-      "hint": "Enter a number between 0 and 100",
+      "hint": "Enter a whole number between 1 and 100",
       "errors": {
-        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places",
+        "invalid": "Please enter a whole number between 1 to 100.",
         "required": "Enter the percentage of properties benefitting in the 40% most deprived areas"
       }
     },
@@ -557,6 +557,15 @@
       "volume": {
         "label": "Design storage volume",
         "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "leaky_barriers": {
@@ -570,6 +579,19 @@
       },
       "width": {
         "label": "Typical width"
+      },
+      "errors": {
+        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "length_required": "Enter the length in km",
+        "length_invalid": "Length must be a number greater than 0",
+        "length_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "length_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "width_required": "Enter the breadth in m",
+        "width_invalid": "Width must be a number greater than 0",
+        "width_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "width_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "offline_storage": {
@@ -580,6 +602,15 @@
       "volume": {
         "label": "Design storage volume",
         "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "woodland": {
@@ -588,6 +619,12 @@
         "label": "Area",
         "hint": "Enter the area in hectares",
         "suffix": "hectares"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "headwater_drainage": {
@@ -596,6 +633,12 @@
         "label": "Area",
         "hint": "Enter the area in hectares",
         "suffix": "hectares"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "runoff_management": {
@@ -606,6 +649,15 @@
       "volume": {
         "label": "Design storage volume",
         "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "saltmarsh": {
@@ -616,6 +668,16 @@
       "length": {
         "label": "Length",
         "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "length_required": "Enter the length in km",
+        "length_invalid": "Length must be a number greater than 0",
+        "length_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "length_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "sand_dune": {
@@ -626,6 +688,16 @@
       "length": {
         "label": "Length",
         "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "length_required": "Enter the length in km",
+        "length_invalid": "Length must be a number greater than 0",
+        "length_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "length_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "land_use_change": {
@@ -657,7 +729,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "enclosed_livestock_farmland": {
@@ -672,7 +745,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "enclosed_dairying_farmland": {
@@ -687,7 +761,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "semi_natural_grassland": {
@@ -702,7 +777,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "woodland": {
@@ -717,7 +793,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "mountain_moors_and_heath": {
@@ -732,7 +809,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "peatland_restoration": {
@@ -747,7 +825,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "rivers_wetlands_freshwater_habitats": {
@@ -762,7 +841,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "coastal_margins": {
@@ -777,7 +857,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       }
     },
@@ -1057,10 +1138,11 @@
       "heading": "How many hectares of intertidal wetland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "woodland": {
@@ -1084,10 +1166,11 @@
       "heading": "How many hectares of woodland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "wet_woodland": {
@@ -1111,10 +1194,11 @@
       "heading": "How many hectares of wet woodlands habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "wetland_or_wet_grassland": {
@@ -1138,10 +1222,11 @@
       "heading": "How many hectares of wetland or wet grassland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "grassland": {
@@ -1165,10 +1250,11 @@
       "heading": "How many hectares of grassland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "heathland": {
@@ -1192,10 +1278,11 @@
       "heading": "How many hectares of heathland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "ponds_lakes": {
@@ -1221,8 +1308,9 @@
       "validation": {
         "required": "You must include the number of hectares your project will create.",
         "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "arable_land": {
@@ -1248,8 +1336,9 @@
       "validation": {
         "required": "You must include the number of hectares your project will create.",
         "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "comprehensive_restoration": {
@@ -1273,10 +1362,11 @@
       "heading": "How many kilometres of comprehensive river restoration will be enhanced or created?",
       "suffix": "km",
       "validation": {
-        "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must enter a valid number for kilometres.",
-        "min": "The number of kilometres must be greater than 0.",
-        "precision": "The number of kilometres must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "partial_restoration": {
@@ -1300,10 +1390,11 @@
       "heading": "How many kilometres of partial restoration will be enhanced or created?",
       "suffix": "km",
       "validation": {
-        "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must enter a valid number for kilometres.",
-        "min": "The number of kilometres must be greater than 0.",
-        "precision": "The number of kilometres must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "create_habitat_watercourse": {
@@ -1327,10 +1418,11 @@
       "heading": "How many kilometres of single major physical improvement the project will be enhanced or created?",
       "suffix": "km",
       "validation": {
-        "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must enter a valid number for kilometres.",
-        "min": "The number of kilometres must be greater than 0.",
-        "precision": "The number of kilometres must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "footer": {
@@ -1386,9 +1478,9 @@
       "if_known": "if known"
     },
     "errors": {
-      "required": "Please enter the value",
-      "invalid": "Enter a whole number with no decimal point or currency symbols",
-      "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+      "required": "Please enter a whole number up to 18 digits (0 allowed)",
+      "invalid": "Please enter a whole number up to 18 digits (0 allowed)",
+      "max_digits": "Please enter a whole number up to 18 digits (0 allowed)"
     }
   },
   "whole_life_benefits": {
@@ -1404,9 +1496,13 @@
       "estimated_land_value_uplift_benefits_header": "What are the estimated land value uplift benefits (if known)?"
     },
     "errors": {
-      "required": "Please enter the value",
-      "invalid": "Enter a whole number with no decimal point or currency symbols",
-      "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+      "required": "Please enter a whole number up to 18 digits (0 allowed)",
+      "invalid": "Please enter a whole number up to 18 digits (0 allowed)",
+      "max_digits": "Please enter a whole number up to 18 digits (0 allowed)"
+    },
+    "validation_messages": {
+      "ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+      "ENVIRONMENTAL_BENEFITS_QUANTITY_WHOLE_NUMBER_PRECISION": "For non decimal values, Please enter a whole number up to 18 digits."
     }
   },
   "carbon_required_information": {

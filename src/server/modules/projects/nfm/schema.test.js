@@ -239,6 +239,33 @@ describe('NFM Measure Schemas', () => {
 
     expect(result.error).toBeUndefined()
   })
+
+  test('rejects area value in scientific notation (fails internal regex)', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: '1e5'
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
+  })
+
+  test('rejects area whole number exceeding 18 digits (number.integer.max)', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: '9'.repeat(19)
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.integer.max')
+  })
+
+  test('rejects area with more than 16 digits before the decimal point (number.precision)', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: '1'.repeat(17) + '.5'
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
+  })
 })
 
 describe('NFM Land-use Schemas', () => {
@@ -278,9 +305,7 @@ describe('NFM Land-use Schemas', () => {
 
     expect(result.error).toBeDefined()
     expect(result.error.details[0].type).toBe('number.precision')
-    expect(result.error.details[0].message).toBe(
-      'Area must have up to 2 decimal places'
-    )
+    expect(result.error.details[0].message).toBe('precision')
   })
 
   test('shows required messages when before and after are blank', () => {
@@ -296,10 +321,10 @@ describe('NFM Land-use Schemas', () => {
     expect(result.error.details).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          message: 'Enter the area before natural flood measures'
+          message: 'required_before'
         }),
         expect.objectContaining({
-          message: 'Enter the area after natural flood measures'
+          message: 'required_after'
         })
       ])
     )
@@ -312,9 +337,7 @@ describe('NFM Land-use Schemas', () => {
     })
 
     expect(nonNumericResult.error).toBeDefined()
-    expect(nonNumericResult.error.details[0].message).toBe(
-      'Area must be a number greater than or equal to 0'
-    )
+    expect(nonNumericResult.error.details[0].message).toBe('invalid')
 
     const negativeResult = nfmLandUseEnclosedArableFarmlandSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE]: -1,
@@ -322,9 +345,7 @@ describe('NFM Land-use Schemas', () => {
     })
 
     expect(negativeResult.error).toBeDefined()
-    expect(negativeResult.error.details[0].message).toBe(
-      'Area must be a number greater than or equal to 0'
-    )
+    expect(negativeResult.error.details[0].message).toBe('invalid')
   })
 })
 

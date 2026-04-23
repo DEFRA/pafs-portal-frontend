@@ -81,12 +81,17 @@ function convertEmptyToNull(value) {
 }
 
 /**
- * Parse string to float if value exists
- * @param {*} value - Value to parse
- * @returns {number|null} Parsed float or null
+ * Keep value as a decimal string to preserve full numeric precision.
+ * Converts empty string to null. Does NOT coerce to float, so large decimal
+ * values (e.g. 16 digits before decimal) are stored precisely by Prisma Decimal.
+ * @param {*} value - Value to keep
+ * @returns {string|null} Original string value or null
  */
-function parseToFloat(value) {
-  return value ? Number.parseFloat(value) : value
+function keepAsDecimalString(value) {
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+  return String(value)
 }
 
 /**
@@ -285,10 +290,10 @@ function processRiverRestoration(payload) {
   payload.nfmRiverRestorationVolume = convertEmptyToNull(
     payload.nfmRiverRestorationVolume
   )
-  payload.nfmRiverRestorationArea = parseToFloat(
+  payload.nfmRiverRestorationArea = keepAsDecimalString(
     payload.nfmRiverRestorationArea
   )
-  payload.nfmRiverRestorationVolume = parseToFloat(
+  payload.nfmRiverRestorationVolume = keepAsDecimalString(
     payload.nfmRiverRestorationVolume
   )
 }
@@ -301,9 +306,15 @@ function processLeakyBarriers(payload) {
   payload.nfmLeakyBarriersVolume = convertEmptyToNull(
     payload.nfmLeakyBarriersVolume
   )
-  payload.nfmLeakyBarriersVolume = parseToFloat(payload.nfmLeakyBarriersVolume)
-  payload.nfmLeakyBarriersLength = parseToFloat(payload.nfmLeakyBarriersLength)
-  payload.nfmLeakyBarriersWidth = parseToFloat(payload.nfmLeakyBarriersWidth)
+  payload.nfmLeakyBarriersVolume = keepAsDecimalString(
+    payload.nfmLeakyBarriersVolume
+  )
+  payload.nfmLeakyBarriersLength = keepAsDecimalString(
+    payload.nfmLeakyBarriersLength
+  )
+  payload.nfmLeakyBarriersWidth = keepAsDecimalString(
+    payload.nfmLeakyBarriersWidth
+  )
 }
 
 /**
@@ -314,8 +325,10 @@ function processOfflineStorage(payload) {
   payload.nfmOfflineStorageVolume = convertEmptyToNull(
     payload.nfmOfflineStorageVolume
   )
-  payload.nfmOfflineStorageArea = parseToFloat(payload.nfmOfflineStorageArea)
-  payload.nfmOfflineStorageVolume = parseToFloat(
+  payload.nfmOfflineStorageArea = keepAsDecimalString(
+    payload.nfmOfflineStorageArea
+  )
+  payload.nfmOfflineStorageVolume = keepAsDecimalString(
     payload.nfmOfflineStorageVolume
   )
 }
@@ -325,7 +338,7 @@ function processOfflineStorage(payload) {
  * @param {Object} payload - Request payload
  */
 function processWoodland(payload) {
-  payload.nfmWoodlandArea = parseToFloat(payload.nfmWoodlandArea)
+  payload.nfmWoodlandArea = keepAsDecimalString(payload.nfmWoodlandArea)
 }
 
 /**
@@ -336,10 +349,10 @@ function processRunoffManagement(payload) {
   payload.nfmRunoffManagementVolume = convertEmptyToNull(
     payload.nfmRunoffManagementVolume
   )
-  payload.nfmRunoffManagementArea = parseToFloat(
+  payload.nfmRunoffManagementArea = keepAsDecimalString(
     payload.nfmRunoffManagementArea
   )
-  payload.nfmRunoffManagementVolume = parseToFloat(
+  payload.nfmRunoffManagementVolume = keepAsDecimalString(
     payload.nfmRunoffManagementVolume
   )
 }
@@ -350,8 +363,8 @@ function processRunoffManagement(payload) {
  */
 function processSaltmarsh(payload) {
   payload.nfmSaltmarshLength = convertEmptyToNull(payload.nfmSaltmarshLength)
-  payload.nfmSaltmarshArea = parseToFloat(payload.nfmSaltmarshArea)
-  payload.nfmSaltmarshLength = parseToFloat(payload.nfmSaltmarshLength)
+  payload.nfmSaltmarshArea = keepAsDecimalString(payload.nfmSaltmarshArea)
+  payload.nfmSaltmarshLength = keepAsDecimalString(payload.nfmSaltmarshLength)
 }
 
 /**
@@ -360,8 +373,8 @@ function processSaltmarsh(payload) {
  */
 function processSandDune(payload) {
   payload.nfmSandDuneLength = convertEmptyToNull(payload.nfmSandDuneLength)
-  payload.nfmSandDuneArea = parseToFloat(payload.nfmSandDuneArea)
-  payload.nfmSandDuneLength = parseToFloat(payload.nfmSandDuneLength)
+  payload.nfmSandDuneArea = keepAsDecimalString(payload.nfmSandDuneArea)
+  payload.nfmSandDuneLength = keepAsDecimalString(payload.nfmSandDuneLength)
 }
 
 /**
@@ -375,8 +388,8 @@ function processLandUseDetailData(payload, step) {
   if (!config) {
     return
   }
-  payload[config.beforeField] = parseToFloat(payload[config.beforeField])
-  payload[config.afterField] = parseToFloat(payload[config.afterField])
+  payload[config.beforeField] = keepAsDecimalString(payload[config.beforeField])
+  payload[config.afterField] = keepAsDecimalString(payload[config.afterField])
 }
 
 /**

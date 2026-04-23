@@ -24,12 +24,15 @@ export const ALL_CARBON_FIELDS = [
 ]
 
 const MAX_EMISSION_DIGITS = 16
+const MAX_WHOLE_NUMBER_DIGITS = 18
 const MAX_COST_DIGITS = 18
 const DECIMAL_REGEX = /^\d+(\.\d{1,2})?$/
 const INTEGER_REGEX = /^\d+$/
 
 const CARBON_EMISSION_INVALID_ERROR =
   'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
+const CARBON_EMISSION_WHOLE_NUMBER_ERROR =
+  'For non decimal values, Please enter a whole number up to 18 digits.'
 const CARBON_COST_INVALID_ERROR =
   'Please enter a whole number with no more than 18 digits.'
 const CARBON_OPERATIONAL_COST_FORECAST_REQUIRED_ERROR =
@@ -39,8 +42,14 @@ const validateCarbonDecimal = (value, helpers) => {
   if (!DECIMAL_REGEX.test(value)) {
     return helpers.error('string.pattern.base')
   }
-  const intPart = value.split('.')[0]
-  if (intPart.length > MAX_EMISSION_DIGITS) {
+  const [intPart, decPart] = value.split('.')
+  if (decPart === undefined) {
+    // Whole number: max 18 digits
+    if (intPart.length > MAX_WHOLE_NUMBER_DIGITS) {
+      return helpers.error('string.whole_number_max')
+    }
+  } else if (intPart.length > MAX_EMISSION_DIGITS) {
+    // Decimal: max 16 digits before decimal point
     return helpers.error('string.max')
   }
   return value
@@ -69,7 +78,8 @@ const optionalDecimalField = Joi.string()
   .messages({
     'string.base': CARBON_EMISSION_INVALID_ERROR,
     'string.pattern.base': CARBON_EMISSION_INVALID_ERROR,
-    'string.max': CARBON_EMISSION_INVALID_ERROR
+    'string.max': CARBON_EMISSION_INVALID_ERROR,
+    'string.whole_number_max': CARBON_EMISSION_WHOLE_NUMBER_ERROR
   })
 
 const optionalIntegerField = Joi.string()
@@ -124,7 +134,8 @@ const optionalDecimalFieldNegativeCheck = Joi.string()
     'string.base': CARBON_EMISSION_INVALID_ERROR,
     'string.negative': CARBON_NEGATIVE_ERROR,
     'string.pattern.base': CARBON_EMISSION_INVALID_ERROR,
-    'string.max': CARBON_EMISSION_INVALID_ERROR
+    'string.max': CARBON_EMISSION_INVALID_ERROR,
+    'string.whole_number_max': CARBON_EMISSION_WHOLE_NUMBER_ERROR
   })
 
 /**

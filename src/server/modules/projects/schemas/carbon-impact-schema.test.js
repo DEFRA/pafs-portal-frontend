@@ -153,6 +153,21 @@ describe('carbon-impact-schema', () => {
       )
     })
 
+    test('rejects whole numbers exceeding 18 digits with specific message', () => {
+      const payload = {
+        ...validPayload,
+        [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '1'.repeat(19)
+      }
+
+      const { error } = carbonImpactSchema.validate(payload, {
+        abortEarly: false
+      })
+      expect(error).toBeDefined()
+      expect(error.details[0].message).toBe(
+        'For non decimal values, Please enter a whole number up to 18 digits.'
+      )
+    })
+
     test('rejects non-integer values in integer fields', () => {
       const payload = {
         ...validPayload,

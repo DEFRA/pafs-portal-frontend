@@ -27,11 +27,7 @@ const validateWlcCostString = (value, helpers) => {
   return value
 }
 
-const WLC_REQUIRED_FIELD_ERROR = 'Please enter the value'
-const WLC_INVALID_FIELD_ERROR =
-  'Enter a whole number with no decimal point or currency symbols'
-const WLC_MAX_DIGITS_ERROR =
-  'You have exceeded the maximum number of digits allowed. Please re-enter.'
+const WLC_MESSAGE = 'Please enter a whole number up to 18 digits (0 allowed)'
 
 /**
  * A single WLC cost field schema (required variant).
@@ -43,10 +39,10 @@ const requiredCostField = Joi.string()
   .required()
   .custom(validateWlcCostString)
   .messages({
-    'string.base': WLC_INVALID_FIELD_ERROR,
-    'string.pattern.base': WLC_INVALID_FIELD_ERROR,
-    'string.max': WLC_MAX_DIGITS_ERROR,
-    'any.required': WLC_REQUIRED_FIELD_ERROR
+    'string.base': WLC_MESSAGE,
+    'string.pattern.base': WLC_MESSAGE,
+    'string.max': WLC_MESSAGE,
+    'any.required': WLC_MESSAGE
   })
 
 /**
@@ -64,9 +60,9 @@ const optionalCostField = Joi.string()
     return validateWlcCostString(value, helpers)
   })
   .messages({
-    'string.base': WLC_INVALID_FIELD_ERROR,
-    'string.pattern.base': WLC_INVALID_FIELD_ERROR,
-    'string.max': WLC_MAX_DIGITS_ERROR
+    'string.base': WLC_MESSAGE,
+    'string.pattern.base': WLC_MESSAGE,
+    'string.max': WLC_MESSAGE
   })
 
 const buildSchema = (fieldSchema) =>
