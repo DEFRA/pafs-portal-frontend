@@ -22,7 +22,9 @@ import {
   buildFinancialYearLabel,
   formatFileSize,
   getProjectStateTag,
-  isConfidenceRestrictedProjectType
+  isConfidenceRestrictedProjectType,
+  buildProcessedFundingValues,
+  computeFundingSourceTotals
 } from '../helpers/project-utils.js'
 import { getBenefitAreaDownloadData } from '../helpers/overview/benefit-area.js'
 import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
@@ -98,6 +100,16 @@ class OverviewController {
     ])
 
     viewData.projectData = enrichmentResult.projectData
+
+    if (viewData.projectData) {
+      viewData.projectData.processedFundingValues = buildProcessedFundingValues(
+        enrichmentResult.projectData
+      )
+      viewData.projectData.fundingSourceTotals = computeFundingSourceTotals(
+        viewData.projectData.processedFundingValues,
+        viewData.projectData
+      )
+    }
 
     return this._handleOverviewResponse(request, h, {
       viewData,

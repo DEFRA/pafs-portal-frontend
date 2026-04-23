@@ -84,7 +84,22 @@ export const PROJECT_VIEWS = {
   CARBON_OPERATIONAL_COST_FORECAST:
     'modules/projects/carbon-impact/carbon-operational-cost-forecast',
   CARBON_SUMMARY: 'modules/projects/carbon-impact/carbon-impact-summary',
-  CARBON_IMPACT_ASSESSMENT: 'modules/projects/carbon-impact/carbon-impact'
+  CARBON_IMPACT_ASSESSMENT: 'modules/projects/carbon-impact/carbon-impact',
+  FUNDING_SOURCES: 'modules/projects/funding-sources/index',
+  FUNDING_SOURCES_ADDITIONAL:
+    'modules/projects/funding-sources/additional-sources',
+  FUNDING_SOURCES_PUBLIC_CONTRIBUTORS:
+    'modules/projects/funding-sources/contributors',
+  FUNDING_SOURCES_PRIVATE_CONTRIBUTORS:
+    'modules/projects/funding-sources/contributors',
+  FUNDING_SOURCES_OTHER_EA_CONTRIBUTORS:
+    'modules/projects/funding-sources/contributors',
+  FUNDING_SOURCES_CONTRIBUTOR_DELETE:
+    'modules/projects/funding-sources/delete-contributor',
+  FUNDING_SOURCES_ESTIMATED_SPEND:
+    'modules/projects/funding-sources/estimated-spend',
+  FUNDING_SOURCES_MISSING_FINANCIAL_YEARS:
+    'modules/projects/funding-sources/missing-financial-years'
 }
 
 export const GENERAL_VIEWS = {

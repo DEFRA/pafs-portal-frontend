@@ -212,17 +212,29 @@ export function initializeEditSession(request, projectData) {
     projectData.pafs_core_nfm_land_use_changes
   )
 
+  const additionalFcermGiaSelected = [
+    PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE,
+    PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING,
+    PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES,
+    PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID,
+    PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT,
+    PROJECT_PAYLOAD_FIELDS.RECOVERY,
+    PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND
+  ].some((field) => projectData?.[field] === true)
+
   const sessionData = {
     ...projectData,
     ...nfmFields, // Merge the mapped NFM fields
     ...nfmLandUseFields,
+    additionalFcermGia: additionalFcermGiaSelected,
     journeyStarted: true,
     isEdit: true,
     referenceNumber: projectData.referenceNumber,
     originalData: {
       ...projectData,
       ...nfmFields, // Store mapped NFM fields in originalData too
-      ...nfmLandUseFields
+      ...nfmLandUseFields,
+      additionalFcermGia: additionalFcermGiaSelected
     }
   }
 

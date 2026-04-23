@@ -106,7 +106,7 @@
 
   {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate, isReadOnly) }}
 
-  {{ fundingSourcesAndSpendingSummaryCard(projectData, t, isReadOnly) }}
+  {{ fundingSourcesAndSpendingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) }}
 
   {{ riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t, isReadOnly) }}
 

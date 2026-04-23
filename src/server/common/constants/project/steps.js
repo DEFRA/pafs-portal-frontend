@@ -108,7 +108,14 @@ export const PROJECT_STEPS = {
   CARBON_SAVINGS_NET_ECONOMIC_BENEFIT: 'carbon-savings-net-economic-benefit',
   CARBON_OPERATIONAL_COST_FORECAST: 'carbon-operational-cost-forecast',
   CARBON_SUMMARY: 'carbon-summary',
-  CARBON_IMPACT_ASSESSMENT: 'carbon-impact-assessment'
+  CARBON_IMPACT_ASSESSMENT: 'carbon-impact-assessment',
+  FUNDING_SOURCES: 'funding-sources',
+  FUNDING_SOURCES_ADDITIONAL: 'funding-sources-additional',
+  FUNDING_SOURCES_PUBLIC_CONTRIBUTORS: 'funding-sources-public-contributors',
+  FUNDING_SOURCES_PRIVATE_CONTRIBUTORS: 'funding-sources-private-contributors',
+  FUNDING_SOURCES_OTHER_EA_CONTRIBUTORS:
+    'funding-sources-other-ea-contributors',
+  FUNDING_SOURCES_ESTIMATED_SPEND: 'funding-sources-estimated-spend'
 }
 
 export const REFERENCE_NUMBER_PARAM = '{referenceNumber}'
