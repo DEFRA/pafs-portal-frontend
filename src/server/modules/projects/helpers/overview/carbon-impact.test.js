@@ -1,15 +1,12 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { getCarbonImpactOverviewData } from './carbon-impact.js'
 import { PROJECT_PAYLOAD_FIELDS } from '../../../../common/constants/projects.js'
-import { getAuthSession } from '../../../../common/helpers/auth/session-manager.js'
-import { getCarbonImpactCalc } from '../../../../common/services/project/project-service.js'
 import { updateSessionData } from '../project-utils.js'
 
-vi.mock('../../../../common/helpers/auth/session-manager.js')
-vi.mock('../../../../common/services/project/project-service.js')
 vi.mock('../project-utils.js')
 
-const mockCalcData = {
+// Shape returned by the backend inside the project overview response
+const mockCarbonCalc = {
   capitalCarbonBaseline: 200,
   capitalCarbonTarget: 180,
   operationalCarbonBaseline: 50,
@@ -36,8 +33,6 @@ describe('getCarbonImpactOverviewData', () => {
       server: { logger: { error: vi.fn() } }
     }
 
-    getAuthSession.mockReturnValue({ accessToken: 'test-token' })
-    getCarbonImpactCalc.mockResolvedValue({ success: false })
     updateSessionData.mockImplementation(() => {})
 
     baseProjectData = {
@@ -51,89 +46,22 @@ describe('getCarbonImpactOverviewData', () => {
     }
   })
 
-  test('returns success without calling API when all carbon fields are null', async () => {
+  test('returns success without enriching when all carbon fields are null', async () => {
     const result = await getCarbonImpactOverviewData(
       mockRequest,
       baseProjectData
     )
 
-    expect(getCarbonImpactCalc).not.toHaveBeenCalled()
+    expect(updateSessionData).not.toHaveBeenCalled()
     expect(result).toEqual({ success: true, projectData: baseProjectData })
   })
 
-  test('calls getCarbonImpactCalc when carbon_cost_build is populated', async () => {
+  test('returns enriched projectData with carbonCalc when carbonCalc is present in projectData', async () => {
     const projectData = {
       ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0'
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0',
+      carbonCalc: mockCarbonCalc
     }
-
-    await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(getCarbonImpactCalc).toHaveBeenCalledWith('ABC-001', 'test-token')
-  })
-
-  test('calls getCarbonImpactCalc when carbon_cost_operation is populated', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION]: '30.0'
-    }
-
-    await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(getCarbonImpactCalc).toHaveBeenCalledTimes(1)
-  })
-
-  test('calls getCarbonImpactCalc when carbon_cost_sequestered is populated', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED]: '5.0'
-    }
-
-    await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(getCarbonImpactCalc).toHaveBeenCalledTimes(1)
-  })
-
-  test('calls getCarbonImpactCalc when carbon_cost_avoided is populated', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: '2.5'
-    }
-
-    await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(getCarbonImpactCalc).toHaveBeenCalledTimes(1)
-  })
-
-  test('calls getCarbonImpactCalc when carbon_savings_net_economic_benefit is populated', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: '200000'
-    }
-
-    await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(getCarbonImpactCalc).toHaveBeenCalledTimes(1)
-  })
-
-  test('calls getCarbonImpactCalc when carbon_operational_cost_forecast is populated', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: '150000'
-    }
-
-    await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(getCarbonImpactCalc).toHaveBeenCalledTimes(1)
-  })
-
-  test('returns enriched projectData with carbonCalc on API success', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0'
-    }
-
-    getCarbonImpactCalc.mockResolvedValue({ success: true, data: mockCalcData })
 
     const result = await getCarbonImpactOverviewData(mockRequest, projectData)
 
@@ -152,13 +80,12 @@ describe('getCarbonImpactOverviewData', () => {
     })
   })
 
-  test('calls updateSessionData with enriched data on API success', async () => {
+  test('calls updateSessionData with enriched data when carbonCalc is present', async () => {
     const projectData = {
       ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0'
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0',
+      carbonCalc: mockCarbonCalc
     }
-
-    getCarbonImpactCalc.mockResolvedValue({ success: true, data: mockCalcData })
 
     await getCarbonImpactOverviewData(mockRequest, projectData)
 
@@ -171,13 +98,9 @@ describe('getCarbonImpactOverviewData', () => {
   test('sets allCarbonValuesPresent to false when carbonCostOperation is null', async () => {
     const projectData = {
       ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0'
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0',
+      carbonCalc: { ...mockCarbonCalc, carbonCostOperation: null }
     }
-
-    getCarbonImpactCalc.mockResolvedValue({
-      success: true,
-      data: { ...mockCalcData, carbonCostOperation: null }
-    })
 
     const result = await getCarbonImpactOverviewData(mockRequest, projectData)
 
@@ -187,13 +110,9 @@ describe('getCarbonImpactOverviewData', () => {
   test('sets allCarbonValuesPresent to false when carbonCostSequestered is null', async () => {
     const projectData = {
       ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0'
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0',
+      carbonCalc: { ...mockCarbonCalc, carbonCostSequestered: null }
     }
-
-    getCarbonImpactCalc.mockResolvedValue({
-      success: true,
-      data: { ...mockCalcData, carbonCostSequestered: null }
-    })
 
     const result = await getCarbonImpactOverviewData(mockRequest, projectData)
 
@@ -203,42 +122,33 @@ describe('getCarbonImpactOverviewData', () => {
   test('sets allCarbonValuesPresent to false when carbonCostAvoided is null', async () => {
     const projectData = {
       ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0'
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0',
+      carbonCalc: { ...mockCarbonCalc, carbonCostAvoided: null }
     }
-
-    getCarbonImpactCalc.mockResolvedValue({
-      success: true,
-      data: { ...mockCalcData, carbonCostAvoided: null }
-    })
 
     const result = await getCarbonImpactOverviewData(mockRequest, projectData)
 
     expect(result.projectData.carbonCalc.allCarbonValuesPresent).toBe(false)
   })
 
-  test('sets hasValuesChanged to true when API reports drift', async () => {
+  test('sets hasValuesChanged to true when backend reports drift', async () => {
     const projectData = {
       ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '50.0'
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '50.0',
+      carbonCalc: { ...mockCarbonCalc, hasValuesChanged: true }
     }
-
-    getCarbonImpactCalc.mockResolvedValue({
-      success: true,
-      data: { ...mockCalcData, hasValuesChanged: true }
-    })
 
     const result = await getCarbonImpactOverviewData(mockRequest, projectData)
 
     expect(result.projectData.carbonCalc.hasValuesChanged).toBe(true)
   })
 
-  test('returns unchanged projectData when API returns success=false', async () => {
+  test('returns unchanged projectData when carbon fields are present but carbonCalc is absent', async () => {
     const projectData = {
       ...baseProjectData,
       [PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION]: '50.0'
+      // no carbonCalc — backend calculation may have failed
     }
-
-    getCarbonImpactCalc.mockResolvedValue({ success: false })
 
     const result = await getCarbonImpactOverviewData(mockRequest, projectData)
 
@@ -246,98 +156,87 @@ describe('getCarbonImpactOverviewData', () => {
     expect(updateSessionData).not.toHaveBeenCalled()
   })
 
-  test('returns unchanged projectData when API returns success=true but data is null', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED]: '5.0'
-    }
-
-    getCarbonImpactCalc.mockResolvedValue({ success: true, data: null })
-
-    const result = await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(result).toEqual({ success: true, projectData })
-    expect(updateSessionData).not.toHaveBeenCalled()
-  })
-
-  test('returns success and original projectData when API throws an error', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: '3.0'
-    }
-
-    getCarbonImpactCalc.mockRejectedValue(new Error('Network timeout'))
-
-    const result = await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(result).toEqual({ success: true, projectData })
-  })
-
-  test('logs error when API throws', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '100.0'
-    }
-
-    getCarbonImpactCalc.mockRejectedValue(new Error('Connection refused'))
-
-    await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(mockRequest.server.logger.error).toHaveBeenCalled()
-  })
-
-  test('uses empty string for accessToken when authSession is null', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '10.0'
-    }
-
-    getAuthSession.mockReturnValue(null)
-    getCarbonImpactCalc.mockResolvedValue({ success: false })
-
-    await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(getCarbonImpactCalc).toHaveBeenCalledWith('ABC-001', '')
-  })
-
-  test('uses empty string for accessToken when authSession has no accessToken property', async () => {
-    const projectData = {
-      ...baseProjectData,
-      [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: '200000'
-    }
-
-    getAuthSession.mockReturnValue({})
-    getCarbonImpactCalc.mockResolvedValue({ success: false })
-
-    await getCarbonImpactOverviewData(mockRequest, projectData)
-
-    expect(getCarbonImpactCalc).toHaveBeenCalledWith('ABC-001', '')
-  })
-
-  test('does not call updateSessionData when API returns no data', async () => {
+  test('does not call updateSessionData when carbonCalc is absent', async () => {
     const projectData = {
       ...baseProjectData,
       [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: '99000'
     }
 
-    getCarbonImpactCalc.mockResolvedValue({ success: false })
-
     await getCarbonImpactOverviewData(mockRequest, projectData)
 
     expect(updateSessionData).not.toHaveBeenCalled()
   })
 
-  test('returns projectData with carbonCalc that includes original projectData fields', async () => {
+  test('preserves other projectData fields when enriching with carbonCalc', async () => {
     const projectData = {
       ...baseProjectData,
       [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '10.0',
-      someOtherField: 'keep-me'
+      someOtherField: 'keep-me',
+      carbonCalc: mockCarbonCalc
     }
-
-    getCarbonImpactCalc.mockResolvedValue({ success: true, data: mockCalcData })
 
     const result = await getCarbonImpactOverviewData(mockRequest, projectData)
 
     expect(result.projectData.someOtherField).toBe('keep-me')
+  })
+
+  test('enriches when carbon_cost_operation field is populated', async () => {
+    const projectData = {
+      ...baseProjectData,
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION]: '30.0',
+      carbonCalc: mockCarbonCalc
+    }
+
+    const result = await getCarbonImpactOverviewData(mockRequest, projectData)
+
+    expect(result.projectData.carbonCalc).toBeDefined()
+  })
+
+  test('enriches when carbon_cost_sequestered field is populated', async () => {
+    const projectData = {
+      ...baseProjectData,
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED]: '5.0',
+      carbonCalc: mockCarbonCalc
+    }
+
+    const result = await getCarbonImpactOverviewData(mockRequest, projectData)
+
+    expect(result.projectData.carbonCalc).toBeDefined()
+  })
+
+  test('enriches when carbon_cost_avoided field is populated', async () => {
+    const projectData = {
+      ...baseProjectData,
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: '2.5',
+      carbonCalc: mockCarbonCalc
+    }
+
+    const result = await getCarbonImpactOverviewData(mockRequest, projectData)
+
+    expect(result.projectData.carbonCalc).toBeDefined()
+  })
+
+  test('enriches when carbon_savings_net_economic_benefit field is populated', async () => {
+    const projectData = {
+      ...baseProjectData,
+      [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: '200000',
+      carbonCalc: mockCarbonCalc
+    }
+
+    const result = await getCarbonImpactOverviewData(mockRequest, projectData)
+
+    expect(result.projectData.carbonCalc).toBeDefined()
+  })
+
+  test('enriches when carbon_operational_cost_forecast field is populated', async () => {
+    const projectData = {
+      ...baseProjectData,
+      [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: '150000',
+      carbonCalc: mockCarbonCalc
+    }
+
+    const result = await getCarbonImpactOverviewData(mockRequest, projectData)
+
+    expect(result.projectData.carbonCalc).toBeDefined()
   })
 })
