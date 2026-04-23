@@ -95,15 +95,16 @@ class OverviewController {
     })
 
     const enrichmentResult = await enrichProjectData(request, projectData, [
-      getBenefitAreaDownloadData,
-      getCarbonImpactOverviewData
+      getBenefitAreaDownloadData
     ])
 
-    viewData.projectData = enrichmentResult.projectData
+    const carbonResult = await getCarbonImpactOverviewData(request, projectData)
+
+    viewData.projectData = carbonResult.projectData
 
     if (viewData.projectData) {
       viewData.projectData.processedFundingValues = buildProcessedFundingValues(
-        enrichmentResult.projectData
+        viewData.projectData
       )
       viewData.projectData.fundingSourceTotals = computeFundingSourceTotals(
         viewData.projectData.processedFundingValues,
@@ -113,7 +114,7 @@ class OverviewController {
 
     return this._handleOverviewResponse(request, h, {
       viewData,
-      success: enrichmentResult.success,
+      success: enrichmentResult.success && carbonResult.success,
       error: enrichmentResult.error
     })
   }
