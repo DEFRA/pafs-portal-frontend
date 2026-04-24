@@ -1,0 +1,91 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+{% block pageTitle %}
+  {{ t(localKeyPrefix + '.title') }}
+{% endblock %}
+
+{% block body %}
+  {% if fieldErrors %}
+    {% set errorList = [] %}
+    {% for field, error in fieldErrors %}
+      {% set errorList = errorList.concat([{ text: error, href: '#' + field }]) %}
+    {% endfor %}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.heading') }}</h1>
+
+    <p class="govuk-body">{{ t(localKeyPrefix + '.intro_1') }}</p>
+
+    {% if hasIntroLink %}
+      <p class="govuk-body">
+        {{ t(localKeyPrefix + '.intro_2_prefix') }}
+        <a
+          href="https://www.gov.uk/government/publications/valuing-the-carbon-net-impacts-of-fcerm-projects"
+          class="govuk-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >{{ t(localKeyPrefix + '.intro_2_link_text') }}</a>.
+        {% if hasIntroLinkSuffix %}
+          {{ t(localKeyPrefix + '.intro_2_suffix') }}
+        {% endif %}
+      </p>
+    {% else %}
+      <p class="govuk-body">{{ t(localKeyPrefix + '.intro_2') }}</p>
+    {% endif %}
+
+    {% if introCount >= 3 %}
+      <p class="govuk-body">{{ t(localKeyPrefix + '.intro_3') }}</p>
+    {% endif %}
+
+    {% if inputType === 'prefix' %}
+      {{ govukInput({
+        label: { text: t(localKeyPrefix + '.label') },
+        id: fieldName,
+        name: fieldName,
+        value: formData[fieldName] if formData[fieldName] is not none else '',
+        inputmode: "numeric",
+        classes: "govuk-input--width-10",
+        prefix: { text: "£" },
+        errorMessage: { text: fieldErrors[fieldName] } if fieldErrors and fieldErrors[fieldName] else undefined
+      }) }}
+    {% else %}
+      {{ govukInput({
+        label: { text: t(localKeyPrefix + '.label') },
+        id: fieldName,
+        name: fieldName,
+        value: formData[fieldName] if formData[fieldName] is not none else '',
+        inputmode: "decimal",
+        classes: "govuk-input--width-10",
+        suffix: { text: t(localKeyPrefix + '.suffix') },
+        errorMessage: { text: fieldErrors[fieldName] } if fieldErrors and fieldErrors[fieldName] else undefined
+      }) }}
+    {% endif %}
+
+    <p class="govuk-body">{{ t(localKeyPrefix + '.after_1') }}</p>
+
+    {% if afterCount >= 2 %}
+      <p class="govuk-body">{{ t(localKeyPrefix + '.after_2') }}</p>
+    {% endif %}
+
+    {% if afterCount >= 3 %}
+      <p class="govuk-body">{{ t(localKeyPrefix + '.after_3') }}</p>
+    {% endif %}
+
+    <div class="govuk-button-group">
+      {{ govukButton({ text: t('common.buttons.save_and_continue') }) }}
+    </div>
+  </form>
+{% endblock %}

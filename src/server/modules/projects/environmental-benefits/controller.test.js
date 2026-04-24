@@ -544,7 +544,8 @@ describe('EnvironmentalBenefitsController', () => {
       expect(updateSessionData).toHaveBeenCalledWith(
         mockRequest,
         expect.objectContaining({
-          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]: 15.75
+          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]:
+            '15.75'
         })
       )
     })
@@ -695,7 +696,8 @@ describe('EnvironmentalBenefitsController', () => {
         ].schema.validate
       ).toHaveBeenCalledWith(
         expect.objectContaining({
-          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]: 12.5,
+          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]:
+            '12.5',
           [PROJECT_PAYLOAD_FIELDS.INTERTIDAL_HABITAT]: true
         }),
         expect.any(Object)
@@ -812,7 +814,7 @@ describe('EnvironmentalBenefitsController', () => {
       )
     })
 
-    test('should convert zero string to number for input fields', async () => {
+    test('should keep zero string as string for input fields', async () => {
       getProjectStep.mockReturnValue(
         PROJECT_STEPS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED
       )
@@ -841,7 +843,8 @@ describe('EnvironmentalBenefitsController', () => {
       expect(updateSessionData).toHaveBeenCalledWith(
         mockRequest,
         expect.objectContaining({
-          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]: 0
+          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]:
+            '0'
         })
       )
     })
@@ -878,6 +881,14 @@ describe('EnvironmentalBenefitsController', () => {
         'ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION'
       )
       expect(result).toBe('precision')
+    })
+
+    test('should return "whole_number_precision" for QUANTITY_WHOLE_NUMBER_PRECISION error code', () => {
+      const controller = new EnvironmentalBenefitsController()
+      const result = controller._getValidationMessageKey(
+        'ENVIRONMENTAL_BENEFITS_QUANTITY_WHOLE_NUMBER_PRECISION'
+      )
+      expect(result).toBe('whole_number_precision')
     })
 
     test('should return "required" as default for unknown error code', () => {
@@ -1200,7 +1211,8 @@ describe('EnvironmentalBenefitsController', () => {
       expect(updateSessionData).toHaveBeenCalledWith(
         mockRequest,
         expect.objectContaining({
-          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED]: 10.25
+          [PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED]:
+            '10.25'
         })
       )
 

@@ -244,8 +244,8 @@ class EnvironmentalBenefitsController {
       }
     }
 
-    // Convert input values to number for quantity fields
-    // Return undefined for empty/missing values so Joi's required() fires instead of number.base
+    // For input fields, keep as string - Joi schema handles conversion internally
+    // Return undefined for empty/missing values so Joi's required() fires instead of string.base
     if (fieldType === 'input') {
       if (
         fieldValue === '' ||
@@ -254,7 +254,8 @@ class EnvironmentalBenefitsController {
       ) {
         return undefined
       }
-      return Number(fieldValue)
+      // Keep as string - our Joi schema does string validation and internal conversion
+      return String(fieldValue)
     }
 
     return fieldValue
@@ -338,6 +339,9 @@ class EnvironmentalBenefitsController {
     }
     if (errorCode?.includes('QUANTITY_MIN')) {
       return 'min'
+    }
+    if (errorCode?.includes('QUANTITY_WHOLE_NUMBER_PRECISION')) {
+      return 'whole_number_precision'
     }
     if (errorCode?.includes('QUANTITY_PRECISION')) {
       return 'precision'

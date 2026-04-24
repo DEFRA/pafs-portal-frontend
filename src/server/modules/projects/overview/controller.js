@@ -27,6 +27,7 @@ import {
   buildProcessedFundingValues,
   computeFundingSourceTotals
 } from '../helpers/project-utils.js'
+import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
 
 class OverviewController {
   _getProjectViewData(request, options = {}) {
@@ -78,6 +79,10 @@ class OverviewController {
       backLink,
       projectData
     })
+
+    const carbonResult = await getCarbonImpactOverviewData(request, projectData)
+
+    viewData.projectData = carbonResult.projectData
 
     if (viewData.projectData) {
       viewData.projectData.processedFundingValues = buildProcessedFundingValues(

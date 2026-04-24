@@ -163,9 +163,9 @@
       "title": "Whole life cost",
       "not_added": "No whole life cost information added yet",
       "whole_life_pv_costs": "Estimated whole life present value costs for appraisal",
-      "design_construction_costs": "Estimated design and construction costs",
-      "risk_contingency_costs": "Estimated risk contingency costs",
-      "future_costs": "Estimated future costs"
+      "design_construction_costs": "Estimated whole life present value costs for design and construction",
+      "risk_contingency_costs": "Estimated whole life present value costs for risk contingency",
+      "future_costs": "Estimated whole life present value costs for future costs"
     },
     "wlb_summary_card": {
       "title": "Whole life benefits",
@@ -176,6 +176,28 @@
       "estimated_environmental_benefits": "Estimated environmental benefits",
       "estimated_recreation_tourism_benefits": "Estimated recreation and tourism benefits",
       "estimated_land_value_uplift_benefits": "Estimated land value uplift and regeneration benefits"
+    },
+    "carbon_impact_summary_card": {
+      "title": "Carbon impact",
+      "not_added": "No carbon impact information added yet",
+      "values_changed": "Calculated values have changed since the section was last completed.",
+      "capital_heading": "Capital",
+      "capital_estimated": "Capital carbon estimated by you (tCO2)",
+      "capital_baseline": "Calculated capital carbon baseline (tCO2)",
+      "capital_target": "Calculated capital carbon target (tCO2)",
+      "capital_cost": "Capital cost calculated for the project",
+      "operational_heading": "Operations and maintenance",
+      "operational_estimated": "Operations and maintenance carbon estimated by you (tCO2)",
+      "operational_baseline": "Calculated operations and maintenance carbon baseline (tCO2)",
+      "operational_target": "Calculated operations and maintenance carbon target (tCO2)",
+      "operational_cost": "Operations and maintenance cost estimated by you",
+      "sequestered_carbon": "Sequestered carbon estimated by you (tCO2)",
+      "avoided_carbon": "Carbon avoided estimated by you (tCO2)",
+      "net_carbon": "Net carbon estimated by you (tCO2)",
+      "net_carbon_with_blanks": "Net carbon with blank values calculated (tCO2)",
+      "net_carbon_economic_benefit": "Net carbon economic benefit estimated by you",
+      "not_provided": "Not provided",
+      "units": "tonnes"
     },
     "funding_sources_summary_card": {
       "title": "Funding sources and spending",
@@ -446,7 +468,7 @@
       "description": "These are properties that are at risk today",
       "no_properties_checkbox": "My project does not benefit any properties at risk of flooding",
       "errors": {
-        "invalid_value": "Enter the number of properties affected by flooding"
+        "invalid_value": "Please enter a whole number up to 18 digits (0 allowed)"
       },
       "table": {
         "maintaining_existing": "Maintaining flood protection",
@@ -465,7 +487,7 @@
       "description": "These are properties that are at risk today.",
       "no_properties_checkbox": "My project does not benefit any properties at risk of coastal erosion",
       "errors": {
-        "invalid_value": "Enter the number of properties affected by coastal erosion"
+        "invalid_value": "Please enter a whole number up to 18 digits (0 allowed)"
       },
       "table": {
         "maintaining_existing": "Maintaining coastal erosion protection",
@@ -477,18 +499,18 @@
     "twenty_percent_deprived": {
       "title": "Properties in 20% most deprived areas",
       "heading": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
-      "hint": "Enter a number between 0 and 100",
+      "hint": "Enter a whole number between 1 and 100",
       "errors": {
-        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places",
+        "invalid": "Please enter a whole number between 1 to 100.",
         "required": "Enter the percentage of properties benefitting in the 20% most deprived areas"
       }
     },
     "forty_percent_deprived": {
       "title": "Properties in 40% most deprived areas",
       "heading": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
-      "hint": "Enter a number between 0 and 100",
+      "hint": "Enter a whole number between 1 and 100",
       "errors": {
-        "invalid": "Enter a valid number between 0 and 100 with at most 2 decimal places",
+        "invalid": "Please enter a whole number between 1 to 100.",
         "required": "Enter the percentage of properties benefitting in the 40% most deprived areas"
       }
     },
@@ -561,6 +583,15 @@
       "volume": {
         "label": "Design storage volume",
         "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "leaky_barriers": {
@@ -574,6 +605,19 @@
       },
       "width": {
         "label": "Typical width"
+      },
+      "errors": {
+        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "length_required": "Enter the length in km",
+        "length_invalid": "Length must be a number greater than 0",
+        "length_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "length_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "width_required": "Enter the breadth in m",
+        "width_invalid": "Width must be a number greater than 0",
+        "width_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "width_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "offline_storage": {
@@ -584,6 +628,15 @@
       "volume": {
         "label": "Design storage volume",
         "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "woodland": {
@@ -592,6 +645,12 @@
         "label": "Area",
         "hint": "Enter the area in hectares",
         "suffix": "hectares"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "headwater_drainage": {
@@ -600,6 +659,12 @@
         "label": "Area",
         "hint": "Enter the area in hectares",
         "suffix": "hectares"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "runoff_management": {
@@ -610,6 +675,15 @@
       "volume": {
         "label": "Design storage volume",
         "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "saltmarsh": {
@@ -620,6 +694,16 @@
       "length": {
         "label": "Length",
         "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "length_required": "Enter the length in km",
+        "length_invalid": "Length must be a number greater than 0",
+        "length_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "length_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "sand_dune": {
@@ -630,6 +714,16 @@
       "length": {
         "label": "Length",
         "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "length_required": "Enter the length in km",
+        "length_invalid": "Length must be a number greater than 0",
+        "length_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "length_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "land_use_change": {
@@ -661,7 +755,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "enclosed_livestock_farmland": {
@@ -676,7 +771,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "enclosed_dairying_farmland": {
@@ -691,7 +787,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "semi_natural_grassland": {
@@ -706,7 +803,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "woodland": {
@@ -721,7 +819,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "mountain_moors_and_heath": {
@@ -736,7 +835,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "peatland_restoration": {
@@ -751,7 +851,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "rivers_wetlands_freshwater_habitats": {
@@ -766,7 +867,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
       "coastal_margins": {
@@ -781,7 +883,8 @@
           "required_before": "Enter the area before natural flood measures",
           "required_after": "Enter the area after natural flood measures",
           "invalid": "Area must be a number greater than or equal to 0",
-          "precision": "Area must have up to 2 decimal places"
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       }
     },
@@ -1061,10 +1164,11 @@
       "heading": "How many hectares of intertidal wetland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "woodland": {
@@ -1088,10 +1192,11 @@
       "heading": "How many hectares of woodland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "wet_woodland": {
@@ -1115,10 +1220,11 @@
       "heading": "How many hectares of wet woodlands habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "wetland_or_wet_grassland": {
@@ -1142,10 +1248,11 @@
       "heading": "How many hectares of wetland or wet grassland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "grassland": {
@@ -1169,10 +1276,11 @@
       "heading": "How many hectares of grassland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "heathland": {
@@ -1196,10 +1304,11 @@
       "heading": "How many hectares of heathland habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "ponds_lakes": {
@@ -1225,8 +1334,9 @@
       "validation": {
         "required": "You must include the number of hectares your project will create.",
         "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "arable_land": {
@@ -1252,8 +1362,9 @@
       "validation": {
         "required": "You must include the number of hectares your project will create.",
         "invalid": "You must enter a valid number for hectares.",
-        "min": "The number of hectares must be greater than 0.",
-        "precision": "The number of hectares must have no more than 2 decimal places."
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "comprehensive_restoration": {
@@ -1277,10 +1388,11 @@
       "heading": "How many kilometres of comprehensive river restoration will be enhanced or created?",
       "suffix": "km",
       "validation": {
-        "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must enter a valid number for kilometres.",
-        "min": "The number of kilometres must be greater than 0.",
-        "precision": "The number of kilometres must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "partial_restoration": {
@@ -1304,10 +1416,11 @@
       "heading": "How many kilometres of partial restoration will be enhanced or created?",
       "suffix": "km",
       "validation": {
-        "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must enter a valid number for kilometres.",
-        "min": "The number of kilometres must be greater than 0.",
-        "precision": "The number of kilometres must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "create_habitat_watercourse": {
@@ -1331,10 +1444,11 @@
       "heading": "How many kilometres of single major physical improvement the project will be enhanced or created?",
       "suffix": "km",
       "validation": {
-        "required": "You must include the number of kilometres your project will create.",
-        "invalid": "You must enter a valid number for kilometres.",
-        "min": "The number of kilometres must be greater than 0.",
-        "precision": "The number of kilometres must have no more than 2 decimal places."
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "footer": {
@@ -1387,7 +1501,7 @@
   "whole_life_cost": {
     "title": "What are the estimated costs of your project?",
     "heading": "What are the estimated costs of your project?",
-    "hint": "Enter a whole-number amount in pounds sterling (e.g. 1500)",
+    "hint": "Please enter a whole-number amount in pounds sterling (e.g. 1500)",
     "table": {
       "whole_life_pv_header": "What are the estimated whole life present value costs for appraisal ?",
       "design_construction_header": "What are the estimated whole life present value costs for design and construction ?",
@@ -1396,15 +1510,15 @@
       "if_known": "if known"
     },
     "errors": {
-      "required": "Please enter the value",
-      "invalid": "Enter a whole number with no decimal point or currency symbols",
-      "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+      "required": "Please enter a whole number up to 18 digits (0 allowed)",
+      "invalid": "Please enter a whole number up to 18 digits (0 allowed)",
+      "max_digits": "Please enter a whole number up to 18 digits (0 allowed)"
     }
   },
   "whole_life_benefits": {
     "title": "Whole life benefits",
     "heading": "What are the estimated whole life benefits of your project?",
-    "hint": "Enter a whole-number amount in pounds sterling (e.g. 1500)",
+    "hint": "Please enter a whole-number amount in pounds sterling (e.g. 1500)",
     "table": {
       "estimated_whole_life_benefits_header": "What are the estimated whole life present value benefits?",
       "estimated_whole_life_benefits_header_optional": "What are the estimated whole life present value benefits (if known)?",
@@ -1414,10 +1528,157 @@
       "estimated_land_value_uplift_benefits_header": "What are the estimated land value uplift and regeneration benefits (if known)?"
     },
     "errors": {
-      "required": "Please enter the value",
-      "invalid": "Enter a whole number with no decimal point or currency symbols",
-      "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
+      "required": "Please enter a whole number up to 18 digits (0 allowed)",
+      "invalid": "Please enter a whole number up to 18 digits (0 allowed)",
+      "max_digits": "Please enter a whole number up to 18 digits (0 allowed)"
+    },
+    "validation_messages": {
+      "ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+      "ENVIRONMENTAL_BENEFITS_QUANTITY_WHOLE_NUMBER_PRECISION": "For non decimal values, Please enter a whole number up to 18 digits."
     }
+  },
+  "carbon_required_information": {
+    "title": "Information we require before you can complete the carbon impact section",
+    "heading": "Information we require before you can complete the carbon impact section",
+    "content": {
+      "intro": "To complete the Carbon impact section, we need other sections to be completed first so that we can calculate carbon baseline and carbon target figures:",
+      "important_dates": "Important dates: We use this to estimate the years of construction.",
+      "funding_sources": "Funding sources and spending: We use this to estimate the capital cost of the proposed project, based on spending profiled between ‘Start of construction’ and ‘Ready for service’.",
+      "continue_message": "Select Save and continue to return to the proposal overview and complete the relevant sections."
+    }
+  },
+  "carbon_prepare": {
+    "title": "What to record about your carbon impact",
+    "heading": "What to record about your carbon impact",
+    "content": {
+      "intro": "Carbon impact data, alongside whole‑life costs and benefits, helps to scope and prioritise projects in the pipeline. For subsequent business cases, Carbon impact data is a mandatory requirement.",
+      "guidance_link_text": "Guidance on how to calculate Carbon impact and the use of a supporting tool",
+      "guidance_url": "https://www.gov.uk/government/publications/valuing-the-carbon-net-impacts-of-fcerm-projects",
+      "comprises_label": "Carbon impact data comprises:",
+      "item_1": "Emissions from both the capital and operational stages of the whole-life investment.",
+      "item_2": "Emissions avoided as a result of reduced flood risk and impacts to properties over the whole-life investment as well as from any solutions that sequester carbon.",
+      "item_3": "A net calculation of emissions 1) minus 2) in tonnes CO2e over the whole-life investment period and monetised as an economic benefit for use in the Partnership funding calculator.",
+      "item_4": "An estimated cost for all operation and maintenance activities over the whole-life investment period, to help calculate a carbon baseline and target for these activities."
+    }
+  },
+  "carbon_cost_build": {
+    "title": "How much capital carbon will this project produce?",
+    "heading": "How much capital carbon will this project produce?",
+    "label": "Capital emissions",
+    "intro_1": "Capital emissions are the project carbon impact from the works that build or refurbish assets. They are calculated from quantities of resource used in building or refurbishing assets.",
+    "intro_2": "To provide capital emissions for the Carbon impact data requires a supporting Carbon assessment and is a mandatory requirement for subsequent business cases. The quantities of resource used in building or refurbishing assets will be calculated into tonnes of CO2e in a Carbon assessment. Enter the total recorded ‘capital emissions’ Carbon impact here.",
+    "intro_3": "The EA is able to provide a supporting Carbon assessment tool (ERIC). Alternative carbon assessment tools should have up to date industry emission rates for resources used such as material, plant and transport.",
+    "suffix": "metric tonnes",
+    "after_1": "If you do not have an estimate from a carbon assessment this total must be left blank.",
+    "after_2": "If there is no construction element to this proposed project then you must enter 0. Any calculations and reporting will use 0."
+  },
+  "carbon_cost_operation": {
+    "title": "How much operational carbon will this project produce?",
+    "heading": "How much operational carbon will this project produce?",
+    "label": "Operational emissions",
+    "intro_1": "Operational emissions are from the operation and maintenance of assets over their lifetime that have been built or refurbished by the project. They are calculated alongside capital emissions for the project works from quantities of resources used to operate and maintain assets.",
+    "intro_2": "The quantities of resource used in operation and maintenance of assets will be calculated into tonnes of CO2e in a Carbon assessment. Enter the total recorded ‘operational emissions’ Carbon impact here.",
+    "intro_3": "Any Carbon assessment tool used should be able to calculate emissions for industry standard ‘Life cycle assessment’ (LCA) stages in which all non-capital stages comprise the ‘operational emissions’ Carbon impact.",
+    "suffix": "metric tonnes",
+    "after_1": "If you do not have an estimate from a carbon assessment this total must be left blank.",
+    "after_2": "If there is no operation and maintenance element to this proposed project then you must enter 0. Any calculations and reporting will use 0.",
+    "after_3": "Operational emissions are recorded in metric tonnes and should align with the same carbon assessment assumptions used for the rest of the project."
+  },
+  "carbon_cost_sequestered": {
+    "title": "How much carbon will be sequestered by this project?",
+    "heading": "How much carbon will be sequestered by this project?",
+    "label": "Sequestered emissions",
+    "intro_1": "Sequestered emissions are from any part of the delivered solution that removes and stores carbon from being emitted over the lifetime of the assets that have been built or refurbished by the project.",
+    "intro_2": "They are calculated alongside capital and operational emissions for the project works from quantities of natural assets or technologies that have measurable carbon sequestration rates and have been delivered additionally to what was already in place.",
+    "intro_3": "The quantities of natural assets or technologies and their sequestration rates will be calculated into tonnes of CO2e in a Carbon Assessment. Enter the total recorded ‘sequestered emissions’ Carbon impact here. Any Carbon assessment tool used should be able to calculate sequestered emissions for accredited forms of natural asset or technology-based removals of emissions.",
+    "suffix": "metric tonnes",
+    "after_1": "If you do not have an estimate from a carbon assessment this total must be left blank. Any calculations will use 0 metric tonnes."
+  },
+  "carbon_cost_avoided": {
+    "title": "How much carbon will be avoided by this project?",
+    "heading": "How much carbon will be avoided by this project?",
+    "label": "Avoided emissions",
+    "intro_1": "Avoided emissions are as a result of the level of reduced flood risk and impacts to properties over the whole-life investment.",
+    "intro_2_prefix": "They are calculated using the",
+    "intro_2_link_text": "FCRM Appraisal guide to Carbon impact valuation and supporting tool (opens in a new window)",
+    "intro_3": "For Carbon impact data this total will be profiled over the duration of the asset lifetime. Enter the total recorded ‘avoided emissions’ Carbon impact here.",
+    "suffix": "metric tonnes",
+    "after_1": "If you do not have an estimate from a Carbon impact tool this total must be left blank. Any calculations will use 0 metric tonnes."
+  },
+  "carbon_savings_net_economic_benefit": {
+    "title": "How much net economic benefit is generated from any net carbon savings?",
+    "heading": "How much net economic benefit is generated from any net carbon savings?",
+    "label": "Net economic benefit",
+    "intro_1": "The economic benefit of the Carbon impact should be provided from a monetisation of the net emissions in tonnes CO2.",
+    "intro_2_prefix": "This must be calculated using the",
+    "intro_2_link_text": "FCRM Appraisal guide to Carbon impact valuation and supporting tool (opens in a new window)",
+    "intro_2_suffix": "This includes the use of carbon prices and discounting over the investment period.",
+    "intro_3": "The resulting economic benefit value should be used to consider the carbon impact of project options in appraisal.",
+    "after_1": "If you do not have an estimate from a Carbon impact tool this total must be left blank."
+  },
+  "carbon_operational_cost_forecast": {
+    "title": "How much Operation and Maintenance cost is forecast for the project?",
+    "heading": "How much Operation and Maintenance cost is forecast for the project?",
+    "label": "Operation and Maintenance cost forecast",
+    "intro_1": "The Operation and Maintenance cost is the forecast cost for all operation, maintenance, refurbishment and decommissioning (where required) over the whole-life investment period as used in the appraisal and carbon impact calculations.",
+    "intro_2": "It should be provided in 'todays prices', in other words, at the current price base. It must not be discounted to a present value or inflated for future cost increases. This allows the baseline calculation to be established from current carbon intensity factors.",
+    "after_1": "If there is no operations or maintenance element to this proposed project then you must enter 0. Any calculations and reporting will use 0."
+  },
+  "carbon_whole_life_carbon": {
+    "title": "Whole life carbon",
+    "heading": "This is the whole life carbon calculated for the project",
+    "description": "A whole life calculation of carbon impact is provided for the project from emissions added as 'capital' and 'operational' carbon in tonnes CO2e over the whole-life investment period.",
+    "build_label": "Capital carbon (build)",
+    "operation_label": "Operational carbon",
+    "total_label": "Whole life carbon",
+    "suffix": "metric tonnes"
+  },
+  "carbon_net_carbon": {
+    "title": "Net carbon",
+    "heading": "This is the net carbon calculated for the project",
+    "description": "A net calculation of Carbon impact is provided for the project from emissions added as ‘capital’ and ‘operational’ carbon, minus ‘sequestered’ and ‘avoided’ carbon in tonnes CO2e over the whole-life investment period.",
+    "whole_life_label": "Whole life carbon",
+    "sequestered_label": "Carbon sequestered",
+    "avoided_label": "Carbon avoided",
+    "net_label": "Net carbon",
+    "suffix": "metric tonnes"
+  },
+  "carbon_impact_summary": {
+    "title": "Carbon impact summary",
+    "heading": "Summary of your data",
+    "summary_of_input_data": "Summary of your input data",
+    "build_label": "Capitol carbon(build)",
+    "operation_label": "Operational carbon",
+    "whole_life_label": "Whole life carbon",
+    "sequestered_label": "Carbon sequestered",
+    "avoided_label": "Carbon avoided",
+    "net_label": "Net carbon",
+    "benefit_label": "Net carbon savings economic benefit",
+    "forecast_label": "Operation and maintenance cost forcast",
+    "capital_cost_estimate": "Estimated capital cost",
+    "capital_cost_estimate_hint": "The sum of spending in the years between the start of construction date and ready for service date.",
+    "capital_cost_label": "Capital cost estimate",
+    "units": "tonnes"
+  },
+  "carbon_impact": {
+    "title": "Carbon impact assessment",
+    "heading": "What we have calculated about your Carbon Impact",
+    "lede_1": "The EA maintain historic carbon data for programmes that enable a common baseline value of emissions per unit of cost in 2020 to be calculated for every project that enables the 'capital' and 'operational' Carbon Impact data to be compared against.",
+    "lede_2": "The EA also maintain a carbon reduction target for the programme in line with Government Net Zero Carbon commitments that is calculated for every project and its dates of construction that enables the 'capital' and 'operational' Carbon Impact data to be compared against.",
+    "lede_3": "Based on data provided in your proposal, we have calculated a baseline and target for comparison against any 'capital' and 'operational' carbon values you have provided.",
+    "lede_4": "Any subsequent changes you make to data in other sections used to calculate these values may result in a change which can be viewed on the Proposal overview page before submission.",
+    "capital_carbon_heading": "Capital carbon",
+    "capital_carbon_estimated": "Capital carbon estimated by you",
+    "capital_carbon_baseline": "Calculated capital carbon baseline",
+    "capital_carbon_target": "Calculated capital carbon target",
+    "operational_carbon_heading": "Operations and maintenance carbon",
+    "operational_carbon_estimated": "Operations and maintenance carbon estimated by you",
+    "operational_carbon_baseline": "Calculated operations and maintenance carbon baseline",
+    "operational_carbon_target": "Calculated operations and maintenance carbon target",
+    "net_carbon_heading": "Net carbon",
+    "net_carbon_estimated": "Net carbon estimated by you",
+    "net_carbon_with_blanks": "Net carbon with blank values calculated",
+    "units": "tonnes"
   },
   "funding_sources": {
     "funding_sources_selection": {

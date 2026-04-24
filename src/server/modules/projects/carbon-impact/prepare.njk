@@ -1,0 +1,37 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}
+  {{ t(localKeyPrefix + '.title') }}
+{% endblock %}
+
+{% block body %}
+  <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.heading') }}</h1>
+
+  <p class="govuk-body">{{ t(localKeyPrefix + '.content.intro') }}</p>
+  <p class="govuk-body">
+    <a
+      class="govuk-link"
+      href="{{ t(localKeyPrefix + '.content.guidance_url') }}"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {{ t(localKeyPrefix + '.content.guidance_link_text') }}
+    </a>
+    (opens in a new window)
+  </p>
+
+  <p class="govuk-body govuk-!-margin-bottom-1">{{ t(localKeyPrefix + '.content.comprises_label') }}</p>
+  <ol class="govuk-list govuk-list--number">
+    <li>{{ t(localKeyPrefix + '.content.item_1') }}</li>
+    <li>{{ t(localKeyPrefix + '.content.item_2') }}</li>
+    <li>{{ t(localKeyPrefix + '.content.item_3') }}</li>
+    <li>{{ t(localKeyPrefix + '.content.item_4') }}</li>
+  </ol>
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+    {{ govukButton({ text: t('common.buttons.continue') }) }}
+  </form>
+{% endblock %}

@@ -14,6 +14,7 @@ import {
 } from '../helpers/project-utils.js'
 
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
+import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
 
 // Mock dependencies
 vi.mock('../../../common/helpers/auth/session-manager.js', () => ({
@@ -36,6 +37,8 @@ vi.mock('../helpers/project-utils.js', () => ({
     grandTotal: 0
   })
 }))
+
+vi.mock('../helpers/overview/carbon-impact.js')
 
 describe('OverviewController', () => {
   let mockRequest
@@ -74,6 +77,13 @@ describe('OverviewController', () => {
       name: 'Test Project',
       projectState: PROJECT_STATUS.DRAFT
     })
+
+    getCarbonImpactOverviewData.mockImplementation(
+      async (_req, projectData) => ({
+        success: true,
+        projectData
+      })
+    )
   })
 
   describe('get', () => {
