@@ -152,7 +152,7 @@ class FinancialYearController {
     if (step === PROJECT_STEPS.FINANCIAL_START_YEAR) {
       return isEditMode
         ? ROUTES.PROJECT.EDIT.FINANCIAL_START_YEAR_MANUAL.replace(
-            '{referenceNumber}',
+            REFERENCE_NUMBER_PARAM,
             request.params.referenceNumber
           )
         : ROUTES.PROJECT.FINANCIAL_START_YEAR_MANUAL
@@ -160,7 +160,7 @@ class FinancialYearController {
     if (step === PROJECT_STEPS.FINANCIAL_END_YEAR) {
       return isEditMode
         ? ROUTES.PROJECT.EDIT.FINANCIAL_END_YEAR_MANUAL.replace(
-            '{referenceNumber}',
+            REFERENCE_NUMBER_PARAM,
             request.params.referenceNumber
           )
         : ROUTES.PROJECT.FINANCIAL_END_YEAR_MANUAL

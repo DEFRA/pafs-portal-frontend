@@ -162,6 +162,37 @@ export function stripEmptyContributorEntries(row) {
 }
 
 /**
+ * Check whether a contributor entry has a non-empty amount.
+ * @private
+ */
+function isContributorEntryPopulated(item) {
+  if (!item || typeof item !== 'object') {
+    return false
+  }
+  const amt = typeof item.amount === 'string' ? item.amount.trim() : ''
+  return amt !== ''
+}
+
+/**
+ * Filter a single contributor array, keeping only entries with non-empty
+ * amounts and returning a mapping from kept indices to original indices.
+ * @private
+ */
+function filterContributorArray(arr) {
+  const kept = []
+  const mapping = []
+
+  for (let i = 0; i < arr.length; i++) {
+    if (isContributorEntryPopulated(arr[i])) {
+      mapping.push(i)
+      kept.push(arr[i])
+    }
+  }
+
+  return { kept, mapping }
+}
+
+/**
  * Like {@link stripEmptyContributorEntries} but also returns a mapping from
  * stripped (post-filter) indices back to the original (pre-filter) indices.
  * This is needed so that Joi validation errors (which reference the stripped
@@ -186,21 +217,7 @@ export function stripEmptyContributorEntriesWithMapping(inputRow) {
       continue
     }
 
-    const kept = []
-    const mapping = []
-
-    for (let i = 0; i < arr.length; i++) {
-      const item = arr[i]
-      if (!item || typeof item !== 'object') {
-        continue
-      }
-      const amt = typeof item.amount === 'string' ? item.amount.trim() : ''
-      if (amt !== '') {
-        mapping.push(i)
-        kept.push(item)
-      }
-    }
-
+    const { kept, mapping } = filterContributorArray(arr)
     indexMaps[key] = mapping
 
     if (kept.length === 0) {

@@ -359,6 +359,61 @@ function checkContributorCoverage(sessionData, fundingValues) {
 }
 
 /**
+ * Auto-computed contributor total fields whose individual errors should be
+ * suppressed because the contributor-level error already covers them.
+ * @private
+ */
+const AUTO_COMPUTED_SOURCE_FIELDS = new Set([
+  'publicContributions',
+  'privateContributions',
+  'otherEaContributions'
+])
+
+/**
+ * Map contributor array fields back to their source amount fields.
+ * @private
+ */
+const ARRAY_TO_SOURCE = {
+  publicContributors: 'publicContributions',
+  privateContributors: 'privateContributions',
+  otherEaContributors: 'otherEaContributions'
+}
+
+/** Expected path length for contributor errors: [yearIndex, arrayField, idx, 'amount'] */
+const CONTRIBUTOR_ERROR_PATH_LENGTH = 4
+
+/**
+ * Classify a source-field error (path = [yearIndex, fieldName]).
+ * @private
+ */
+function classifySourceFieldError(path, msgSuffix) {
+  if (AUTO_COMPUTED_SOURCE_FIELDS.has(path[1])) {
+    return null
+  }
+  return { kind: 'field', fieldKey: `${path[1]}-${path[0]}`, msgSuffix }
+}
+
+/**
+ * Classify a contributor error (path = [yearIndex, arrayField, idx, 'amount']).
+ * @private
+ */
+function classifyContributorError(path, msgSuffix, contributorIndexMaps) {
+  const yearIndex = path[0]
+  const arrayField = path[1]
+  const strippedIdx = path[2]
+  const sourceField = ARRAY_TO_SOURCE[arrayField] || arrayField
+
+  const originalIdx =
+    contributorIndexMaps[yearIndex]?.[arrayField]?.[strippedIdx] ?? strippedIdx
+
+  return {
+    kind: 'field',
+    fieldKey: `${sourceField}-${originalIdx}-${yearIndex}`,
+    msgSuffix
+  }
+}
+
+/**
  * Build field-level and global errors from Joi validation output and
  * contributor coverage check.
  * @private
@@ -374,59 +429,20 @@ function classifyValidationDetail(detail, contributorIndexMaps = []) {
 
   const msgSuffix = detail.type === 'string.max' ? 'max_digits' : 'invalid'
 
-  // Source field error: path = [yearIndex, fieldName]
-  // Build a year-specific key like "fcermGia-0" so only the individual input
-  // is highlighted rather than the entire row.
-  // Skip errors on auto-computed contributor total fields — the contributor-
-  // level error already covers them and showing both would duplicate the
-  // message in the error summary.
   if (path.length === 2 && typeof path[0] === 'number') {
-    const AUTO_COMPUTED_SOURCE_FIELDS = new Set([
-      'publicContributions',
-      'privateContributions',
-      'otherEaContributions'
-    ])
-    if (AUTO_COMPUTED_SOURCE_FIELDS.has(path[1])) {
-      return null
-    }
-    const fieldKey = `${path[1]}-${path[0]}`
-    return { kind: 'field', fieldKey, msgSuffix }
+    return classifySourceFieldError(path, msgSuffix)
   }
 
-  // Contributor error: path = [yearIndex, contributorArrayField, contributorIndex, 'amount']
-  // Map the array field back to its source field for the template id pattern:
-  // "sourceField-contributorIndex-yearIndex"
-  // The contributorIndex from Joi refers to the stripped array (empty entries
-  // removed).  Translate it back to the original index using the mapping built
-  // during stripping so the correct input is highlighted in the template.
-  if (path.length === 4 && path[3] === 'amount') {
-    const ARRAY_TO_SOURCE = {
-      publicContributors: 'publicContributions',
-      privateContributors: 'privateContributions',
-      otherEaContributors: 'otherEaContributions'
-    }
-    const yearIndex = path[0]
-    const arrayField = path[1]
-    const strippedIdx = path[2]
-    const sourceField = ARRAY_TO_SOURCE[arrayField] || arrayField
-
-    // Look up the original (pre-strip) contributor index
-    const yearMaps = contributorIndexMaps[yearIndex]
-    const originalIdx =
-      yearMaps && yearMaps[arrayField]
-        ? (yearMaps[arrayField][strippedIdx] ?? strippedIdx)
-        : strippedIdx
-
-    const fieldKey = `${sourceField}-${originalIdx}-${yearIndex}`
-    return { kind: 'field', fieldKey, msgSuffix }
+  if (path.length === CONTRIBUTOR_ERROR_PATH_LENGTH && path[3] === 'amount') {
+    return classifyContributorError(path, msgSuffix, contributorIndexMaps)
   }
 
-  const fieldKey = path[path.length - 1]
-  if (!fieldKey) {
+  const lastSegment = path[path.length - 1]
+  if (!lastSegment) {
     return null
   }
 
-  return { kind: 'field', fieldKey, msgSuffix }
+  return { kind: 'field', fieldKey: lastSegment, msgSuffix }
 }
 
 function buildSpendValidationErrors(
@@ -514,6 +530,63 @@ function buildEstimatedSpendViewData(
 
 // ─── Controller Class ──────────────────────────────────────────────────────────
 
+/**
+ * Validate funding values and return an error view response if invalid.
+ * Returns null when validation passes.
+ * @private
+ */
+function validateAndRenderErrors(
+  request,
+  h,
+  sessionData,
+  fundingValues,
+  config
+) {
+  const contributorIndexMaps = []
+  const fundingValuesForValidation = fundingValues.map((row) => {
+    const { row: stripped, indexMaps } =
+      stripEmptyContributorEntriesWithMapping(row)
+    contributorIndexMaps.push(indexMaps)
+    return stripped
+  })
+
+  const contributorCoverageError = checkContributorCoverage(
+    sessionData,
+    fundingValuesForValidation
+  )
+
+  const selectedSources = getSelectedEstimatedSpendSourceFields(sessionData)
+  const schema = config.schema(selectedSources)
+  const { error } = schema.validate(fundingValuesForValidation, {
+    abortEarly: false
+  })
+
+  if (!error && !contributorCoverageError) {
+    return { validatedRows: fundingValuesForValidation, errorResponse: null }
+  }
+
+  const t = request.t.bind(request)
+  const { fieldErrors, globalError } = buildSpendValidationErrors(
+    error,
+    contributorCoverageError,
+    t,
+    contributorIndexMaps
+  )
+  const errorViewData = buildEstimatedSpendViewData(request, {
+    existingValues: fundingValues,
+    fieldErrors,
+    globalError
+  })
+
+  return {
+    validatedRows: null,
+    errorResponse: h.view(
+      PROJECT_VIEWS.FUNDING_SOURCES_ESTIMATED_SPEND,
+      errorViewData
+    )
+  }
+}
+
 class EstimatedSpendController {
   async getEstimatedSpend(request, h) {
     const viewData = buildEstimatedSpendViewData(request)
@@ -547,47 +620,19 @@ class EstimatedSpendController {
         .takeover()
     }
 
-    const contributorIndexMaps = []
-    const fundingValuesForValidation = fundingValues.map((row) => {
-      const { row: stripped, indexMaps } =
-        stripEmptyContributorEntriesWithMapping(row)
-      contributorIndexMaps.push(indexMaps)
-      return stripped
-    })
-
-    const contributorCoverageError = checkContributorCoverage(
+    const { validatedRows, errorResponse } = validateAndRenderErrors(
+      request,
+      h,
       sessionData,
-      fundingValuesForValidation
+      fundingValues,
+      config
     )
 
-    const selectedSources = getSelectedEstimatedSpendSourceFields(sessionData)
-    const schema = config.schema(selectedSources)
-    const { error } = schema.validate(fundingValuesForValidation, {
-      abortEarly: false
-    })
-
-    if (error || contributorCoverageError) {
-      const t = request.t.bind(request)
-      const { fieldErrors, globalError } = buildSpendValidationErrors(
-        error,
-        contributorCoverageError,
-        t,
-        contributorIndexMaps
-      )
-      const errorViewData = buildEstimatedSpendViewData(request, {
-        existingValues: fundingValues,
-        fieldErrors,
-        globalError
-      })
-      return h.view(
-        PROJECT_VIEWS.FUNDING_SOURCES_ESTIMATED_SPEND,
-        errorViewData
-      )
+    if (errorResponse) {
+      return errorResponse
     }
 
-    const sanitisedRows = sanitiseZerosFromValidatedRows(
-      fundingValuesForValidation
-    )
+    const sanitisedRows = sanitiseZerosFromValidatedRows(validatedRows)
 
     updateSessionData(request, {
       [PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]: sanitisedRows

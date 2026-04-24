@@ -359,6 +359,52 @@ describe('stripEmptyContributorEntriesWithMapping', () => {
     expect(row).toEqual({ fcermGia: '500' })
     expect(indexMaps).toEqual({})
   })
+
+  it('treats null contributor entries as empty', () => {
+    const input = {
+      publicContributors: [null, { name: 'A', amount: '100' }]
+    }
+    const { row, indexMaps } = stripEmptyContributorEntriesWithMapping(input)
+    expect(row.publicContributors).toHaveLength(1)
+    expect(row.publicContributors[0].name).toBe('A')
+    expect(indexMaps.publicContributors).toEqual([1])
+  })
+
+  it('treats non-object contributor entries as empty', () => {
+    const input = {
+      publicContributors: ['not-an-object', { name: 'B', amount: '50' }]
+    }
+    const { row, indexMaps } = stripEmptyContributorEntriesWithMapping(input)
+    expect(row.publicContributors).toHaveLength(1)
+    expect(row.publicContributors[0].name).toBe('B')
+    expect(indexMaps.publicContributors).toEqual([1])
+  })
+
+  it('treats contributor with non-string amount as empty', () => {
+    const input = {
+      publicContributors: [
+        { name: 'A', amount: 0 },
+        { name: 'B', amount: '200' }
+      ]
+    }
+    const { row, indexMaps } = stripEmptyContributorEntriesWithMapping(input)
+    expect(row.publicContributors).toHaveLength(1)
+    expect(row.publicContributors[0].name).toBe('B')
+    expect(indexMaps.publicContributors).toEqual([1])
+  })
+
+  it('treats contributor with whitespace-only amount as empty', () => {
+    const input = {
+      privateContributors: [
+        { name: 'X', amount: '   ' },
+        { name: 'Y', amount: '300' }
+      ]
+    }
+    const { row, indexMaps } = stripEmptyContributorEntriesWithMapping(input)
+    expect(row.privateContributors).toHaveLength(1)
+    expect(row.privateContributors[0].name).toBe('Y')
+    expect(indexMaps.privateContributors).toEqual([1])
+  })
 })
 
 // ─── sanitiseZerosFromValidatedRows ──────────────────────────────────────────
@@ -407,6 +453,35 @@ describe('sanitiseZerosFromValidatedRows', () => {
     const rows = [{ financialYear: 2025, fcermGia: '1000' }]
     const result = sanitiseZerosFromValidatedRows(rows)
     expect(result[0].fcermGia).toBe('1000')
+  })
+
+  it('handles null or non-object contributor entries in sanitisation', () => {
+    const rows = [
+      {
+        financialYear: 2025,
+        publicContributors: [null, 'not-obj', { name: 'A', amount: '100' }]
+      }
+    ]
+    const result = sanitiseZerosFromValidatedRows(rows)
+    // null and non-object are filtered out
+    expect(result[0].publicContributors).toHaveLength(1)
+    expect(result[0].publicContributors[0].name).toBe('A')
+  })
+
+  it('handles contributor with non-string amount in sanitisation', () => {
+    const rows = [
+      {
+        financialYear: 2025,
+        privateContributors: [
+          { name: 'A', amount: 100 },
+          { name: 'B', amount: '200' }
+        ]
+      }
+    ]
+    const result = sanitiseZerosFromValidatedRows(rows)
+    // amount=100 (number) → treated as empty string → filtered out
+    expect(result[0].privateContributors).toHaveLength(1)
+    expect(result[0].privateContributors[0].name).toBe('B')
   })
 })
 
