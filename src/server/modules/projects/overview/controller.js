@@ -23,8 +23,11 @@ import {
   buildFinancialYearLabel,
   formatFileSize,
   getProjectStateTag,
-  isConfidenceRestrictedProjectType
+  isConfidenceRestrictedProjectType,
+  buildProcessedFundingValues,
+  computeFundingSourceTotals
 } from '../helpers/project-utils.js'
+import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
 
 class OverviewController {
   _getProjectViewData(request, options = {}) {
@@ -76,6 +79,20 @@ class OverviewController {
       backLink,
       projectData
     })
+
+    const carbonResult = await getCarbonImpactOverviewData(request, projectData)
+
+    viewData.projectData = carbonResult.projectData
+
+    if (viewData.projectData) {
+      viewData.projectData.processedFundingValues = buildProcessedFundingValues(
+        viewData.projectData
+      )
+      viewData.projectData.fundingSourceTotals = computeFundingSourceTotals(
+        viewData.projectData.processedFundingValues,
+        viewData.projectData
+      )
+    }
 
     return h.view(PROJECT_VIEWS.OVERVIEW, viewData)
   }

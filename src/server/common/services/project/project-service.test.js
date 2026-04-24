@@ -5,7 +5,8 @@ import {
   upsertProjectProposal,
   deleteProject,
   getProjects,
-  updateProjectStatus
+  updateProjectStatus,
+  getCarbonImpactCalc
 } from './project-service.js'
 import { apiRequest } from '../../helpers/api-client/index.js'
 
@@ -1124,6 +1125,74 @@ describe('project-service', () => {
         expect.objectContaining({
           method: 'PUT'
         })
+      )
+    })
+  })
+
+  describe('getCarbonImpactCalc', () => {
+    test('calls apiRequest with correct carbon-impact URL', async () => {
+      apiRequest.mockResolvedValue({ success: true, data: {} })
+
+      await getCarbonImpactCalc('REF-001', 'token123')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF-001/carbon-impact',
+        expect.objectContaining({ method: 'GET' })
+      )
+    })
+
+    test('includes Authorization header when accessToken is provided', async () => {
+      apiRequest.mockResolvedValue({ success: true, data: {} })
+
+      await getCarbonImpactCalc('REF-001', 'my-access-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          headers: { Authorization: 'Bearer my-access-token' }
+        })
+      )
+    })
+
+    test('sends empty headers when accessToken is an empty string', async () => {
+      apiRequest.mockResolvedValue({ success: true, data: {} })
+
+      await getCarbonImpactCalc('REF-001', '')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ headers: {} })
+      )
+    })
+
+    test('sends empty headers when accessToken is undefined', async () => {
+      apiRequest.mockResolvedValue({ success: true, data: {} })
+
+      await getCarbonImpactCalc('REF-001', undefined)
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ headers: {} })
+      )
+    })
+
+    test('returns the apiRequest result directly', async () => {
+      const mockResult = { success: true, data: { netCarbonEstimate: 150 } }
+      apiRequest.mockResolvedValue(mockResult)
+
+      const result = await getCarbonImpactCalc('REF-001', 'token')
+
+      expect(result).toBe(mockResult)
+    })
+
+    test('builds URL with correct reference number', async () => {
+      apiRequest.mockResolvedValue({ success: true })
+
+      await getCarbonImpactCalc('ACC-501E-000A', 'token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/ACC-501E-000A/carbon-impact',
+        expect.any(Object)
       )
     })
   })

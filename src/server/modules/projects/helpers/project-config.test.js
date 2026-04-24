@@ -5,6 +5,7 @@ import {
   IMPORTANT_DATES_CONFIG,
   GOALS_URGENCY_CONFIDENCE_CONFIG,
   PROJECT_PAYLOAD_LEVEL_FIELDS,
+  FUNDING_SOURCES_CONFIG,
   interventionTypesLocalKeyPrefix,
   projectTypesLocalKeyPrefix,
   financialYearStartLocalKeyPrefix,
@@ -460,6 +461,83 @@ describe('project-config', () => {
       ])
     })
 
+    test('should have fields for FUNDING_SOURCES_SELECTED level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.FUNDING_SOURCES_SELECTED
+        ]
+
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.FCERM_GIA,
+        PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY,
+        'additionalFcermGia',
+        PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS,
+        PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS,
+        PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS,
+        PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED
+      ])
+    })
+
+    test('should have fields for ADDITIONAL_FUNDING_SOURCES_GIA_SELECTED level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.ADDITIONAL_FUNDING_SOURCES_GIA_SELECTED
+        ]
+
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE,
+        PROJECT_PAYLOAD_FIELDS.ENVIRONMENT_STATUTORY_FUNDING,
+        PROJECT_PAYLOAD_FIELDS.FREQUENTLY_FLOODED_COMMUNITIES,
+        PROJECT_PAYLOAD_FIELDS.OTHER_ADDITIONAL_GRANT_IN_AID,
+        PROJECT_PAYLOAD_FIELDS.OTHER_GOVERNMENT_DEPARTMENT,
+        PROJECT_PAYLOAD_FIELDS.RECOVERY,
+        PROJECT_PAYLOAD_FIELDS.SUMMER_ECONOMIC_FUND
+      ])
+    })
+
+    test('should have fields for funding contributor levels', () => {
+      expect(
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.PUBLIC_SECTOR_CONTRIBUTORS
+        ]
+      ).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTOR_NAMES
+      ])
+
+      expect(
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.PRIVATE_SECTOR_CONTRIBUTORS
+        ]
+      ).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTOR_NAMES
+      ])
+
+      expect(
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS
+        ]
+      ).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTOR_NAMES
+      ])
+    })
+
+    test('should have fields for FUNDING_SOURCES_ESTIMATED_SPEND level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.FUNDING_SOURCES_ESTIMATED_SPEND
+        ]
+
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES
+      ])
+    })
+
     test('should include reference number in all edit-level payloads', () => {
       const editLevels = [
         PROJECT_PAYLOAD_LEVELS.PROJECT_NAME,
@@ -705,6 +783,140 @@ describe('project-config', () => {
       expect(fundingConfig.backLinkOptions.targetEditURL).toBe(
         ROUTES.PROJECT.EDIT.CONFIDENCE_HOMES_BY_GATEWAY_FOUR
       )
+    })
+  })
+
+  describe('FUNDING_SOURCES_CONFIG', () => {
+    test('exports config for all 6 funding source steps', () => {
+      expect(
+        FUNDING_SOURCES_CONFIG[PROJECT_STEPS.FUNDING_SOURCES]
+      ).toBeDefined()
+      expect(
+        FUNDING_SOURCES_CONFIG[PROJECT_STEPS.FUNDING_SOURCES_ADDITIONAL]
+      ).toBeDefined()
+      expect(
+        FUNDING_SOURCES_CONFIG[
+          PROJECT_STEPS.FUNDING_SOURCES_PUBLIC_CONTRIBUTORS
+        ]
+      ).toBeDefined()
+      expect(
+        FUNDING_SOURCES_CONFIG[
+          PROJECT_STEPS.FUNDING_SOURCES_PRIVATE_CONTRIBUTORS
+        ]
+      ).toBeDefined()
+      expect(
+        FUNDING_SOURCES_CONFIG[
+          PROJECT_STEPS.FUNDING_SOURCES_OTHER_EA_CONTRIBUTORS
+        ]
+      ).toBeDefined()
+      expect(
+        FUNDING_SOURCES_CONFIG[PROJECT_STEPS.FUNDING_SOURCES_ESTIMATED_SPEND]
+      ).toBeDefined()
+    })
+
+    test('main FUNDING_SOURCES step has required properties', () => {
+      const config = FUNDING_SOURCES_CONFIG[PROJECT_STEPS.FUNDING_SOURCES]
+      expect(config.localKeyPrefix).toBe(
+        'projects.funding_sources.funding_sources_selection'
+      )
+      expect(config.backLinkOptions).toBeDefined()
+      expect(config.backLinkOptions.conditionalRedirect).toBe(true)
+      expect(config.schema).toBeDefined()
+      expect(config.fieldType).toBe('checkbox')
+    })
+
+    test('FUNDING_SOURCES_ADDITIONAL step has gateField', () => {
+      const config =
+        FUNDING_SOURCES_CONFIG[PROJECT_STEPS.FUNDING_SOURCES_ADDITIONAL]
+      expect(config.gateField).toBe('additionalFcermGia')
+      expect(config.fieldType).toBe('checkbox')
+    })
+
+    test('contributor steps have gateField, deleteRoute and fieldName', () => {
+      const contributorSteps = [
+        PROJECT_STEPS.FUNDING_SOURCES_PUBLIC_CONTRIBUTORS,
+        PROJECT_STEPS.FUNDING_SOURCES_PRIVATE_CONTRIBUTORS,
+        PROJECT_STEPS.FUNDING_SOURCES_OTHER_EA_CONTRIBUTORS
+      ]
+      for (const step of contributorSteps) {
+        const config = FUNDING_SOURCES_CONFIG[step]
+        expect(config.gateField).toBeDefined()
+        expect(config.deleteRoute).toBeDefined()
+        expect(config.fieldName).toBeDefined()
+        expect(config.fieldType).toBe('contributor-names')
+        expect(config.schema).toBeDefined()
+      }
+    })
+
+    test('PUBLIC_CONTRIBUTORS gateField is publicContributions', () => {
+      const config =
+        FUNDING_SOURCES_CONFIG[
+          PROJECT_STEPS.FUNDING_SOURCES_PUBLIC_CONTRIBUTORS
+        ]
+      expect(config.gateField).toBe(PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS)
+      expect(config.fieldName).toBe(
+        PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTOR_NAMES
+      )
+    })
+
+    test('PRIVATE_CONTRIBUTORS gateField is privateContributions', () => {
+      const config =
+        FUNDING_SOURCES_CONFIG[
+          PROJECT_STEPS.FUNDING_SOURCES_PRIVATE_CONTRIBUTORS
+        ]
+      expect(config.gateField).toBe(
+        PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS
+      )
+      expect(config.fieldName).toBe(
+        PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTOR_NAMES
+      )
+    })
+
+    test('OTHER_EA_CONTRIBUTORS gateField is otherEaContributions', () => {
+      const config =
+        FUNDING_SOURCES_CONFIG[
+          PROJECT_STEPS.FUNDING_SOURCES_OTHER_EA_CONTRIBUTORS
+        ]
+      expect(config.gateField).toBe(
+        PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS
+      )
+      expect(config.fieldName).toBe(
+        PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTOR_NAMES
+      )
+    })
+
+    test('ESTIMATED_SPEND step has schema as a function (factory)', () => {
+      const config =
+        FUNDING_SOURCES_CONFIG[PROJECT_STEPS.FUNDING_SOURCES_ESTIMATED_SPEND]
+      expect(typeof config.schema).toBe('function')
+      expect(config.fieldType).toBe('spending-table')
+      expect(config.successRedirect).toBeDefined()
+    })
+
+    test('backLinkOptions for FUNDING_SOURCES_ADDITIONAL points to main selection edit route', () => {
+      const config =
+        FUNDING_SOURCES_CONFIG[PROJECT_STEPS.FUNDING_SOURCES_ADDITIONAL]
+      expect(config.backLinkOptions.conditionalRedirect).toBe(false)
+      expect(config.backLinkOptions.targetEditURL).toBeDefined()
+    })
+
+    test('conditional steps have backLinkFn returning correct route based on project state', () => {
+      const publicConfig =
+        FUNDING_SOURCES_CONFIG[
+          PROJECT_STEPS.FUNDING_SOURCES_PUBLIC_CONTRIBUTORS
+        ]
+      // When additionalFcermGia is set, back link should point to additional selection page
+      const urlWithAdditional = publicConfig.backLinkOptions.backLinkFn({
+        additionalFcermGia: true
+      })
+      expect(urlWithAdditional).toBeDefined()
+      expect(typeof urlWithAdditional).toBe('string')
+      // Without additionalFcermGia, should point to main selection page
+      const urlWithout = publicConfig.backLinkOptions.backLinkFn({})
+      expect(urlWithout).toBeDefined()
+      expect(typeof urlWithout).toBe('string')
+      // The two URLs should be different
+      expect(urlWithAdditional).not.toBe(urlWithout)
     })
   })
 })

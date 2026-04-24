@@ -180,3 +180,19 @@ export async function updateProjectStatus(
     headers
   })
 }
+
+/**
+ * Get calculated carbon impact values for a project.
+ * Returns capital/operational baselines and targets, net carbon, and capital cost estimate.
+ * @param {string} referenceNumber - The project reference number
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} API response with carbonImpact data
+ */
+export async function getCarbonImpactCalc(referenceNumber, accessToken) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(`/api/v1/project/${referenceNumber}/carbon-impact`, {
+    method: 'GET',
+    headers
+  })
+}

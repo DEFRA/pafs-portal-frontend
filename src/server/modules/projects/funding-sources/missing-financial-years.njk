@@ -1,0 +1,31 @@
+{% extends 'layouts/page.njk' %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set p = 'projects.funding_sources.missing_financial_years' %}
+
+{% block pageTitle %}{{ t(p + '.title') }}{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {{ govukWarningText({
+        text: t(p + '.warning'),
+        iconFallbackText: "Warning"
+      }) }}
+
+      <h1 class="govuk-heading-l">{{ t(p + '.heading') }}</h1>
+
+      <p class="govuk-body">{{ t(p + '.body') }}</p>
+
+      <a href="{{ overviewUrl }}" role="button" draggable="false"
+         class="govuk-button" data-module="govuk-button">
+        {{ t(p + '.return_to_overview_button') }}
+      </a>
+
+    </div>
+  </div>
+
+{% endblock %}

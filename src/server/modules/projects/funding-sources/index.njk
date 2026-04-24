@@ -1,0 +1,121 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% set p = 'projects.funding_sources.funding_sources_selection' %}
+
+{% block pageTitle %}{{ t(p + '.title') }}{% endblock %}
+
+{% block body %}
+
+  {% if fieldErrors %}
+    {% set errorList = [] %}
+    {% if fieldErrors['value'] %}
+      {% set errorList = errorList.concat([{ text: t(p + '.errors.required'), href: '#fcermGia' }]) %}
+    {% endif %}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+        titleText: t('common.error_summary_title'),
+        errorList: errorList
+      }) }}
+    {% endif %}
+  {% endif %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+
+    {% set checkboxError = false %}
+    {% if fieldErrors and fieldErrors['value'] %}
+      {% set checkboxError = { text: t(p + '.errors.required') } %}
+    {% endif %}
+
+    {# Hidden "false" values ensure unchecked boxes POST as false #}
+    {% set items = [
+      {
+        text: t(p + '.options.grant_in_aid'),
+        value: 'true',
+        name: PROJECT_PAYLOAD_FIELDS.FCERM_GIA,
+        id: PROJECT_PAYLOAD_FIELDS.FCERM_GIA,
+        checked: formData[PROJECT_PAYLOAD_FIELDS.FCERM_GIA] === true
+      },
+      {
+        text: t(p + '.options.local_levy'),
+        value: 'true',
+        name: PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY,
+        id: PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY,
+        checked: formData[PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY] === true
+      },
+      {
+        text: t(p + '.options.additional_fcrm_grant_in_aid'),
+        value: 'true',
+        name: 'additionalFcermGia',
+        id: 'additionalFcermGia',
+        checked: formData['additionalFcermGia'] === true
+      },
+      {
+        text: t(p + '.options.public_contributions'),
+        value: 'true',
+        name: PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS,
+        id: PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS,
+        checked: formData[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS] === true
+      },
+      {
+        text: t(p + '.options.private_contributions'),
+        value: 'true',
+        name: PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS,
+        id: PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS,
+        checked: formData[PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS] === true
+      },
+      {
+        text: t(p + '.options.other_ea_contributions'),
+        value: 'true',
+        name: PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS,
+        id: PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS,
+        checked: formData[PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS] === true
+      },
+      {
+        text: t(p + '.options.not_yet_identified'),
+        value: 'true',
+        name: PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED,
+        id: PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED,
+        checked: formData[PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED] === true
+      }
+    ] %}
+
+    {# Because govukCheckboxes uses a single name, we use individual hidden inputs + custom checkboxes #}
+    {# Each checkbox has its own name matching the field, value="true", unchecked = no submission (handle in controller) #}
+    <div class="govuk-form-group{% if checkboxError %} govuk-form-group--error{% endif %}">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+          <h1 class="govuk-fieldset__heading">{{ t(p + '.heading') }}</h1>
+        </legend>
+        <div class="govuk-hint">{{ t(p + '.hint') }}</div>
+        {% if checkboxError %}
+          <p class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ checkboxError.text }}
+          </p>
+        {% endif %}
+        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+          {% for item in items %}
+            <div class="govuk-checkboxes__item">
+              <input
+                class="govuk-checkboxes__input"
+                id="{{ item.id }}"
+                name="{{ item.name }}"
+                type="checkbox"
+                value="{{ item.value }}"
+                {% if item.checked %}checked{% endif %}
+              >
+              <label class="govuk-label govuk-checkboxes__label" for="{{ item.id }}">
+                {{ item.text }}
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </fieldset>
+    </div>
+
+    {{ govukButton({ text: t('common.buttons.save_and_continue') }) }}
+  </form>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set NOT_PROVIDED = "Not provided" %}
+{% set units = t(localKeyPrefix + '.units') %}
+{% set keyClass = 'govuk-!-width-three-quarters' %}
+
+{% block pageTitle %}
+  {{ t(localKeyPrefix + '.title') }}
+{% endblock %}
+
+{% block body %}
+  <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.heading') }}</h1>
+
+  <p class="govuk-body">{{ t(localKeyPrefix + '.lede_1') }}</p>
+  <p class="govuk-body">{{ t(localKeyPrefix + '.lede_2') }}</p>
+  <p class="govuk-body">{{ t(localKeyPrefix + '.lede_3') }}</p>
+  <p class="govuk-body">{{ t(localKeyPrefix + '.lede_4') }}</p>
+
+  {# ── Capital Carbon ─────────────────────────────────────────────────── #}
+  <h3 class="govuk-heading-s">{{ t(localKeyPrefix + '.capital_carbon_heading') }}</h3>
+
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: { text: t(localKeyPrefix + '.capital_carbon_estimated'), classes: keyClass },
+        value: { text: (displayData.build | float | round(2)) + ' ' + units }
+      },
+      {
+        key: { text: t(localKeyPrefix + '.capital_carbon_baseline'), classes: keyClass },
+        value: { text: (displayData.capitalCarbonBaseline | float | round(2)) + ' ' + units if displayData.capitalCarbonBaseline is not none else NOT_PROVIDED }
+      },
+      {
+        key: { text: t(localKeyPrefix + '.capital_carbon_target'), classes: keyClass },
+        value: { text: (displayData.capitalCarbonTarget | float | round(2)) + ' ' + units if displayData.capitalCarbonTarget is not none else NOT_PROVIDED }
+      }
+    ]
+  }) }}
+
+  {# ── Operations and maintenance carbon ────────────────────────────── #}
+  <h3 class="govuk-heading-s">{{ t(localKeyPrefix + '.operational_carbon_heading') }}</h3>
+
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: { text: t(localKeyPrefix + '.operational_carbon_estimated'), classes: keyClass },
+        value: { text: (displayData.operation | float | round(2)) + ' ' + units }
+      },
+      {
+        key: { text: t(localKeyPrefix + '.operational_carbon_baseline'), classes: keyClass },
+        value: { text: (displayData.operationalCarbonBaseline | float | round(2)) + ' ' + units if displayData.operationalCarbonBaseline is not none else NOT_PROVIDED }
+      },
+      {
+        key: { text: t(localKeyPrefix + '.operational_carbon_target'), classes: keyClass },
+        value: { text: (displayData.operationalCarbonTarget | float | round(2)) + ' ' + units if displayData.operationalCarbonTarget is not none else NOT_PROVIDED }
+      }
+    ]
+  }) }}
+
+  {# ── Net Carbon ──────────────────────────────────────────────────────── #}
+  <h3 class="govuk-heading-s">{{ t(localKeyPrefix + '.net_carbon_heading') }}</h3>
+
+  {% set netRows = [
+    {
+      key: { text: t(localKeyPrefix + '.net_carbon_estimated'), classes: keyClass },
+      value: { text: (displayData.netCarbonEstimate | float | round(2)) + ' ' + units if displayData.netCarbonEstimate is not none else NOT_PROVIDED }
+    }
+  ] %}
+
+  {% if not displayData.allCarbonValuesPresent %}
+    {% set netRows = netRows.concat([{
+      key: { text: t(localKeyPrefix + '.net_carbon_with_blanks'), classes: keyClass },
+      value: { text: (displayData.netCarbonWithBlanks | float | round(2)) + ' ' + units if displayData.netCarbonWithBlanks is not none else NOT_PROVIDED }
+    }]) %}
+  {% endif %}
+
+  {{ govukSummaryList({
+    rows: netRows
+  }) }}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+    <div class="govuk-button-group">
+      {{ govukButton({ text: t('common.buttons.continue') }) }}
+    </div>
+  </form>
+{% endblock %}
+

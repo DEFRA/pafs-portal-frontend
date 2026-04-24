@@ -143,6 +143,25 @@ describe('NFM Redirect Helpers', () => {
         path: '/project/TEST-001/nfm-river-restoration'
       })
     })
+
+    test('should redirect to sand dune when it is the only selected measure', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'sand_dune_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_SELECTED_MEASURES,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('sand-dune')
+      expect(result.path).toContain('TEST-001')
+    })
   })
 
   describe('handleConditionalRedirect - NFM_RUNOFF_MANAGEMENT', () => {
