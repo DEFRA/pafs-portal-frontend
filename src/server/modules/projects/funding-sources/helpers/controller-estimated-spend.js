@@ -382,6 +382,9 @@ const ARRAY_TO_SOURCE = {
 /** Expected path length for contributor errors: [yearIndex, arrayField, idx, 'amount'] */
 const CONTRIBUTOR_ERROR_PATH_LENGTH = 4
 
+/** Index of the 'amount' segment inside a contributor error path. */
+const CONTRIBUTOR_AMOUNT_PATH_INDEX = 3
+
 /**
  * Classify a source-field error (path = [yearIndex, fieldName]).
  * @private
@@ -433,7 +436,10 @@ function classifyValidationDetail(detail, contributorIndexMaps = []) {
     return classifySourceFieldError(path, msgSuffix)
   }
 
-  if (path.length === CONTRIBUTOR_ERROR_PATH_LENGTH && path[3] === 'amount') {
+  if (
+    path.length === CONTRIBUTOR_ERROR_PATH_LENGTH &&
+    path[CONTRIBUTOR_AMOUNT_PATH_INDEX] === 'amount'
+  ) {
     return classifyContributorError(path, msgSuffix, contributorIndexMaps)
   }
 
