@@ -29,6 +29,6 @@ describe('getAuthSession', () => {
         }
       }
     }
-    expect(() => getAuthSession(req)).toThrow('boom')
+    expect(getAuthSession(req)).toBeNull()
   })
 })

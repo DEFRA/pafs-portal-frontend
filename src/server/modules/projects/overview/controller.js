@@ -27,6 +27,7 @@ import {
   computeFundingSourceTotals
 } from '../helpers/project-utils.js'
 import { getBenefitAreaDownloadData } from '../helpers/overview/benefit-area.js'
+import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
 import { enrichProjectData } from '../helpers/overview/data-enrichment.js'
 import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
@@ -97,11 +98,13 @@ class OverviewController {
       getBenefitAreaDownloadData
     ])
 
-    viewData.projectData = enrichmentResult.projectData
+    const carbonResult = await getCarbonImpactOverviewData(request, projectData)
+
+    viewData.projectData = carbonResult.projectData
 
     if (viewData.projectData) {
       viewData.projectData.processedFundingValues = buildProcessedFundingValues(
-        enrichmentResult.projectData
+        viewData.projectData
       )
       viewData.projectData.fundingSourceTotals = computeFundingSourceTotals(
         viewData.projectData.processedFundingValues,
@@ -111,7 +114,7 @@ class OverviewController {
 
     return this._handleOverviewResponse(request, h, {
       viewData,
-      success: enrichmentResult.success,
+      success: enrichmentResult.success && carbonResult.success,
       error: enrichmentResult.error
     })
   }

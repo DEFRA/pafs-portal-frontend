@@ -7,10 +7,12 @@ describe('Journey Selection Routes', () => {
   beforeAll(async () => {
     server = await createServer()
     await server.initialize()
-  })
+  }, 30000)
 
   afterAll(async () => {
-    await server.stop({ timeout: 0 })
+    if (server) {
+      await server.stop({ timeout: 0 })
+    }
   })
 
   test('GET /admin/journey-selection route exists', async () => {

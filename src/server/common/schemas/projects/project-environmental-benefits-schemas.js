@@ -15,27 +15,71 @@ const booleanSchema = Joi.boolean().required().messages({
   'boolean.base': PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_INVALID
 })
 
+const ERR_PRECISION = 'number.precision'
+const ERR_WHOLE_NUMBER_PRECISION = 'number.integer.max'
+const ERR_BASE = 'number.base'
+
+/**
+ * Maximum digits allowed for whole-number values — matches Decimal(20,2) DB column
+ */
+const MAX_WHOLE_NUMBER_DIGITS = 18
+
+/**
+ * Maximum digits allowed before the decimal point for decimal values
+ * (leaves 2 digits for the fractional part within Decimal(20,2))
+ */
+const MAX_INTEGER_PART_DIGITS = 16
+
 /**
  * Number schema for environmental benefits quantity fields
- * - Minimum value: 0.01
- * - Maximum 2 decimal places
- * - No automatic rounding (strict validation)
+ * - Whole numbers (no decimal): up to 18 digits — matches Decimal(20,2) DB column
+ * - Decimal numbers: up to 16 digits before decimal, up to 2 digits after
+ * - Accepts string inputs to avoid JS precision issues for large numbers
  */
-const quantitySchema = Joi.number()
-  .min(0.01)
-  .precision(2)
+const quantitySchema = Joi.string()
+  .trim()
+  .custom((value, helpers) => {
+    // Check basic format first
+    if (!/^\d+(?:\.\d+)?$/.test(value)) {
+      return helpers.error(ERR_BASE)
+    }
+
+    const [integerPart, decimalPart] = value.split('.')
+
+    if (decimalPart === undefined) {
+      // Whole number: max 18 digits
+      if (integerPart.length > MAX_WHOLE_NUMBER_DIGITS) {
+        return helpers.error(ERR_WHOLE_NUMBER_PRECISION)
+      }
+    } else if (
+      integerPart.length > MAX_INTEGER_PART_DIGITS ||
+      decimalPart.length > 2
+    ) {
+      // Decimal number: max 16 digits before decimal, max 2 after
+      return helpers.error(ERR_PRECISION)
+    } else {
+      // Decimal is within precision limits — no error
+    }
+
+    // Return the original string value to preserve precision for Decimal database fields
+    return value
+  })
   .required()
-  .strict()
-  .prefs({ convert: false })
   .messages({
     'any.required':
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_REQUIRED,
     'number.base':
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_INVALID,
+    'string.pattern.base':
+      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_INVALID,
     'number.min':
       PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_MIN,
+    'number.max':
+      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION,
     'number.precision':
-      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION
+      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_PRECISION,
+    'number.integer.max':
+      PROJECT_VALIDATION_MESSAGES.ENVIRONMENTAL_BENEFITS_QUANTITY_WHOLE_NUMBER_PRECISION
   })
 
 // Main environmental benefits gate

@@ -13,6 +13,7 @@ import {
   isConfidenceRestrictedProjectType
 } from '../helpers/project-utils.js'
 import { enrichProjectData } from '../helpers/overview/data-enrichment.js'
+import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
 import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
 // Mock dependencies
@@ -34,6 +35,7 @@ vi.mock('../helpers/project-utils.js', () => ({
 }))
 
 vi.mock('../helpers/overview/data-enrichment.js')
+vi.mock('../helpers/overview/carbon-impact.js')
 vi.mock('../helpers/project-submission.js')
 
 describe('OverviewController', () => {
@@ -81,6 +83,13 @@ describe('OverviewController', () => {
         projectState: PROJECT_STATUS.DRAFT
       }
     })
+
+    getCarbonImpactOverviewData.mockImplementation(
+      async (_req, projectData) => ({
+        success: true,
+        projectData
+      })
+    )
 
     handleServiceConsumptionError.mockReturnValue({ error: true })
   })
@@ -613,13 +622,19 @@ describe('OverviewController', () => {
         success: true,
         projectData: enrichedData
       })
+      getCarbonImpactOverviewData.mockResolvedValue({
+        success: true,
+        projectData: enrichedData
+      })
 
       await overviewController.getHandler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
         'modules/projects/overview/index',
         expect.objectContaining({
-          projectData: enrichedData
+          projectData: expect.objectContaining({
+            benefitAreaFileDownloadUrl: 'https://example.com/download'
+          })
         })
       )
     })
@@ -861,13 +876,19 @@ describe('OverviewController', () => {
         success: true,
         projectData: enrichedData
       })
+      getCarbonImpactOverviewData.mockResolvedValue({
+        success: true,
+        projectData: enrichedData
+      })
 
       await overviewController.getHandler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          projectData: enrichedData
+          projectData: expect.objectContaining({
+            enrichedField: 'enriched value'
+          })
         })
       )
     })

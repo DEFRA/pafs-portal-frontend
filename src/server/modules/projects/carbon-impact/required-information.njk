@@ -1,0 +1,25 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}
+  {{ t(localKeyPrefix + '.title') }}
+{% endblock %}
+
+{% block body %}
+  <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.heading') }}</h1>
+
+  <p class="govuk-body">{{ t(localKeyPrefix + '.content.intro') }}</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ t(localKeyPrefix + '.content.important_dates') }}</li>
+    <li>{{ t(localKeyPrefix + '.content.funding_sources') }}</li>
+  </ul>
+
+  <p class="govuk-body">{{ t(localKeyPrefix + '.content.continue_message') }}</p>
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+    {{ govukButton({ text: t('common.buttons.save_and_continue') }) }}
+  </form>
+{% endblock %}

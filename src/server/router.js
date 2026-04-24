@@ -68,6 +68,7 @@ export const router = {
         'nfm',
         'whole-life-cost',
         'whole-life-benefits',
+        'carbon-impact',
         'funding-sources'
       ])
 

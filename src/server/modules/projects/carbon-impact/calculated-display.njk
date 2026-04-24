@@ -1,0 +1,26 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}
+  {{ t(localKeyPrefix + '.title') }}
+{% endblock %}
+
+{% block body %}
+  <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.heading') }}</h1>
+
+  <p class="govuk-body">{{ t(localKeyPrefix + '.description') }}</p>
+
+  {% set suffix = t(localKeyPrefix + '.suffix') %}
+
+  <p class="govuk-heading-m govuk-!-margin-bottom-6">
+    <strong>{{ (displayData[displayValueKey] | round(2)) + ' ' + suffix }}</strong>
+  </p>
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+    <div class="govuk-button-group">
+      {{ govukButton({ text: t('common.buttons.continue') }) }}
+    </div>
+  </form>
+{% endblock %}

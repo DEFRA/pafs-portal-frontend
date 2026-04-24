@@ -1,0 +1,70 @@
+{% extends 'layouts/projects.njk' %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block pageTitle %}
+  {{ t(localKeyPrefix + '.title') }}
+{% endblock %}
+
+{% set keyClass = 'govuk-!-width-three-quarters' %}
+
+{% block body %}
+  <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.heading') }}</h1>
+
+  {% set rows = [
+    {
+      key: { text: t(localKeyPrefix + '.build_label'), classes: keyClass },
+      value: { text: (displayData.build | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+    },
+    {
+      key: { text: t(localKeyPrefix + '.operation_label'), classes: keyClass },
+      value: { text: (displayData.operation | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+    },
+    {
+      key: { text: t(localKeyPrefix + '.whole_life_label'), classes: keyClass },
+      value: { text: (displayData.wholeLifeCarbon | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+    },
+    {
+      key: { text: t(localKeyPrefix + '.sequestered_label'), classes: keyClass },
+      value: { text: (displayData.sequestered | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+    },
+    {
+      key: { text: t(localKeyPrefix + '.avoided_label'), classes: keyClass },
+      value: { text: (displayData.avoided | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+    },
+    {
+      key: { text: t(localKeyPrefix + '.net_label'), classes: keyClass },
+      value: { text: (displayData.netCarbon | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+    },
+    {
+      key: { text: t(localKeyPrefix + '.benefit_label'), classes: keyClass },
+      value: { text: displayData.benefitDisplay }
+    },
+    {
+      key: { text: t(localKeyPrefix + '.forecast_label'), classes: keyClass },
+      value: { text: displayData.forecastDisplay }
+    }
+  ] %}
+
+  {{ govukSummaryList({ rows: rows }) }}
+
+  <h2 class="govuk-heading-m">{{ t(localKeyPrefix + '.capital_cost_estimate') }}</h2>
+  {% if t(localKeyPrefix + '.capital_cost_estimate_hint') %}
+    <p class="govuk-body">{{ t(localKeyPrefix + '.capital_cost_estimate_hint') }}</p>
+  {% endif %}
+
+  {{ govukSummaryList({
+    rows: [{
+      key: { text: t(localKeyPrefix + '.capital_cost_label'), classes: keyClass },
+      value: { text: displayData.capitalCostEstimateDisplay }
+    }]
+  }) }}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+    <div class="govuk-button-group">
+      {{ govukButton({ text: t('common.buttons.continue') }) }}
+    </div>
+  </form>
+{% endblock %}
