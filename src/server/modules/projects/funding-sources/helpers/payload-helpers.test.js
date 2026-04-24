@@ -5,6 +5,8 @@ import {
   sanitiseFundingValueRow,
   setSourceTotalsFromContributorArrays,
   stripEmptyContributorEntries,
+  stripEmptyContributorEntriesWithMapping,
+  sanitiseZerosFromValidatedRows,
   numericKeysToArrays,
   parseFundingValuesPayload,
   parseContributorsPayload
@@ -296,6 +298,115 @@ describe('stripEmptyContributorEntries', () => {
     const row = { fcermGia: '500' }
     stripEmptyContributorEntries(row)
     expect(row).toEqual({ fcermGia: '500' })
+  })
+})
+
+// ─── stripEmptyContributorEntriesWithMapping ─────────────────────────────────
+
+describe('stripEmptyContributorEntriesWithMapping', () => {
+  it('returns stripped row and index mapping', () => {
+    const input = {
+      privateContributors: [
+        { name: 'Alice', amount: '' },
+        { name: 'Bob', amount: '' },
+        { name: 'Charlie', amount: '500' }
+      ]
+    }
+    const { row, indexMaps } = stripEmptyContributorEntriesWithMapping(input)
+    expect(row.privateContributors).toHaveLength(1)
+    expect(row.privateContributors[0].name).toBe('Charlie')
+    // Stripped index 0 → original index 2
+    expect(indexMaps.privateContributors).toEqual([2])
+  })
+
+  it('maps multiple kept entries to their original indices', () => {
+    const input = {
+      publicContributors: [
+        { name: 'A', amount: '100' },
+        { name: 'B', amount: '' },
+        { name: 'C', amount: '200' },
+        { name: 'D', amount: '300' }
+      ]
+    }
+    const { row, indexMaps } = stripEmptyContributorEntriesWithMapping(input)
+    expect(row.publicContributors).toHaveLength(3)
+    expect(indexMaps.publicContributors).toEqual([0, 2, 3])
+  })
+
+  it('deletes array key when all entries are empty', () => {
+    const input = {
+      otherEaContributors: [{ name: 'X', amount: '' }]
+    }
+    const { row, indexMaps } = stripEmptyContributorEntriesWithMapping(input)
+    expect(row.otherEaContributors).toBeUndefined()
+    expect(indexMaps.otherEaContributors).toEqual([])
+  })
+
+  it('does not mutate the original row', () => {
+    const input = {
+      publicContributors: [
+        { name: 'A', amount: '' },
+        { name: 'B', amount: '100' }
+      ]
+    }
+    stripEmptyContributorEntriesWithMapping(input)
+    expect(input.publicContributors).toHaveLength(2)
+  })
+
+  it('handles rows with no contributor arrays', () => {
+    const input = { fcermGia: '500' }
+    const { row, indexMaps } = stripEmptyContributorEntriesWithMapping(input)
+    expect(row).toEqual({ fcermGia: '500' })
+    expect(indexMaps).toEqual({})
+  })
+})
+
+// ─── sanitiseZerosFromValidatedRows ──────────────────────────────────────────
+
+describe('sanitiseZerosFromValidatedRows', () => {
+  it('converts "0" spend fields to empty strings', () => {
+    const rows = [{ financialYear: 2025, fcermGia: '0', localLevy: '500' }]
+    const result = sanitiseZerosFromValidatedRows(rows)
+    expect(result[0].fcermGia).toBe('')
+    expect(result[0].localLevy).toBe('500')
+  })
+
+  it('converts "0" contributor amounts and strips them', () => {
+    const rows = [
+      {
+        financialYear: 2025,
+        publicContributors: [
+          { name: 'A', amount: '0' },
+          { name: 'B', amount: '100' }
+        ]
+      }
+    ]
+    const result = sanitiseZerosFromValidatedRows(rows)
+    expect(result[0].publicContributors).toHaveLength(1)
+    expect(result[0].publicContributors[0].name).toBe('B')
+  })
+
+  it('removes contributor array key when all amounts are zero', () => {
+    const rows = [
+      {
+        financialYear: 2025,
+        privateContributors: [{ name: 'A', amount: '0' }]
+      }
+    ]
+    const result = sanitiseZerosFromValidatedRows(rows)
+    expect(result[0].privateContributors).toBeUndefined()
+  })
+
+  it('does not mutate the original rows', () => {
+    const rows = [{ financialYear: 2025, fcermGia: '0' }]
+    sanitiseZerosFromValidatedRows(rows)
+    expect(rows[0].fcermGia).toBe('0')
+  })
+
+  it('leaves non-zero values unchanged', () => {
+    const rows = [{ financialYear: 2025, fcermGia: '1000' }]
+    const result = sanitiseZerosFromValidatedRows(rows)
+    expect(result[0].fcermGia).toBe('1000')
   })
 })
 

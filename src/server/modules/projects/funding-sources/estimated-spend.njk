@@ -17,14 +17,11 @@
     }]) %}
   {% endif %}
   {% if fieldErrors %}
-    {% for row in spendRows %}
-      {% set key = row.field or row.sourceField %}
-      {% if key and fieldErrors[key] %}
-        {% set errorList = errorList.concat([{
-          text: fieldErrors[key],
-          href: '#' + key + '-0'
-        }]) %}
-      {% endif %}
+    {% for key, msg in fieldErrors %}
+      {% set errorList = errorList.concat([{
+        text: msg,
+        href: '#' + key
+      }]) %}
     {% endfor %}
   {% endif %}
   {% if errorList.length > 0 %}
@@ -95,7 +92,7 @@
                         {% endif %}
                       {% endfor %}
 
-                      {% set cellError = fieldErrors and fieldErrors[row.field] %}
+                      {% set cellError = fieldErrors and fieldErrors[row.field + '-' + yearIdx] %}
 
                       <td class="govuk-table__cell govuk-table__cell--numeric">
                         <input
@@ -140,7 +137,7 @@
                         {% endif %}
                       {% endfor %}
 
-                      {% set cellError = fieldErrors and fieldErrors[row.sourceField] %}
+                      {% set cellError = fieldErrors and fieldErrors[row.sourceField + '-' + row.contributorIndex + '-' + yearIdx] %}
 
                       <td class="govuk-table__cell govuk-table__cell--numeric">
                         <input type="hidden" name="fundingValues[{{ yearIdx }}][{{ row.contributorArrayField }}][{{ row.contributorIndex }}][name]" value="{{ row.contributorName }}">

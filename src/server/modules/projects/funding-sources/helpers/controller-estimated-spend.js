@@ -23,7 +23,8 @@ import { resolveBackLinkOptions } from './navigation-helpers.js'
 import {
   sanitiseFundingValueRow,
   setSourceTotalsFromContributorArrays,
-  stripEmptyContributorEntries,
+  stripEmptyContributorEntriesWithMapping,
+  sanitiseZerosFromValidatedRows,
   parseFundingValuesPayload
 } from './payload-helpers.js'
 import {
@@ -320,7 +321,11 @@ function hasContributorAmount(fundingValues, contributorArrayField, name) {
       return false
     }
     return contributors.some(
-      (c) => c.name === name && c.amount != null && c.amount !== ''
+      (c) =>
+        c.name === name &&
+        c.amount != null &&
+        c.amount !== '' &&
+        c.amount !== '0'
     )
   })
 }
@@ -358,7 +363,7 @@ function checkContributorCoverage(sessionData, fundingValues) {
  * contributor coverage check.
  * @private
  */
-function classifyValidationDetail(detail) {
+function classifyValidationDetail(detail, contributorIndexMaps = []) {
   const path = detail.path
   const isTopLevel =
     path.length === 0 || (path.length === 1 && typeof path[0] === 'number')
@@ -367,16 +372,69 @@ function classifyValidationDetail(detail) {
     return { kind: 'global' }
   }
 
+  const msgSuffix = detail.type === 'string.max' ? 'max_digits' : 'invalid'
+
+  // Source field error: path = [yearIndex, fieldName]
+  // Build a year-specific key like "fcermGia-0" so only the individual input
+  // is highlighted rather than the entire row.
+  // Skip errors on auto-computed contributor total fields — the contributor-
+  // level error already covers them and showing both would duplicate the
+  // message in the error summary.
+  if (path.length === 2 && typeof path[0] === 'number') {
+    const AUTO_COMPUTED_SOURCE_FIELDS = new Set([
+      'publicContributions',
+      'privateContributions',
+      'otherEaContributions'
+    ])
+    if (AUTO_COMPUTED_SOURCE_FIELDS.has(path[1])) {
+      return null
+    }
+    const fieldKey = `${path[1]}-${path[0]}`
+    return { kind: 'field', fieldKey, msgSuffix }
+  }
+
+  // Contributor error: path = [yearIndex, contributorArrayField, contributorIndex, 'amount']
+  // Map the array field back to its source field for the template id pattern:
+  // "sourceField-contributorIndex-yearIndex"
+  // The contributorIndex from Joi refers to the stripped array (empty entries
+  // removed).  Translate it back to the original index using the mapping built
+  // during stripping so the correct input is highlighted in the template.
+  if (path.length === 4 && path[3] === 'amount') {
+    const ARRAY_TO_SOURCE = {
+      publicContributors: 'publicContributions',
+      privateContributors: 'privateContributions',
+      otherEaContributors: 'otherEaContributions'
+    }
+    const yearIndex = path[0]
+    const arrayField = path[1]
+    const strippedIdx = path[2]
+    const sourceField = ARRAY_TO_SOURCE[arrayField] || arrayField
+
+    // Look up the original (pre-strip) contributor index
+    const yearMaps = contributorIndexMaps[yearIndex]
+    const originalIdx =
+      yearMaps && yearMaps[arrayField]
+        ? (yearMaps[arrayField][strippedIdx] ?? strippedIdx)
+        : strippedIdx
+
+    const fieldKey = `${sourceField}-${originalIdx}-${yearIndex}`
+    return { kind: 'field', fieldKey, msgSuffix }
+  }
+
   const fieldKey = path[path.length - 1]
   if (!fieldKey) {
     return null
   }
 
-  const msgSuffix = detail.type === 'string.max' ? 'max_digits' : 'invalid'
   return { kind: 'field', fieldKey, msgSuffix }
 }
 
-function buildSpendValidationErrors(error, contributorCoverageError, t) {
+function buildSpendValidationErrors(
+  error,
+  contributorCoverageError,
+  t,
+  contributorIndexMaps = []
+) {
   const fieldErrors = {}
   let globalError = contributorCoverageError
     ? t(contributorCoverageError)
@@ -389,7 +447,7 @@ function buildSpendValidationErrors(error, contributorCoverageError, t) {
   const ERROR_PREFIX = 'projects.funding_sources.estimated_spend.errors.'
 
   for (const detail of error.details) {
-    const classified = classifyValidationDetail(detail)
+    const classified = classifyValidationDetail(detail, contributorIndexMaps)
 
     if (classified?.kind === 'global' && !globalError) {
       globalError = t(`${ERROR_PREFIX}required`)
@@ -489,9 +547,13 @@ class EstimatedSpendController {
         .takeover()
     }
 
-    const fundingValuesForValidation = fundingValues.map((row) =>
-      stripEmptyContributorEntries({ ...row })
-    )
+    const contributorIndexMaps = []
+    const fundingValuesForValidation = fundingValues.map((row) => {
+      const { row: stripped, indexMaps } =
+        stripEmptyContributorEntriesWithMapping(row)
+      contributorIndexMaps.push(indexMaps)
+      return stripped
+    })
 
     const contributorCoverageError = checkContributorCoverage(
       sessionData,
@@ -509,7 +571,8 @@ class EstimatedSpendController {
       const { fieldErrors, globalError } = buildSpendValidationErrors(
         error,
         contributorCoverageError,
-        t
+        t,
+        contributorIndexMaps
       )
       const errorViewData = buildEstimatedSpendViewData(request, {
         existingValues: fundingValues,
@@ -522,12 +585,16 @@ class EstimatedSpendController {
       )
     }
 
+    const sanitisedRows = sanitiseZerosFromValidatedRows(
+      fundingValuesForValidation
+    )
+
     updateSessionData(request, {
-      [PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]: fundingValuesForValidation
+      [PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]: sanitisedRows
     })
 
     const saveViewData = buildEstimatedSpendViewData(request, {
-      existingValues: fundingValuesForValidation
+      existingValues: sanitisedRows
     })
 
     const saveError = await saveProjectWithErrorHandling(

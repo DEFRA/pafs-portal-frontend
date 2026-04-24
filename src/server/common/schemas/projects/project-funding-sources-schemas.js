@@ -299,7 +299,8 @@ export const createFundingValuesSchema = (selectedSources = []) =>
           (row) =>
             row[source] !== null &&
             row[source] !== undefined &&
-            row[source] !== ''
+            row[source] !== '' &&
+            row[source] !== '0'
         )
         if (!hasAtLeastOneEntry) {
           return helpers.error('array.sourceRequiresValue', { source })

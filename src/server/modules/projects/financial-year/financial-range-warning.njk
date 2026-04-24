@@ -1,0 +1,36 @@
+{% extends 'layouts/projects.njk' %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set p = 'projects.financial_year.warning' %}
+
+{% block pageTitle %}{{ t(p + '.title') }}{% endblock %}
+
+{% block content %}
+
+  <form method="post" novalidate>
+    <input type="hidden" name="crumb" value="{{ crumb }}">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+
+        <h1 class="govuk-heading-l">{{ t(p + '.heading') }}</h1>
+
+        <p class="govuk-body">{{ t(p + '.body_1') }}</p>
+
+        <ol class="govuk-list govuk-list--number">
+          <li>{{ t(p + '.list_item_1') }}</li>
+          <li>{{ t(p + '.list_item_2') }}</li>
+        </ol>
+
+        <p class="govuk-body">{{ t(p + '.body_2') }}</p>
+        <p class="govuk-body">{{ t(p + '.body_3') }}</p>
+        {{ govukButton({
+          text: t('common.buttons.save_and_continue'),
+          preventDoubleClick: true
+        }) }}
+
+      </div>
+    </div>
+  </form>
+
+{% endblock %}

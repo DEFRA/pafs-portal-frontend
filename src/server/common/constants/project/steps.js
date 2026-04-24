@@ -9,6 +9,7 @@ export const PROJECT_STEPS = {
   FINANCIAL_START_YEAR_MANUAL: 'financial-start-year-manual',
   FINANCIAL_END_YEAR: 'financial-end-year',
   FINANCIAL_END_YEAR_MANUAL: 'financial-end-year-manual',
+  FINANCIAL_YEAR_WARNING: 'financial-year-warning',
   START_OUTLINE_BUSINESS_CASE: 'start-outline-business-case',
   COMPLETE_OUTLINE_BUSINESS_CASE: 'complete-outline-business-case',
   AWARD_MAIN_CONTRACT: 'award-main-contract',

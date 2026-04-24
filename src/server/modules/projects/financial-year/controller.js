@@ -21,6 +21,91 @@ import {
   requiredInterventionTypesForProjectType
 } from '../helpers/project-utils.js'
 
+const REFERENCE_NUMBER_PARAM = '{referenceNumber}'
+
+/**
+ * Important dates payload fields that indicate the project has date data.
+ */
+const IMPORTANT_DATES_FIELDS = [
+  'startOutlineBusinessCaseMonth',
+  'startOutlineBusinessCaseYear',
+  'completeOutlineBusinessCaseMonth',
+  'completeOutlineBusinessCaseYear',
+  'awardContractMonth',
+  'awardContractYear',
+  'startConstructionMonth',
+  'startConstructionYear',
+  'readyForServiceMonth',
+  'readyForServiceYear'
+]
+
+/**
+ * Funding source boolean fields that indicate at least one source has been selected.
+ */
+const FUNDING_SOURCE_BOOLEAN_FIELDS = [
+  'fcermGia',
+  'localLevy',
+  'publicContributions',
+  'privateContributions',
+  'otherEaContributions',
+  'notYetIdentified',
+  'additionalFcermGia',
+  'assetReplacementAllowance',
+  'environmentStatutoryFunding',
+  'frequentlyFloodedCommunities',
+  'otherAdditionalGrantInAid',
+  'otherGovernmentDepartment',
+  'recovery',
+  'summerEconomicFund'
+]
+
+/**
+ * Checks whether the project has any Important Dates or Funding Sources data
+ * that would be affected by a financial year range change.
+ * @param {Object} sessionData - Project session data
+ * @returns {boolean}
+ */
+function hasDateOrFundingData(sessionData) {
+  // Check important dates
+  const hasImportantDates = IMPORTANT_DATES_FIELDS.some((field) => {
+    const value = sessionData[field]
+    return value !== undefined && value !== null && value !== ''
+  })
+
+  if (hasImportantDates) {
+    return true
+  }
+
+  // Check funding source selection booleans
+  const hasFundingSourceSelected = FUNDING_SOURCE_BOOLEAN_FIELDS.some(
+    (field) => sessionData[field] === true
+  )
+
+  if (hasFundingSourceSelected) {
+    return true
+  }
+
+  // Check funding values (session format after estimated-spend save)
+  const fundingValues = sessionData.fundingValues
+  if (Array.isArray(fundingValues) && fundingValues.length > 0) {
+    return true
+  }
+
+  // Check raw DB funding value rows (loaded from API before estimated-spend visit)
+  const dbFundingValues = sessionData.pafs_core_funding_values
+  if (Array.isArray(dbFundingValues) && dbFundingValues.length > 0) {
+    return true
+  }
+
+  // Check raw DB contributor rows (legacy projects store names here)
+  const dbContributors = sessionData.pafs_core_funding_contributors
+  if (Array.isArray(dbContributors) && dbContributors.length > 0) {
+    return true
+  }
+
+  return false
+}
+
 class FinancialYearController {
   _isFinancialStartYearStep(step) {
     return [
@@ -126,6 +211,21 @@ class FinancialYearController {
       return h.redirect(ROUTES.PROJECT.FINANCIAL_END_YEAR).takeover()
     }
 
+    // In edit mode, check if project has data that could be affected
+    if (isEditMode && hasDateOrFundingData(sessionData)) {
+      // Store which step triggered the warning for back link
+      updateSessionData(request, { pendingFinancialYearStep: step })
+
+      return h
+        .redirect(
+          ROUTES.PROJECT.EDIT.FINANCIAL_YEAR_WARNING.replace(
+            REFERENCE_NUMBER_PARAM,
+            referenceNumber
+          )
+        )
+        .takeover()
+    }
+
     // In edit mode or end year steps, go to overview
     if (isEditMode || this._isFinancialEndYearStep(step)) {
       return navigateToProjectOverview(referenceNumber, h)
@@ -169,6 +269,14 @@ class FinancialYearController {
     // Skip submission in create mode for start year steps
     if (!isEditMode && this._isFinancialStartYearStep(step)) {
       return null
+    }
+
+    // In edit mode, skip submission if data exists (warning page will handle save)
+    if (isEditMode) {
+      const sessionData = getSessionData(request)
+      if (hasDateOrFundingData(sessionData)) {
+        return null
+      }
     }
 
     // Determine level for edit mode
