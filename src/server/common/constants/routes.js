@@ -95,6 +95,7 @@ export const ROUTES = {
 
   PROJECT: {
     OVERVIEW: '/project/{referenceNumber}',
+    SUBMIT: '/project/{referenceNumber}/submit',
     ARCHIVE: '/project/{referenceNumber}/archive',
     REVERT_TO_DRAFT: '/project/{referenceNumber}/revert-to-draft',
     ARCHIVE_CONFIRMATION: '/project/{referenceNumber}/archive/confirmation',

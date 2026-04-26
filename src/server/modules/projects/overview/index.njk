@@ -1,6 +1,6 @@
 {% extends 'layouts/projects.njk' %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
@@ -38,6 +38,13 @@
   {% endif %}
 
   <h1 class="govuk-heading-xl">{{ t('projects.overview.heading') }}</h1>
+
+  {% if submissionErrorList and submissionErrorList.length %}
+    {{ govukErrorSummary({
+      titleText: t('projects.overview.submission.errors.summary_title'),
+      errorList: submissionErrorList
+    }) }}
+  {% endif %}
 
   <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-4">
     <div class="govuk-summary-list__row">
@@ -102,40 +109,138 @@
 
   <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
-  {{ proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t, isReadOnly) }}
+  <div id="section-proposal-details"{% if submissionErrors['section-proposal-details'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-proposal-details'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-proposal-details'] }}</p>
+    {% endif %}
+    {{ proposalDetailsSummaryCard(projectData, PROJECT_TYPES, PROJECT_INTERVENTION_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, buildFinancialYearLabel, t, isReadOnly) }}
+  </div>
 
-  {{ projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, formatFileSize, t, isReadOnly) }}
+  <div id="section-benefit-area"{% if submissionErrors['section-benefit-area'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-benefit-area'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-benefit-area'] }}</p>
+    {% endif %}
+    {{ projectBenefitAreaCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, formatFileSize, t, isReadOnly) }}
+  </div>
 
-  {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate, isReadOnly) }}
+  <div id="section-important-dates"{% if submissionErrors['section-important-dates'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-important-dates'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-important-dates'] }}</p>
+    {% endif %}
+    {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate, isReadOnly) }}
+  </div>
 
-  {{ fundingSourcesAndSpendingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) }}
+  <div id="section-funding-sources"{% if submissionErrors['section-funding-sources'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-funding-sources'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-funding-sources'] }}</p>
+    {% endif %}
+    {{ fundingSourcesAndSpendingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) }}
+  </div>
 
-  {{ riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t, isReadOnly) }}
+  <div id="section-risk-properties"{% if submissionErrors['section-risk-properties'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-risk-properties'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-risk-properties'] }}</p>
+    {% endif %}
+    {{ riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t, isReadOnly) }}
+  </div>
 
-  {{ environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) }}
+  <div id="section-environmental-benefits"{% if submissionErrors['section-environmental-benefits'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-environmental-benefits'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-environmental-benefits'] }}</p>
+    {% endif %}
+    {{ environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) }}
+  </div>
 
-  {{ goalsApproachSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) }}
+  <div id="section-goals"{% if submissionErrors['section-goals'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-goals'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-goals'] }}</p>
+    {% endif %}
+    {{ goalsApproachSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) }}
+  </div>
 
-  {{ urgencyAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, URGENCY_REASONS, t, isReadOnly) }}
+  <div id="section-urgency"{% if submissionErrors['section-urgency'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-urgency'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-urgency'] }}</p>
+    {% endif %}
+    {{ urgencyAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, URGENCY_REASONS, t, isReadOnly) }}
+  </div>
 
-  {{ confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, PROJECT_TYPES, t, isReadOnly, isConfidenceRestricted) }}
+  <div id="section-confidence"{% if submissionErrors['section-confidence'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-confidence'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-confidence'] }}</p>
+    {% endif %}
+    {{ confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, PROJECT_TYPES, t, isReadOnly, isConfidenceRestricted) }}
+  </div>
 
-  {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t, isReadOnly) }}
+  <div id="section-nfm"{% if submissionErrors['section-nfm'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-nfm'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-nfm'] }}</p>
+    {% endif %}
+    {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t, isReadOnly) }}
+  </div>
 
-  {{ wlcSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_TYPES, t, isReadOnly, formatNumberWithCommas) }}
+  <div id="section-wlc"{% if submissionErrors['section-wlc'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-wlc'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-wlc'] }}</p>
+    {% endif %}
+    {{ wlcSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_TYPES, t, isReadOnly, formatNumberWithCommas) }}
+  </div>
 
-  {{ wlbSummaryCard(projectData, PROJECT_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) }}
+  <div id="section-wlb"{% if submissionErrors['section-wlb'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-wlb'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-wlb'] }}</p>
+    {% endif %}
+    {{ wlbSummaryCard(projectData, PROJECT_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) }}
+  </div>
 
-  {{ carbonImpactSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_TYPES, t, isReadOnly, formatNumberWithCommas) }}
+  <div id="section-carbon"{% if submissionErrors['section-carbon'] %} class="govuk-form-group--error"{% endif %}>
+    {% if submissionErrors['section-carbon'] %}
+      <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-carbon'] }}</p>
+    {% endif %}
+    {{ carbonImpactSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_TYPES, t, isReadOnly, formatNumberWithCommas) }}
+  </div>
 
   {% if not isReadOnly %}
     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
 
-    <p class="govuk-body">{{ t('projects.overview.submission_info') }}</p>
+    <section aria-labelledby="submission-heading">
+      <h2 class="govuk-heading-m" id="submission-heading">{{ t('projects.overview.submission.title') }}</h2>
 
-    {{ govukButton({
-      text: t('common.buttons.submit_proposal')
-    }) }}
+      <p class="govuk-body">{{ t('projects.overview.submission.notice') }}</p>
+
+      <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">{{ t('projects.overview.submission.data_notice.summary') }}</span>
+        </summary>
+        <div class="govuk-details__text" id="data-notice">
+          <h2 class="govuk-heading-s">{{ t('projects.overview.submission.data_notice.how_we_use_heading') }}</h2>
+          <p>{{ t('projects.overview.submission.data_notice.how_we_use_intro') }}</p>
+          <ul class="govuk-list govuk-list--number">
+            {% for item in t('projects.overview.submission.data_notice.how_we_use_items', {returnObjects: true}) %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+          <h2 class="govuk-heading-s">{{ t('projects.overview.submission.data_notice.may_also_heading') }}</h2>
+          <ul class="govuk-list govuk-list--number">
+            {% for item in t('projects.overview.submission.data_notice.may_also_items', {returnObjects: true}) %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+          <p>{{ t('projects.overview.submission.data_notice.agents_notice') }}</p>
+        </div>
+      </details>
+
+        {% if submissionErrors and submissionErrors.general %}
+        <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors.general }}</p>
+      {% endif %}
+
+      <form method="post" action="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/submit" novalidate>
+        <input type="hidden" name="crumb" value="{{ crumb }}">
+        {{ govukButton({
+          text: t('common.buttons.submit_proposal')
+        }) }}
+      </form>
+    </section>
   {% endif %}
 
 {% endblock %}

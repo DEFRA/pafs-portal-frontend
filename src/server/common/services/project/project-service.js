@@ -196,3 +196,19 @@ export async function getCarbonImpactCalc(referenceNumber, accessToken) {
     headers
   })
 }
+
+/**
+ * Submit a draft project proposal for review.
+ * Runs backend submission validation and transitions the project to submitted state.
+ * @param {string} referenceNumber - The project reference number (slug format with dashes)
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} API response — success or validation/permission errors
+ */
+export async function submitProjectProposal(referenceNumber, accessToken) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(`/api/v1/project/${referenceNumber}/submit`, {
+    method: 'POST',
+    headers
+  })
+}
