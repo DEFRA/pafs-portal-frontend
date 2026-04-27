@@ -63,7 +63,7 @@
     "update_totals": "Update totals"
   },
   "footer": {
-    "contact_html": "Any issues contact the Defra IT Service Desk on <a href=\"tel:08008766458\" class=\"govuk-footer__link\">0800 8766458</a>",
+    "contact_html": "For users outside the Environment Agency please contact: <a href=\"tel:03708506506\" class=\"govuk-footer__link\">0370 8506 506.</a></br>For Environment Agency users please contact the Defra IT Service Desk on <a href=\"tel:08008766458\" class=\"govuk-footer__link\">0800 876 6458.</a>",
     "links": {
       "privacy": {
         "text": "Privacy",
