@@ -52,8 +52,8 @@ describe('Routes Constants', () => {
       expect(ROUTES.GENERAL.PROPOSALS).toBe('/')
     })
 
-    test('DOWNLOAD route is defined', () => {
-      expect(ROUTES.GENERAL.DOWNLOAD).toBe('/download')
+    test('PROGRAMME_DOWNLOAD route is defined', () => {
+      expect(ROUTES.DOWNLOADS.PROGRAMME).toBe('/downloads')
     })
 
     test('ARCHIVE route is defined', () => {
@@ -181,6 +181,12 @@ describe('Routes Constants', () => {
 
     test('SUBMISSIONS route is defined', () => {
       expect(ROUTES.ADMIN.SUBMISSIONS).toBe('/admin/submissions')
+    })
+
+    test('SUBMISSIONS_MARK_IN_AIMS_PD route is defined', () => {
+      expect(ROUTES.ADMIN.SUBMISSIONS_MARK_IN_AIMS_PD).toBe(
+        '/admin/submissions/{referenceNumber}/mark-in-aims-pd'
+      )
     })
 
     test('ORGANISATIONS route is defined', () => {
@@ -332,7 +338,6 @@ describe('Routes Constants', () => {
     test('all general routes are defined', () => {
       expect(ROUTES.GENERAL).toHaveProperty('HOME')
       expect(ROUTES.GENERAL).toHaveProperty('PROPOSALS')
-      expect(ROUTES.GENERAL).toHaveProperty('DOWNLOAD')
       expect(ROUTES.GENERAL).toHaveProperty('ARCHIVE')
     })
 

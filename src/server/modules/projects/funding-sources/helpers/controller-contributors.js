@@ -29,6 +29,76 @@ import {
   CONTRIBUTOR_SPEND_GROUPS
 } from './estimated-spending-helpers.js'
 
+// ─── Session sync ────────────────────────────────────────────────────────────
+
+/**
+ * Rename / delete contributor rows inside `pafs_core_funding_contributors` in
+ * the session so the estimated-spend page pre-populates amounts correctly
+ * after a contributor is renamed.
+ *
+ * Mirrors the paired rename algorithm used in the backend service:
+ * sorted removed names are paired with sorted added names (rename-in-place);
+ * any excess removals beyond available pairings are true deletions.
+ *
+ * @param {object} request
+ * @param {string} sessionKey - identifies which contributor group was changed
+ * @param {string[]} newNames  - the names that were just saved
+ */
+function syncSessionContributorNames(request, sessionKey, newNames) {
+  const group = CONTRIBUTOR_SPEND_GROUPS.find(
+    (g) => g.sessionKey === sessionKey
+  )
+  if (!group) {
+    return
+  }
+
+  const sessionData = getSessionData(request)
+  const allContributors = sessionData.pafs_core_funding_contributors
+
+  if (!Array.isArray(allContributors) || allContributors.length === 0) {
+    return
+  }
+
+  const { contributorType } = group
+  const typeRows = allContributors.filter(
+    (c) => c.contributorType === contributorType
+  )
+  const existingNames = [...new Set(typeRows.map((c) => c.name))].sort((a, b) =>
+    a.localeCompare(b)
+  )
+  const sortedNew = [...newNames].sort((a, b) => a.localeCompare(b))
+  const removed = existingNames
+    .filter((n) => !sortedNew.includes(n))
+    .sort((a, b) => a.localeCompare(b))
+  const added = sortedNew
+    .filter((n) => !existingNames.includes(n))
+    .sort((a, b) => a.localeCompare(b))
+
+  if (removed.length === 0 && added.length === 0) {
+    return
+  }
+
+  let updated = [...allContributors]
+
+  for (let i = 0; i < removed.length; i++) {
+    if (i < added.length) {
+      // Rename in-place — preserves amount so estimated-spend pre-populates
+      updated = updated.map((c) =>
+        c.contributorType === contributorType && c.name === removed[i]
+          ? { ...c, name: added[i] }
+          : c
+      )
+    } else {
+      // True deletion
+      updated = updated.filter(
+        (c) => !(c.contributorType === contributorType && c.name === removed[i])
+      )
+    }
+  }
+
+  updateSessionData(request, { pafs_core_funding_contributors: updated })
+}
+
 // ─── Contributor name validation ────────────────────────────────────────────
 
 /**
@@ -305,6 +375,10 @@ class ContributorsController {
     if (saveError) {
       return saveError
     }
+
+    // Keep session in sync so the estimated-spend page pre-populates renamed
+    // contributor amounts without needing a full project re-fetch.
+    syncSessionContributorNames(request, sessionKey, nonEmptyNames)
 
     const updated = getSessionData(request)
     return h

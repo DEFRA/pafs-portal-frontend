@@ -102,6 +102,12 @@ export const PROJECT_VIEWS = {
     'modules/projects/funding-sources/missing-financial-years'
 }
 
+export const DOWNLOADS_VIEWS = {
+  INDIVIDUAL: 'modules/downloads/individual/index',
+  PROGRAMME: 'modules/downloads/programme/index',
+  ADMIN: 'modules/downloads/admin/index'
+}
+
 export const GENERAL_VIEWS = {
   STATIC_PAGES: {
     PRIVACY: 'modules/general/static/views/privacy',

@@ -198,7 +198,7 @@
                   <td class="govuk-table__cell govuk-!-white-space-nowrap" data-label="">
                     <a href="#" class="govuk-link" data-testid="resend-to-aims-pd">{{ t('projects.failed_submissions.actions.resend_to_aims_pd') }}</a>
                     &nbsp;|&nbsp;
-                    <a href="#" class="govuk-link" data-testid="proposal-in-aims-pd">{{ t('projects.failed_submissions.actions.proposal_in_aims_pd') }}</a>
+                    <button type="submit" form="mark-in-aims-pd-{{ project.referenceNumberFormatted }}" class="app-button--link" data-testid="proposal-in-aims-pd">{{ t('projects.failed_submissions.actions.proposal_in_aims_pd') }}</button>
                   </td>
                 {% endif %}
               </tr>
@@ -207,6 +207,20 @@
         </table>
       {% else %}
         <p class="govuk-body" data-testid="projects-empty">{{ t('projects.manage_projects.empty') }}</p>
+      {% endif %}
+
+      {# Detached forms for submission actions — placed outside the table to avoid layout interference.
+         Buttons reference these by id via the HTML5 'form' attribute. #}
+      {% if isSubmission %}
+        {% for project in projects %}
+          <form
+            id="mark-in-aims-pd-{{ project.referenceNumberFormatted }}"
+            method="post"
+            action="/admin/submissions/{{ project.referenceNumberFormatted }}/mark-in-aims-pd"
+            hidden>
+            <input type="hidden" name="crumb" value="{{ crumb }}">
+          </form>
+        {% endfor %}
       {% endif %}
 
       {# Pagination row with summary and navigation #}

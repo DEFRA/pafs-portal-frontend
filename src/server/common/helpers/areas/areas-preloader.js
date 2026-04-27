@@ -24,7 +24,14 @@ export const areasPreloader = {
 
     // Hook into onPreHandler to preload areas on first request and keep
     // server.app.areasByType populated so synchronous helpers can read it
-    server.ext('onPreHandler', async (_request, h) => {
+    server.ext('onPreHandler', async (request, h) => {
+      // Skip areas preloading for the not-found catch-all route — it doesn't
+      // need areas data, and the API calls (with retries) would otherwise hang
+      // in environments where the backend is not running (e.g. unit tests).
+      if (request.route.path === '/{p*}') {
+        return h.continue
+      }
+
       if (!areasPreloaded) {
         try {
           server.logger.info('First request detected - preloading areas')

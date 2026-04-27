@@ -21,8 +21,11 @@ describe('Auth Middleware', () => {
 
   beforeEach(() => {
     mockRequest = {
+      method: 'get',
+      url: { pathname: '/projects/123', search: '' },
       yar: {
-        flash: vi.fn()
+        flash: vi.fn(),
+        set: vi.fn()
       }
     }
     mockH = {
@@ -47,6 +50,36 @@ describe('Auth Middleware', () => {
       expect(result.takeover).toHaveBeenCalled()
     })
 
+    test('saves returnTo for GET request with no session', async () => {
+      getAuthSession.mockReturnValue(null)
+      mockRequest.url = { pathname: '/projects/123', search: '?tab=details' }
+
+      await requireAuth(mockRequest, mockH)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'returnTo',
+        '/projects/123?tab=details'
+      )
+    })
+
+    test('does not save returnTo for POST request', async () => {
+      getAuthSession.mockReturnValue(null)
+      mockRequest.method = 'post'
+
+      await requireAuth(mockRequest, mockH)
+
+      expect(mockRequest.yar.set).not.toHaveBeenCalled()
+    })
+
+    test('does not save returnTo for login path', async () => {
+      getAuthSession.mockReturnValue(null)
+      mockRequest.url = { pathname: '/login', search: '' }
+
+      await requireAuth(mockRequest, mockH)
+
+      expect(mockRequest.yar.set).not.toHaveBeenCalled()
+    })
+
     test('redirects if session expired', async () => {
       getAuthSession.mockReturnValue({ user: { id: 1 } })
       isSessionExpired.mockReturnValue(true)
@@ -59,6 +92,19 @@ describe('Auth Middleware', () => {
         'session-timeout'
       )
       expect(mockH.redirect).toHaveBeenCalledWith('/login')
+    })
+
+    test('saves returnTo when session is expired', async () => {
+      getAuthSession.mockReturnValue({ user: { id: 1 } })
+      isSessionExpired.mockReturnValue(true)
+      mockRequest.url = { pathname: '/projects/456', search: '' }
+
+      await requireAuth(mockRequest, mockH)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'returnTo',
+        '/projects/456'
+      )
     })
 
     test('refreshes token if needed before validation', async () => {

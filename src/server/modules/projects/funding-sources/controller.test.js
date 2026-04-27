@@ -563,6 +563,76 @@ describe('publicContributorsController', () => {
       expect(nextRouteAfterContributors).toHaveBeenCalled()
     })
 
+    it('renames contributor in session when name changes (sync for estimated-spend pre-population)', async () => {
+      const sessionWithOldContributor = {
+        [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: true,
+        _publicContributorsSession: ['Alice'],
+        pafs_core_funding_contributors: [
+          {
+            name: 'Alice',
+            contributorType: 'public_contributions',
+            fundingValueId: 1,
+            amount: '5000'
+          }
+        ]
+      }
+      getSessionData.mockReturnValue(sessionWithOldContributor)
+      request.payload = {}
+      parseContributorsPayload.mockReturnValue(['Alice Smith'])
+      FUNDING_SOURCES_CONFIG[
+        PROJECT_STEPS.FUNDING_SOURCES_PUBLIC_CONTRIBUTORS
+      ].schema.validate.mockReturnValue({ error: null })
+      saveProjectWithErrorHandling.mockResolvedValue(null)
+
+      await publicContributorsController.postHandler(request, h)
+
+      // Session contributors should be updated with the new name so the
+      // estimated-spend page can match contributor amounts by name
+      expect(updateSessionData).toHaveBeenCalledWith(
+        request,
+        expect.objectContaining({
+          pafs_core_funding_contributors: [
+            {
+              name: 'Alice Smith',
+              contributorType: 'public_contributions',
+              fundingValueId: 1,
+              amount: '5000'
+            }
+          ]
+        })
+      )
+    })
+
+    it('does not update pafs_core_funding_contributors when names are unchanged', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: true,
+        _publicContributorsSession: ['Alice'],
+        pafs_core_funding_contributors: [
+          {
+            name: 'Alice',
+            contributorType: 'public_contributions',
+            fundingValueId: 1,
+            amount: '5000'
+          }
+        ]
+      })
+      request.payload = {}
+      parseContributorsPayload.mockReturnValue(['Alice'])
+      FUNDING_SOURCES_CONFIG[
+        PROJECT_STEPS.FUNDING_SOURCES_PUBLIC_CONTRIBUTORS
+      ].schema.validate.mockReturnValue({ error: null })
+      saveProjectWithErrorHandling.mockResolvedValue(null)
+
+      await publicContributorsController.postHandler(request, h)
+
+      // No pafs_core_funding_contributors update should have been triggered
+      const allCalls = updateSessionData.mock.calls
+      const contributorSyncCall = allCalls.find((call) =>
+        Object.hasOwn(call[1], 'pafs_core_funding_contributors')
+      )
+      expect(contributorSyncCall).toBeUndefined()
+    })
+
     it('re-renders with error when no contributors entered', async () => {
       getSessionData.mockReturnValue({
         [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: true,

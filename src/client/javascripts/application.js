@@ -125,6 +125,114 @@ globalThis.pafs.numberFormatting = {
   bindCommaFormattingToInputs
 }
 
+setupHeaderNavigation()
+
+// ── Programme download – progressive enhancement polling ─────────────────────
+//
+// When the page shows a "generating" state the module polls a JSON endpoint
+// every 3 seconds and updates the UI without a full page reload.
+// Without JS the view falls back to a <noscript> meta-refresh.
+//
+// Activated by: [data-module="programme-download"][data-download-status="generating"]
+
+const MAX_CONSECUTIVE_ERRORS = 3
+const POLL_INTERVAL_MS = 3000
+
+function updateAdminProgress(data, progressBar, progressCount) {
+  if (!data.progressTotal || data.progressTotal <= 0) {
+    return
+  }
+  const pct = Math.round((data.progressCurrent / data.progressTotal) * 100)
+  if (progressBar) {
+    progressBar.style.width = pct + '%'
+    progressBar
+      .closest('[role="progressbar"]')
+      ?.setAttribute('aria-valuenow', pct)
+  }
+  if (progressCount) {
+    progressCount.textContent = `${data.progressCurrent} of ${data.progressTotal} (${pct}%)`
+  }
+}
+
+function handleGeneratingStatus(
+  data,
+  isAdmin,
+  progressMessage,
+  progressBar,
+  progressCount
+) {
+  if (progressMessage && data.progressMessage) {
+    progressMessage.textContent = data.progressMessage
+  }
+  if (isAdmin) {
+    updateAdminProgress(data, progressBar, progressCount)
+  }
+}
+
+export function initProgrammeDownloadPolling() {
+  const el = document.querySelector('[data-module="programme-download"]')
+  if (el?.dataset.downloadStatus !== 'generating') {
+    return
+  }
+
+  const pollUrl = el.dataset.pollUrl
+  const isAdmin = el.dataset.isAdmin === 'true'
+  if (!pollUrl) {
+    return
+  }
+
+  const progressMessage = document.getElementById('js-progress-message')
+  const progressCount = document.getElementById('js-progress-count')
+  const progressBar = document.getElementById('js-progress-bar')
+
+  let consecutiveErrors = 0
+
+  async function poll() {
+    try {
+      const res = await fetch(pollUrl, {
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin'
+      })
+
+      if (!res.ok) {
+        consecutiveErrors++
+        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          clearInterval(timer)
+        }
+        return
+      }
+
+      consecutiveErrors = 0
+      const data = await res.json()
+
+      if (data.status === 'generating') {
+        handleGeneratingStatus(
+          data,
+          isAdmin,
+          progressMessage,
+          progressBar,
+          progressCount
+        )
+        return
+      }
+
+      // Status changed – do a full reload to render the correct server-side partial
+      clearInterval(timer)
+      globalThis.location.reload()
+    } catch (err) {
+      console.error('Programme download poll error', err)
+      consecutiveErrors++
+      if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+        clearInterval(timer)
+      }
+    }
+  }
+
+  const timer = setInterval(poll, POLL_INTERVAL_MS)
+}
+
+initProgrammeDownloadPolling()
+
 bindCommaFormattingToInputs(
   '[data-number-format="comma"], [data-wlc-cost-input="true"]',
   { unformatOnSubmit: true }

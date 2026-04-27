@@ -11,11 +11,47 @@ import { validateSession } from '../../services/auth/auth-service.js'
 import { AUTH_ERROR_CODES } from '../../constants/validation.js'
 import { SESSION } from '../../constants/common.js'
 
+const EXCLUDED_RETURN_PATHS = [
+  ROUTES.LOGIN,
+  ROUTES.LOGOUT,
+  ROUTES.FORGOT_PASSWORD,
+  ROUTES.RESET_PASSWORD,
+  ROUTES.SET_PASSWORD
+]
+
+/**
+ * Check if a URL is safe to use as a post-login return destination
+ * @private
+ */
+function isValidReturnUrl(url) {
+  return (
+    typeof url === 'string' &&
+    url.startsWith('/') &&
+    !url.startsWith('//') &&
+    !EXCLUDED_RETURN_PATHS.some((path) => url.startsWith(path))
+  )
+}
+
+/**
+ * Save the current URL to the session for post-login redirect (GET requests only)
+ * @private
+ */
+function saveReturnUrl(request) {
+  if (request.method !== 'get' || !request.url) {
+    return
+  }
+  const returnTo = request.url.pathname + (request.url.search || '')
+  if (isValidReturnUrl(returnTo)) {
+    request.yar.set('returnTo', returnTo)
+  }
+}
+
 /**
  * Redirect to login with error message
  * @private
  */
 function redirectToLogin(request, h, errorMessage) {
+  saveReturnUrl(request)
   clearAuthSession(request)
   request.yar.flash('authError', errorMessage)
   return h.redirect(ROUTES.LOGIN).takeover()
@@ -88,6 +124,7 @@ export async function requireAuth(request, h) {
   const session = getAuthSession(request)
 
   if (!session) {
+    saveReturnUrl(request)
     return h.redirect(ROUTES.LOGIN).takeover()
   }
 
