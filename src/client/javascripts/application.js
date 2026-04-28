@@ -70,6 +70,9 @@ export const formatInputValueWithCommas = (inputEl) => {
   if (typeof document === 'undefined' || !inputEl) {
     return
   }
+  if (inputEl.value.includes('.')) {
+    return
+  }
   inputEl.value = formatNumberWithCommas(inputEl.value)
 }
 
@@ -77,7 +80,7 @@ export const unformatInputValue = (inputEl) => {
   if (typeof document === 'undefined' || !inputEl) {
     return
   }
-  inputEl.value = digitsOnly(inputEl.value)
+  inputEl.value = inputEl.value.replaceAll(',', '')
 }
 
 export const bindCommaFormattingToInputs = (selector, options = {}) => {
@@ -251,12 +254,16 @@ bindCommaFormattingToInputs(
   }
 
   function parseVal(input) {
-    const v = stripCommas(input.value)
-    return v === '' ? 0 : Number.parseInt(v, 10) || 0
+    const raw = (input.value || '').trim()
+    if (raw.includes('.')) {
+      return 0n
+    }
+    const v = stripCommas(raw)
+    return v === '' ? 0n : BigInt(v)
   }
 
   function formatNum(n) {
-    return n === 0 ? '0' : n.toLocaleString('en-GB')
+    return n === 0n ? '0' : n.toLocaleString('en-GB')
   }
 
   function processInput(inp, colIdx, colTotals, numCols) {
@@ -270,7 +277,7 @@ bindCommaFormattingToInputs(
 
   function processRow(row, _form, colTotals, numCols) {
     const inputs = row.querySelectorAll('[data-spend-cell]')
-    let rowTotal = 0
+    let rowTotal = 0n
 
     inputs.forEach(function (inp, colIdx) {
       rowTotal += processInput(inp, colIdx, colTotals, numCols)
@@ -283,7 +290,7 @@ bindCommaFormattingToInputs(
   }
 
   function updateColumnTotals(form, colTotals) {
-    let grandTotal = 0
+    let grandTotal = 0n
     colTotals.forEach(function (ct, colIdx) {
       grandTotal += ct
       const el = form.querySelector(`[data-col-total="${colIdx}"]`)
@@ -300,7 +307,7 @@ bindCommaFormattingToInputs(
 
   function recalc(form, numCols) {
     const rows = form.querySelectorAll('[data-source-row]')
-    const colTotals = Array.from({ length: numCols }, () => 0)
+    const colTotals = Array.from({ length: numCols }, () => 0n)
 
     rows.forEach(function (row) {
       processRow(row, form, colTotals, numCols)
