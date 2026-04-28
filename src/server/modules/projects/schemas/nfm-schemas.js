@@ -101,13 +101,13 @@ export const nfmRiverRestorationSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: Joi.number()
     .unsafe()
-    .positive()
+    .min(0)
     .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .optional()
     .messages({
       'number.base': 'volume_invalid',
-      'number.positive': 'volume_invalid',
+      'number.min': 'volume_invalid',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     })
@@ -120,13 +120,13 @@ export const nfmRiverRestorationSchema = Joi.object({
 export const nfmLeakyBarriersSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: Joi.number()
     .unsafe()
-    .positive()
+    .min(0)
     .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .optional()
     .messages({
       'number.base': 'volume_invalid',
-      'number.positive': 'volume_invalid',
+      'number.min': 'volume_invalid',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     }),
@@ -178,12 +178,12 @@ export const nfmOfflineStorageSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: Joi.number()
     .unsafe()
-    .positive()
+    .min(0)
     .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .messages({
       'number.base': 'volume_invalid',
-      'number.positive': 'volume_invalid',
+      'number.min': 'volume_invalid',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     })
@@ -249,12 +249,12 @@ export const nfmRunoffManagementSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: Joi.number()
     .unsafe()
-    .positive()
+    .min(0)
     .custom(maxTwoDecimalPlaces)
     .allow(null, '')
     .messages({
       'number.base': 'volume_invalid',
-      'number.positive': 'volume_invalid',
+      'number.min': 'volume_invalid',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     })
