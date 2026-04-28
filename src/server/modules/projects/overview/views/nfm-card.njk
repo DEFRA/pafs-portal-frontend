@@ -1,26 +1,27 @@
-{% macro nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t) %}
+{% macro nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t, isReadOnly) %}
   {% set hasNfmData = projectData[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES] %}
-  {% set hasNfmOrSudIntervention = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] and 
-      (PROJECT_INTERVENTION_TYPES.NFM in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] or 
-       PROJECT_INTERVENTION_TYPES.SUDS in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]) %}
-  
+  {% set hasNfmOrSudIntervention = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] and(PROJECT_INTERVENTION_TYPES.NFM in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] or PROJECT_INTERVENTION_TYPES.SUDS in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]) %}
+
   {% if hasNfmOrSudIntervention %}
     <div class="govuk-summary-card">
       <div class="govuk-summary-card__title-wrapper">
         <h2 class="govuk-summary-card__title">{{ t('projects.overview.nfm_summary_card.title') }}</h2>
-        <ul class="govuk-summary-card__actions">
-          <li class="govuk-summary-card__action">
-            <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.NFM_SELECTED_MEASURES }}">
-              {% if hasNfmData %}{{ t('common.change') }}
-              {% else %}{{ t('common.add') }}
-              {% endif %}
-              <span class="govuk-visually-hidden"> {{ t('projects.overview.nfm_summary_card.title') | lower }}</span>
-            </a>
-          </li>
-        </ul>
+        {% if not isReadOnly %}
+          <ul class="govuk-summary-card__actions">
+            <li class="govuk-summary-card__action">
+              <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.NFM_SELECTED_MEASURES }}">
+                {% if hasNfmData %}{{ t('common.change') }}
+                {% else %}{{ t('common.add') }}
+                {% endif %}
+                <span class="govuk-visually-hidden">
+                  {{ t('projects.overview.nfm_summary_card.title') | lower }}</span>
+              </a>
+            </li>
+          </ul>
+        {% endif %}
       </div>
       <div class="govuk-summary-card__content">
-        {% if hasNfmData %}  
+        {% if hasNfmData %}
           {# NFM Measures Details Table #}
           {% if projectData.pafs_core_nfm_measures and projectData.pafs_core_nfm_measures.length > 0 %}
             <details class="govuk-details govuk-!-margin-top-6">

@@ -10,8 +10,8 @@
     }
   },
   "overview": {
-    "title": "Proposal Overview",
-    "heading": "Proposal Overview",
+    "title": "Proposal overview",
+    "heading": "Proposal overview",
     "common": {
       "npn": "National Proposal Number",
       "last_updated": "Last updated",
@@ -21,7 +21,7 @@
       "archive": "Archive",
       "revert_to_draft": "Revert to draft",
       "revert_to_revise": "Revert to revise",
-      "download": "Download",
+      "download": "Download proposal",
       "delete": "Delete",
       "not_submitted": "Not yet submitted",
       "not_provided": "Not provided",
@@ -85,7 +85,7 @@
       "reducing_coastal_erosion": "Reducing coastal erosion risk",
       "percent_properties_20_deprived": "Percentage of properties in 20% most deprived areas",
       "percent_properties_40_deprived": "Percentage of properties in 40% most deprived areas",
-      "current_flood_fluvial_risk": "Current flood risk (fluvial and coastal)",
+      "current_flood_fluvial_risk": "Current flood risk (fluvial and tidal)",
       "current_flood_surface_water_risk": "Current flood risk (surface water)",
       "current_coastal_erosion_risk": "Current coastal erosion risk",
       "flood_risk": {
@@ -487,7 +487,7 @@
         "reducing_less_50": "Reducing flood risk (less than 50%)",
         "increasing_resilience": "Increasing flood resilience",
         "maintaining_existing_question": "How many properties are estimated to benefit from maintaining existing assets?",
-        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more?",
+        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more (excluding property flood resilience)?",
         "reducing_less_50_question": "How many properties are estimated to benefit from a reduction in flood probability of less than 50% (excluding property flood resilience)?",
         "increasing_resilience_question": "How many properties will benefit from an individual property intervention?"
       }
@@ -527,7 +527,7 @@
     },
     "current_flood_fluvial_risk": {
       "title": "Current flood risk",
-      "heading": "What is the current flood risk (fluvial and coastal) in the area the project is likely to benefit?",
+      "heading": "What is the current flood risk (fluvial and tidal) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
         "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
@@ -1097,17 +1097,17 @@
     "urgency_reason": {
       "title": "Is the project urgent for any of the following reasons?",
       "heading": "Is the project urgent for any of the following reasons?",
-      "hint": "Urgency proposals must be agreed with your local Partnership and Strategic Overview (PSO) officer before submission.",
+      "hint": "Urgent proposals must be agreed with your local Partnership and Strategic Overview (PSO) officer before submission.",
       "options": {
         "not_urgent": {
           "label": "The project is not urgent"
         },
         "divider": "or",
         "statutory_need": {
-          "label": "There is a business-critical or statutory need"
+          "label": "There is a business-critical statutory need"
         },
         "legal_need": {
-          "label": "There is a business-critical or legal need"
+          "label": "There is a business-critical legal need"
         },
         "health_and_safety": {
           "label": "There is a health and safety issue"
@@ -1125,8 +1125,8 @@
     },
     "urgency_detail": {
       "title": "Why is your project urgent?",
-      "statutory_need_heading": "What is the business-critical or statutory need?",
-      "legal_need_heading": "What is the business-critical or legal need?",
+      "statutory_need_heading": "What is the business-critical statutory need?",
+      "legal_need_heading": "What is the business-critical legal need?",
       "health_and_safety_heading": "What is the health and safety issue?",
       "emergency_works_heading": "What is the emergency?",
       "time_limited_heading": "What is the specific aspect of the project that has a time limit?",
@@ -1474,6 +1474,12 @@
       "resend_to_aims_pd": "Resend to AIMS PD",
       "proposal_in_aims_pd": "Proposal in AIMS PD"
     },
+    "notifications": {
+      "marked_in_aims_pd": "Submission has been marked as received in AIMS PD."
+    },
+    "errors": {
+      "mark_failed": "Failed to mark submission as received in AIMS PD. Please try again."
+    },
     "footer": {
       "label": "How to manage failed submissions",
       "check_aims_pd": "Check if the proposal has arrived in AIMS PD",
@@ -1530,7 +1536,7 @@
       "estimated_property_damages_avoided_header": "What are the estimated property damages avoided (if known)?",
       "estimated_environmental_benefits_header": "What are the estimated environmental benefits (if known)?",
       "estimated_recreation_tourism_benefits_header": "What are the estimated recreation and tourism benefits (if known)?",
-      "estimated_land_value_uplift_benefits_header": "What are the estimated land value uplift benefits (if known)?"
+      "estimated_land_value_uplift_benefits_header": "What are the estimated land value uplift and regeneration benefits (if known)?"
     },
     "errors": {
       "required": "Please enter a whole number up to 18 digits (0 allowed)",
@@ -1776,6 +1782,44 @@
       "warning": "You cannot manage funding sources until the start financial year and end financial year have been set.",
       "body": "Please return to the project overview and set the start financial year and end financial year before continuing with funding sources.",
       "return_to_overview_button": "Return to overview"
+    }
+  },
+  "downloads": {
+    "heading": "Download proposal documents",
+    "project_name": "Project name",
+    "reference_number": "Reference number",
+    "status": "Status",
+    "not_submitted": "Not yet submitted",
+    "main_downloads": {
+      "heading": "Current proposal documents",
+      "description": "Download the latest versions of your proposal documents in the current format.",
+      "fcerm1_new": "Proposal",
+      "fcerm1_new_hint": "Excel spreadsheet with current proposal data in the latest format",
+      "benefit_area": "Proposal benefit area",
+      "benefit_area_hint": "ZIP file containing the proposal benefit area geographical data",
+      "no_downloads": "No documents available for download"
+    },
+    "legacy_downloads": {
+      "heading": "Legacy proposal documents",
+      "inset_text": "These documents are from the previous system and contain data in the old format. They are provided for reference and historical purposes.",
+      "fcerm1_legacy": "Proposal",
+      "fcerm1_legacy_hint": "Excel spreadsheet with proposal data in the old format from the previous system",
+      "funding_calculator": "Partnership Funding calculator",
+      "funding_calculator_hint": "Excel spreadsheet with funding calculations from the previous system",
+      "moderation": "Urgency moderation evidence",
+      "moderation_hint": "Plain text file with urgency justification details"
+    },
+    "help": {
+      "heading": "About these downloads",
+      "description": "These documents contain detailed information about your proposal.",
+      "what_is_fcerm1": {
+        "summary": "What is the Proposal spreadsheet?",
+        "text": "The Proposal spreadsheet is a standardized Excel spreadsheet that contains all the key information about your flood and coastal erosion risk management proposal. It is used for proposal appraisal, funding applications, and reporting purposes."
+      },
+      "legacy_vs_new": {
+        "summary": "What's the difference between legacy and current format?",
+        "text": "Following the 2025 policy reforms, the Proposal format was updated to capture additional information. The legacy format contains your original data as submitted in the previous system. The current format includes new fields and updated structure to align with current requirements. For submitted projects, only the legacy format is available to preserve the original submission."
+      }
     }
   }
 }

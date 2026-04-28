@@ -24,3 +24,34 @@
 .app-\!-overflow-x-auto {
   overflow-x: auto;
 }
+
+// Button styled as a plain inline link.
+// Apply alongside govuk-link on a <button type="submit"> to strip all
+// browser-default button chrome (background, border, padding, etc.) so the
+// element renders identically to an <a class="govuk-link">.
+//
+// NOTE: govuk-link-style-default sets colours via the &:link pseudo-class,
+// which only matches <a> elements (never <button>). We must set colour
+// explicitly here to achieve the same GDS blue appearance.
+.app-button--link {
+  appearance: none;
+  background: none;
+  border: none;
+  color: #1d70b8; // govuk-colour("blue") — must be explicit; :link doesn't match <button>
+  cursor: pointer;
+  display: inline;
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0;
+  padding: 0;
+  text-decoration: underline;
+  vertical-align: baseline;
+
+  &:hover {
+    color: #003078; // govuk link hover colour
+  }
+
+  &:focus {
+    color: #0b0c0c; // govuk focus text colour (dark, for contrast on yellow background)
+  }
+}

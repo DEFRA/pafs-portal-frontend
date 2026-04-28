@@ -24,8 +24,8 @@ describe('#errors', () => {
       url: '/non-existent-path'
     })
 
-    // Non-existent paths return 404 or redirect to login
-    expect([302, 404, 500]).toContain(statusCode)
+    // Non-existent paths return 404 or redirect to login (auth)
+    expect([302, 404]).toContain(statusCode)
   })
 })
 

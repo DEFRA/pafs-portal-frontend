@@ -67,7 +67,9 @@
             &nbsp; | &nbsp;
             <form method="post" action="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/revert-to-draft" class="app-inline-form">
               <input type="hidden" name="crumb" value="{{ crumb }}">
-              {% set revertButtonText = t('projects.overview.common.revert_to_revise') if (projectData[PROJECT_PAYLOAD_FIELDS.IS_LEGACY] and not projectData[PROJECT_PAYLOAD_FIELDS.IS_REVISED]) else t('projects.overview.common.revert_to_draft') %}
+              {% set revertButtonText = t('projects.overview.common.revert_to_revise')if (projectData[PROJECT_PAYLOAD_FIELDS.IS_LEGACY] and not projectData[PROJECT_PAYLOAD_FIELDS.IS_REVISED]) 
+                else 
+                  t('projects.overview.common.revert_to_draft') %}
               {{ govukButton({
                 text: revertButtonText,
                 classes: "app-link-button",
@@ -93,7 +95,7 @@
           {% endif %}
         {% endif %}
         &nbsp; | &nbsp;
-        <a class="govuk-link" href="#" data-testid="download-link">{{ t('projects.overview.common.download') }}</a>
+        <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/downloads" data-testid="download-link">{{ t('projects.overview.common.download') }}</a>
       </dd>
     </div>
   </dl>
@@ -118,7 +120,7 @@
 
   {{ confidenceAssessmentSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, CONFIDENCE_LEVELS, PROJECT_TYPES, t, isReadOnly, isConfidenceRestricted) }}
 
-  {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t) }}
+  {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t, isReadOnly) }}
 
   {{ wlcSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_TYPES, t, isReadOnly, formatNumberWithCommas) }}
 

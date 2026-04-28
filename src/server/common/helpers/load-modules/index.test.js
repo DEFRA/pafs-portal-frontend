@@ -103,7 +103,7 @@ describe('loadModules', () => {
 
     it('continues loading other modules when one fails', async () => {
       const basePath = join(__dirname, '../../../modules/general')
-      const patterns = ['home', 'non-existent', 'download']
+      const patterns = ['home', 'non-existent', 'static']
 
       await loadModules(mockServer, basePath, patterns)
 
@@ -239,13 +239,13 @@ describe('loadModules', () => {
 
     it('only registers successfully loaded modules', async () => {
       const basePath = join(__dirname, '../../../modules/general')
-      const patterns = ['home', 'invalid-module', 'download']
+      const patterns = ['home', 'invalid-module', 'static']
 
       await loadModules(mockServer, basePath, patterns)
 
       expect(mockServer.register).toHaveBeenCalledTimes(1)
       const registeredModules = mockServer.register.mock.calls[0][0]
-      expect(registeredModules).toHaveLength(2) // Only home and download
+      expect(registeredModules).toHaveLength(2) // Only home and static
     })
   })
 })

@@ -12,11 +12,15 @@ import {
   getProjectStateTag,
   isConfidenceRestrictedProjectType
 } from '../helpers/project-utils.js'
-import { enrichProjectData } from '../helpers/overview/data-enrichment.js'
+
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
-import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
 // Mock dependencies
+vi.mock('../../../common/helpers/auth/session-manager.js', () => ({
+  getAuthSession: vi.fn()
+}))
+
 vi.mock('../helpers/project-utils.js', () => ({
   getSessionData: vi.fn(),
   getBackLink: vi.fn(),
@@ -34,9 +38,7 @@ vi.mock('../helpers/project-utils.js', () => ({
   })
 }))
 
-vi.mock('../helpers/overview/data-enrichment.js')
 vi.mock('../helpers/overview/carbon-impact.js')
-vi.mock('../helpers/project-submission.js')
 
 describe('OverviewController', () => {
   let mockRequest
@@ -52,6 +54,8 @@ describe('OverviewController', () => {
     mockH = {
       view: vi.fn()
     }
+
+    getAuthSession.mockReturnValue({ user: {} })
 
     getBackLink.mockReturnValue({
       href: '/projects/home',
@@ -74,24 +78,12 @@ describe('OverviewController', () => {
       projectState: PROJECT_STATUS.DRAFT
     })
 
-    enrichProjectData.mockResolvedValue({
-      success: true,
-      projectData: {
-        id: 1,
-        referenceNumber: 'REF123',
-        name: 'Test Project',
-        projectState: PROJECT_STATUS.DRAFT
-      }
-    })
-
     getCarbonImpactOverviewData.mockImplementation(
       async (_req, projectData) => ({
         success: true,
         projectData
       })
     )
-
-    handleServiceConsumptionError.mockReturnValue({ error: true })
   })
 
   describe('get', () => {
@@ -117,11 +109,6 @@ describe('OverviewController', () => {
         areaId: 5
       }
       getSessionData.mockReturnValue(projectData)
-
-      enrichProjectData.mockResolvedValue({
-        success: true,
-        projectData
-      })
 
       await overviewController.getHandler(mockRequest, mockH)
 
@@ -596,128 +583,6 @@ describe('OverviewController', () => {
     })
   })
 
-  describe('data enrichment', () => {
-    test('should call enrichProjectData with getBenefitAreaDownloadData', async () => {
-      await overviewController.getHandler(mockRequest, mockH)
-
-      expect(enrichProjectData).toHaveBeenCalledWith(
-        mockRequest,
-        expect.objectContaining({
-          id: 1,
-          referenceNumber: 'REF123'
-        }),
-        expect.arrayContaining([expect.any(Function)])
-      )
-    })
-
-    test('should use enriched project data in view', async () => {
-      const enrichedData = {
-        id: 1,
-        referenceNumber: 'REF123',
-        name: 'Test Project',
-        benefitAreaFileDownloadUrl: 'https://example.com/download'
-      }
-
-      enrichProjectData.mockResolvedValue({
-        success: true,
-        projectData: enrichedData
-      })
-      getCarbonImpactOverviewData.mockResolvedValue({
-        success: true,
-        projectData: enrichedData
-      })
-
-      await overviewController.getHandler(mockRequest, mockH)
-
-      expect(mockH.view).toHaveBeenCalledWith(
-        'modules/projects/overview/index',
-        expect.objectContaining({
-          projectData: expect.objectContaining({
-            benefitAreaFileDownloadUrl: 'https://example.com/download'
-          })
-        })
-      )
-    })
-
-    test('should handle enrichment failure', async () => {
-      enrichProjectData.mockResolvedValue({
-        success: false,
-        projectData: {
-          id: 1,
-          referenceNumber: 'REF123'
-        },
-        error: 'ENRICHMENT_FAILED'
-      })
-
-      handleServiceConsumptionError.mockReturnValue({ errorView: true })
-
-      const result = await overviewController.getHandler(mockRequest, mockH)
-
-      expect(handleServiceConsumptionError).toHaveBeenCalledWith(
-        mockRequest,
-        mockH,
-        'ENRICHMENT_FAILED',
-        expect.objectContaining({
-          pageTitle: 'projects.overview.heading'
-        }),
-        'modules/projects/overview/index'
-      )
-      expect(result).toEqual({ errorView: true })
-    })
-  })
-
-  describe('_handleOverviewResponse', () => {
-    test('should render overview view when success is true', async () => {
-      const viewData = { id: 1, name: 'Test' }
-
-      // We test this indirectly through the get handler
-      enrichProjectData.mockResolvedValue({
-        success: true,
-        projectData: viewData
-      })
-
-      await overviewController.getHandler(mockRequest, mockH)
-
-      expect(mockH.view).toHaveBeenCalledWith(
-        'modules/projects/overview/index',
-        expect.any(Object)
-      )
-    })
-
-    test('should call handleServiceConsumptionError when success is false', async () => {
-      enrichProjectData.mockResolvedValue({
-        success: false,
-        projectData: {},
-        error: 'SERVICE_ERROR'
-      })
-
-      const mockResponse = { errorHandled: true }
-      handleServiceConsumptionError.mockReturnValue(mockResponse)
-
-      const result = await overviewController.getHandler(mockRequest, mockH)
-
-      expect(handleServiceConsumptionError).toHaveBeenCalled()
-      expect(result).toEqual(mockResponse)
-    })
-
-    test('should pass view template constant to handleServiceConsumptionError', async () => {
-      enrichProjectData.mockResolvedValue({
-        success: false,
-        error: 'ERROR'
-      })
-
-      await overviewController.getHandler(mockRequest, mockH)
-
-      expect(handleServiceConsumptionError).toHaveBeenCalledWith(
-        mockRequest,
-        mockH,
-        'ERROR',
-        expect.any(Object),
-        'modules/projects/overview/index'
-      )
-    })
-  })
-
   describe('_getProjectViewData', () => {
     test('should include all required constants in view data', async () => {
       getSessionData.mockReturnValue({
@@ -789,11 +654,6 @@ describe('OverviewController', () => {
       const projectData = { id: 1, name: 'Project A' }
       getSessionData.mockReturnValue(projectData)
 
-      enrichProjectData.mockResolvedValue({
-        success: true,
-        projectData
-      })
-
       await overviewController.getHandler(mockRequest, mockH)
 
       expect(mockH.view).toHaveBeenCalledWith(
@@ -853,32 +713,11 @@ describe('OverviewController', () => {
     })
   })
 
-  describe('enrichProjectData integration', () => {
-    test('should pass enrichment functions to enrichProjectData', async () => {
-      await overviewController.getHandler(mockRequest, mockH)
-
-      const enrichmentCall = enrichProjectData.mock.calls[0]
-      expect(enrichmentCall[2]).toEqual(
-        expect.arrayContaining([expect.any(Function)])
-      )
-    })
-
-    test('should update projectData with enrichment results', async () => {
-      const originalData = { id: 1, name: 'Original' }
-      const enrichedData = {
-        id: 1,
-        name: 'Original',
-        enrichedField: 'enriched value'
-      }
-
-      getSessionData.mockReturnValue(originalData)
-      enrichProjectData.mockResolvedValue({
-        success: true,
-        projectData: enrichedData
-      })
-      getCarbonImpactOverviewData.mockResolvedValue({
-        success: true,
-        projectData: enrichedData
+  describe('EA user access', () => {
+    test('should set isReadOnly to true for EA user with DRAFT state', async () => {
+      getAuthSession.mockReturnValue({ user: { isEa: true } })
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT
       })
 
       await overviewController.getHandler(mockRequest, mockH)
@@ -886,55 +725,55 @@ describe('OverviewController', () => {
       expect(mockH.view).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          projectData: expect.objectContaining({
-            enrichedField: 'enriched value'
-          })
+          isReadOnly: true
         })
       )
     })
 
-    test('should call enrichProjectData with request and session data', async () => {
-      const sessionData = { id: 1, name: 'Test' }
-      getSessionData.mockReturnValue(sessionData)
+    test('should set isReadOnly to true for EA user with REVISE state', async () => {
+      getAuthSession.mockReturnValue({ user: { isEa: true } })
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.REVISE
+      })
 
       await overviewController.getHandler(mockRequest, mockH)
 
-      expect(enrichProjectData).toHaveBeenCalledWith(
-        mockRequest,
-        sessionData,
-        expect.any(Array)
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isReadOnly: true
+        })
       )
     })
-  })
 
-  describe('error handling', () => {
-    test('should handle enrichment errors', async () => {
-      enrichProjectData.mockResolvedValue({
-        success: false,
-        error: 'FAILED_TO_ENRICH'
-      })
-
-      const errorResponse = { handled: true }
-      handleServiceConsumptionError.mockReturnValue(errorResponse)
-
-      const result = await overviewController.getHandler(mockRequest, mockH)
-
-      expect(result).toEqual(errorResponse)
-      expect(handleServiceConsumptionError).toHaveBeenCalled()
-    })
-
-    test('should include viewData in error response', async () => {
-      enrichProjectData.mockResolvedValue({
-        success: false,
-        error: 'ERROR'
+    test('should set isReadOnly to false for non-EA user with DRAFT state', async () => {
+      getAuthSession.mockReturnValue({ user: { isEa: false } })
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT
       })
 
       await overviewController.getHandler(mockRequest, mockH)
 
-      const errorCall = handleServiceConsumptionError.mock.calls[0]
-      expect(errorCall[3]).toEqual(
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
         expect.objectContaining({
-          pageTitle: 'projects.overview.heading'
+          isReadOnly: false
+        })
+      )
+    })
+
+    test('should set isReadOnly to false for user without isEa flag with DRAFT state', async () => {
+      getAuthSession.mockReturnValue({ user: {} })
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          isReadOnly: false
         })
       )
     })

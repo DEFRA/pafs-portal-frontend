@@ -28,7 +28,9 @@ describe('Login Controller', () => {
       t: vi.fn((key) => key),
       server: { logger: { error: vi.fn(), warn: vi.fn() } },
       yar: {
-        flash: vi.fn(() => [])
+        flash: vi.fn(() => []),
+        get: vi.fn(() => null),
+        set: vi.fn()
       }
     }
     mockH = {
@@ -261,6 +263,75 @@ describe('Login Controller', () => {
           email: 'user@example.com'
         })
       )
+    })
+  })
+
+  describe('POST /login - returnTo redirect', () => {
+    const successPayload = { email: 'user@example.com', password: 'password' }
+    const successResult = {
+      success: true,
+      data: {
+        user: { id: 1, email: 'user@example.com', admin: false },
+        accessToken: 'token123',
+        refreshToken: 'refresh123'
+      }
+    }
+
+    test('redirects to returnTo URL after successful login', async () => {
+      mockRequest.payload = successPayload
+      mockRequest.yar.get.mockReturnValue('/projects/TEST-001/details')
+      login.mockResolvedValue(successResult)
+
+      await loginPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith('/projects/TEST-001/details')
+    })
+
+    test('clears returnTo from session after using it', async () => {
+      mockRequest.payload = successPayload
+      mockRequest.yar.get.mockReturnValue('/projects/TEST-001/details')
+      login.mockResolvedValue(successResult)
+
+      await loginPostController.handler(mockRequest, mockH)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith('returnTo', null)
+    })
+
+    test('falls back to home when no returnTo is set', async () => {
+      mockRequest.payload = successPayload
+      mockRequest.yar.get.mockReturnValue(null)
+      login.mockResolvedValue(successResult)
+
+      await loginPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith('/')
+    })
+
+    test('ignores returnTo with protocol-relative URL', async () => {
+      mockRequest.payload = successPayload
+      mockRequest.yar.get.mockReturnValue('//evil.example.com/steal')
+      login.mockResolvedValue(successResult)
+
+      await loginPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith('/')
+    })
+
+    test('admin with returnTo redirects to returnTo URL', async () => {
+      mockRequest.payload = { email: 'admin@example.com', password: 'password' }
+      mockRequest.yar.get.mockReturnValue('/admin/users')
+      login.mockResolvedValue({
+        success: true,
+        data: {
+          user: { id: 1, email: 'admin@example.com', admin: true },
+          accessToken: 'token123',
+          refreshToken: 'refresh123'
+        }
+      })
+
+      await loginPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith('/admin/users')
     })
   })
 })
