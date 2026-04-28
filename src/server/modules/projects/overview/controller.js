@@ -14,6 +14,7 @@ import {
   NFM_EXPERIENCE_LEVEL_OPTIONS
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import {
   getBackLink,
   getSessionData,
@@ -26,15 +27,15 @@ import {
   buildProcessedFundingValues,
   computeFundingSourceTotals
 } from '../helpers/project-utils.js'
-import { getBenefitAreaDownloadData } from '../helpers/overview/benefit-area.js'
 import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
-import { enrichProjectData } from '../helpers/overview/data-enrichment.js'
-import { handleServiceConsumptionError } from '../helpers/project-submission.js'
 
 class OverviewController {
   _getProjectViewData(request, options = {}) {
     const { backLink, projectData } = options
-    const isReadOnly = !EDITABLE_STATUSES.includes(projectData.projectState)
+    const session = getAuthSession(request)
+    const isEaUser = Boolean(session?.user?.isEa)
+    const isReadOnly =
+      !EDITABLE_STATUSES.includes(projectData.projectState) || isEaUser
     const isLegacy = Boolean(projectData.isLegacy)
     const isConfidenceRestricted = isConfidenceRestrictedProjectType(
       projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]
@@ -69,21 +70,6 @@ class OverviewController {
     }
   }
 
-  _handleOverviewResponse(request, h, options = {}) {
-    const overviewTemplate = PROJECT_VIEWS.OVERVIEW
-    const { viewData, success = true, error = '' } = options
-    if (success) {
-      return h.view(overviewTemplate, viewData)
-    }
-    return handleServiceConsumptionError(
-      request,
-      h,
-      error,
-      viewData,
-      overviewTemplate
-    )
-  }
-
   async get(request, h) {
     const backLink = getBackLink(request, {
       targetURL: ROUTES.PROJECT.HOME
@@ -93,10 +79,6 @@ class OverviewController {
       backLink,
       projectData
     })
-
-    const enrichmentResult = await enrichProjectData(request, projectData, [
-      getBenefitAreaDownloadData
-    ])
 
     const carbonResult = await getCarbonImpactOverviewData(request, projectData)
 
@@ -112,11 +94,7 @@ class OverviewController {
       )
     }
 
-    return this._handleOverviewResponse(request, h, {
-      viewData,
-      success: enrichmentResult.success && carbonResult.success,
-      error: enrichmentResult.error
-    })
+    return h.view(PROJECT_VIEWS.OVERVIEW, viewData)
   }
 }
 

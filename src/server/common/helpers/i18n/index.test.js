@@ -168,7 +168,9 @@ describe('i18n translation service with fs-backend', () => {
       expect(translate('common.navigation.your_proposals')).toBe(
         'Your proposals'
       )
-      expect(translate('common.navigation.download_all')).toBe('Download All')
+      expect(translate('common.navigation.download_all')).toBe(
+        'Download all proposals'
+      )
       expect(translate('common.navigation.archive')).toBe('Archive')
     })
 

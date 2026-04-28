@@ -24,7 +24,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.download_all',
-          href: '/download'
+          href: '/downloads'
         },
         {
           current: false,
@@ -42,9 +42,9 @@ describe('#buildNavigation', () => {
           href: '/'
         },
         {
-          current: true,
+          current: false,
           text: 'common.navigation.download_all',
-          href: '/download'
+          href: '/downloads'
         },
         {
           current: false,
@@ -64,7 +64,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.download_all',
-          href: '/download'
+          href: '/downloads'
         },
         {
           current: true,
@@ -84,7 +84,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.download_all',
-          href: '/download'
+          href: '/downloads'
         },
         {
           current: false,
@@ -120,11 +120,6 @@ describe('#buildNavigation', () => {
         },
         {
           current: false,
-          text: 'common.navigation.download_projects',
-          href: '/admin/download-projects'
-        },
-        {
-          current: false,
           text: 'common.navigation.download_rma',
           href: '/admin/download-rma'
         }
@@ -154,11 +149,6 @@ describe('#buildNavigation', () => {
           current: false,
           text: 'common.navigation.organisations',
           href: '/admin/organisations'
-        },
-        {
-          current: false,
-          text: 'common.navigation.download_projects',
-          href: '/admin/download-projects'
         },
         {
           current: false,
@@ -194,11 +184,6 @@ describe('#buildNavigation', () => {
         },
         {
           current: false,
-          text: 'common.navigation.download_projects',
-          href: '/admin/download-projects'
-        },
-        {
-          current: false,
           text: 'common.navigation.download_rma',
           href: '/admin/download-rma'
         }
@@ -227,11 +212,6 @@ describe('#buildNavigation', () => {
             current: false,
             text: 'common.navigation.organisations',
             href: '/admin/organisations'
-          },
-          {
-            current: false,
-            text: 'common.navigation.download_projects',
-            href: '/admin/download-projects'
           },
           {
             current: false,
@@ -268,11 +248,6 @@ describe('#buildNavigation', () => {
         },
         {
           current: false,
-          text: 'common.navigation.download_projects',
-          href: '/admin/download-projects'
-        },
-        {
-          current: false,
           text: 'common.navigation.download_rma',
           href: '/admin/download-rma'
         }
@@ -302,11 +277,6 @@ describe('#buildNavigation', () => {
           current: true,
           text: 'common.navigation.organisations',
           href: '/admin/organisations'
-        },
-        {
-          current: false,
-          text: 'common.navigation.download_projects',
-          href: '/admin/download-projects'
         },
         {
           current: false,
@@ -341,11 +311,6 @@ describe('#buildNavigation', () => {
           href: '/admin/organisations'
         },
         {
-          current: true,
-          text: 'common.navigation.download_projects',
-          href: '/admin/download-projects'
-        },
-        {
           current: false,
           text: 'common.navigation.download_rma',
           href: '/admin/download-rma'
@@ -376,11 +341,6 @@ describe('#buildNavigation', () => {
           current: false,
           text: 'common.navigation.organisations',
           href: '/admin/organisations'
-        },
-        {
-          current: false,
-          text: 'common.navigation.download_projects',
-          href: '/admin/download-projects'
         },
         {
           current: true,
@@ -437,7 +397,7 @@ describe('#buildNavigation', () => {
         {
           current: false,
           text: 'common.navigation.download_all',
-          href: '/download'
+          href: '/downloads'
         },
         {
           current: false,

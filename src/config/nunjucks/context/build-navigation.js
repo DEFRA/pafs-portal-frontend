@@ -28,8 +28,8 @@ function buildGeneralNavigation(path) {
     },
     {
       text: translate('common.navigation.download_all'),
-      href: ROUTES.GENERAL.DOWNLOAD,
-      current: path === ROUTES.GENERAL.DOWNLOAD
+      href: ROUTES.DOWNLOADS.PROGRAMME,
+      current: path === ROUTES.DOWNLOADS.PROGRAMME
     },
     {
       text: translate('common.navigation.archive'),
@@ -66,11 +66,6 @@ function buildAdminNavigation(path) {
       current:
         path === ROUTES.ADMIN.ORGANISATIONS ||
         path.startsWith(ROUTES.ADMIN.ORGANISATIONS + '/')
-    },
-    {
-      text: translate('common.navigation.download_projects'),
-      href: ROUTES.ADMIN.DOWNLOAD_PROJECTS,
-      current: path === ROUTES.ADMIN.DOWNLOAD_PROJECTS
     },
     {
       text: translate('common.navigation.download_rma'),

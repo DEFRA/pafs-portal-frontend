@@ -22,12 +22,17 @@ describe('Protected Routes Registration', () => {
       (r) => r.path === '/archive' && r.method === 'get'
     )
     const downloadRoute = table.find(
-      (r) => r.path === '/download' && r.method === 'get'
+      (r) => r.path === '/downloads' && r.method === 'get'
     )
 
     expect(homeRoute).toBeDefined()
+    expect(homeRoute.settings.pre).toBeDefined()
+
     expect(archiveRoute).toBeDefined()
+    expect(archiveRoute.settings.pre).toBeDefined()
+
     expect(downloadRoute).toBeDefined()
+    expect(downloadRoute.settings.pre).toBeDefined()
   })
 
   test('admin routes are registered with admin middleware', () => {

@@ -2,6 +2,7 @@ export const PROJECT_STATUS = {
   REVISE: 'revise',
   DRAFT: 'draft',
   SUBMITTED: 'submitted',
+  APPROVED: 'approved',
   COMPLETED: 'completed',
   ARCHIVED: 'archived'
 }
@@ -27,6 +28,18 @@ export const URGENCY_REASONS = {
   HEALTH_AND_SAFETY: 'health_and_safety',
   EMERGENCY_WORKS: 'emergency_works',
   TIME_LIMITED: 'time_limited'
+}
+
+/**
+ * Human-readable urgency reason labels for the moderation text report.
+ */
+export const URGENCY_REASON_LABELS = {
+  [URGENCY_REASONS.STATUTORY_NEED]: 'A business critical statutory need',
+  [URGENCY_REASONS.LEGAL_NEED]: 'A business critical legal need',
+  [URGENCY_REASONS.HEALTH_AND_SAFETY]: 'A health and safety issue',
+  [URGENCY_REASONS.EMERGENCY_WORKS]: 'An emergency',
+  [URGENCY_REASONS.TIME_LIMITED]:
+    'A specific aspect of the project has a time limit'
 }
 
 export const CONFIDENCE_LEVELS = {
