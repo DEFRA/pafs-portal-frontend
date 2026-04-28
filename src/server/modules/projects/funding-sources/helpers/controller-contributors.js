@@ -150,6 +150,36 @@ function handleAddAction(request, sessionContributors, sessionKey, step) {
   return stepRoute.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
 }
 
+// ─── Handle the "remove contributor" action ─────────────────────────────────
+
+/**
+ * Parse submitted names, persist them in the session, and redirect to the
+ * delete-confirmation page for the contributor at the given index.
+ */
+function handleRemoveAction(
+  request,
+  sessionContributors,
+  sessionKey,
+  step,
+  index
+) {
+  const submitted = parseContributorsPayload(
+    request.payload,
+    sessionContributors
+  )
+  const preserved = submitted.map((name) =>
+    typeof name === 'string' ? name.trim() : ''
+  )
+  updateSessionData(request, { [sessionKey]: preserved })
+
+  const { referenceNumber } = request.params
+  const config = FUNDING_SOURCES_CONFIG[step]
+  const deleteUrl = config.deleteRoute
+    .replace(REFERENCE_NUMBER_PARAM, referenceNumber)
+    .concat(`/${index}`)
+  return deleteUrl
+}
+
 // ─── Controller Class ──────────────────────────────────────────────────────────
 
 class ContributorsController {
@@ -212,6 +242,18 @@ class ContributorsController {
         sessionContributors,
         sessionKey,
         step
+      )
+      return h.redirect(redirectUrl).takeover()
+    }
+
+    if (typeof action === 'string' && action.startsWith('remove:')) {
+      const removeIndex = Number.parseInt(action.split(':')[1], 10)
+      const redirectUrl = handleRemoveAction(
+        request,
+        sessionContributors,
+        sessionKey,
+        step,
+        removeIndex
       )
       return h.redirect(redirectUrl).takeover()
     }

@@ -208,7 +208,7 @@
       "local_levy": "Local levy",
       "additional_gia": "Additional FCRM Grant-in-Aid",
       "internal_drainage_boards": "Funds recovered from an internal drainage board by the Environment Agency, known as a precept",
-      "not_yet_identified": "Other funding sources not yet identified",
+      "not_yet_identified": "Funding sources not yet identified",
       "public_sector_contributors": "Public sector contributors",
       "private_sector_contributors": "Private sector contributors",
       "other_ea_contributors": "Other Environment Agency contributors",
@@ -1697,7 +1697,7 @@
         "public_contributions": "Public sector contributions",
         "private_contributions": "Private sector contributions",
         "other_ea_contributions": "Contributions from other Environment Agency functions or sources",
-        "not_yet_identified": "Other funding sources not yet identified"
+        "not_yet_identified": "Funding sources not yet identified"
       },
       "errors": {
         "required": "The project must have at least one funding source.",
