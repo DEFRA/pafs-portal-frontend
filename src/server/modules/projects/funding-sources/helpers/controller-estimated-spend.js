@@ -306,7 +306,7 @@ function calculateServerTotals(spendRows, existingValues, financialYears) {
     rowTotals[rowKey] = Number(rowTotal)
   }
 
-  const colTotals = colTotalsBig.map((ct) => Number(ct))
+  const colTotals = colTotalsBig.map(Number)
   const grandTotal = colTotals.reduce((sum, ct) => sum + ct, 0)
 
   return { rowTotals, colTotals, grandTotal }
@@ -358,6 +358,38 @@ function checkContributorCoverage(sessionData, fundingValues) {
 }
 
 /**
+ * Classify a contributor-cell Joi error.
+ * Path shape: [yearIdx, contributorArrayField, contributorIdx, ...]
+ * @private
+ */
+function classifyContributorDetail(detail, path) {
+  const contribYearIdx = path[0]
+  const contributorArrayField = path[1]
+  const contribIdx = path[2]
+  const msgSuffix = detail.type === 'string.max' ? 'max_digits' : 'invalid'
+  return {
+    kind: 'contributor-cell',
+    cellKey: `${contributorArrayField}-${contribIdx}-${contribYearIdx}`,
+    msgSuffix,
+    contributorArrayField
+  }
+}
+
+/**
+ * Return true when the Joi error path matches a contributor-cell shape:
+ * [yearIdx, contributorArrayField, contributorIdx, ...]
+ * @private
+ */
+function isContributorPath(path) {
+  return (
+    path.length >= 4 &&
+    typeof path[0] === 'number' &&
+    typeof path[1] === 'string' &&
+    typeof path[2] === 'number'
+  )
+}
+
+/**
  * Build field-level and global errors from Joi validation output and
  * contributor coverage check.
  * @private
@@ -371,24 +403,8 @@ function classifyValidationDetail(detail) {
     return { kind: 'global' }
   }
 
-  // Contributor cell: [yearIdx, contributorArrayField, contributorIdx, 'amount']
-  if (
-    path.length >= 4 &&
-    typeof path[0] === 'number' &&
-    typeof path[1] === 'string' &&
-    typeof path[2] === 'number'
-  ) {
-    const yearIdx = path[0]
-    const contributorArrayField = path[1]
-    const contributorIdx = path[2]
-    const msgSuffix = detail.type === 'string.max' ? 'max_digits' : 'invalid'
-    const cellKey = `${contributorArrayField}-${contributorIdx}-${yearIdx}`
-    return {
-      kind: 'contributor-cell',
-      cellKey,
-      msgSuffix,
-      contributorArrayField
-    }
+  if (isContributorPath(path)) {
+    return classifyContributorDetail(detail, path)
   }
 
   const fieldKey = path[path.length - 1]
@@ -397,9 +413,44 @@ function classifyValidationDetail(detail) {
   }
 
   const yearIdx = typeof path[0] === 'number' ? path[0] : null
-
   const msgSuffix = detail.type === 'string.max' ? 'max_digits' : 'invalid'
   return { kind: 'field', fieldKey, yearIdx, msgSuffix }
+}
+
+/**
+ * Mutate fieldErrors / cellErrors with the result of a classified detail.
+ * Global-kind details are handled by the caller.
+ * @private
+ */
+function applyClassifiedError(
+  classified,
+  fieldErrors,
+  cellErrors,
+  ERROR_PREFIX,
+  t
+) {
+  if (classified.kind === 'contributor-cell') {
+    if (!cellErrors[classified.cellKey]) {
+      cellErrors[classified.cellKey] = true
+    }
+    // Ensure one field-level error exists per array field for the error summary
+    if (!fieldErrors[classified.contributorArrayField]) {
+      fieldErrors[classified.contributorArrayField] = t(
+        `${ERROR_PREFIX}${classified.msgSuffix}`
+      )
+    }
+    return
+  }
+  if (classified.kind === 'field') {
+    if (!fieldErrors[classified.fieldKey]) {
+      fieldErrors[classified.fieldKey] = t(
+        `${ERROR_PREFIX}${classified.msgSuffix}`
+      )
+    }
+    if (classified.yearIdx !== null) {
+      cellErrors[`${classified.fieldKey}-${classified.yearIdx}`] = true
+    }
+  }
 }
 
 function buildSpendValidationErrors(error, contributorCoverageError, t) {
@@ -417,30 +468,11 @@ function buildSpendValidationErrors(error, contributorCoverageError, t) {
 
   for (const detail of error.details) {
     const classified = classifyValidationDetail(detail)
-
     if (classified?.kind === 'global' && !globalError) {
       globalError = t(`${ERROR_PREFIX}required`)
-    } else if (classified?.kind === 'contributor-cell') {
-      if (!cellErrors[classified.cellKey]) {
-        cellErrors[classified.cellKey] = true
-      }
-      // Ensure a field-level error exists for the error summary link
-      if (!fieldErrors[classified.contributorArrayField]) {
-        fieldErrors[classified.contributorArrayField] = t(
-          `${ERROR_PREFIX}${classified.msgSuffix}`
-        )
-      }
-    } else if (classified?.kind === 'field') {
-      if (!fieldErrors[classified.fieldKey]) {
-        fieldErrors[classified.fieldKey] = t(
-          `${ERROR_PREFIX}${classified.msgSuffix}`
-        )
-      }
-      if (classified.yearIdx !== null) {
-        cellErrors[`${classified.fieldKey}-${classified.yearIdx}`] = true
-      }
-    } else {
-      // Duplicate or unclassified detail — intentionally ignored
+    }
+    if (classified && classified.kind !== 'global') {
+      applyClassifiedError(classified, fieldErrors, cellErrors, ERROR_PREFIX, t)
     }
   }
 

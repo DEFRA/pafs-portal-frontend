@@ -1817,3 +1817,195 @@ describe('_calculateServerTotals (via getEstimatedSpend)', () => {
     expect(buildViewData).toHaveBeenCalled()
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// classifyValidationDetail / applyClassifiedError coverage
+// (tested via estimatedSpendController.postHandler with crafted schema errors)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('_classifyValidationDetail (via postHandler)', () => {
+  let request, h
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    request = makeRequest()
+    h = makeH()
+    buildViewData.mockReturnValue({ viewData: true })
+    resolveBackLinkOptions.mockReturnValue({})
+    buildEstimatedSpendRows.mockReturnValue([])
+    getSelectedEstimatedSpendSourceFields.mockReturnValue([])
+    parseFundingValuesPayload.mockReturnValue([])
+    sanitiseFundingValueRow.mockImplementation((row) => row)
+    setSourceTotalsFromContributorArrays.mockImplementation((row) => row)
+    stripEmptyContributorEntries.mockImplementation((row) => row)
+    getSessionData.mockReturnValue({
+      [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2025,
+      [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: 2025
+    })
+  })
+
+  function schemaWithError(errorDetails) {
+    FUNDING_SOURCES_CONFIG[
+      PROJECT_STEPS.FUNDING_SOURCES_ESTIMATED_SPEND
+    ].schema.mockReturnValue({
+      validate: vi.fn().mockReturnValue({ error: { details: errorDetails } })
+    })
+  }
+
+  it('classifies contributor-cell error (4-deep path) and sets cellErrors', async () => {
+    schemaWithError([
+      {
+        path: [0, 'publicContributors', 0, 'amount'],
+        type: 'string.pattern.base'
+      }
+    ])
+    await estimatedSpendController.postHandler(request, h)
+    expect(h.view).toHaveBeenCalledWith(
+      PROJECT_VIEWS.FUNDING_SOURCES_ESTIMATED_SPEND,
+      expect.any(Object)
+    )
+  })
+
+  it('classifies contributor-cell string.max error (max_digits suffix)', async () => {
+    schemaWithError([
+      { path: [0, 'publicContributors', 0, 'amount'], type: 'string.max' }
+    ])
+    await estimatedSpendController.postHandler(request, h)
+    expect(h.view).toHaveBeenCalledWith(
+      PROJECT_VIEWS.FUNDING_SOURCES_ESTIMATED_SPEND,
+      expect.any(Object)
+    )
+  })
+
+  it('does not duplicate cellErrors for the same contributor cell', async () => {
+    // Two errors for the same [yearIdx, arrayField, idx] path
+    schemaWithError([
+      {
+        path: [0, 'publicContributors', 0, 'amount'],
+        type: 'string.pattern.base'
+      },
+      { path: [0, 'publicContributors', 0, 'amount'], type: 'string.max' }
+    ])
+    await estimatedSpendController.postHandler(request, h)
+    expect(h.view).toHaveBeenCalledWith(
+      PROJECT_VIEWS.FUNDING_SOURCES_ESTIMATED_SPEND,
+      expect.any(Object)
+    )
+  })
+
+  it('does not duplicate fieldErrors for the same contributorArrayField', async () => {
+    // Two different contributor indices in the same array → same fieldErrors key
+    schemaWithError([
+      {
+        path: [0, 'publicContributors', 0, 'amount'],
+        type: 'string.pattern.base'
+      },
+      {
+        path: [0, 'publicContributors', 1, 'amount'],
+        type: 'string.pattern.base'
+      }
+    ])
+    await estimatedSpendController.postHandler(request, h)
+    expect(h.view).toHaveBeenCalledWith(
+      PROJECT_VIEWS.FUNDING_SOURCES_ESTIMATED_SPEND,
+      expect.any(Object)
+    )
+  })
+
+  it('returns null for a detail with falsy last path element (ignored silently)', async () => {
+    // path = [0, null] → path[-1] = null → classifyValidationDetail returns null
+    schemaWithError([{ path: [0, null], type: 'any.required' }])
+    await estimatedSpendController.postHandler(request, h)
+    expect(h.view).toHaveBeenCalledWith(
+      PROJECT_VIEWS.FUNDING_SOURCES_ESTIMATED_SPEND,
+      expect.any(Object)
+    )
+  })
+
+  it('covers the else (null/unclassified) branch in buildSpendValidationErrors', async () => {
+    // globalError already set via contributorCoverageError AND a global schema error —
+    // the second global detail hits the else branch (classified.kind === 'global' && !globalError is false)
+    const mockGroup = {
+      enabledField: PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS,
+      contributorArrayField: 'publicContributors'
+    }
+    vi.mocked(CONTRIBUTOR_SPEND_GROUPS).length = 0
+    vi.mocked(CONTRIBUTOR_SPEND_GROUPS).push(mockGroup)
+    getSessionData.mockReturnValue({
+      [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2025,
+      [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: 2025,
+      [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: true
+    })
+    getContributorNames.mockReturnValue(['Alice'])
+    const rowWithNoAmount = {
+      financialYear: 2025,
+      publicContributors: [{ name: 'Alice', amount: null }]
+    }
+    parseFundingValuesPayload.mockReturnValue([rowWithNoAmount])
+    sanitiseFundingValueRow.mockReturnValue(rowWithNoAmount)
+    setSourceTotalsFromContributorArrays.mockReturnValue(rowWithNoAmount)
+    stripEmptyContributorEntries.mockReturnValue(rowWithNoAmount)
+    // Schema also emits a global error — the second global hits the else branch
+    schemaWithError([
+      { path: [], type: 'array.min' },
+      { path: [], type: 'array.min' }
+    ])
+    await estimatedSpendController.postHandler(request, h)
+    expect(h.view).toHaveBeenCalledWith(
+      PROJECT_VIEWS.FUNDING_SOURCES_ESTIMATED_SPEND,
+      expect.any(Object)
+    )
+  })
+})
+
+describe('_hasContributorAmount non-array branch (via postHandler coverage)', () => {
+  let request, h
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    request = makeRequest()
+    h = makeH()
+    buildViewData.mockReturnValue({ viewData: true })
+    resolveBackLinkOptions.mockReturnValue({})
+    buildEstimatedSpendRows.mockReturnValue([])
+    getSelectedEstimatedSpendSourceFields.mockReturnValue([])
+    FUNDING_SOURCES_CONFIG[
+      PROJECT_STEPS.FUNDING_SOURCES_ESTIMATED_SPEND
+    ].schema.mockReturnValue({
+      validate: vi.fn().mockReturnValue({ error: null })
+    })
+  })
+
+  it('treats non-array contributor field as no amount (triggers coverage error)', async () => {
+    const mockGroup = {
+      enabledField: PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS,
+      contributorArrayField: 'publicContributors'
+    }
+    vi.mocked(CONTRIBUTOR_SPEND_GROUPS).length = 0
+    vi.mocked(CONTRIBUTOR_SPEND_GROUPS).push(mockGroup)
+    getSessionData.mockReturnValue({
+      [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2025,
+      [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: 2025,
+      [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: true
+    })
+    getContributorNames.mockReturnValue(['Alice'])
+    // publicContributors is a string, not an array — !Array.isArray branch
+    const rowWithStringContributors = {
+      financialYear: 2025,
+      publicContributors: 'not-an-array'
+    }
+    parseFundingValuesPayload.mockReturnValue([rowWithStringContributors])
+    sanitiseFundingValueRow.mockReturnValue(rowWithStringContributors)
+    setSourceTotalsFromContributorArrays.mockReturnValue(
+      rowWithStringContributors
+    )
+    stripEmptyContributorEntries.mockReturnValue(rowWithStringContributors)
+    request.payload = {}
+    await estimatedSpendController.postHandler(request, h)
+    // Coverage error fires → renders validation view
+    expect(h.view).toHaveBeenCalledWith(
+      PROJECT_VIEWS.FUNDING_SOURCES_ESTIMATED_SPEND,
+      expect.any(Object)
+    )
+  })
+})
