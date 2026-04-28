@@ -7,7 +7,8 @@ import {
   getProjects,
   updateProjectStatus,
   getCarbonImpactCalc,
-  submitProjectProposal
+  submitProjectProposal,
+  resubmitProject
 } from './project-service.js'
 import { apiRequest } from '../../helpers/api-client/index.js'
 
@@ -1271,6 +1272,85 @@ describe('project-service', () => {
       await expect(
         submitProjectProposal('LCR-123-456', 'token')
       ).rejects.toThrow('Network error')
+    })
+  })
+
+  describe('resubmitProject', () => {
+    test('calls apiRequest POST to correct endpoint', async () => {
+      apiRequest.mockResolvedValue({ success: true })
+
+      await resubmitProject('LCR-123-456', 'mock-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/LCR-123-456/resubmit',
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+
+    test('includes Authorization header when accessToken is provided', async () => {
+      apiRequest.mockResolvedValue({ success: true })
+
+      await resubmitProject('LCR-123-456', 'my-access-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/LCR-123-456/resubmit',
+        expect.objectContaining({
+          headers: { Authorization: 'Bearer my-access-token' }
+        })
+      )
+    })
+
+    test('sends empty headers when accessToken is an empty string', async () => {
+      apiRequest.mockResolvedValue({ success: true })
+
+      await resubmitProject('LCR-123-456', '')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/LCR-123-456/resubmit',
+        expect.objectContaining({ headers: {} })
+      )
+    })
+
+    test('sends empty headers when accessToken is null', async () => {
+      apiRequest.mockResolvedValue({ success: true })
+
+      await resubmitProject('LCR-123-456', null)
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/LCR-123-456/resubmit',
+        expect.objectContaining({ headers: {} })
+      )
+    })
+
+    test('returns the apiRequest result directly', async () => {
+      const mockResult = {
+        success: true,
+        data: { externalSubmission: { success: true } }
+      }
+      apiRequest.mockResolvedValue(mockResult)
+
+      const result = await resubmitProject('LCR-123-456', 'token')
+
+      expect(result).toBe(mockResult)
+    })
+
+    test('builds URL with the correct referenceNumber', async () => {
+      apiRequest.mockResolvedValue({ success: true })
+
+      await resubmitProject('ACC-501E-000A', 'token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/ACC-501E-000A/resubmit',
+        expect.any(Object)
+      )
+    })
+
+    test('propagates apiRequest errors', async () => {
+      apiRequest.mockRejectedValue(new Error('Network error'))
+
+      await expect(resubmitProject('LCR-123-456', 'token')).rejects.toThrow(
+        'Network error'
+      )
     })
   })
 })

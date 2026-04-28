@@ -48,6 +48,14 @@ export const projects = {
             pre: [{ method: requireAdmin }]
           },
           handler: submissionsActionsController.markInAimsPd
+        },
+        {
+          method: 'POST',
+          path: ROUTES.ADMIN.SUBMISSIONS_RESUBMIT,
+          options: {
+            pre: [{ method: requireAdmin }]
+          },
+          handler: submissionsActionsController.resubmit
         }
       ])
     }

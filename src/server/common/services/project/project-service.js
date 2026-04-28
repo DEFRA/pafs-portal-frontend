@@ -212,3 +212,18 @@ export async function submitProjectProposal(referenceNumber, accessToken) {
     headers
   })
 }
+
+/**
+ * Admin: retry sending an already-submitted proposal to the external system.
+ * @param {string} referenceNumber - The project reference number (slug format with dashes)
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} API response with externalSubmission outcome
+ */
+export async function resubmitProject(referenceNumber, accessToken) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(`/api/v1/project/${referenceNumber}/resubmit`, {
+    method: 'POST',
+    headers
+  })
+}

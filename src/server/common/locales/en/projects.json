@@ -1511,10 +1511,12 @@
       "proposal_in_aims_pd": "Proposal in AIMS PD"
     },
     "notifications": {
-      "marked_in_aims_pd": "Submission has been marked as received in AIMS PD."
+      "marked_in_aims_pd": "Submission has been marked as received in AIMS PD.",
+      "resubmitted": "Proposal has been resent to AIMS PD successfully."
     },
     "errors": {
-      "mark_failed": "Failed to mark submission as received in AIMS PD. Please try again."
+      "mark_failed": "Failed to mark submission as received in AIMS PD. Please try again.",
+      "resend_failed": "Failed to resend proposal to AIMS PD. Please try again or contact the helpdesk."
     },
     "footer": {
       "label": "How to manage failed submissions",

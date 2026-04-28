@@ -1,4 +1,12 @@
-import { describe, test, expect, afterEach, vi } from 'vitest'
+import {
+  describe,
+  test,
+  expect,
+  beforeAll,
+  afterAll,
+  afterEach,
+  vi
+} from 'vitest'
 import { createServer, collectProductionCookieErrors } from './server.js'
 import { config } from '../config/config.js'
 
@@ -9,109 +17,91 @@ import { config } from '../config/config.js'
 describe('createServer', () => {
   let server
 
-  afterEach(async () => {
-    if (server) {
-      await server.stop({ timeout: 0 })
-    }
+  beforeAll(async () => {
+    server = await createServer()
   })
 
-  test('creates server with host and port from config', async () => {
-    server = await createServer()
+  afterAll(async () => {
+    await server.stop({ timeout: 0 })
+  })
 
+  test('creates server with host and port from config', () => {
     expect(server.info.host).toBeDefined()
     expect(server.info.port).toBeDefined()
   })
 
-  test('strips trailing slashes', async () => {
-    server = await createServer()
-
+  test('strips trailing slashes', () => {
     expect(server.settings.router.stripTrailingSlash).toBe(true)
   })
 
-  test('strictHeader is disabled (tolerates legacy browser cookies)', async () => {
-    server = await createServer()
-
+  test('strictHeader is disabled (tolerates legacy browser cookies)', () => {
     expect(server.settings.state.strictHeader).toBe(false)
   })
 
   describe('security headers', () => {
-    test('HSTS maxAge is one year', async () => {
-      server = await createServer()
+    test('HSTS maxAge is one year', () => {
       expect(server.settings.routes.security.hsts.maxAge).toBe(31536000)
     })
 
-    test('HSTS includeSubDomains is enabled', async () => {
-      server = await createServer()
+    test('HSTS includeSubDomains is enabled', () => {
       expect(server.settings.routes.security.hsts.includeSubDomains).toBe(true)
     })
 
-    test('HSTS preload is disabled (not yet in preload list)', async () => {
-      server = await createServer()
+    test('HSTS preload is disabled (not yet in preload list)', () => {
       expect(server.settings.routes.security.hsts.preload).toBe(false)
     })
 
-    test('XSS protection is enabled', async () => {
-      server = await createServer()
+    test('XSS protection is enabled', () => {
       expect(server.settings.routes.security.xss).toBe('enabled')
     })
 
-    test('noSniff is enabled', async () => {
-      server = await createServer()
+    test('noSniff is enabled', () => {
       expect(server.settings.routes.security.noSniff).toBe(true)
     })
 
-    test('xframe is enabled', async () => {
-      server = await createServer()
+    test('xframe is enabled', () => {
       expect(server.settings.routes.security.xframe).toBe(true)
     })
   })
 
   describe('route validation options', () => {
-    test('abortEarly is false (collects all errors)', async () => {
-      server = await createServer()
+    test('abortEarly is false (collects all errors)', () => {
       expect(server.settings.routes.validate.options.abortEarly).toBe(false)
     })
 
-    test('allowUnknown is true (permits CSRF token in POST payloads)', async () => {
-      server = await createServer()
+    test('allowUnknown is true (permits CSRF token in POST payloads)', () => {
       expect(server.settings.routes.validate.options.allowUnknown).toBe(true)
     })
   })
 
   describe('plugin registration', () => {
-    test('registers hapi-pino for request logging', async () => {
-      server = await createServer()
+    test('registers hapi-pino for request logging', () => {
       const plugins = Object.keys(server.registrations)
       expect(plugins).toContain('hapi-pino')
     })
 
-    test('registers crumb for CSRF protection', async () => {
-      server = await createServer()
+    test('registers crumb for CSRF protection', () => {
       const plugins = Object.keys(server.registrations)
       expect(plugins).toContain('@hapi/crumb')
     })
 
-    test('registers scooter for user agent parsing', async () => {
-      server = await createServer()
+    test('registers scooter for user agent parsing', () => {
       const plugins = Object.keys(server.registrations)
       expect(plugins).toContain('@hapi/scooter')
     })
 
-    test('registers blankie for CSP headers', async () => {
-      server = await createServer()
+    test('registers blankie for CSP headers', () => {
       const plugins = Object.keys(server.registrations)
       expect(plugins).toContain('blankie')
     })
 
-    test('registers more than five plugins', async () => {
-      server = await createServer()
+    test('registers more than five plugins', () => {
       expect(Object.keys(server.registrations).length).toBeGreaterThan(5)
     })
   })
 
   describe('routes', () => {
-    test('health route is registered', async () => {
-      server = await createServer()
+    test('health route is registered', () => {
       const route = server.lookup('health')
       expect(route).toBeDefined()
     })
