@@ -224,10 +224,21 @@ describe('project-funding-sources-schemas', () => {
       expect(error.details[0].type).toBe('array.sourceRequiresValue')
     })
 
-    test('accepts selected source when at least one row has value', () => {
+    test('treats all-zero values as no spend (triggers source coverage error)', () => {
       const schema = createFundingValuesSchema(['fcermGia'])
       const { error } = schema.validate([
-        validRow({ financialYear: 2025, fcermGia: '' }),
+        validRow({ financialYear: 2025, fcermGia: '0' }),
+        validRow({ financialYear: 2026, fcermGia: '0' })
+      ])
+
+      expect(error).toBeDefined()
+      expect(error.details[0].type).toBe('array.sourceRequiresValue')
+    })
+
+    test('accepts selected source when at least one row has a non-zero value', () => {
+      const schema = createFundingValuesSchema(['fcermGia'])
+      const { error } = schema.validate([
+        validRow({ financialYear: 2025, fcermGia: '0' }),
         validRow({ financialYear: 2026, fcermGia: '1' })
       ])
 
