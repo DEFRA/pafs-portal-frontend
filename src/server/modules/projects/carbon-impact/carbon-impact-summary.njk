@@ -15,27 +15,27 @@
   {% set rows = [
     {
       key: { text: t(localKeyPrefix + '.build_label'), classes: keyClass },
-      value: { text: (displayData.build | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: (displayData.buildFormatted if displayData.buildFormatted else (displayData.build | float | round(2))) + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.operation_label'), classes: keyClass },
-      value: { text: (displayData.operation | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: (displayData.operationFormatted if displayData.operationFormatted else (displayData.operation | float | round(2))) + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.whole_life_label'), classes: keyClass },
-      value: { text: (displayData.wholeLifeCarbon | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: (displayData.wholeLifeCarbonFormatted if displayData.wholeLifeCarbonFormatted else (displayData.wholeLifeCarbon | float | round(2))) + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.sequestered_label'), classes: keyClass },
-      value: { text: (displayData.sequestered | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: (displayData.sequesteredFormatted if displayData.sequesteredFormatted else (displayData.sequestered | float | round(2))) + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.avoided_label'), classes: keyClass },
-      value: { text: (displayData.avoided | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: (displayData.avoidedFormatted if displayData.avoidedFormatted else (displayData.avoided | float | round(2))) + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.net_label'), classes: keyClass },
-      value: { text: (displayData.netCarbon | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: (displayData.netCarbonFormatted if displayData.netCarbonFormatted else (displayData.netCarbon | float | round(2))) + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.benefit_label'), classes: keyClass },

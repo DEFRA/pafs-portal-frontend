@@ -59,6 +59,7 @@
         inputmode: "numeric",
         classes: "govuk-input--width-10",
         prefix: { text: "£" },
+        attributes: { "data-number-format": "comma" },
         errorMessage: { text: fieldErrors[fieldName] } if fieldErrors and fieldErrors[fieldName] else undefined
       }) }}
     {% else %}
