@@ -589,7 +589,8 @@
         "area_invalid": "Area must be a number greater than 0",
         "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
-        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_invalid": "Volume must be a number 0 or greater",
+        "NFM_MEASURE_VOLUME_INVALID": "Volume must be a number 0 or greater",
         "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
@@ -607,7 +608,8 @@
         "label": "Typical width"
       },
       "errors": {
-        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_invalid": "Volume must be a number 0 or greater",
+        "NFM_MEASURE_VOLUME_INVALID": "Volume must be a number 0 or greater",
         "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
         "length_required": "Enter the length in km",
@@ -634,7 +636,8 @@
         "area_invalid": "Area must be a number greater than 0",
         "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
-        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_invalid": "Volume must be a number 0 or greater",
+        "NFM_MEASURE_VOLUME_INVALID": "Volume must be a number 0 or greater",
         "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
@@ -681,7 +684,8 @@
         "area_invalid": "Area must be a number greater than 0",
         "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
-        "volume_invalid": "Volume must be a number greater than 0",
+        "volume_invalid": "Volume must be a number 0 or greater",
+        "NFM_MEASURE_VOLUME_INVALID": "Volume must be a number 0 or greater",
         "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
