@@ -11,30 +11,42 @@
 
   {# ─── Error summary ──────────────────────────────────────────────────────── #}
   {% set errorList = [] %}
+  {% set seenMessages = '' %}
   {% if globalError %}
     {% set errorList = errorList.concat([{
       text: globalError,
       href: '#funding-values-table'
     }]) %}
+    {% set seenMessages = '||' + globalError + '||' %}
   {% endif %}
   {% if fieldErrors %}
-    {% set seenErrorKeys = [] %}
     {% for row in spendRows %}
       {% if row.kind == 'contributor' %}
         {% set errKey = row.contributorArrayField %}
-        {% if fieldErrors[errKey] and errKey not in seenErrorKeys %}
-          {% set seenErrorKeys = seenErrorKeys.concat([errKey]) %}
-          {% set firstId = row.sourceField + '-' + row.contributorIndex + '-0' %}
-          {% set errorList = errorList.concat([{
-            text: fieldErrors[errKey],
-            href: '#' + firstId
-          }]) %}
+        {% if fieldErrors[errKey] %}
+          {% set msg = fieldErrors[errKey] %}
+          {% if msg not in seenMessages %}
+            {% set firstId = row.sourceField + '-' + row.contributorIndex + '-0' %}
+            {% set errorList = errorList.concat([
+              {
+                text: msg,
+                href: '#' + firstId
+              }
+            ]) %}
+            {% set seenMessages = seenMessages + msg + '||' %}
+          {% endif %}
         {% endif %}
       {% elif row.field and fieldErrors[row.field] %}
-        {% set errorList = errorList.concat([{
-          text: fieldErrors[row.field],
-          href: '#' + row.field + '-0'
-        }]) %}
+        {% set msg = fieldErrors[row.field] %}
+        {% if msg not in seenMessages %}
+          {% set errorList = errorList.concat([
+            {
+              text: msg,
+              href: '#' + row.field + '-0'
+            }
+          ]) %}
+          {% set seenMessages = seenMessages + msg + '||' %}
+        {% endif %}
       {% endif %}
     {% endfor %}
   {% endif %}
@@ -111,8 +123,7 @@
                       {% if cellValue and '.' in (cellValue | string) %}
                         {% set displayValue = cellValue | string %}
                       {% else %}
-                        {% set displayValue = formatNumberWithCommas(cellValue)if cellValue else 
-                          '' %}
+                        {% set displayValue = formatNumberWithCommas(cellValue) if cellValue else '' %}
                       {% endif %}
 
                       <td class="govuk-table__cell govuk-table__cell--numeric">
@@ -164,8 +175,7 @@
                       {% if cellValue and '.' in (cellValue | string) %}
                         {% set displayValue = cellValue | string %}
                       {% else %}
-                        {% set displayValue = formatNumberWithCommas(cellValue)if cellValue else 
-                          '' %}
+                        {% set displayValue = formatNumberWithCommas(cellValue) if cellValue else '' %}
                       {% endif %}
 
                       <td class="govuk-table__cell govuk-table__cell--numeric">

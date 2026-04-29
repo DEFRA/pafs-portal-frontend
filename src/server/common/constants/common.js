@@ -42,6 +42,8 @@ export const PROJECT_VIEWS = {
   AREA: 'modules/projects/area/index',
   TYPE: 'modules/projects/type/index',
   FINANCIAL_YEAR: 'modules/projects/financial-year/index',
+  FINANCIAL_YEAR_WARNING:
+    'modules/projects/financial-year/financial-range-warning',
   IMPORTANT_DATES: 'modules/projects/important-dates/index',
   BENEFIT_AREA: 'modules/projects/benefit-area/index',
   BENEFIT_AREA_DELETE: 'modules/projects/benefit-area/delete',

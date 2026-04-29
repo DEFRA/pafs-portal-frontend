@@ -130,6 +130,11 @@ vi.mock('./helpers/payload-helpers.js', () => ({
   sanitiseFundingValueRow: vi.fn((row) => row),
   setSourceTotalsFromContributorArrays: vi.fn((row) => row),
   stripEmptyContributorEntries: vi.fn((row) => row),
+  stripEmptyContributorEntriesWithMapping: vi.fn((row) => ({
+    row,
+    indexMaps: {}
+  })),
+  sanitiseZerosFromValidatedRows: vi.fn((rows) => rows),
   parseFundingValuesPayload: vi.fn().mockReturnValue([]),
   parseContributorsPayload: vi.fn().mockReturnValue(['Alice'])
 }))
@@ -167,7 +172,9 @@ import {
   parseContributorsPayload,
   sanitiseFundingValueRow,
   setSourceTotalsFromContributorArrays,
-  stripEmptyContributorEntries
+  stripEmptyContributorEntries,
+  stripEmptyContributorEntriesWithMapping,
+  sanitiseZerosFromValidatedRows
 } from './helpers/payload-helpers.js'
 import {
   buildEstimatedSpendRows,
@@ -1113,6 +1120,11 @@ describe('estimatedSpendController', () => {
     sanitiseFundingValueRow.mockImplementation((row) => row)
     setSourceTotalsFromContributorArrays.mockImplementation((row) => row)
     stripEmptyContributorEntries.mockImplementation((row) => row)
+    stripEmptyContributorEntriesWithMapping.mockImplementation((row) => ({
+      row,
+      indexMaps: {}
+    }))
+    sanitiseZerosFromValidatedRows.mockImplementation((rows) => rows)
   })
 
   describe('getHandler', () => {
@@ -1183,9 +1195,12 @@ describe('estimatedSpendController', () => {
         financialYear: 2025,
         publicContributors: [{ name: 'Alice', amount: null }]
       })
-      stripEmptyContributorEntries.mockReturnValue({
-        financialYear: 2025,
-        publicContributors: [{ name: 'Alice', amount: null }]
+      stripEmptyContributorEntriesWithMapping.mockReturnValue({
+        row: {
+          financialYear: 2025,
+          publicContributors: [{ name: 'Alice', amount: null }]
+        },
+        indexMaps: {}
       })
 
       request.payload = {}
@@ -1223,9 +1238,12 @@ describe('estimatedSpendController', () => {
         financialYear: 2025,
         publicContributors: [{ name: 'Alice', amount: '1000' }]
       })
-      stripEmptyContributorEntries.mockReturnValue({
-        financialYear: 2025,
-        publicContributors: [{ name: 'Alice', amount: '1000' }]
+      stripEmptyContributorEntriesWithMapping.mockReturnValue({
+        row: {
+          financialYear: 2025,
+          publicContributors: [{ name: 'Alice', amount: '1000' }]
+        },
+        indexMaps: {}
       })
       FUNDING_SOURCES_CONFIG[
         PROJECT_STEPS.FUNDING_SOURCES_ESTIMATED_SPEND
@@ -1258,7 +1276,10 @@ describe('estimatedSpendController', () => {
       parseFundingValuesPayload.mockReturnValue([rowWithNullAmount])
       sanitiseFundingValueRow.mockReturnValue(rowWithNullAmount)
       setSourceTotalsFromContributorArrays.mockReturnValue(rowWithNullAmount)
-      stripEmptyContributorEntries.mockReturnValue(rowWithNullAmount)
+      stripEmptyContributorEntriesWithMapping.mockReturnValue({
+        row: rowWithNullAmount,
+        indexMaps: {}
+      })
       // Also have a schema error so both paths fire
       FUNDING_SOURCES_CONFIG[
         PROJECT_STEPS.FUNDING_SOURCES_ESTIMATED_SPEND

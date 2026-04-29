@@ -208,7 +208,7 @@
       "local_levy": "Local levy",
       "additional_gia": "Additional FCRM Grant-in-Aid",
       "internal_drainage_boards": "Funds recovered from an internal drainage board by the Environment Agency, known as a precept",
-      "not_yet_identified": "Other funding sources not yet identified",
+      "not_yet_identified": "Funding sources not yet identified",
       "public_sector_contributors": "Public sector contributors",
       "private_sector_contributors": "Private sector contributors",
       "other_ea_contributors": "Other Environment Agency contributors",
@@ -333,6 +333,17 @@
       "out_of_range": "Enter a financial year less than or equal to 2100",
       "should_be_in_future": "Enter a financial year that is the current year or later",
       "invalid_range": "Your last financial year should be greater than or equal to your first financial year"
+    }
+  },
+  "financial_year": {
+    "warning": {
+      "title": "You have changed the project date range",
+      "heading": "You have changed the project date range",
+      "body_1": "Please note that this change may affect data previously entered in the Funding & Spending sources and Important dates sections.",
+      "list_item_1": "You may lose Funding & Spending data that falls outside your new project's date range (from the Financial Start Date to the Financial Stop Year in which funds will be spent).",
+      "list_item_2": "Your Important dates section may no longer align with the project date range and may require an update.",
+      "body_2": "If you select 'Save and continue', the system will automatically remove any previously updated funding data that falls outside your new project date range.",
+      "body_3": "Or, you can select 'Back' to manually review and correct your data."
     }
   },
   "important_dates": {
@@ -1695,7 +1706,7 @@
         "public_contributions": "Public sector contributions",
         "private_contributions": "Private sector contributions",
         "other_ea_contributions": "Contributions from other Environment Agency functions or sources",
-        "not_yet_identified": "Other funding sources not yet identified"
+        "not_yet_identified": "Funding sources not yet identified"
       },
       "errors": {
         "required": "The project must have at least one funding source.",
@@ -1740,8 +1751,8 @@
       "hint": "For example, a local business such as Llanmoor Development Company."
     },
     "other_ea_contributors": {
-      "title": "What are the expected contributions from other Environment Agency sources?",
-      "heading": "What are the expected contributions from other Environment Agency sources?",
+      "title": "Who are the expected contributors from Environment agency?",
+      "heading": "Who are the expected contributors from Environment agency?",
       "hint": "These are Environment Agency functions or funding streams. For example, Water Framework Directive or Water Resources."
     },
     "delete_contributor": {

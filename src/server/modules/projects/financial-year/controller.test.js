@@ -529,5 +529,143 @@ describe('FinancialYearController', () => {
         PROJECT_VIEWS.FINANCIAL_YEAR
       )
     })
+
+    test('should redirect to warning page in edit mode when project has important dates', async () => {
+      mockRequest.params.referenceNumber = 'TEST-001'
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        projectType: 'FRM',
+        startOutlineBusinessCaseMonth: 4,
+        startOutlineBusinessCaseYear: 2026
+      })
+
+      await financialYearController.postHandler(mockRequest, mockH)
+
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+      expect(updateSessionData).toHaveBeenCalledWith(mockRequest, {
+        pendingFinancialYearStep: PROJECT_STEPS.FINANCIAL_START_YEAR
+      })
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.FINANCIAL_YEAR_WARNING.replace(
+          '{referenceNumber}',
+          'TEST-001'
+        )
+      )
+    })
+
+    test('should redirect to warning page in edit mode when project has funding values', async () => {
+      mockRequest.params.referenceNumber = 'TEST-001'
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        projectType: 'FRM',
+        fundingValues: [{ financialYear: 2025, fcermGia: '1000' }]
+      })
+
+      await financialYearController.postHandler(mockRequest, mockH)
+
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.FINANCIAL_YEAR_WARNING.replace(
+          '{referenceNumber}',
+          'TEST-001'
+        )
+      )
+    })
+
+    test('should redirect to warning page in edit mode when a funding source boolean is true', async () => {
+      mockRequest.params.referenceNumber = 'TEST-001'
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        projectType: 'FRM',
+        fcermGia: true
+      })
+
+      await financialYearController.postHandler(mockRequest, mockH)
+
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.FINANCIAL_YEAR_WARNING.replace(
+          '{referenceNumber}',
+          'TEST-001'
+        )
+      )
+    })
+
+    test('should redirect to warning page in edit mode when project has raw DB funding values (pafs_core_funding_values)', async () => {
+      mockRequest.params.referenceNumber = 'TEST-001'
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        projectType: 'FRM',
+        pafs_core_funding_values: [
+          { id: 1, financialYear: 2025, fcerm_gia: 500000n }
+        ]
+      })
+
+      await financialYearController.postHandler(mockRequest, mockH)
+
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.FINANCIAL_YEAR_WARNING.replace(
+          '{referenceNumber}',
+          'TEST-001'
+        )
+      )
+    })
+
+    test('should redirect to warning page in edit mode when project has raw DB contributors (pafs_core_funding_contributors)', async () => {
+      mockRequest.params.referenceNumber = 'TEST-001'
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        projectType: 'FRM',
+        pafs_core_funding_contributors: [
+          { id: 1, name: 'Partner A', contributor_type: 'public_contributions' }
+        ]
+      })
+
+      await financialYearController.postHandler(mockRequest, mockH)
+
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.FINANCIAL_YEAR_WARNING.replace(
+          '{referenceNumber}',
+          'TEST-001'
+        )
+      )
+    })
+
+    test('should not redirect to warning page in edit mode when project has no date or funding data', async () => {
+      mockRequest.params.referenceNumber = 'TEST-001'
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        projectType: 'FRM'
+      })
+      navigateToProjectOverview.mockReturnValue('overview-redirect')
+
+      const result = await financialYearController.postHandler(
+        mockRequest,
+        mockH
+      )
+
+      expect(saveProjectWithErrorHandling).toHaveBeenCalled()
+      expect(navigateToProjectOverview).toHaveBeenCalledWith('TEST-001', mockH)
+      expect(result).toBe('overview-redirect')
+    })
+
+    test('should redirect to warning for FINANCIAL_END_YEAR edit when project has funding data', async () => {
+      mockRequest.params.referenceNumber = 'TEST-001'
+      getProjectStep.mockReturnValue(PROJECT_STEPS.FINANCIAL_END_YEAR)
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        projectType: 'FRM',
+        fundingValues: [{ financialYear: 2025, fcermGia: '500' }]
+      })
+
+      await financialYearController.postHandler(mockRequest, mockH)
+
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+      expect(updateSessionData).toHaveBeenCalledWith(mockRequest, {
+        pendingFinancialYearStep: PROJECT_STEPS.FINANCIAL_END_YEAR
+      })
+    })
   })
 })
