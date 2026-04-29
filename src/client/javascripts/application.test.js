@@ -64,15 +64,27 @@ describe('input formatting helpers', () => {
     expect(input.value).toBe('1,234,567')
   })
 
+  it('formatInputValueWithCommas leaves value unchanged when it contains a decimal point', () => {
+    input.value = '1234.56'
+    formatInputValueWithCommas(input)
+    expect(input.value).toBe('1234.56')
+  })
+
   it('formatInputValueWithCommas does nothing if input is falsy', () => {
     expect(formatInputValueWithCommas(null)).toBeUndefined()
     expect(formatInputValueWithCommas(undefined)).toBeUndefined()
   })
 
-  it('unformatInputValue strips commas from input value', () => {
+  it('unformatInputValue strips only commas, preserving decimal points', () => {
     input.value = '1,234,567'
     unformatInputValue(input)
     expect(input.value).toBe('1234567')
+  })
+
+  it('unformatInputValue preserves decimal point so server validation can reject it', () => {
+    input.value = '1,234.56'
+    unformatInputValue(input)
+    expect(input.value).toBe('1234.56')
   })
 
   it('unformatInputValue does nothing if input is falsy', () => {
@@ -358,6 +370,19 @@ describe('initEstimatedSpend (progressive enhancement)', () => {
     expect(grand.textContent).toBe('0')
   })
 
+  it('treats a cell containing a decimal point as 0 in live totals', async () => {
+    // The dot is preserved in the input (not stripped by formatInputValueWithCommas),
+    // so parseVal must return 0n rather than throwing from BigInt('1234.56').
+    document.body.innerHTML = buildFormHtml({
+      numCols: 1,
+      rows: [['1234.56']]
+    })
+    await import('./application.js?decimal')
+
+    const grand = document.querySelector('[data-grand-total]')
+    expect(grand.textContent).toBe('0')
+  })
+
   it('registers DOMContentLoaded listener when readyState is loading', async () => {
     document.body.innerHTML = buildFormHtml({
       numCols: 1,
@@ -390,6 +415,20 @@ describe('initEstimatedSpend (progressive enhancement)', () => {
     await import('./application.js?fmt')
     const grand = document.querySelector('[data-grand-total]')
     expect(grand.textContent).toBe('1,234')
+  })
+
+  it('calculates totals exactly for values exceeding Number.MAX_SAFE_INTEGER (17+ digits)', async () => {
+    // 17-digit value: 11111111111111111
+    // With Number.parseInt this rounds to 11111111111111112 due to IEEE 754 limits.
+    // BigInt must preserve the exact value.
+    document.body.innerHTML = buildFormHtml({
+      numCols: 1,
+      rows: [['11111111111111111']]
+    })
+    await import('./application.js?bigint')
+
+    const grand = document.querySelector('[data-grand-total]')
+    expect(grand.textContent).toBe('11,111,111,111,111,111')
   })
 
   it('ignores extra input cells beyond numCols', async () => {

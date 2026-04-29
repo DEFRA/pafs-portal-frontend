@@ -12,7 +12,12 @@
   {% if fieldErrors %}
     {% set errorList = [] %}
     {% for field, error in fieldErrors %}
-      {% set errorList = errorList.concat([{ text: error, href: '#' + field }]) %}
+      {% set errorList = errorList.concat([
+        {
+          text: error,
+          href: '#' + field
+        }
+      ]) %}
     {% endfor %}
     {% if errorList.length > 0 %}
       {{ govukErrorSummary({
@@ -78,10 +83,6 @@
 
     {% if afterCount >= 2 %}
       <p class="govuk-body">{{ t(localKeyPrefix + '.after_2') }}</p>
-    {% endif %}
-
-    {% if afterCount >= 3 %}
-      <p class="govuk-body">{{ t(localKeyPrefix + '.after_3') }}</p>
     {% endif %}
 
     <div class="govuk-button-group">

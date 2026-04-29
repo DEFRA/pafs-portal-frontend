@@ -269,9 +269,8 @@ function getRowValue(row, fvRow) {
  * @private
  */
 function calculateServerTotals(spendRows, existingValues, financialYears) {
-  const colTotals = Array.from({ length: financialYears.length }, () => 0)
+  const colTotalsBig = Array.from({ length: financialYears.length }, () => 0n)
   const rowTotals = {}
-  let grandTotal = 0
 
   for (const row of spendRows) {
     if (row.kind === 'group-heading') {
@@ -282,7 +281,7 @@ function calculateServerTotals(spendRows, existingValues, financialYears) {
       row.kind === 'contributor'
         ? `${row.contributorArrayField}-${row.contributorIndex}`
         : row.field
-    let rowTotal = 0
+    let rowTotal = 0n
 
     for (let colIdx = 0; colIdx < financialYears.length; colIdx++) {
       const year = financialYears[colIdx].value
@@ -293,17 +292,22 @@ function calculateServerTotals(spendRows, existingValues, financialYears) {
         continue
       }
 
-      const val = getRowValue(row, fvRow)
+      const val = BigInt(
+        Number.parseInt(
+          String(getRowValue(row, fvRow) || '0').replaceAll(/\D/g, '') || '0',
+          10
+        ) || 0
+      )
       rowTotal += val
-      colTotals[colIdx] += val
+      colTotalsBig[colIdx] += val
     }
 
-    rowTotals[rowKey] = rowTotal
+    // Store as regular number for Nunjucks template rendering
+    rowTotals[rowKey] = Number(rowTotal)
   }
 
-  for (const ct of colTotals) {
-    grandTotal += ct
-  }
+  const colTotals = colTotalsBig.map(Number)
+  const grandTotal = colTotals.reduce((sum, ct) => sum + ct, 0)
 
   return { rowTotals, colTotals, grandTotal }
 }
@@ -354,6 +358,38 @@ function checkContributorCoverage(sessionData, fundingValues) {
 }
 
 /**
+ * Classify a contributor-cell Joi error.
+ * Path shape: [yearIdx, contributorArrayField, contributorIdx, ...]
+ * @private
+ */
+function classifyContributorDetail(detail, path) {
+  const contribYearIdx = path[0]
+  const contributorArrayField = path[1]
+  const contribIdx = path[2]
+  const msgSuffix = detail.type === 'string.max' ? 'max_digits' : 'invalid'
+  return {
+    kind: 'contributor-cell',
+    cellKey: `${contributorArrayField}-${contribIdx}-${contribYearIdx}`,
+    msgSuffix,
+    contributorArrayField
+  }
+}
+
+/**
+ * Return true when the Joi error path matches a contributor-cell shape:
+ * [yearIdx, contributorArrayField, contributorIdx, ...]
+ * @private
+ */
+function isContributorPath(path) {
+  return (
+    path.length >= 4 &&
+    typeof path[0] === 'number' &&
+    typeof path[1] === 'string' &&
+    typeof path[2] === 'number'
+  )
+}
+
+/**
  * Build field-level and global errors from Joi validation output and
  * contributor coverage check.
  * @private
@@ -367,45 +403,80 @@ function classifyValidationDetail(detail) {
     return { kind: 'global' }
   }
 
+  if (isContributorPath(path)) {
+    return classifyContributorDetail(detail, path)
+  }
+
   const fieldKey = path[path.length - 1]
   if (!fieldKey) {
     return null
   }
 
+  const yearIdx = typeof path[0] === 'number' ? path[0] : null
   const msgSuffix = detail.type === 'string.max' ? 'max_digits' : 'invalid'
-  return { kind: 'field', fieldKey, msgSuffix }
+  return { kind: 'field', fieldKey, yearIdx, msgSuffix }
+}
+
+/**
+ * Mutate fieldErrors / cellErrors with the result of a classified detail.
+ * Global-kind details are handled by the caller.
+ * @private
+ */
+function applyClassifiedError(
+  classified,
+  fieldErrors,
+  cellErrors,
+  ERROR_PREFIX,
+  t
+) {
+  if (classified.kind === 'contributor-cell') {
+    if (!cellErrors[classified.cellKey]) {
+      cellErrors[classified.cellKey] = true
+    }
+    // Ensure one field-level error exists per array field for the error summary
+    if (!fieldErrors[classified.contributorArrayField]) {
+      fieldErrors[classified.contributorArrayField] = t(
+        `${ERROR_PREFIX}${classified.msgSuffix}`
+      )
+    }
+    return
+  }
+  if (classified.kind === 'field') {
+    if (!fieldErrors[classified.fieldKey]) {
+      fieldErrors[classified.fieldKey] = t(
+        `${ERROR_PREFIX}${classified.msgSuffix}`
+      )
+    }
+    if (classified.yearIdx !== null) {
+      cellErrors[`${classified.fieldKey}-${classified.yearIdx}`] = true
+    }
+  }
 }
 
 function buildSpendValidationErrors(error, contributorCoverageError, t) {
   const fieldErrors = {}
+  const cellErrors = {}
   let globalError = contributorCoverageError
     ? t(contributorCoverageError)
     : null
 
   if (!error) {
-    return { fieldErrors, globalError }
+    return { fieldErrors, cellErrors, globalError }
   }
 
   const ERROR_PREFIX = 'projects.funding_sources.estimated_spend.errors.'
 
   for (const detail of error.details) {
     const classified = classifyValidationDetail(detail)
-
     if (classified?.kind === 'global' && !globalError) {
       globalError = t(`${ERROR_PREFIX}required`)
-    } else if (
-      classified?.kind === 'field' &&
-      !fieldErrors[classified.fieldKey]
-    ) {
-      fieldErrors[classified.fieldKey] = t(
-        `${ERROR_PREFIX}${classified.msgSuffix}`
-      )
-    } else {
-      // Duplicate or unclassified detail — intentionally ignored
+    }
+    if (classified && classified.kind !== 'global') {
+      applyClassifiedError(classified, fieldErrors, cellErrors, ERROR_PREFIX, t)
     }
   }
 
-  return { fieldErrors, globalError }
+  return { fieldErrors, cellErrors, globalError }
 }
 
 // ─── View data builder ──────────────────────────────────────────────────────
@@ -416,7 +487,7 @@ function buildSpendValidationErrors(error, contributorCoverageError, t) {
  */
 function buildEstimatedSpendViewData(
   request,
-  { existingValues, fieldErrors, globalError } = {}
+  { existingValues, fieldErrors, cellErrors, globalError } = {}
 ) {
   const sessionData = getSessionData(request)
   const step = PROJECT_STEPS.FUNDING_SOURCES_ESTIMATED_SPEND
@@ -446,6 +517,7 @@ function buildEstimatedSpendViewData(
       existingValues: values,
       serverTotals,
       fieldErrors: fieldErrors || {},
+      cellErrors: cellErrors || {},
       globalError: globalError || null,
       formatNumberWithCommas,
       PROJECT_PAYLOAD_FIELDS,
@@ -506,14 +578,12 @@ class EstimatedSpendController {
 
     if (error || contributorCoverageError) {
       const t = request.t.bind(request)
-      const { fieldErrors, globalError } = buildSpendValidationErrors(
-        error,
-        contributorCoverageError,
-        t
-      )
+      const { fieldErrors, cellErrors, globalError } =
+        buildSpendValidationErrors(error, contributorCoverageError, t)
       const errorViewData = buildEstimatedSpendViewData(request, {
         existingValues: fundingValues,
         fieldErrors,
+        cellErrors,
         globalError
       })
       return h.view(
