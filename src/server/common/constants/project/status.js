@@ -3,7 +3,7 @@ export const PROJECT_STATUS = {
   DRAFT: 'draft',
   SUBMITTED: 'submitted',
   APPROVED: 'approved',
-  COMPLETED: 'completed',
+  REJECTED: 'rejected',
   ARCHIVED: 'archived'
 }
 

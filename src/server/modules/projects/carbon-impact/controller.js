@@ -20,6 +20,7 @@ import {
   DISPLAY_PAGE_SEQUENCE,
   getCarbonFields,
   getNextRouteForStep,
+  getPreviousRouteForStep,
   getRouteForStep,
   getStep,
   hasCarbonPrerequisites,
@@ -91,12 +92,21 @@ class CarbonImpactController {
       extraDataToPass.displayValueKey = stepConfig.displayValueKey
     }
 
+    // Info/guidance pages (CARBON_REQUIRED_INFORMATION, CARBON_PREPARE) link back
+    // to the project overview. All subsequent input and display pages link back to
+    // the preceding page in the wizard sequence.
+    const isInfoPage = [
+      PROJECT_STEPS.CARBON_REQUIRED_INFORMATION,
+      PROJECT_STEPS.CARBON_PREPARE
+    ].includes(step)
+
+    const backLinkOptions = isInfoPage
+      ? { conditionalRedirect: true }
+      : { targetEditURL: getPreviousRouteForStep(step) }
+
     return buildViewData(request, {
       localKeyPrefix,
-      backLinkOptions: {
-        targetEditURL: ROUTES.PROJECT.OVERVIEW,
-        conditionalRedirect: true
-      },
+      backLinkOptions,
       additionalData: {
         step,
         carbonFields: getCarbonFields(),

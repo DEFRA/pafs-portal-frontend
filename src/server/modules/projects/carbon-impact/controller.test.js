@@ -324,8 +324,8 @@ describe('carbonImpactController', () => {
         expect.objectContaining({
           additionalData: expect.objectContaining({
             displayData: expect.objectContaining({
-              capitalCarbonBaseline: 100,
-              capitalCarbonTarget: 90
+              capitalCarbonBaseline: '100.00',
+              capitalCarbonTarget: '90.00'
             })
           })
         })
@@ -353,7 +353,7 @@ describe('carbonImpactController', () => {
         expect.objectContaining({
           additionalData: expect.objectContaining({
             displayData: expect.objectContaining({
-              netCarbonEstimate: expect.any(Number),
+              netCarbonEstimate: expect.any(String),
               allCarbonValuesPresent: false
             })
           })
@@ -678,6 +678,94 @@ describe('carbonImpactController', () => {
       mockRequest.payload = {
         [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: ''
       }
+
+      const result = await carbonImpactController.postHandler(
+        mockRequest,
+        mockH
+      )
+
+      expect(mockH.view).toHaveBeenCalled()
+      expect(result).toBe('view-response')
+    })
+  })
+
+  describe('back link options in _buildViewData', () => {
+    test('info page carbon-required-information uses conditionalRedirect back link', async () => {
+      mockRequest.route.path =
+        '/project/{referenceNumber}/carbon-required-information'
+
+      await carbonImpactController.getHandler(mockRequest, mockH)
+
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          backLinkOptions: { conditionalRedirect: true }
+        })
+      )
+    })
+
+    test('info page carbon-prepare uses conditionalRedirect back link', async () => {
+      mockRequest.route.path = '/project/{referenceNumber}/carbon-prepare'
+
+      await carbonImpactController.getHandler(mockRequest, mockH)
+
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          backLinkOptions: { conditionalRedirect: true }
+        })
+      )
+    })
+
+    test('input page carbon-cost-build links back to carbon-prepare', async () => {
+      mockRequest.route.path = '/project/{referenceNumber}/carbon-cost-build'
+
+      await carbonImpactController.getHandler(mockRequest, mockH)
+
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          backLinkOptions: { targetEditURL: ROUTES.PROJECT.EDIT.CARBON_PREPARE }
+        })
+      )
+    })
+
+    test('display page carbon-impact-assessment links back to carbon-summary', async () => {
+      mockRequest.route.path =
+        '/project/{referenceNumber}/carbon-impact-assessment'
+
+      await carbonImpactController.getHandler(mockRequest, mockH)
+
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          backLinkOptions: {
+            targetEditURL: ROUTES.PROJECT.EDIT.CARBON_SUMMARY
+          }
+        })
+      )
+    })
+
+    test('unknown step falls back to project overview for back link', async () => {
+      // Exercises: L167 (get fallback view) and getPreviousRouteForStep L288 fallback
+      mockRequest.route.path = '/project/{referenceNumber}/unknown-carbon-step'
+
+      await carbonImpactController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalled()
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          backLinkOptions: { targetEditURL: ROUTES.PROJECT.OVERVIEW }
+        })
+      )
+    })
+  })
+
+  describe('unknown step fallback (POST)', () => {
+    test('unknown step POST renders fallback view', async () => {
+      // Exercises L371: final return h.view in post()
+      mockRequest.route.path = '/project/{referenceNumber}/unknown-carbon-step'
 
       const result = await carbonImpactController.postHandler(
         mockRequest,

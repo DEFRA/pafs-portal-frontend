@@ -14,7 +14,7 @@
   {% set suffix = t(localKeyPrefix + '.suffix') %}
 
   <p class="govuk-heading-m govuk-!-margin-bottom-6">
-    <strong>{{ (displayData[displayValueKey] | round(2)) + ' ' + suffix }}</strong>
+    <strong>{{ displayData[displayValueKey] + ' ' + suffix }}</strong>
   </p>
 
   <form method="post" novalidate>

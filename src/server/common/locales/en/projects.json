@@ -1705,7 +1705,7 @@
     "benefit_label": "Net carbon savings economic benefit",
     "forecast_label": "Operation and maintenance cost forcast",
     "capital_cost_estimate": "Estimated capital cost",
-    "capital_cost_estimate_hint": "The sum of spending in the years between the start of construction date and ready for service date.",
+    "capital_cost_estimate_hint": "The sum of spending in the years between the start of construction date and ready for service date (Gateway 4 important dates).",
     "capital_cost_label": "Capital cost estimate",
     "units": "tonnes"
   },

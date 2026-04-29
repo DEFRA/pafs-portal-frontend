@@ -13,7 +13,7 @@
       "draft": "Draft",
       "revise": "Revise (legacy)",
       "approved": "Approved",
-      "completed": "Completed",
+      "rejected": "Rejected",
       "archived": "Archived"
     },
     "empty": {
@@ -59,7 +59,7 @@
       "draft": "Draft",
       "revise": "Revise (legacy)",
       "approved": "Approved",
-      "completed": "Completed",
+      "rejected": "Rejected",
       "archived": "Archived",
       "note": "Archived projects are excluded from the system-wide download."
     },

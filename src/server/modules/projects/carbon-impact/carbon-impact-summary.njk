@@ -15,27 +15,27 @@
   {% set rows = [
     {
       key: { text: t(localKeyPrefix + '.build_label'), classes: keyClass },
-      value: { text: (displayData.build | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: displayData.build + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.operation_label'), classes: keyClass },
-      value: { text: (displayData.operation | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: displayData.operation + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.whole_life_label'), classes: keyClass },
-      value: { text: (displayData.wholeLifeCarbon | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: displayData.wholeLifeCarbon + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.sequestered_label'), classes: keyClass },
-      value: { text: (displayData.sequestered | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: displayData.sequestered + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.avoided_label'), classes: keyClass },
-      value: { text: (displayData.avoided | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: displayData.avoided + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.net_label'), classes: keyClass },
-      value: { text: (displayData.netCarbon | float | round(2)) + ' ' + t(localKeyPrefix + '.units') }
+      value: { text: displayData.netCarbon + ' ' + t(localKeyPrefix + '.units') }
     },
     {
       key: { text: t(localKeyPrefix + '.benefit_label'), classes: keyClass },

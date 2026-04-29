@@ -109,13 +109,13 @@ export const propertiesBenefitInvestmentCoastalErosionSchema =
   )
 
 /**
- * Percentage schema - whole numbers 1-100
- * No decimals, no zero, no negatives, no values above 100
+ * Percentage schema - whole numbers 0-100
+ * No decimals, no negatives, no values above 100
  */
 
 const percentageSchemaRequired = (errorMessages) =>
   Joi.string()
-    .pattern(/^([1-9]\d?|100)$/)
+    .pattern(/^(0|[1-9]\d?|100)$/)
     .required()
     .label('Percentage')
     .messages(errorMessages)
