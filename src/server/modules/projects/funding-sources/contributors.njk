@@ -63,9 +63,9 @@
           {% if inputError %}aria-describedby="contributor-{{ i }}-error"{% endif %}
         >
         {% if contributors.length > 1 %}
-          <a href="{{ deleteRoute.replace('{referenceNumber}', referenceNumber) }}/{{ i }}" class="govuk-link govuk-!-font-size-19 govuk-!-margin-left-2">
+          <button type="submit" name="action" value="remove:{{ i }}" class="govuk-link govuk-!-font-size-19 govuk-!-margin-left-2 app-link-button">
             {{ t('common.remove') }} <span class="govuk-visually-hidden">{{ t('projects.funding_sources.contributors.contributor') }}{{ i + 1 }}</span>
-          </a>
+          </button>
         {% endif %}
       </div>
     {% endfor %}

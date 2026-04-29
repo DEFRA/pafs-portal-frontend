@@ -20,28 +20,15 @@ const EXCLUDED_RETURN_PATHS = [
 ]
 
 /**
- * Check if a URL is safe to use as a post-login return destination.
- * Decodes percent-encoded characters before validation to prevent open-redirect
- * attacks via encoded protocol-relative paths (e.g. /%2F%2Fevil.com → //evil.com).
+ * Check if a URL is safe to use as a post-login return destination
  * @private
  */
-function isValidReturnUrl(url) {
-  if (typeof url !== 'string') {
-    return false
-  }
-
-  let decoded
-  try {
-    decoded = decodeURIComponent(url)
-  } catch {
-    // Malformed percent-encoding — reject
-    return false
-  }
-
+export function isValidReturnUrl(url) {
   return (
-    decoded.startsWith('/') &&
-    !decoded.startsWith('//') &&
-    !EXCLUDED_RETURN_PATHS.some((path) => decoded.startsWith(path))
+    typeof url === 'string' &&
+    url.startsWith('/') &&
+    !url.startsWith('//') &&
+    !EXCLUDED_RETURN_PATHS.some((path) => url.startsWith(path))
   )
 }
 

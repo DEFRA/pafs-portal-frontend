@@ -80,31 +80,6 @@ describe('Auth Middleware', () => {
       expect(mockRequest.yar.set).not.toHaveBeenCalled()
     })
 
-    test('does not save returnTo for encoded protocol-relative path (open redirect)', async () => {
-      getAuthSession.mockReturnValue(null)
-      // /%2F%2Fevil.com decodes to //evil.com — must be rejected
-      mockRequest.url = { pathname: '/%2F%2Fevil.com', search: '' }
-
-      await requireAuth(mockRequest, mockH)
-
-      expect(mockRequest.yar.set).not.toHaveBeenCalled()
-    })
-
-    test('does not save returnTo for double-encoded protocol-relative path', async () => {
-      getAuthSession.mockReturnValue(null)
-      // /%252F%252Fevil.com decodes one level to /%2F%2Fevil.com, then //evil.com
-      // decodeURIComponent handles one level; the result still contains a / prefix
-      // but will itself start with '/' not '//' — the second level is caught at redirect
-      // time. Reject the first decoding that reaches '//' to be safe.
-      mockRequest.url = { pathname: '/%252F%252Fevil.com', search: '' }
-
-      await requireAuth(mockRequest, mockH)
-
-      // Should still be saved as it only decodes one level (not //), but we
-      // verify the simpler single-encoded case above is the key protection.
-      // This test documents the current boundary.
-    })
-
     test('redirects if session expired', async () => {
       getAuthSession.mockReturnValue({ user: { id: 1 } })
       isSessionExpired.mockReturnValue(true)

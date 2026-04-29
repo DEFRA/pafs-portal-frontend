@@ -240,6 +240,53 @@ describe('NFM Measure Schemas', () => {
     expect(result.error).toBeUndefined()
   })
 
+  test('allows zero for river restoration optional volume (AC: 0 treated same as empty)', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 45.67,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: 0
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('allows zero for leaky barriers optional volume (AC: 0 treated same as empty)', () => {
+    const result = nfmLeakyBarriersSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: 0,
+      [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]: 1.5,
+      [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]: 2.0
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('allows zero for offline storage optional volume (AC: 0 treated same as empty)', () => {
+    const result = nfmOfflineStorageSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: 8.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: 0
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('allows zero for runoff management optional volume (AC: 0 treated same as empty)', () => {
+    const result = nfmRunoffManagementSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: 10.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: 0
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects negative value for river restoration volume', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 45.67,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: -1
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.min')
+  })
+
   test('rejects area value in scientific notation (fails internal regex)', () => {
     const result = nfmRiverRestorationSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: '1e5'

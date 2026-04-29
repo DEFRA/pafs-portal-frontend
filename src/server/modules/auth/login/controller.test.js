@@ -333,5 +333,22 @@ describe('Login Controller', () => {
 
       expect(mockH.redirect).toHaveBeenCalledWith('/admin/users')
     })
+
+    test('admin with returnTo of home (/) ignores it and goes to journey selection', async () => {
+      mockRequest.payload = { email: 'admin@example.com', password: 'password' }
+      mockRequest.yar.get.mockReturnValue('/')
+      login.mockResolvedValue({
+        success: true,
+        data: {
+          user: { id: 1, email: 'admin@example.com', admin: true },
+          accessToken: 'token123',
+          refreshToken: 'refresh123'
+        }
+      })
+
+      await loginPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith('/admin/journey-selection')
+    })
   })
 })

@@ -42,17 +42,17 @@ function handleLoginFailure(request, h, result, email) {
 function resolvePostLoginRedirect(request, result) {
   const returnTo = request.yar.get('returnTo')
   request.yar.set('returnTo', null)
+  const isAdmin = result.data.user.admin
   if (
     returnTo &&
     typeof returnTo === 'string' &&
     returnTo.startsWith('/') &&
-    !returnTo.startsWith('//')
+    !returnTo.startsWith('//') &&
+    !(isAdmin && returnTo === ROUTES.GENERAL.HOME)
   ) {
     return returnTo
   }
-  return result.data.user.admin
-    ? ROUTES.ADMIN.JOURNEY_SELECTION
-    : ROUTES.GENERAL.HOME
+  return isAdmin ? ROUTES.ADMIN.JOURNEY_SELECTION : ROUTES.GENERAL.HOME
 }
 
 export const loginController = {

@@ -5,8 +5,12 @@ import {
   requirePrimaryInterventionTypeSet,
   noEditSessionRequired
 } from '../helpers/permissions.js'
-import { createRoutePair } from '../helpers/route-helpers.js'
+import {
+  createRoutePair,
+  createEditRoutePair
+} from '../helpers/route-helpers.js'
 import { financialYearController } from './controller.js'
+import { financialYearWarningController } from './helpers/financial-year-warning-controller.js'
 
 export const projectFinancialYear = {
   plugin: {
@@ -41,6 +45,10 @@ export const projectFinancialYear = {
           ROUTES.PROJECT.EDIT.FINANCIAL_END_YEAR_MANUAL,
           [...basePreHandlers, requireFinancialStartYearSet],
           financialYearController
+        ),
+        ...createEditRoutePair(
+          ROUTES.PROJECT.EDIT.FINANCIAL_YEAR_WARNING,
+          financialYearWarningController
         )
       ])
     }

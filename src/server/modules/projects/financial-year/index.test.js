@@ -15,12 +15,14 @@ import {
   initializeEditSessionPreHandler
 } from '../helpers/project-edit-session.js'
 import { financialYearController } from './controller.js'
+import { financialYearWarningController } from './helpers/financial-year-warning-controller.js'
 
 // Mock dependencies
 vi.mock('../../../common/helpers/auth/auth-middleware.js')
 vi.mock('../helpers/permissions.js')
 vi.mock('../helpers/project-edit-session.js')
 vi.mock('./controller.js')
+vi.mock('./helpers/financial-year-warning-controller.js')
 
 describe('projectFinancialYear plugin', () => {
   let mockServer
@@ -35,12 +37,12 @@ describe('projectFinancialYear plugin', () => {
     expect(projectFinancialYear.plugin.name).toBe('Project - Financial Year')
   })
 
-  test('should register 16 routes (4 steps × 2 modes × 2 methods)', () => {
+  test('should register 18 routes (4 steps × 2 modes × 2 methods + warning edit pair)', () => {
     projectFinancialYear.plugin.register(mockServer)
 
     expect(mockServer.route).toHaveBeenCalledTimes(1)
     const registeredRoutes = mockServer.route.mock.calls[0][0]
-    expect(registeredRoutes).toHaveLength(16)
+    expect(registeredRoutes).toHaveLength(18)
   })
 
   describe('Create mode routes', () => {
@@ -284,12 +286,16 @@ describe('projectFinancialYear plugin', () => {
     })
   })
 
-  test('should use same controller for all routes', () => {
+  test('should use same controller for all financial year routes', () => {
     projectFinancialYear.plugin.register(mockServer)
 
     const registeredRoutes = mockServer.route.mock.calls[0][0]
-    const getRoutes = registeredRoutes.filter((r) => r.method === 'GET')
-    const postRoutes = registeredRoutes.filter((r) => r.method === 'POST')
+    const warningPath = ROUTES.PROJECT.EDIT.FINANCIAL_YEAR_WARNING
+    const nonWarningRoutes = registeredRoutes.filter(
+      (r) => r.path !== warningPath
+    )
+    const getRoutes = nonWarningRoutes.filter((r) => r.method === 'GET')
+    const postRoutes = nonWarningRoutes.filter((r) => r.method === 'POST')
 
     getRoutes.forEach((route) => {
       expect(route.options.handler).toBe(financialYearController.getHandler)
@@ -298,5 +304,19 @@ describe('projectFinancialYear plugin', () => {
     postRoutes.forEach((route) => {
       expect(route.options.handler).toBe(financialYearController.postHandler)
     })
+
+    const warningGetRoute = registeredRoutes.find(
+      (r) => r.method === 'GET' && r.path === warningPath
+    )
+    const warningPostRoute = registeredRoutes.find(
+      (r) => r.method === 'POST' && r.path === warningPath
+    )
+
+    expect(warningGetRoute.options.handler).toBe(
+      financialYearWarningController.getHandler
+    )
+    expect(warningPostRoute.options.handler).toBe(
+      financialYearWarningController.postHandler
+    )
   })
 })

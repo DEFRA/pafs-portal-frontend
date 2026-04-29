@@ -162,6 +162,150 @@ export function stripEmptyContributorEntries(row) {
 }
 
 /**
+ * Check whether a contributor entry has a non-empty amount.
+ * @private
+ */
+function isContributorEntryPopulated(item) {
+  if (!item || typeof item !== 'object') {
+    return false
+  }
+  const amt = typeof item.amount === 'string' ? item.amount.trim() : ''
+  return amt !== ''
+}
+
+/**
+ * Filter a single contributor array, keeping only entries with non-empty
+ * amounts and returning a mapping from kept indices to original indices.
+ * @private
+ */
+function filterContributorArray(arr) {
+  const kept = []
+  const mapping = []
+
+  for (let i = 0; i < arr.length; i++) {
+    if (isContributorEntryPopulated(arr[i])) {
+      mapping.push(i)
+      kept.push(arr[i])
+    }
+  }
+
+  return { kept, mapping }
+}
+
+/**
+ * Like {@link stripEmptyContributorEntries} but also returns a mapping from
+ * stripped (post-filter) indices back to the original (pre-filter) indices.
+ * This is needed so that Joi validation errors (which reference the stripped
+ * array positions) can be translated back to the original contributor
+ * positions used in the template.
+ *
+ * @param {object} inputRow - A sanitised funding-value row (not mutated)
+ * @returns {{ row: object, indexMaps: Object<string, number[]> }}
+ */
+export function stripEmptyContributorEntriesWithMapping(inputRow) {
+  const CONTRIBUTOR_ARRAY_KEYS = [
+    'publicContributors',
+    'privateContributors',
+    'otherEaContributors'
+  ]
+  const row = { ...inputRow }
+  const indexMaps = {}
+
+  for (const key of CONTRIBUTOR_ARRAY_KEYS) {
+    const arr = row[key]
+    if (!Array.isArray(arr)) {
+      continue
+    }
+
+    const { kept, mapping } = filterContributorArray(arr)
+    indexMaps[key] = mapping
+
+    if (kept.length === 0) {
+      delete row[key]
+    } else {
+      row[key] = kept
+    }
+  }
+
+  return { row, indexMaps }
+}
+
+/**
+ * Convert "0" values to empty strings in funding value rows so that zeros
+ * are not persisted to the backend.  A row whose values are ALL zero is
+ * treated as having no data; individual zero cells in a row that has other
+ * non-zero values are simply stripped.
+ *
+ * Call this AFTER validation but BEFORE saving to session / backend.
+ *
+ * @param {object[]} rows - Array of funding value row objects
+ * @returns {object[]} Rows with "0" amounts replaced by empty strings
+ */
+export function sanitiseZerosFromValidatedRows(rows) {
+  const SPEND_FIELDS = [
+    'fcermGia',
+    'localLevy',
+    'publicContributions',
+    'privateContributions',
+    'otherEaContributions',
+    'notYetIdentified',
+    'assetReplacementAllowance',
+    'environmentStatutoryFunding',
+    'frequentlyFloodedCommunities',
+    'otherAdditionalGrantInAid',
+    'otherGovernmentDepartment',
+    'recovery',
+    'summerEconomicFund',
+    'total'
+  ]
+  const CONTRIBUTOR_ARRAY_KEYS = [
+    'publicContributors',
+    'privateContributors',
+    'otherEaContributors'
+  ]
+
+  return rows.map((row) => {
+    const copy = { ...row }
+
+    for (const field of SPEND_FIELDS) {
+      if (copy[field] === '0') {
+        copy[field] = ''
+      }
+    }
+
+    for (const key of CONTRIBUTOR_ARRAY_KEYS) {
+      const arr = copy[key]
+      if (!Array.isArray(arr)) {
+        continue
+      }
+      copy[key] = arr
+        .map((item) => {
+          if (!item || typeof item !== 'object') {
+            return item
+          }
+          const amt = typeof item.amount === 'string' ? item.amount.trim() : ''
+          if (amt === '0') {
+            return { ...item, amount: '' }
+          }
+          return item
+        })
+        .filter((item) => {
+          if (!item || typeof item !== 'object') {
+            return false
+          }
+          const amt = typeof item.amount === 'string' ? item.amount.trim() : ''
+          return amt !== ''
+        })
+      if (copy[key].length === 0) {
+        delete copy[key]
+      }
+    }
+
+    return copy
+  })
+}
+
+/**
  * Recursively convert objects whose keys are all numeric strings
  * (e.g. { '0': …, '1': … }) into proper arrays.
  *
