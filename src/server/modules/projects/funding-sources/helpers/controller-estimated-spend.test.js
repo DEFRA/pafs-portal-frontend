@@ -877,7 +877,10 @@ describe('estimatedSpendController', () => {
       mockSchema.validate.mockReturnValue({
         error: {
           details: [
-            { path: [0, 'publicContributors', 0, 'amount'], type: 'number.base' },
+            {
+              path: [0, 'publicContributors', 0, 'amount'],
+              type: 'number.base'
+            },
             { path: [0, 'publicContributors', 0, 'amount'], type: 'string.max' }
           ]
         }
