@@ -23,7 +23,7 @@ const EXCLUDED_RETURN_PATHS = [
  * Check if a URL is safe to use as a post-login return destination
  * @private
  */
-function isValidReturnUrl(url) {
+export function isValidReturnUrl(url) {
   return (
     typeof url === 'string' &&
     url.startsWith('/') &&
