@@ -83,7 +83,7 @@ function remapContributorIndex(classified, contributorIndexMaps) {
   }
 
   const originalIdx = mapping[classified.strippedIdx]
-  return originalIdx !== undefined ? originalIdx : classified.strippedIdx
+  return originalIdx === undefined ? classified.strippedIdx : originalIdx
 }
 
 // ─── Error application ──────────────────────────────────────────────────────

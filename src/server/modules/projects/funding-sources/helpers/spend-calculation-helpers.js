@@ -1,6 +1,8 @@
 import { PROJECT_PAYLOAD_FIELDS } from '../../../../common/constants/projects.js'
-import { getContributorNames } from './estimated-spending-helpers.js'
-import { CONTRIBUTOR_SPEND_GROUPS } from './estimated-spending-helpers.js'
+import {
+  getContributorNames,
+  CONTRIBUTOR_SPEND_GROUPS
+} from './estimated-spending-helpers.js'
 
 // ─── Row value extraction ───────────────────────────────────────────────────
 
