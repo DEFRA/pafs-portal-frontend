@@ -48,7 +48,8 @@ describe('carbonImpactController', () => {
       [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]: 3,
       [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]: 2025,
       [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]: 6,
-      [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: 2026
+      [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: 2026,
+      pafs_core_funding_values: [{ financialYear: 2025, total: 50000 }]
     })
 
     buildViewData.mockReturnValue({ pageTitle: 'Carbon Impact' })
@@ -120,6 +121,27 @@ describe('carbonImpactController', () => {
       await carbonImpactController.getHandler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalled()
+    })
+
+    test('redirects to carbon-required-information when only funding values are missing', async () => {
+      getSessionData.mockReturnValue({
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: PROJECT_TYPES.DEF,
+        slug: 'acc501e-000a-001a',
+        [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]: 3,
+        [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]: 2025,
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]: 6,
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: 2026
+        // No pafs_core_funding_values — timeline present but funding absent
+      })
+
+      await carbonImpactController.getHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        ROUTES.PROJECT.EDIT.CARBON_REQUIRED_INFORMATION.replace(
+          '{referenceNumber}',
+          'acc501e-000a-001a'
+        )
+      )
     })
   })
 

@@ -192,12 +192,20 @@ export const getStep = (request) => {
 }
 
 export const hasCarbonPrerequisites = (sessionData = {}) => {
-  return (
+  const hasTimeline =
     sessionData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH] != null &&
     sessionData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR] != null &&
     sessionData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH] != null &&
     sessionData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR] != null
-  )
+
+  // At least one saved funding-value row must have a non-zero total so the
+  // carbon calculator has meaningful capital-cost data to work with.
+  const fundingValues = sessionData.pafs_core_funding_values
+  const hasFundingValues =
+    Array.isArray(fundingValues) &&
+    fundingValues.some((fv) => fv.total != null && Number(fv.total) !== 0)
+
+  return hasTimeline && hasFundingValues
 }
 
 export const formatCurrency = (value) => {

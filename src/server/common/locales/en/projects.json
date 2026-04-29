@@ -1592,8 +1592,7 @@
     "intro_3": "Any Carbon assessment tool used should be able to calculate emissions for industry standard ‘Life cycle assessment’ (LCA) stages in which all non-capital stages comprise the ‘operational emissions’ Carbon impact.",
     "suffix": "metric tonnes",
     "after_1": "If you do not have an estimate from a carbon assessment this total must be left blank.",
-    "after_2": "If there is no operation and maintenance element to this proposed project then you must enter 0. Any calculations and reporting will use 0.",
-    "after_3": "Operational emissions are recorded in metric tonnes and should align with the same carbon assessment assumptions used for the rest of the project."
+    "after_2": "If there is no operations or maintenance element to this proposed project then you must enter 0. Any calculations and reporting will use 0."
   },
   "carbon_cost_sequestered": {
     "title": "How much carbon will be sequestered by this project?",
@@ -1636,7 +1635,7 @@
     "after_1": "If there is no operations or maintenance element to this proposed project then you must enter 0. Any calculations and reporting will use 0."
   },
   "carbon_whole_life_carbon": {
-    "title": "Whole life carbon",
+    "title": "This is the whole life carbon calculated for the project",
     "heading": "This is the whole life carbon calculated for the project",
     "description": "A whole life calculation of carbon impact is provided for the project from emissions added as 'capital' and 'operational' carbon in tonnes CO2e over the whole-life investment period.",
     "build_label": "Capital carbon (build)",
@@ -1645,7 +1644,7 @@
     "suffix": "metric tonnes"
   },
   "carbon_net_carbon": {
-    "title": "Net carbon",
+    "title": "This is the net carbon calculated for the project",
     "heading": "This is the net carbon calculated for the project",
     "description": "A net calculation of Carbon impact is provided for the project from emissions added as ‘capital’ and ‘operational’ carbon, minus ‘sequestered’ and ‘avoided’ carbon in tonnes CO2e over the whole-life investment period.",
     "whole_life_label": "Whole life carbon",
@@ -1772,8 +1771,8 @@
       },
       "errors": {
         "required": "Each funding source must have an estimated spend for at least one financial year.",
-        "invalid": "Enter a whole number with no decimal point or currency symbols",
-        "max_digits": "Please enter a whole number up to 18 digits (0 allowed)"
+        "invalid": "Please enter a whole number up to 18 digits (0 allowed)",
+        "max_digits": "You have exceeded the maximum number of digits allowed. Please re-enter."
       }
     },
     "missing_financial_years": {

@@ -684,14 +684,17 @@ describe('estimatedSpendController', () => {
         'modules/projects/funding-sources/estimated-spend',
         expect.objectContaining({
           fieldErrors: expect.objectContaining({
-            'fcermGia-0': expect.any(String)
+            fcermGia: expect.any(String)
+          }),
+          cellErrors: expect.objectContaining({
+            'fcermGia-0': true
           })
         })
       )
       expect(result).toBe('view-response')
     })
 
-    it('suppresses auto-computed source field errors', async () => {
+    it('reports auto-computed source field errors in origin flow', async () => {
       mockParseFundingValuesPayload.mockReturnValue([{ financialYear: 2024 }])
       mockSchema.validate.mockReturnValue({
         error: {
@@ -703,10 +706,10 @@ describe('estimatedSpendController', () => {
 
       await estimatedSpendController.postHandler(request, h)
 
-      // publicContributions is auto-computed, so no field error for it
       const viewCall = h.view.mock.calls[0]
       const viewData = viewCall[1]
-      expect(viewData.fieldErrors).not.toHaveProperty('publicContributions-0')
+      expect(viewData.fieldErrors).toHaveProperty('publicContributions')
+      expect(viewData.cellErrors).toHaveProperty('publicContributions-0', true)
     })
 
     it('handles string.max validation errors with max_digits suffix', async () => {
@@ -725,7 +728,171 @@ describe('estimatedSpendController', () => {
 
       const viewCall = h.view.mock.calls[0]
       const viewData = viewCall[1]
-      expect(viewData.fieldErrors['fcermGia-0']).toContain('max_digits')
+      expect(viewData.fieldErrors.fcermGia).toContain('max_digits')
+    })
+
+    it('remaps contributor stripped index to original index for cell errors', async () => {
+      mockParseFundingValuesPayload.mockReturnValue([
+        {
+          financialYear: 2024,
+          publicContributors: [
+            { name: '', amount: '' },
+            { name: 'Bob', amount: '999999999999' }
+          ]
+        }
+      ])
+      mockStripEmptyContributors.mockReturnValue({
+        row: {
+          financialYear: 2024,
+          publicContributors: [{ name: 'Bob', amount: '999999999999' }]
+        },
+        // stripped idx 0 maps back to original idx 1
+        indexMaps: { publicContributors: [1] }
+      })
+      mockSchema.validate.mockReturnValue({
+        error: {
+          details: [
+            {
+              path: [0, 'publicContributors', 0, 'amount'],
+              type: 'string.max'
+            }
+          ]
+        }
+      })
+      const request = createRequest({ payload: {} })
+      const h = createH()
+
+      await estimatedSpendController.postHandler(request, h)
+
+      const viewData = h.view.mock.calls[0][1]
+      expect(viewData.cellErrors).toHaveProperty('publicContributors-1-0', true)
+      expect(viewData.cellErrors).not.toHaveProperty('publicContributors-0-0')
+      expect(viewData.fieldErrors.publicContributors).toContain('max_digits')
+    })
+
+    it('falls back to stripped index when contributor mapping is missing', async () => {
+      mockParseFundingValuesPayload.mockReturnValue([
+        {
+          financialYear: 2024,
+          publicContributors: [{ name: 'Bob', amount: '999999999999' }]
+        }
+      ])
+      mockStripEmptyContributors.mockReturnValue({
+        row: {
+          financialYear: 2024,
+          publicContributors: [{ name: 'Bob', amount: '999999999999' }]
+        },
+        indexMaps: {}
+      })
+      mockSchema.validate.mockReturnValue({
+        error: {
+          details: [
+            {
+              path: [0, 'publicContributors', 0, 'amount'],
+              type: 'number.base'
+            }
+          ]
+        }
+      })
+      const request = createRequest({ payload: {} })
+      const h = createH()
+
+      await estimatedSpendController.postHandler(request, h)
+
+      const viewData = h.view.mock.calls[0][1]
+      expect(viewData.cellErrors).toHaveProperty('publicContributors-0-0', true)
+      expect(viewData.fieldErrors).toHaveProperty('publicContributors')
+    })
+
+    it('falls back when mapping array exists but index is undefined', async () => {
+      mockParseFundingValuesPayload.mockReturnValue([
+        {
+          financialYear: 2024,
+          publicContributors: [{ name: 'Bob', amount: '999999999999' }]
+        }
+      ])
+      mockStripEmptyContributors.mockReturnValue({
+        row: {
+          financialYear: 2024,
+          publicContributors: [{ name: 'Bob', amount: '999999999999' }]
+        },
+        indexMaps: { publicContributors: [] }
+      })
+      mockSchema.validate.mockReturnValue({
+        error: {
+          details: [
+            {
+              path: [0, 'publicContributors', 2, 'amount'],
+              type: 'number.base'
+            }
+          ]
+        }
+      })
+      const request = createRequest({ payload: {} })
+      const h = createH()
+
+      await estimatedSpendController.postHandler(request, h)
+
+      const viewData = h.view.mock.calls[0][1]
+      expect(viewData.cellErrors).toHaveProperty('publicContributors-2-0', true)
+      expect(viewData.fieldErrors).toHaveProperty('publicContributors')
+    })
+
+    it('handles contributor errors even when contributorIndexMaps is empty', async () => {
+      mockParseFundingValuesPayload.mockReturnValue([])
+      mockSchema.validate.mockReturnValue({
+        error: {
+          details: [
+            {
+              path: [0, 'publicContributors', 0, 'amount'],
+              type: 'number.base'
+            }
+          ]
+        }
+      })
+      const request = createRequest({ payload: {} })
+      const h = createH()
+
+      await estimatedSpendController.postHandler(request, h)
+
+      const viewData = h.view.mock.calls[0][1]
+      expect(viewData.cellErrors).toHaveProperty('publicContributors-0-0', true)
+      expect(viewData.fieldErrors).toHaveProperty('publicContributors')
+    })
+
+    it('does not duplicate contributor cell/field errors for repeated details', async () => {
+      mockParseFundingValuesPayload.mockReturnValue([
+        {
+          financialYear: 2024,
+          publicContributors: [{ name: 'Alice', amount: 'oops' }]
+        }
+      ])
+      mockStripEmptyContributors.mockReturnValue({
+        row: {
+          financialYear: 2024,
+          publicContributors: [{ name: 'Alice', amount: 'oops' }]
+        },
+        indexMaps: { publicContributors: [0] }
+      })
+      mockSchema.validate.mockReturnValue({
+        error: {
+          details: [
+            { path: [0, 'publicContributors', 0, 'amount'], type: 'number.base' },
+            { path: [0, 'publicContributors', 0, 'amount'], type: 'string.max' }
+          ]
+        }
+      })
+      const request = createRequest({ payload: {} })
+      const h = createH()
+
+      await estimatedSpendController.postHandler(request, h)
+
+      const viewData = h.view.mock.calls[0][1]
+      expect(viewData.cellErrors).toEqual(
+        expect.objectContaining({ 'publicContributors-0-0': true })
+      )
+      expect(Object.keys(viewData.cellErrors)).toHaveLength(1)
+      expect(viewData.fieldErrors.publicContributors).toContain('invalid')
     })
 
     it('handles unclassified detail with fallback fieldKey', async () => {
@@ -1058,6 +1225,27 @@ describe('estimatedSpendController', () => {
       expect(viewData.additionalData.serverTotals.grandTotal).toBe(0)
     })
 
+    it('handles contributor row with missing contributor array', async () => {
+      mockBuildEstimatedSpendRows.mockReturnValue([
+        {
+          kind: 'contributor',
+          contributorArrayField: 'publicContributors',
+          contributorName: 'Alice',
+          contributorIndex: 0
+        }
+      ])
+      setSessionData({
+        fundingValues: [{ financialYear: 2024 }]
+      })
+      const request = createRequest()
+      const h = createH()
+
+      await estimatedSpendController.getHandler(request, h)
+
+      const viewData = mockBuildViewData.mock.calls[0][1]
+      expect(viewData.additionalData.serverTotals.grandTotal).toBe(0)
+    })
+
     it('strips non-numeric chars from source values', async () => {
       mockBuildEstimatedSpendRows.mockReturnValue([
         { kind: 'source', field: 'fcermGia' }
@@ -1114,7 +1302,7 @@ describe('estimatedSpendController', () => {
 
       const viewData = h.view.mock.calls[0][1]
       // First error wins, second is duplicate → ignored
-      expect(viewData.fieldErrors['fcermGia-0']).toContain('invalid')
+      expect(viewData.fieldErrors.fcermGia).toContain('invalid')
     })
   })
 })

@@ -4,7 +4,8 @@
 
 {% set p = 'projects.funding_sources.estimated_spend' %}
 
-{% block pageTitle %}{{ t(p + '.title') }}{% endblock %}
+{% block pageTitle %}{{ t(p + '.title') }}
+{% endblock %}
 
 {% block body %}
 
@@ -17,11 +18,24 @@
     }]) %}
   {% endif %}
   {% if fieldErrors %}
-    {% for key, msg in fieldErrors %}
-      {% set errorList = errorList.concat([{
-        text: msg,
-        href: '#' + key
-      }]) %}
+    {% set seenErrorKeys = [] %}
+    {% for row in spendRows %}
+      {% if row.kind == 'contributor' %}
+        {% set errKey = row.contributorArrayField %}
+        {% if fieldErrors[errKey] and errKey not in seenErrorKeys %}
+          {% set seenErrorKeys = seenErrorKeys.concat([errKey]) %}
+          {% set firstId = row.sourceField + '-' + row.contributorIndex + '-0' %}
+          {% set errorList = errorList.concat([{
+            text: fieldErrors[errKey],
+            href: '#' + firstId
+          }]) %}
+        {% endif %}
+      {% elif row.field and fieldErrors[row.field] %}
+        {% set errorList = errorList.concat([{
+          text: fieldErrors[row.field],
+          href: '#' + row.field + '-0'
+        }]) %}
+      {% endif %}
     {% endfor %}
   {% endif %}
   {% if errorList.length > 0 %}
@@ -77,7 +91,7 @@
                     </th>
                   </tr>
 
-                {# ── Source row (GIA, local levy, additional GIA sub-sources, not-yet-identified) ── #}
+                  {# ── Source row (GIA, local levy, additional GIA sub-sources, not-yet-identified) ── #}
                 {% elif row.kind == 'source' %}
                   <tr class="govuk-table__row" data-source-row>
                     <th scope="row" class="govuk-table__header">{{ row.label }}</th>
@@ -92,18 +106,24 @@
                         {% endif %}
                       {% endfor %}
 
-                      {% set cellError = fieldErrors and fieldErrors[row.field + '-' + yearIdx] %}
+                      {% set cellHasError = cellErrors and cellErrors[row.field + '-' + yearIdx] %}
+
+                      {% if cellValue and '.' in (cellValue | string) %}
+                        {% set displayValue = cellValue | string %}
+                      {% else %}
+                        {% set displayValue = formatNumberWithCommas(cellValue) if cellValue else '' %}
+                      {% endif %}
 
                       <td class="govuk-table__cell govuk-table__cell--numeric">
                         <input
-                          class="govuk-input govuk-input--width-10{% if cellError %} govuk-input--error{% endif %}"
+                          class="govuk-input govuk-input--width-10{% if cellHasError %} govuk-input--error{% endif %}"
                           id="{{ row.field }}-{{ yearIdx }}"
                           name="fundingValues[{{ yearIdx }}][{{ row.field }}]"
                           type="text"
                           inputmode="numeric"
                           data-spend-cell
                           data-number-format="comma"
-                          value="{{ formatNumberWithCommas(cellValue) if cellValue else '' }}"
+                          value="{{ displayValue }}"
                           aria-label="{{ row.label }} {{ year.value % 100 }}/{{ (year.value + 1) % 100 }}"
                           style="text-align: right;"
                         >
@@ -119,7 +139,7 @@
                     </td>
                   </tr>
 
-                {# ── Contributor row (named contributor under a group) ── #}
+                  {# ── Contributor row (named contributor under a group) ── #}
                 {% elif row.kind == 'contributor' %}
                   <tr class="govuk-table__row" data-source-row>
                     <td class="govuk-table__cell" style="padding-left: 30px; font-weight: normal;">{{ row.label }}</td>
@@ -128,7 +148,7 @@
                       {% set cellValue = '' %}
                       {% for existing in existingValues %}
                         {% if existing.financialYear | string == year.value | string %}
-                          {% set contributorItems = existing[row.contributorArrayField] or [] %}
+                          {% set contributorItems = existing[row.contributorArrayField] or[] %}
                           {% for item in contributorItems %}
                             {% if item.name == row.contributorName and item.amount is not none and item.amount != '' %}
                               {% set cellValue = item.amount %}
@@ -137,7 +157,14 @@
                         {% endif %}
                       {% endfor %}
 
-                      {% set cellError = fieldErrors and fieldErrors[row.sourceField + '-' + row.contributorIndex + '-' + yearIdx] %}
+                      {% set cellError = cellErrors and cellErrors[row.contributorArrayField + '-' + row.contributorIndex + '-' + yearIdx] %}
+
+                      {# Preserve decimal values so server validation can show the right message. #}
+                      {% if cellValue and '.' in (cellValue | string) %}
+                        {% set displayValue = cellValue | string %}
+                      {% else %}
+                        {% set displayValue = formatNumberWithCommas(cellValue) if cellValue else '' %}
+                      {% endif %}
 
                       <td class="govuk-table__cell govuk-table__cell--numeric">
                         <input type="hidden" name="fundingValues[{{ yearIdx }}][{{ row.contributorArrayField }}][{{ row.contributorIndex }}][name]" value="{{ row.contributorName }}">
@@ -150,7 +177,7 @@
                           inputmode="numeric"
                           data-spend-cell
                           data-number-format="comma"
-                          value="{{ formatNumberWithCommas(cellValue) if cellValue else '' }}"
+                          value="{{ displayValue }}"
                           aria-label="{{ row.label }} {{ year.value % 100 }}/{{ (year.value + 1) % 100 }}"
                           style="text-align: right;"
                         >
@@ -171,7 +198,9 @@
             </tbody>
             <tfoot class="govuk-table__foot">
               <tr class="govuk-table__row">
-                <td class="govuk-table__cell"><strong>{{ t(p + '.table.total') }}</strong></td>
+                <td class="govuk-table__cell">
+                  <strong>{{ t(p + '.table.total') }}</strong>
+                </td>
                 {% for year in financialYears %}
                   <td class="govuk-table__cell govuk-table__cell--numeric" data-col-total="{{ loop.index0 }}">
                     {% if serverTotals and serverTotals.colTotals[loop.index0] %}
