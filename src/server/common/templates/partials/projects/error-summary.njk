@@ -25,6 +25,13 @@
       href: "#name"
     }
   ]) %}
+{% elif fieldErrors.name == ERROR_CODES.NAME_TOO_LONG or errorCode == ERROR_CODES.NAME_TOO_LONG %}
+  {% set errorList = errorList.concat([
+    {
+      text: t('projects.project_name.errors.too_long'),
+      href: "#name"
+    }
+  ]) %}
 {% endif %}
 
 {# Area Id errors #}
@@ -104,7 +111,7 @@
 {% if fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_REQUIRED or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_REQUIRED or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_REQUIRED or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_REQUIRED %}
   {% set errorList = errorList.concat([
     {
-      text: t(financialLocalePrefixKey + '.errors.required')if financialLocalePrefixKey else 
+      text: t(financialLocalePrefixKey + '.errors.required')if financialLocalePrefixKey else
         t('projects.financial_year_start_manual.errors.required'),
         href: "#financialStartYear"
     }
@@ -112,7 +119,7 @@
 {% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_INVALID or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_INVALID %}
   {% set errorList = errorList.concat([
     {
-      text: t(financialLocalePrefixKey + '.errors.invalid_format')if financialLocalePrefixKey else 
+      text: t(financialLocalePrefixKey + '.errors.invalid_format')if financialLocalePrefixKey else
         t('projects.financial_year_start_manual.errors.invalid_format'),
         href: "#financialStartYear"
     }
@@ -120,7 +127,7 @@
 {% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_OUT_OF_RANGE or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_OUT_OF_RANGE or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_OUT_OF_RANGE or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_OUT_OF_RANGE %}
   {% set errorList = errorList.concat([
     {
-      text: t(financialLocalePrefixKey + '.errors.out_of_range')if financialLocalePrefixKey else 
+      text: t(financialLocalePrefixKey + '.errors.out_of_range')if financialLocalePrefixKey else
         t('projects.financial_year_start_manual.errors.out_of_range'),
         href: "#financialStartYear"
     }
@@ -545,7 +552,7 @@
 {% if fieldErrors[fieldName] and localKeyPrefix and localKeyPrefix.startsWith('projects.environmental_benefits') %}
   {% set errorCode = fieldErrors[fieldName] %}
   {% set validationKey = 'required' %}
-  
+
   {# Determine which validation message key to use based on error code #}
   {% if errorCode.includes('QUANTITY_INVALID') %}
     {% set validationKey = 'invalid' %}
@@ -558,7 +565,7 @@
   {% elif errorCode.includes('INVALID') %}
     {% set validationKey = 'required' %}
   {% endif %}
-  
+
   {% set errorList = errorList.concat([
     {
       text: t(localKeyPrefix + '.validation.' + validationKey),

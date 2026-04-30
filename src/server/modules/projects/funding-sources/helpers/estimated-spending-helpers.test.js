@@ -27,13 +27,12 @@ describe('getContributorNames', () => {
     expect(result).toEqual(['Alice', 'Bob'])
   })
 
-  it('falls back to CSV field when session array is empty', () => {
+  it('returns empty when session array is empty and no DB contributors', () => {
     const sessionData = {
-      _publicContributorsSession: [],
-      [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTOR_NAMES]: 'Alice, Bob, Charlie'
+      _publicContributorsSession: []
     }
     const result = getContributorNames(sessionData, group)
-    expect(result).toEqual(['Alice', 'Bob', 'Charlie'])
+    expect(result).toEqual([])
   })
 
   it('returns empty array when session array is missing and CSV is absent', () => {
@@ -49,23 +48,20 @@ describe('getContributorNames', () => {
     expect(result).toEqual([])
   })
 
-  it('filters out empty names after trimming CSV', () => {
-    const sessionData = {
-      [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTOR_NAMES]: 'Alice,,Bob'
-    }
+  it('returns empty when no session array and no DB contributors', () => {
+    const sessionData = {}
     const result = getContributorNames(sessionData, group)
-    expect(result).toEqual(['Alice', 'Bob'])
+    expect(result).toEqual([])
   })
 
-  it('prefers session array over CSV even when array has only empty strings', () => {
-    // Empty session array → should fall through to CSV
+  it('ignores namesField CSV - only uses session array or DB contributors', () => {
     const sessionData = {
       _publicContributorsSession: [],
       [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTOR_NAMES]: 'CSV Name'
     }
     const result = getContributorNames(sessionData, group)
-    // session array is empty ([]) so falls through to CSV
-    expect(result).toEqual(['CSV Name'])
+    // CSV fallback removed - returns empty since no DB contributors
+    expect(result).toEqual([])
   })
 
   it('falls back to pafs_core_funding_contributors when session and CSV are empty', () => {

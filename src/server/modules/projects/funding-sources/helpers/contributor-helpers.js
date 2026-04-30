@@ -76,22 +76,12 @@ export function validateContributorNames(cleanNames, nonEmptyNames, config, t) {
 // ─── Shared helper: load contributors from session or CSV ───────────────────
 
 /**
- * Load contributor names from session key, database CSV, or contributors table fallback.
+ * Load contributor names from session key or funding_contributors table fallback.
  */
 export function loadContributors(sessionData, sessionKey, namesField, step) {
   let contributors = sessionData[sessionKey] || []
 
-  if (!contributors.length) {
-    const csv = sessionData[namesField]
-    if (typeof csv === 'string' && csv.trim()) {
-      contributors = csv
-        .split(',')
-        .map((name) => name.trim())
-        .filter(Boolean)
-    }
-  }
-
-  // Fallback: extract unique names from pafs_core_funding_contributors (legacy data)
+  // Fallback: extract unique names from pafs_core_funding_contributors
   if (!contributors.length && step) {
     const group = CONTRIBUTOR_SPEND_GROUPS.find(
       (g) => g.sessionKey === sessionKey

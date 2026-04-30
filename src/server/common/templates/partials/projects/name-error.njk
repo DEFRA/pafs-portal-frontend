@@ -4,6 +4,8 @@
       required
     {%- elif fieldErrors.name == ERROR_CODES.NAME_INVALID_FORMAT -%}
       invalid_format
+    {%- elif fieldErrors.name == ERROR_CODES.NAME_TOO_LONG -%}
+      too_long
     {%- elif fieldErrors.name == ERROR_CODES.NAME_DUPLICATE -%}
       already_exists
     {%- endif -%}
