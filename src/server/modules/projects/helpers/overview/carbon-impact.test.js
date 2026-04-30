@@ -152,7 +152,8 @@ describe('getCarbonImpactOverviewData', () => {
 
     const result = await getCarbonImpactOverviewData(mockRequest, projectData)
 
-    expect(result).toEqual({ success: true, projectData })
+    expect(result.success).toBe(true)
+    expect(result.projectData.carbonDisplay).toBeDefined()
     expect(updateSessionData).not.toHaveBeenCalled()
   })
 
@@ -238,5 +239,41 @@ describe('getCarbonImpactOverviewData', () => {
     const result = await getCarbonImpactOverviewData(mockRequest, projectData)
 
     expect(result.projectData.carbonCalc).toBeDefined()
+  })
+
+  test('attaches carbonDisplay with formatted tCO2e values when carbonCalc is present', async () => {
+    const projectData = {
+      ...baseProjectData,
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '1000000.50',
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION]: '500000',
+      carbonCalc: mockCarbonCalc
+    }
+
+    const result = await getCarbonImpactOverviewData(mockRequest, projectData)
+    const { carbonDisplay } = result.projectData
+
+    expect(carbonDisplay).toBeDefined()
+    // Session values — BigInt formatted (no float conversion)
+    expect(carbonDisplay.buildFormatted).toBe('1,000,000.50')
+    expect(carbonDisplay.operationFormatted).toBe('500,000.00')
+    // API calc values — thousands commas + 2dp
+    expect(carbonDisplay.capitalCarbonBaselineFormatted).toBe('200.00')
+    expect(carbonDisplay.netCarbonEstimateFormatted).toBe('250.00')
+  })
+
+  test('attaches carbonDisplay with formatted session values when carbonCalc is absent', async () => {
+    const projectData = {
+      ...baseProjectData,
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '75000.25',
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION]: '25000'
+    }
+
+    const result = await getCarbonImpactOverviewData(mockRequest, projectData)
+    const { carbonDisplay } = result.projectData
+
+    expect(carbonDisplay).toBeDefined()
+    expect(carbonDisplay.buildFormatted).toBe('75,000.25')
+    expect(carbonDisplay.operationFormatted).toBe('25,000.00')
+    expect(carbonDisplay.wholeLifeCarbonFormatted).toBe('100,000.25')
   })
 })

@@ -12,9 +12,10 @@
   <p class="govuk-body">{{ t(localKeyPrefix + '.description') }}</p>
 
   {% set suffix = t(localKeyPrefix + '.suffix') %}
+  {% set formattedValue = displayData[displayValueKey + 'Formatted'] if displayData[displayValueKey + 'Formatted'] else (displayData[displayValueKey] | round(2)) %}
 
   <p class="govuk-heading-m govuk-!-margin-bottom-6">
-    <strong>{{ displayData[displayValueKey] + ' ' + suffix }}</strong>
+    <strong>{{ formattedValue + ' ' + suffix }}</strong>
   </p>
 
   <form method="post" novalidate>

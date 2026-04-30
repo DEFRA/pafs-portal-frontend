@@ -14,7 +14,8 @@ vi.mock('./controller-helpers.js', () => ({
   formatCurrency: vi.fn((v) => {
     if (v == null || v === '') return 'Not provided'
     return `£${v}`
-  })
+  }),
+  formatEmission: vi.fn((v) => (v == null ? null : String(v)))
 }))
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -229,6 +230,38 @@ describe('buildInitialDisplayData', () => {
     })
     expect(result.benefit).toBe('5000')
     expect(result.forecast).toBe('2500')
+  })
+
+  test('formats *Formatted fields with thousands commas without float precision loss', () => {
+    // Number('100000000000001001.00') loses precision (float64 ULP ~16 at 10^17)
+    // formatBigDecimalString must use string arithmetic instead
+    const result = buildInitialDisplayData(
+      {},
+      {
+        build: '100000000000000001',
+        operation: '1000',
+        sequestered: '0',
+        avoided: '0'
+      }
+    )
+    expect(result.wholeLifeCarbon).toBe('100000000000001001.00')
+    expect(result.wholeLifeCarbonFormatted).toBe('100,000,000,000,001,001.00')
+    expect(result.buildFormatted).toBe('100,000,000,000,000,001.00')
+  })
+
+  test('formats decimal part precisely in *Formatted fields', () => {
+    // Number('1000000000001000.23') rounds .23 to .25 at float64 ULP 0.125
+    const result = buildInitialDisplayData(
+      {},
+      {
+        build: '1000000000000000.23',
+        operation: '1000',
+        sequestered: '0',
+        avoided: '0'
+      }
+    )
+    expect(result.wholeLifeCarbon).toBe('1000000000001000.23')
+    expect(result.wholeLifeCarbonFormatted).toBe('1,000,000,000,001,000.23')
   })
 })
 

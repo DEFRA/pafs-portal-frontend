@@ -62,8 +62,9 @@
         name: fieldName,
         value: formData[fieldName] if formData[fieldName] is not none else '',
         inputmode: "numeric",
-        classes: "govuk-input--width-10",
+        classes: "govuk-input--width-20",
         prefix: { text: "£" },
+        attributes: { "data-number-format": "comma" },
         errorMessage: { text: fieldErrors[fieldName] } if fieldErrors and fieldErrors[fieldName] else undefined
       }) }}
     {% else %}
@@ -73,7 +74,7 @@
         name: fieldName,
         value: formData[fieldName] if formData[fieldName] is not none else '',
         inputmode: "decimal",
-        classes: "govuk-input--width-10",
+        classes: "govuk-input--width-20",
         suffix: { text: t(localKeyPrefix + '.suffix') },
         errorMessage: { text: fieldErrors[fieldName] } if fieldErrors and fieldErrors[fieldName] else undefined
       }) }}

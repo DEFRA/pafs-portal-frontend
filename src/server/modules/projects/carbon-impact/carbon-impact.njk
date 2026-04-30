@@ -26,15 +26,15 @@
     rows: [
       {
         key: { text: t(localKeyPrefix + '.capital_carbon_estimated'), classes: keyClass },
-        value: { text: displayData.build + ' ' + units }
+        value: { text: (displayData.buildFormatted if displayData.buildFormatted else (displayData.build | float | round(2))) + ' ' + units }
       },
       {
         key: { text: t(localKeyPrefix + '.capital_carbon_baseline'), classes: keyClass },
-        value: { text: displayData.capitalCarbonBaseline + ' ' + units if displayData.capitalCarbonBaseline is not none else NOT_PROVIDED }
+        value: { text: (displayData.capitalCarbonBaselineFormatted if displayData.capitalCarbonBaselineFormatted else (displayData.capitalCarbonBaseline | float | round(2))) + ' ' + units if displayData.capitalCarbonBaseline is not none else NOT_PROVIDED }
       },
       {
         key: { text: t(localKeyPrefix + '.capital_carbon_target'), classes: keyClass },
-        value: { text: displayData.capitalCarbonTarget + ' ' + units if displayData.capitalCarbonTarget is not none else NOT_PROVIDED }
+        value: { text: (displayData.capitalCarbonTargetFormatted if displayData.capitalCarbonTargetFormatted else (displayData.capitalCarbonTarget | float | round(2))) + ' ' + units if displayData.capitalCarbonTarget is not none else NOT_PROVIDED }
       }
     ]
   }) }}
@@ -46,15 +46,15 @@
     rows: [
       {
         key: { text: t(localKeyPrefix + '.operational_carbon_estimated'), classes: keyClass },
-        value: { text: displayData.operation + ' ' + units }
+        value: { text: (displayData.operationFormatted if displayData.operationFormatted else (displayData.operation | float | round(2))) + ' ' + units }
       },
       {
         key: { text: t(localKeyPrefix + '.operational_carbon_baseline'), classes: keyClass },
-        value: { text: displayData.operationalCarbonBaseline + ' ' + units if displayData.operationalCarbonBaseline is not none else NOT_PROVIDED }
+        value: { text: (displayData.operationalCarbonBaselineFormatted if displayData.operationalCarbonBaselineFormatted else (displayData.operationalCarbonBaseline | float | round(2))) + ' ' + units if displayData.operationalCarbonBaseline is not none else NOT_PROVIDED }
       },
       {
         key: { text: t(localKeyPrefix + '.operational_carbon_target'), classes: keyClass },
-        value: { text: displayData.operationalCarbonTarget + ' ' + units if displayData.operationalCarbonTarget is not none else NOT_PROVIDED }
+        value: { text: (displayData.operationalCarbonTargetFormatted if displayData.operationalCarbonTargetFormatted else (displayData.operationalCarbonTarget | float | round(2))) + ' ' + units if displayData.operationalCarbonTarget is not none else NOT_PROVIDED }
       }
     ]
   }) }}
@@ -65,14 +65,14 @@
   {% set netRows = [
     {
       key: { text: t(localKeyPrefix + '.net_carbon_estimated'), classes: keyClass },
-      value: { text: displayData.netCarbonEstimate + ' ' + units if displayData.netCarbonEstimate is not none else NOT_PROVIDED }
+      value: { text: (displayData.netCarbonEstimateFormatted if displayData.netCarbonEstimateFormatted else (displayData.netCarbonEstimate | float | round(2))) + ' ' + units if displayData.netCarbonEstimate is not none else NOT_PROVIDED }
     }
   ] %}
 
   {% if not displayData.allCarbonValuesPresent %}
     {% set netRows = netRows.concat([{
       key: { text: t(localKeyPrefix + '.net_carbon_with_blanks'), classes: keyClass },
-      value: { text: displayData.netCarbonWithBlanks + ' ' + units if displayData.netCarbonWithBlanks is not none else NOT_PROVIDED }
+      value: { text: (displayData.netCarbonWithBlanksFormatted if displayData.netCarbonWithBlanksFormatted else (displayData.netCarbonWithBlanks | float | round(2))) + ' ' + units if displayData.netCarbonWithBlanks is not none else NOT_PROVIDED }
     }]) %}
   {% endif %}
 

@@ -1,6 +1,11 @@
 import { PROJECT_PAYLOAD_FIELDS } from '../../../../common/constants/projects.js'
 import { updateSessionData } from '../project-utils.js'
-import { hasAllCarbonValues } from '../../carbon-impact/carbon-display-helpers.js'
+import {
+  buildInitialDisplayData,
+  extractCarbonCosts,
+  hasAllCarbonValues,
+  mergeCalculatedValues
+} from '../../carbon-impact/carbon-display-helpers.js'
 
 const CARBON_DATA_FIELDS = [
   PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD,
@@ -46,10 +51,15 @@ export async function getCarbonImpactOverviewData(request, projectData) {
   try {
     const rawCalc = projectData.carbonCalc
 
+    const carbonCosts = extractCarbonCosts(projectData)
+    let carbonDisplay = buildInitialDisplayData(projectData, carbonCosts)
+
     if (rawCalc) {
+      carbonDisplay = mergeCalculatedValues(carbonDisplay, rawCalc)
       const enrichedData = {
         ...projectData,
-        carbonCalc: buildCarbonCalc(rawCalc)
+        carbonCalc: buildCarbonCalc(rawCalc),
+        carbonDisplay
       }
 
       updateSessionData(request, enrichedData)
@@ -57,8 +67,8 @@ export async function getCarbonImpactOverviewData(request, projectData) {
       return { success: true, projectData: enrichedData }
     }
 
-    // carbonCalc absent (e.g. backend calculation failed) — render page without it
-    return { success: true, projectData }
+    // carbonCalc absent (e.g. backend calculation failed) — return with formatted session values
+    return { success: true, projectData: { ...projectData, carbonDisplay } }
   } catch (error) {
     request.server?.logger?.error?.(
       { err: error },

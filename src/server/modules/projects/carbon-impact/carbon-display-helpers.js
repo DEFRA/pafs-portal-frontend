@@ -1,5 +1,5 @@
 import { PROJECT_PAYLOAD_FIELDS } from '../../../common/constants/projects.js'
-import { formatCurrency } from './controller-helpers.js'
+import { formatCurrency, formatEmission } from './controller-helpers.js'
 
 /**
  * Convert a tCO2e string value (up to 18 integer digits or 16 digits + 2dp)
@@ -35,6 +35,25 @@ const scaledBigIntToFixed2 = (scaled) => {
   const intPart = abs / 100n
   const decPart = String(abs % 100n).padStart(2, '0')
   return `${neg ? '-' : ''}${intPart}.${decPart}`
+}
+
+/**
+ * Add thousands separators to an already-formatted 2dp string (e.g. from
+ * formatTonnes or scaledBigIntToFixed2) without converting to Number.
+ * Avoids float64 precision loss for values with >15 significant digits.
+ * e.g. '100000000000001001.00' → '100,000,000,000,001,001.00'
+ */
+export const formatBigDecimalString = (str) => {
+  if (str == null) {
+    return null
+  }
+  const neg = str.startsWith('-')
+  const abs = neg ? str.slice(1) : str
+  const dotIdx = abs.indexOf('.')
+  const intPart = dotIdx >= 0 ? abs.slice(0, dotIdx) : abs
+  const decPart = dotIdx >= 0 ? abs.slice(dotIdx + 1) : '00'
+  const formattedInt = intPart.replaceAll(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return `${neg ? '-' : ''}${formattedInt}.${decPart}`
 }
 
 /**
@@ -92,15 +111,28 @@ export const buildInitialDisplayData = (sessionData, carbonCosts) => {
   const sequesteredScaled = toScaledBigInt(carbonCosts.sequestered)
   const avoidedScaled = toScaledBigInt(carbonCosts.avoided)
 
+  const build = formatTonnes(carbonCosts.build) ?? '0.00'
+  const operation = formatTonnes(carbonCosts.operation) ?? '0.00'
+  const sequestered = formatTonnes(carbonCosts.sequestered) ?? '0.00'
+  const avoided = formatTonnes(carbonCosts.avoided) ?? '0.00'
+  const wholeLifeCarbon = scaledBigIntToFixed2(buildScaled + operationScaled)
+  const netCarbon = scaledBigIntToFixed2(
+    buildScaled + operationScaled - sequesteredScaled - avoidedScaled
+  )
+
   return {
-    build: formatTonnes(carbonCosts.build) ?? '0.00',
-    operation: formatTonnes(carbonCosts.operation) ?? '0.00',
-    sequestered: formatTonnes(carbonCosts.sequestered) ?? '0.00',
-    avoided: formatTonnes(carbonCosts.avoided) ?? '0.00',
-    wholeLifeCarbon: scaledBigIntToFixed2(buildScaled + operationScaled),
-    netCarbon: scaledBigIntToFixed2(
-      buildScaled + operationScaled - sequesteredScaled - avoidedScaled
-    ),
+    build,
+    operation,
+    sequestered,
+    avoided,
+    wholeLifeCarbon,
+    netCarbon,
+    buildFormatted: formatBigDecimalString(build),
+    operationFormatted: formatBigDecimalString(operation),
+    sequesteredFormatted: formatBigDecimalString(sequestered),
+    avoidedFormatted: formatBigDecimalString(avoided),
+    wholeLifeCarbonFormatted: formatBigDecimalString(wholeLifeCarbon),
+    netCarbonFormatted: formatBigDecimalString(netCarbon),
     benefit:
       sessionData[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT],
     forecast:
@@ -140,6 +172,23 @@ export const mergeCalculatedValues = (displayData, calcData) => {
   enriched.allCarbonValuesPresent = hasAllCarbonValues(c)
   enriched.constructionTotalFunding = formatCurrency(c.constructionTotalFunding)
   enriched.capitalCostEstimateDisplay = enriched.constructionTotalFunding
+
+  // Formatted emission values for calculated fields
+  enriched.capitalCarbonBaselineFormatted = formatEmission(
+    c.capitalCarbonBaseline
+  )
+  enriched.capitalCarbonTargetFormatted = formatEmission(c.capitalCarbonTarget)
+  enriched.operationalCarbonBaselineFormatted = formatEmission(
+    c.operationalCarbonBaseline
+  )
+  enriched.operationalCarbonTargetFormatted = formatEmission(
+    c.operationalCarbonTarget
+  )
+  enriched.netCarbonEstimateFormatted =
+    c.netCarbonEstimate == null
+      ? formatBigDecimalString(displayData.netCarbon)
+      : formatEmission(c.netCarbonEstimate)
+  enriched.netCarbonWithBlanksFormatted = formatEmission(c.netCarbonWithBlanks)
 
   return enriched
 }
