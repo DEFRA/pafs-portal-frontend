@@ -1,16 +1,14 @@
 import {
-  updateProjectStatus,
+  markProjectSubmittedToPol,
   resubmitProject
 } from '../../../../common/services/project/project-service.js'
 import { getAuthSession } from '../../../../common/helpers/auth/session-manager.js'
 import { ROUTES } from '../../../../common/constants/routes.js'
-import { PROJECT_STATUS } from '../../../../common/constants/projects.js'
 
 export const submissionsActionsController = {
   /**
    * Mark a proposal as received in AIMS PD.
-   * Transitions status from 'submitted' → 'approved', removing it from the
-   * failed submissions list.
+   * Stamps submitted_to_pol — no status change.
    */
   async markInAimsPd(request, h) {
     const referenceNumber = request.params?.referenceNumber
@@ -18,9 +16,8 @@ export const submissionsActionsController = {
     const accessToken = authSession?.accessToken
 
     try {
-      const result = await updateProjectStatus(
+      const result = await markProjectSubmittedToPol(
         referenceNumber,
-        PROJECT_STATUS.APPROVED,
         accessToken
       )
 
@@ -32,6 +29,9 @@ export const submissionsActionsController = {
       }
 
       request.yar.flash('success', {
+        title: request.t(
+          'projects.failed_submissions.notifications.marked_in_aims_pd_title'
+        ),
         message: request.t(
           'projects.failed_submissions.notifications.marked_in_aims_pd'
         )
@@ -72,6 +72,9 @@ export const submissionsActionsController = {
       }
 
       request.yar.flash('success', {
+        title: request.t(
+          'projects.failed_submissions.notifications.resubmitted_title'
+        ),
         message: request.t(
           'projects.failed_submissions.notifications.resubmitted'
         )

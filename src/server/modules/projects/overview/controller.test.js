@@ -60,7 +60,8 @@ describe('OverviewController', () => {
     vi.clearAllMocks()
 
     mockRequest = {
-      t: vi.fn((key) => key)
+      t: vi.fn((key) => key),
+      yar: { flash: vi.fn().mockReturnValue([]) }
     }
 
     mockH = {
@@ -524,6 +525,30 @@ describe('OverviewController', () => {
         'modules/projects/overview/index',
         expect.objectContaining({ projectData: null })
       )
+    })
+
+    test('should pass submissionSuccess to view when flash contains success message', async () => {
+      mockRequest.yar.flash.mockReturnValue([
+        { message: 'Your proposal has been submitted successfully' }
+      ])
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          submissionSuccess: 'Your proposal has been submitted successfully'
+        })
+      )
+    })
+
+    test('should not set submissionSuccess when flash is empty', async () => {
+      mockRequest.yar.flash.mockReturnValue([])
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(viewData.submissionSuccess).toBeUndefined()
     })
   })
 

@@ -225,6 +225,11 @@ class OverviewController {
       )
     }
 
+    const [flashSuccess] = request.yar.flash('success')
+    if (flashSuccess) {
+      viewData.submissionSuccess = flashSuccess.message
+    }
+
     return h.view(PROJECT_VIEWS.OVERVIEW, viewData)
   }
 

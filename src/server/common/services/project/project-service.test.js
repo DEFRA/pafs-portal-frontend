@@ -8,7 +8,8 @@ import {
   updateProjectStatus,
   getCarbonImpactCalc,
   submitProjectProposal,
-  resubmitProject
+  resubmitProject,
+  markProjectSubmittedToPol
 } from './project-service.js'
 import { apiRequest } from '../../helpers/api-client/index.js'
 
@@ -1351,6 +1352,63 @@ describe('project-service', () => {
       await expect(resubmitProject('LCR-123-456', 'token')).rejects.toThrow(
         'Network error'
       )
+    })
+  })
+
+  describe('markProjectSubmittedToPol', () => {
+    test('calls apiRequest POST to correct endpoint', async () => {
+      apiRequest.mockResolvedValue({ success: true })
+
+      await markProjectSubmittedToPol('LCR-123-456', 'mock-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/LCR-123-456/mark-submitted-to-pol',
+        expect.objectContaining({ method: 'POST' })
+      )
+    })
+
+    test('includes Authorization header when accessToken is provided', async () => {
+      apiRequest.mockResolvedValue({ success: true })
+
+      await markProjectSubmittedToPol('LCR-123-456', 'my-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          headers: { Authorization: 'Bearer my-token' }
+        })
+      )
+    })
+
+    test('sends empty headers when accessToken is falsy', async () => {
+      apiRequest.mockResolvedValue({ success: true })
+
+      await markProjectSubmittedToPol('LCR-123-456', null)
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ headers: {} })
+      )
+    })
+
+    test('returns the apiRequest result directly', async () => {
+      const mockResult = {
+        success: true,
+        data: { referenceNumber: 'LCR-123-456' }
+      }
+      apiRequest.mockResolvedValue(mockResult)
+
+      const result = await markProjectSubmittedToPol('LCR-123-456', 'token')
+
+      expect(result).toBe(mockResult)
+    })
+
+    test('propagates apiRequest errors', async () => {
+      apiRequest.mockRejectedValue(new Error('Network error'))
+
+      await expect(
+        markProjectSubmittedToPol('LCR-123-456', 'token')
+      ).rejects.toThrow('Network error')
     })
   })
 })

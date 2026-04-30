@@ -1,12 +1,11 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { submissionsActionsController } from './controller.js'
 import { ROUTES } from '../../../../common/constants/routes.js'
-import { PROJECT_STATUS } from '../../../../common/constants/projects.js'
 
 vi.mock('../../../../common/services/project/project-service.js')
 vi.mock('../../../../common/helpers/auth/session-manager.js')
 
-const { updateProjectStatus, resubmitProject } =
+const { markProjectSubmittedToPol, resubmitProject } =
   await import('../../../../common/services/project/project-service.js')
 
 const { getAuthSession } =
@@ -45,22 +44,23 @@ beforeEach(() => {
 })
 
 describe('markInAimsPd — success path', () => {
-  test('calls updateProjectStatus with correct args and flashes success', async () => {
-    updateProjectStatus.mockResolvedValue({ success: true })
+  test('calls markProjectSubmittedToPol with correct args and flashes success', async () => {
+    markProjectSubmittedToPol.mockResolvedValue({ success: true })
     await submissionsActionsController.markInAimsPd(mockRequest, mockH)
-    expect(updateProjectStatus).toHaveBeenCalledWith(
+    expect(markProjectSubmittedToPol).toHaveBeenCalledWith(
       TEST_REFERENCE_NUMBER,
-      PROJECT_STATUS.APPROVED,
       TEST_ACCESS_TOKEN
     )
     expect(mockRequest.yar.flash).toHaveBeenCalledWith('success', {
+      title:
+        'projects.failed_submissions.notifications.marked_in_aims_pd_title',
       message: 'projects.failed_submissions.notifications.marked_in_aims_pd'
     })
     expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.ADMIN.SUBMISSIONS)
   })
 
   test('redirects to submissions on success', async () => {
-    updateProjectStatus.mockResolvedValue({ success: true })
+    markProjectSubmittedToPol.mockResolvedValue({ success: true })
     const result = await submissionsActionsController.markInAimsPd(
       mockRequest,
       mockH
@@ -70,33 +70,30 @@ describe('markInAimsPd — success path', () => {
 
   test('uses accessToken from auth session', async () => {
     getAuthSession.mockReturnValue({ accessToken: 'bearer-xyz' })
-    updateProjectStatus.mockResolvedValue({ success: true })
+    markProjectSubmittedToPol.mockResolvedValue({ success: true })
     await submissionsActionsController.markInAimsPd(mockRequest, mockH)
-    expect(updateProjectStatus).toHaveBeenCalledWith(
+    expect(markProjectSubmittedToPol).toHaveBeenCalledWith(
       expect.any(String),
-      PROJECT_STATUS.APPROVED,
       'bearer-xyz'
     )
   })
 
   test('handles null auth session gracefully', async () => {
     getAuthSession.mockReturnValue(null)
-    updateProjectStatus.mockResolvedValue({ success: true })
+    markProjectSubmittedToPol.mockResolvedValue({ success: true })
     await submissionsActionsController.markInAimsPd(mockRequest, mockH)
-    expect(updateProjectStatus).toHaveBeenCalledWith(
+    expect(markProjectSubmittedToPol).toHaveBeenCalledWith(
       TEST_REFERENCE_NUMBER,
-      PROJECT_STATUS.APPROVED,
       undefined
     )
   })
 
   test('uses referenceNumber from request params', async () => {
     mockRequest.params = { referenceNumber: 'ABC123-000B-099C' }
-    updateProjectStatus.mockResolvedValue({ success: true })
+    markProjectSubmittedToPol.mockResolvedValue({ success: true })
     await submissionsActionsController.markInAimsPd(mockRequest, mockH)
-    expect(updateProjectStatus).toHaveBeenCalledWith(
+    expect(markProjectSubmittedToPol).toHaveBeenCalledWith(
       'ABC123-000B-099C',
-      PROJECT_STATUS.APPROVED,
       TEST_ACCESS_TOKEN
     )
   })
@@ -104,7 +101,7 @@ describe('markInAimsPd — success path', () => {
 
 describe('markInAimsPd — error path', () => {
   test('flashes error when API returns success: false', async () => {
-    updateProjectStatus.mockResolvedValue({
+    markProjectSubmittedToPol.mockResolvedValue({
       success: false,
       errors: ['Not found']
     })
@@ -116,7 +113,7 @@ describe('markInAimsPd — error path', () => {
   })
 
   test('flashes error when API returns null', async () => {
-    updateProjectStatus.mockResolvedValue(null)
+    markProjectSubmittedToPol.mockResolvedValue(null)
     await submissionsActionsController.markInAimsPd(mockRequest, mockH)
     expect(mockRequest.yar.flash).toHaveBeenCalledWith('error', {
       message: MARK_FAILED_MSG
@@ -124,8 +121,8 @@ describe('markInAimsPd — error path', () => {
     expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.ADMIN.SUBMISSIONS)
   })
 
-  test('logs error and flashes error when updateProjectStatus throws', async () => {
-    updateProjectStatus.mockRejectedValue(new Error('Network error'))
+  test('logs error and flashes error when markProjectSubmittedToPol throws', async () => {
+    markProjectSubmittedToPol.mockRejectedValue(new Error('Network error'))
     await submissionsActionsController.markInAimsPd(mockRequest, mockH)
     expect(mockRequest.server.logger.error).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -141,7 +138,7 @@ describe('markInAimsPd — error path', () => {
   })
 
   test('does not flash success when API call fails', async () => {
-    updateProjectStatus.mockRejectedValue(new Error('timeout'))
+    markProjectSubmittedToPol.mockRejectedValue(new Error('timeout'))
     await submissionsActionsController.markInAimsPd(mockRequest, mockH)
     const successCalls = mockRequest.yar.flash.mock.calls.filter(
       ([type]) => type === 'success'
@@ -164,6 +161,7 @@ describe('resubmit', () => {
     resubmitProject.mockResolvedValue({ success: true })
     await submissionsActionsController.resubmit(mockRequest, mockH)
     expect(mockRequest.yar.flash).toHaveBeenCalledWith('success', {
+      title: 'projects.failed_submissions.notifications.resubmitted_title',
       message: 'projects.failed_submissions.notifications.resubmitted'
     })
     expect(mockH.redirect).toHaveBeenCalledWith(ROUTES.ADMIN.SUBMISSIONS)

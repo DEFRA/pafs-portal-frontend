@@ -164,6 +164,7 @@
         "carbon_incomplete": "Tell us about the carbon cost of the project."
       },
       "submitted_message": "Your proposal has been submitted successfully",
+      "success_title": "Success",
       "data_notice": {
         "summary": "Standard data notice",
         "how_we_use_heading": "How we will use your personal information?",
@@ -1527,7 +1528,9 @@
     },
     "notifications": {
       "marked_in_aims_pd": "Submission has been marked as received in AIMS PD.",
-      "resubmitted": "Proposal has been resent to AIMS PD successfully."
+      "marked_in_aims_pd_title": "Proposal in AIMS PD",
+      "resubmitted": "Proposal has been resent to AIMS PD successfully.",
+      "resubmitted_title": "Proposal resubmitted"
     },
     "errors": {
       "mark_failed": "Failed to mark submission as received in AIMS PD. Please try again.",

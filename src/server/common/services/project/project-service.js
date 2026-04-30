@@ -227,3 +227,22 @@ export async function resubmitProject(referenceNumber, accessToken) {
     headers
   })
 }
+
+/**
+ * Admin: mark a proposal as received in POL/AIMS PD.
+ * Stamps submitted_to_pol on the project — no status change.
+ * @param {string} referenceNumber - The project reference number (slug format with dashes)
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} API response
+ */
+export async function markProjectSubmittedToPol(referenceNumber, accessToken) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(
+    `/api/v1/project/${referenceNumber}/mark-submitted-to-pol`,
+    {
+      method: 'POST',
+      headers
+    }
+  )
+}

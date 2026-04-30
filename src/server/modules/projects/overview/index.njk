@@ -39,6 +39,16 @@
 
   <h1 class="govuk-heading-xl">{{ t('projects.overview.heading') }}</h1>
 
+  {% if submissionSuccess %}
+    {% call govukNotificationBanner({
+      type: 'success',
+      titleText: t('projects.overview.submission.success_title'),
+      classes: 'app-notification-banner--full-width'
+    }) %}
+    <p class="govuk-body">{{ submissionSuccess }}</p>
+    {% endcall %}
+  {% endif %}
+
   {% if submissionErrorList and submissionErrorList.length %}
     {{ govukErrorSummary({
       titleText: t('projects.overview.submission.errors.summary_title'),
