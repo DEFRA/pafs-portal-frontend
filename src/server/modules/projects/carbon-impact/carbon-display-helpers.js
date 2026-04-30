@@ -52,7 +52,16 @@ export const formatBigDecimalString = (str) => {
   const dotIdx = abs.indexOf('.')
   const intPart = dotIdx >= 0 ? abs.slice(0, dotIdx) : abs
   const decPart = dotIdx >= 0 ? abs.slice(dotIdx + 1) : '00'
-  const formattedInt = intPart.replaceAll(/\B(?=(\d{3})+(?!\d))/g, ',')
+  // Linear O(n) comma insertion — no regex backtracking
+  const THOUSANDS = 3
+  const len = intPart.length
+  let formattedInt = ''
+  for (let i = 0; i < len; i++) {
+    if (i > 0 && (len - i) % THOUSANDS === 0) {
+      formattedInt += ','
+    }
+    formattedInt += intPart[i]
+  }
   return `${neg ? '-' : ''}${formattedInt}.${decPart}`
 }
 

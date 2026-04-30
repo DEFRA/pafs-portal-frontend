@@ -196,9 +196,9 @@
                   </td>
                 {% elif isSubmission %}
                   <td class="govuk-table__cell govuk-!-white-space-nowrap" data-label="">
-                    <button type="submit" form="resubmit-{{ project.referenceNumberFormatted }}" class="app-button--link" data-testid="resend-to-aims-pd">{{ t('projects.failed_submissions.actions.resend_to_aims_pd') }}</button>
+                    <button type="submit" form="resubmit-{{ project.referenceNumberFormatted }}" class="govuk-button app-link-button" data-testid="resend-to-aims-pd">{{ t('projects.failed_submissions.actions.resend_to_aims_pd') }}</button>
                     &nbsp;|&nbsp;
-                    <button type="submit" form="mark-in-aims-pd-{{ project.referenceNumberFormatted }}" class="app-button--link" data-testid="proposal-in-aims-pd">{{ t('projects.failed_submissions.actions.proposal_in_aims_pd') }}</button>
+                    <button type="submit" form="mark-in-aims-pd-{{ project.referenceNumberFormatted }}" class="govuk-button app-link-button" data-testid="proposal-in-aims-pd">{{ t('projects.failed_submissions.actions.proposal_in_aims_pd') }}</button>
                   </td>
                 {% endif %}
               </tr>
