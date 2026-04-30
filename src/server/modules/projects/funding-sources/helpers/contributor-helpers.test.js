@@ -185,21 +185,22 @@ describe('loadContributors', () => {
     expect(result).toEqual(['Alice', 'Bob'])
   })
 
-  it('falls back to CSV names field when session array is empty', () => {
+  it('does not fall back to CSV names field (removed)', () => {
     const sessionData = {
       [SESSION_KEY]: [],
       [NAMES_FIELD]: 'Alice, Bob, Charlie'
     }
     const result = loadContributors(sessionData, SESSION_KEY, NAMES_FIELD, STEP)
-    expect(result).toEqual(['Alice', 'Bob', 'Charlie'])
+    // CSV fallback removed - falls through to DB fallback then default ['']
+    expect(result).toEqual([''])
   })
 
-  it('filters out empty names from CSV', () => {
+  it('returns default empty slot when no session and no DB contributors', () => {
     const sessionData = {
       [NAMES_FIELD]: 'Alice,,Bob'
     }
     const result = loadContributors(sessionData, SESSION_KEY, NAMES_FIELD, STEP)
-    expect(result).toEqual(['Alice', 'Bob'])
+    expect(result).toEqual([''])
   })
 
   it('ignores non-string CSV values', () => {

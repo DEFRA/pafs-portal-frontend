@@ -482,7 +482,7 @@ describe('publicContributorsController', () => {
       expect(navigateToProjectOverview).toHaveBeenCalledWith(REF, h)
     })
 
-    it('seeds session from CSV when session array is empty', async () => {
+    it('ignores CSV when session array is empty', async () => {
       getSessionData.mockReturnValue({
         [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: true,
         [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTOR_NAMES]: 'Alice, Bob',
@@ -492,7 +492,7 @@ describe('publicContributorsController', () => {
       expect(updateSessionData).toHaveBeenCalledWith(
         request,
         expect.objectContaining({
-          _publicContributorsSession: ['Alice', 'Bob']
+          _publicContributorsSession: ['']
         })
       )
     })

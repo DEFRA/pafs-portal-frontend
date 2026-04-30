@@ -2,6 +2,7 @@ import {
   CONTRIBUTOR_REQUIRED_ERROR_CODES,
   CONTRIBUTOR_INVALID_ERROR_CODES,
   CONTRIBUTOR_DUPLICATE_ERROR_CODES,
+  CONTRIBUTOR_TOO_LONG_ERROR_CODES,
   CONTRIBUTOR_SPEND_GROUPS,
   MAIN_SPEND_SOURCES
 } from '../../../../common/constants/projects.js'
@@ -11,8 +12,8 @@ export { CONTRIBUTOR_SPEND_GROUPS } from '../../../../common/constants/projects.
 
 /**
  * Retrieve the list of contributor names for a given contributor group.
- * Prefers the in-progress session array, then falls back to the stored
- * comma-separated CSV field from the database.
+ * Prefers the in-progress session array, then falls back to unique names
+ * extracted from the pafs_core_funding_contributors table.
  *
  * @param {object} sessionData - Current session data
  * @param {object} group - A CONTRIBUTOR_SPEND_GROUPS entry
@@ -24,15 +25,7 @@ export function getContributorNames(sessionData, group) {
     return sessionValues.map((name) => `${name || ''}`.trim()).filter(Boolean)
   }
 
-  const csv = sessionData[group.namesField]
-  if (typeof csv === 'string' && csv.trim()) {
-    return csv
-      .split(',')
-      .map((name) => name.trim())
-      .filter(Boolean)
-  }
-
-  // Fallback: extract unique names from pafs_core_funding_contributors (legacy data)
+  // Extract unique names from pafs_core_funding_contributors
   const dbContributors = sessionData.pafs_core_funding_contributors || []
   const fallbackNames = getUniqueContributorNamesFromDb(
     dbContributors,
@@ -193,6 +186,9 @@ export function localizeContributorErrorMessage(rawMessage, t) {
   }
   if (CONTRIBUTOR_DUPLICATE_ERROR_CODES.has(rawMessage)) {
     return t('projects.funding_sources.contributors.errors.duplicate')
+  }
+  if (CONTRIBUTOR_TOO_LONG_ERROR_CODES.has(rawMessage)) {
+    return t('projects.funding_sources.contributors.errors.too_long')
   }
   return rawMessage
 }

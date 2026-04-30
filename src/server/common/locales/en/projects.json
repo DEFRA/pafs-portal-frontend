@@ -289,6 +289,7 @@
     "errors": {
       "required": "Enter a project name",
       "invalid_format": "The project name must only contain letters, spaces, underscores, hyphens and numbers",
+      "too_long": "Please enter no more than 200 characters",
       "already_exists": "The project name already exists. Your project must have a unique name."
     }
   },
@@ -1788,8 +1789,9 @@
       "add_contributor_button": "Add another contributor",
       "errors": {
         "required": "Please add at least one contributor",
-        "invalid": "Make sure there is no commas in the contributor name",
-        "duplicate": "Please add each contributor only once"
+        "invalid": "The contributor name must only contain valid characters",
+        "duplicate": "Please add each contributor only once",
+        "too_long": "Please enter no more than 200 characters"
       }
     },
     "public_sector_contributors": {
