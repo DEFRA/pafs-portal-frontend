@@ -244,7 +244,7 @@ class ContributorsController {
       )
     }
 
-    const joinedNames = nonEmptyNames.join(', ')
+    const joinedNames = nonEmptyNames.join('|||')
     updateSessionData(request, {
       [sessionKey]: cleanNames,
       [namesField]: joinedNames

@@ -5,8 +5,8 @@ import {
 } from '../../constants/projects.js'
 
 const MAX_DIGITS = 18
+const MAX_CONTRIBUTOR_NAME_LENGTH = 200
 const DIGITS_ONLY_REGEX = /^\d+$/
-const NO_COMMA_REGEX = /^[^,]+$/
 
 const ADDITIONAL_FCERM_GIA_FIELD = 'additionalFcermGia'
 const PUBLIC_CONTRIBUTORS_FIELD = 'publicContributors'
@@ -143,14 +143,23 @@ const createContributorsArraySchema = (contributorType) =>
     )
     .optional()
 
-const createContributorNamesSchema = (requiredMessage, invalidMessage) =>
-  Joi.string().trim().min(1).pattern(NO_COMMA_REGEX).required().messages({
-    'string.base': invalidMessage,
-    'string.empty': requiredMessage,
-    'string.min': requiredMessage,
-    'string.pattern.base': invalidMessage,
-    'any.required': requiredMessage
-  })
+const createContributorNamesSchema = (
+  requiredMessage,
+  invalidMessage,
+  tooLongMessage
+) =>
+  Joi.string()
+    .trim()
+    .min(1)
+    .max(MAX_CONTRIBUTOR_NAME_LENGTH)
+    .required()
+    .messages({
+      'string.base': invalidMessage,
+      'string.empty': requiredMessage,
+      'string.min': requiredMessage,
+      'string.max': tooLongMessage,
+      'any.required': requiredMessage
+    })
 
 const fundingSourceBoolSchema = createFundingSourceBoolSchema(
   PROJECT_VALIDATION_MESSAGES.FUNDING_SOURCES_SELECTED_INVALID
@@ -205,17 +214,20 @@ export const additionalFcrmGiaSelectedSchema = Joi.object(
 
 export const publicContributorNamesSchema = createContributorNamesSchema(
   PROJECT_VALIDATION_MESSAGES.PUBLIC_SECTOR_CONTRIBUTORS_REQUIRED,
-  PROJECT_VALIDATION_MESSAGES.PUBLIC_SECTOR_CONTRIBUTORS_INVALID
+  PROJECT_VALIDATION_MESSAGES.PUBLIC_SECTOR_CONTRIBUTORS_INVALID,
+  PROJECT_VALIDATION_MESSAGES.PUBLIC_SECTOR_CONTRIBUTORS_TOO_LONG
 )
 
 export const privateContributorNamesSchema = createContributorNamesSchema(
   PROJECT_VALIDATION_MESSAGES.PRIVATE_SECTOR_CONTRIBUTORS_REQUIRED,
-  PROJECT_VALIDATION_MESSAGES.PRIVATE_SECTOR_CONTRIBUTORS_INVALID
+  PROJECT_VALIDATION_MESSAGES.PRIVATE_SECTOR_CONTRIBUTORS_INVALID,
+  PROJECT_VALIDATION_MESSAGES.PRIVATE_SECTOR_CONTRIBUTORS_TOO_LONG
 )
 
 export const otherEaContributorNamesSchema = createContributorNamesSchema(
   PROJECT_VALIDATION_MESSAGES.OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS_REQUIRED,
-  PROJECT_VALIDATION_MESSAGES.OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS_INVALID
+  PROJECT_VALIDATION_MESSAGES.OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS_INVALID,
+  PROJECT_VALIDATION_MESSAGES.OTHER_ENVIRONMENT_AGENCY_CONTRIBUTORS_TOO_LONG
 )
 
 export const fundingValueRowSchema = Joi.object({

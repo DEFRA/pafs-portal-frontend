@@ -88,10 +88,9 @@ describe('project-funding-sources-schemas', () => {
       expect(error).toBeUndefined()
     })
 
-    test('rejects public contributor name containing a comma', () => {
+    test('accepts public contributor name containing a comma (comma allowed)', () => {
       const { error } = publicContributorNamesSchema.validate('Org A, Org B')
-      expect(error).toBeDefined()
-      expect(error.details[0].type).toBe('string.pattern.base')
+      expect(error).toBeUndefined()
     })
 
     test('accepts private contributor names', () => {
