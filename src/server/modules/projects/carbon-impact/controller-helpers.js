@@ -222,6 +222,24 @@ export const formatCurrency = (value) => {
 }
 
 /**
+ * Format an emission value (tCO₂e) with thousands commas and 2 decimal places.
+ * e.g. 1500000 → "1,500,000.00"
+ */
+export const formatEmission = (value) => {
+  if (value === null || value === undefined) {
+    return null
+  }
+  const numericValue = Number(value)
+  if (Number.isNaN(numericValue)) {
+    return null
+  }
+  return new Intl.NumberFormat('en-GB', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(numericValue)
+}
+
+/**
  * Get next route for a given step
  */
 export const getNextRouteForStep = (step, referenceNumber) => {

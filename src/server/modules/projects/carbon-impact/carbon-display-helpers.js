@@ -1,5 +1,5 @@
 import { PROJECT_PAYLOAD_FIELDS } from '../../../common/constants/projects.js'
-import { formatCurrency } from './controller-helpers.js'
+import { formatCurrency, formatEmission } from './controller-helpers.js'
 
 /**
  * Extract and convert carbon cost values from session data
@@ -18,31 +18,43 @@ export const extractCarbonCosts = (sessionData) => ({
 /**
  * Build initial display data from session values
  */
-export const buildInitialDisplayData = (sessionData, carbonCosts) => ({
-  build: carbonCosts.build,
-  operation: carbonCosts.operation,
-  sequestered: carbonCosts.sequestered,
-  avoided: carbonCosts.avoided,
-  wholeLifeCarbon: carbonCosts.build + carbonCosts.operation,
-  netCarbon:
+export const buildInitialDisplayData = (sessionData, carbonCosts) => {
+  const wholeLifeCarbon = carbonCosts.build + carbonCosts.operation
+  const netCarbon =
     carbonCosts.build +
     carbonCosts.operation -
     carbonCosts.sequestered -
-    carbonCosts.avoided,
-  benefit:
-    sessionData[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT],
-  forecast:
-    sessionData[PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST],
-  benefitDisplay: formatCurrency(
-    sessionData[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]
-  ),
-  forecastDisplay: formatCurrency(
-    sessionData[PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]
-  ),
-  capitalCostEstimateDisplay: formatCurrency(
-    sessionData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]
-  )
-})
+    carbonCosts.avoided
+  return {
+    build: carbonCosts.build,
+    operation: carbonCosts.operation,
+    sequestered: carbonCosts.sequestered,
+    avoided: carbonCosts.avoided,
+    wholeLifeCarbon,
+    netCarbon,
+    buildFormatted: formatEmission(carbonCosts.build),
+    operationFormatted: formatEmission(carbonCosts.operation),
+    sequesteredFormatted: formatEmission(carbonCosts.sequestered),
+    avoidedFormatted: formatEmission(carbonCosts.avoided),
+    wholeLifeCarbonFormatted: formatEmission(wholeLifeCarbon),
+    netCarbonFormatted: formatEmission(netCarbon),
+    benefit:
+      sessionData[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT],
+    forecast:
+      sessionData[PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST],
+    benefitDisplay: formatCurrency(
+      sessionData[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]
+    ),
+    forecastDisplay: formatCurrency(
+      sessionData[PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]
+    ),
+    capitalCostEstimateDisplay: formatCurrency(
+      sessionData[
+        PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS
+      ]
+    )
+  }
+}
 
 /**
  * Merge backend calculated values into display data
@@ -60,6 +72,22 @@ export const mergeCalculatedValues = (displayData, calcData) => {
   enriched.allCarbonValuesPresent = hasAllCarbonValues(c)
   enriched.constructionTotalFunding = formatCurrency(c.constructionTotalFunding)
   enriched.capitalCostEstimateDisplay = enriched.constructionTotalFunding
+
+  // Formatted emission values for calculated fields
+  enriched.capitalCarbonBaselineFormatted = formatEmission(
+    c.capitalCarbonBaseline
+  )
+  enriched.capitalCarbonTargetFormatted = formatEmission(c.capitalCarbonTarget)
+  enriched.operationalCarbonBaselineFormatted = formatEmission(
+    c.operationalCarbonBaseline
+  )
+  enriched.operationalCarbonTargetFormatted = formatEmission(
+    c.operationalCarbonTarget
+  )
+  enriched.netCarbonEstimateFormatted = formatEmission(
+    c.netCarbonEstimate ?? displayData.netCarbon
+  )
+  enriched.netCarbonWithBlanksFormatted = formatEmission(c.netCarbonWithBlanks)
 
   return enriched
 }
