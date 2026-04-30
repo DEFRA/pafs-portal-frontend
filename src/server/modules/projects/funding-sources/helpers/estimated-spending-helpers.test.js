@@ -352,4 +352,14 @@ describe('localizeContributorErrorMessage', () => {
     const result = localizeContributorErrorMessage('SOME_UNKNOWN_ERROR', t)
     expect(result).toBe('SOME_UNKNOWN_ERROR')
   })
+
+  it('translates PUBLIC_SECTOR_CONTRIBUTORS_TOO_LONG', () => {
+    const result = localizeContributorErrorMessage(
+      'PUBLIC_SECTOR_CONTRIBUTORS_TOO_LONG',
+      t
+    )
+    expect(result).toBe(
+      '[projects.funding_sources.contributors.errors.too_long]'
+    )
+  })
 })

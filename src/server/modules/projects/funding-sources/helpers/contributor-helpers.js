@@ -78,7 +78,7 @@ export function validateContributorNames(cleanNames, nonEmptyNames, config, t) {
 /**
  * Load contributor names from session key or funding_contributors table fallback.
  */
-export function loadContributors(sessionData, sessionKey, namesField, step) {
+export function loadContributors(sessionData, sessionKey, _namesField, step) {
   let contributors = sessionData[sessionKey] || []
 
   // Fallback: extract unique names from pafs_core_funding_contributors

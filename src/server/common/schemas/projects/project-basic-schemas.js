@@ -7,6 +7,8 @@ import {
   PROJECT_VALIDATION_MESSAGES
 } from '../../constants/projects.js'
 
+const MAX_PROJECT_NAME_LENGTH = 200
+
 /**
  * Project reference number schema - for updates
  * Format: {RFCC_CODE}C501E/{HIGH_COUNTER:3digits}A/{LOW_COUNTER:3digits}A
@@ -31,7 +33,7 @@ export const projectNameSchema = Joi.string()
   .trim()
   .custom((value) => value.split(/\s+/).join(' '))
   .pattern(VALIDATION_PATTERNS.NAME_WITH_ALPHANUMERIC_SPACE_UNDERSCORE_DASH)
-  .max(200)
+  .max(MAX_PROJECT_NAME_LENGTH)
   .required()
   .label(PROJECT_PAYLOAD_FIELDS.NAME)
   .messages({
