@@ -43,10 +43,6 @@ const SUBMISSION_ERROR_MAP = {
     localeKey:
       'projects.overview.submission.errors.project_type_basic_incomplete'
   },
-  SUBMISSION_FINANCIAL_YEARS_INCOMPLETE: {
-    sectionId: SECTION_PROPOSAL_DETAILS,
-    localeKey: 'projects.overview.submission.errors.financial_years_incomplete'
-  },
   SUBMISSION_FINANCIAL_START_YEAR_INCOMPLETE: {
     sectionId: SECTION_PROPOSAL_DETAILS,
     localeKey:
@@ -56,6 +52,11 @@ const SUBMISSION_ERROR_MAP = {
     sectionId: SECTION_PROPOSAL_DETAILS,
     localeKey:
       'projects.overview.submission.errors.financial_end_year_incomplete'
+  },
+  SUBMISSION_FINANCIAL_END_YEAR_NOT_AFTER_START: {
+    sectionId: SECTION_PROPOSAL_DETAILS,
+    localeKey:
+      'projects.overview.submission.errors.financial_end_year_not_after_start'
   },
   SUBMISSION_BENEFIT_AREA_INCOMPLETE: {
     sectionId: 'section-benefit-area',

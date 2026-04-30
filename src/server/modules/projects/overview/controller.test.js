@@ -949,6 +949,26 @@ describe('OverviewController', () => {
       expect(item).toBeDefined()
     })
 
+    test('maps SUBMISSION_FINANCIAL_END_YEAR_NOT_AFTER_START to section-proposal-details', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [
+          { errorCode: 'SUBMISSION_FINANCIAL_END_YEAR_NOT_AFTER_START' }
+        ],
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      const viewData = mockH.view.mock.calls[0][1]
+      expect(
+        viewData.submissionErrors['section-proposal-details']
+      ).toBeDefined()
+      expect(
+        viewData.submissionErrorList.find(
+          (e) => e.href === '#section-proposal-details'
+        )
+      ).toBeDefined()
+    })
+
     test('passes project data through to the view on failure', async () => {
       submitProjectProposal.mockResolvedValue({
         success: false,
