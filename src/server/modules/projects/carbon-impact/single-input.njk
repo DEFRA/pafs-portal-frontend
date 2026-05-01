@@ -4,9 +4,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{% block pageTitle %}
-  {{ t(localKeyPrefix + '.title') }}
-{% endblock %}
+{% block titleText %}{{ t(localKeyPrefix + '.title') }}{% endblock %}
 
 {% block body %}
   {% if fieldErrors %}

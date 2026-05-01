@@ -7,9 +7,7 @@
 {% set units = t(localKeyPrefix + '.units') %}
 {% set keyClass = 'govuk-!-width-three-quarters' %}
 
-{% block pageTitle %}
-  {{ t(localKeyPrefix + '.title') }}
-{% endblock %}
+{% block titleText %}{{ t(localKeyPrefix + '.title') }}{% endblock %}
 
 {% block body %}
   <h1 class="govuk-heading-l">{{ t(localKeyPrefix + '.heading') }}</h1>
@@ -20,7 +18,7 @@
   <p class="govuk-body">{{ t(localKeyPrefix + '.lede_4') }}</p>
 
   {# ── Capital Carbon ─────────────────────────────────────────────────── #}
-  <h3 class="govuk-heading-s">{{ t(localKeyPrefix + '.capital_carbon_heading') }}</h3>
+  <h2 class="govuk-heading-s">{{ t(localKeyPrefix + '.capital_carbon_heading') }}</h2>
 
   {{ govukSummaryList({
     rows: [
@@ -40,7 +38,7 @@
   }) }}
 
   {# ── Operations and maintenance carbon ────────────────────────────── #}
-  <h3 class="govuk-heading-s">{{ t(localKeyPrefix + '.operational_carbon_heading') }}</h3>
+  <h2 class="govuk-heading-s">{{ t(localKeyPrefix + '.operational_carbon_heading') }}</h2>
 
   {{ govukSummaryList({
     rows: [
@@ -60,7 +58,7 @@
   }) }}
 
   {# ── Net Carbon ──────────────────────────────────────────────────────── #}
-  <h3 class="govuk-heading-s">{{ t(localKeyPrefix + '.net_carbon_heading') }}</h3>
+  <h2 class="govuk-heading-s">{{ t(localKeyPrefix + '.net_carbon_heading') }}</h2>
 
   {% set netRows = [
     {

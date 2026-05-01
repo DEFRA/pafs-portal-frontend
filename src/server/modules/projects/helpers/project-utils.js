@@ -143,7 +143,7 @@ export function resetSessionData(request) {
 export function buildViewData(request, options = {}) {
   const {
     formData = {},
-    fieldErrors = {},
+    fieldErrors = null,
     errorCode = '',
     additionalData = {}
   } = options

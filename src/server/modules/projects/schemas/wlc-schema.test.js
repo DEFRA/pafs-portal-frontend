@@ -60,7 +60,7 @@ describe('wlc-schema', () => {
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number up to 18 digits (0 allowed)'
+      'Enter a whole number up to 18 digits (0 is allowed)'
     )
   })
 
@@ -74,7 +74,7 @@ describe('wlc-schema', () => {
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number up to 18 digits (0 allowed)'
+      'Enter a whole number up to 18 digits (0 is allowed)'
     )
   })
 
@@ -87,7 +87,7 @@ describe('wlc-schema', () => {
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number up to 18 digits (0 allowed)'
+      'Enter a whole number up to 18 digits (0 is allowed)'
     )
   })
 
@@ -112,7 +112,7 @@ describe('wlc-schema', () => {
     const { error } = wlcOptionalSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number up to 18 digits (0 allowed)'
+      'Enter a whole number up to 18 digits (0 is allowed)'
     )
   })
 
