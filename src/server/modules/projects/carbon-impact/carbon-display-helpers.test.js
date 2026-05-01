@@ -1,5 +1,6 @@
-import { describe, expect, test, vi } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
 import {
+  formatTonnes,
   extractCarbonCosts,
   buildInitialDisplayData,
   mergeCalculatedValues,
@@ -9,161 +10,446 @@ import {
 } from './carbon-display-helpers.js'
 import { PROJECT_PAYLOAD_FIELDS } from '../../../common/constants/projects.js'
 
-const makeSession = (overrides = {}) => ({
-  [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: 1000,
-  [PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION]: 500,
-  [PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED]: 200,
-  [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: 100,
-  [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: 50000,
-  [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: 20000,
-  [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]: 100000,
-  ...overrides
+vi.mock('./controller-helpers.js', () => ({
+  formatCurrency: vi.fn((v) => {
+    if (v == null || v === '') return 'Not provided'
+    return `£${v}`
+  }),
+  formatEmission: vi.fn((v) => (v == null ? null : String(v)))
+}))
+
+// ─────────────────────────────────────────────────────────────────────────────
+// formatTonnes
+// ─────────────────────────────────────────────────────────────────────────────
+describe('formatTonnes', () => {
+  test('returns null for null', () => {
+    expect(formatTonnes(null)).toBeNull()
+  })
+
+  test('returns null for undefined', () => {
+    expect(formatTonnes(undefined)).toBeNull()
+  })
+
+  test('returns 0.00 for empty string', () => {
+    expect(formatTonnes('')).toBe('0.00')
+  })
+
+  test('returns 0.00 for whitespace-only string', () => {
+    expect(formatTonnes('   ')).toBe('0.00')
+  })
+
+  test('formats whole number string as 2 decimal places', () => {
+    expect(formatTonnes('15')).toBe('15.00')
+  })
+
+  test('formats single-decimal string with trailing zero', () => {
+    expect(formatTonnes('15.0')).toBe('15.00')
+    expect(formatTonnes('15.2')).toBe('15.20')
+  })
+
+  test('preserves 2 decimal place string unchanged', () => {
+    expect(formatTonnes('15.23')).toBe('15.23')
+  })
+
+  test('formats large integer string correctly', () => {
+    expect(formatTonnes('123456789012345678')).toBe('123456789012345678.00')
+  })
+
+  test('formats max-precision decimal string correctly', () => {
+    expect(formatTonnes('1234567890123456.23')).toBe('1234567890123456.23')
+  })
+
+  test('returns 0.00 for string starting with decimal point (invalid format)', () => {
+    // ".5" doesn't match the schema format (must have leading digit); treated as zero
+    expect(formatTonnes('.5')).toBe('0.00')
+  })
+
+  test('returns 0.00 for a malformed string (non-numeric)', () => {
+    // Invalid input: regex guard treats it as zero
+    expect(formatTonnes('abc')).toBe('0.00')
+  })
+
+  test('formats number 0 as 0.00', () => {
+    expect(formatTonnes(0)).toBe('0.00')
+  })
+
+  test('formats integer number as 2 decimal places', () => {
+    expect(formatTonnes(100)).toBe('100.00')
+  })
+
+  test('formats fractional number with trailing zero', () => {
+    expect(formatTonnes(100.5)).toBe('100.50')
+  })
+
+  test('formats fractional number to 2dp', () => {
+    expect(formatTonnes(15.23)).toBe('15.23')
+  })
+
+  test('returns null for NaN number', () => {
+    expect(formatTonnes(Number.NaN)).toBeNull()
+  })
+
+  test('returns null when a non-string non-number value cannot be parsed', () => {
+    // e.g. boolean true → parseFloat('true') = NaN → null
+    expect(formatTonnes(true)).toBeNull()
+  })
 })
 
+// ─────────────────────────────────────────────────────────────────────────────
+// extractCarbonCosts
+// ─────────────────────────────────────────────────────────────────────────────
 describe('extractCarbonCosts', () => {
-  test('extracts numeric cost values from session', () => {
-    const result = extractCarbonCosts(makeSession())
+  test('extracts raw string values from session data', () => {
+    const sessionData = {
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: '10.50',
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_OPERATION]: '5.00',
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED]: '2.25',
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: '1.00'
+    }
+    const result = extractCarbonCosts(sessionData)
     expect(result).toEqual({
-      build: 1000,
-      operation: 500,
-      sequestered: 200,
-      avoided: 100
+      build: '10.50',
+      operation: '5.00',
+      sequestered: '2.25',
+      avoided: '1.00'
     })
   })
 
-  test('defaults missing fields to 0', () => {
+  test('returns empty string for missing fields', () => {
     const result = extractCarbonCosts({})
     expect(result).toEqual({
-      build: 0,
-      operation: 0,
-      sequestered: 0,
-      avoided: 0
+      build: '',
+      operation: '',
+      sequestered: '',
+      avoided: ''
     })
   })
-})
 
-describe('buildInitialDisplayData', () => {
-  test('computes wholeLifeCarbon and netCarbon', () => {
-    const session = makeSession()
-    const costs = extractCarbonCosts(session)
-    const data = buildInitialDisplayData(session, costs)
-    expect(data.wholeLifeCarbon).toBe(1500) // 1000 + 500
-    expect(data.netCarbon).toBe(1200) // 1000 + 500 - 200 - 100
-  })
-
-  test('includes formatted emission fields', () => {
-    const session = makeSession()
-    const costs = extractCarbonCosts(session)
-    const data = buildInitialDisplayData(session, costs)
-    expect(data.buildFormatted).toBe('1,000.00')
-    expect(data.wholeLifeCarbonFormatted).toBe('1,500.00')
-    expect(data.netCarbonFormatted).toBe('1,200.00')
-  })
-
-  test('includes formatted currency fields', () => {
-    const session = makeSession()
-    const costs = extractCarbonCosts(session)
-    const data = buildInitialDisplayData(session, costs)
-    expect(data.benefitDisplay).toBe('£50,000')
-    expect(data.capitalCostEstimateDisplay).toBe('£100,000')
-  })
-})
-
-describe('mergeCalculatedValues', () => {
-  test('merges calc data and adds formatted fields', () => {
-    const session = makeSession()
-    const costs = extractCarbonCosts(session)
-    const displayData = buildInitialDisplayData(session, costs)
-    const calcData = {
-      capitalCarbonBaseline: 2000,
-      capitalCarbonTarget: 1800,
-      operationalCarbonBaseline: 300,
-      operationalCarbonTarget: 250,
-      netCarbonEstimate: 1200,
-      netCarbonWithBlanks: null,
-      constructionTotalFunding: 500000,
-      carbonCostBuild: 1000,
-      carbonCostOperation: 500,
-      carbonCostSequestered: 200,
-      carbonCostAvoided: 100
+  test('returns empty string when field is null', () => {
+    const sessionData = {
+      [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: null
     }
-    const result = mergeCalculatedValues(displayData, calcData)
-    expect(result.capitalCarbonBaselineFormatted).toBe('2,000.00')
-    expect(result.netCarbonEstimateFormatted).toBe('1,200.00')
-    expect(result.netCarbonWithBlanksFormatted).toBeNull()
-    expect(result.allCarbonValuesPresent).toBe(true)
-    expect(result.constructionTotalFunding).toBe('£500,000')
+    const result = extractCarbonCosts(sessionData)
+    expect(result.build).toBe('')
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// buildInitialDisplayData
+// ─────────────────────────────────────────────────────────────────────────────
+describe('buildInitialDisplayData', () => {
+  test('returns 0.00 for all tCO2e fields when costs are empty', () => {
+    const sessionData = {}
+    const carbonCosts = {
+      build: '',
+      operation: '',
+      sequestered: '',
+      avoided: ''
+    }
+    const result = buildInitialDisplayData(sessionData, carbonCosts)
+    expect(result.build).toBe('0.00')
+    expect(result.operation).toBe('0.00')
+    expect(result.sequestered).toBe('0.00')
+    expect(result.avoided).toBe('0.00')
+    expect(result.wholeLifeCarbon).toBe('0.00')
+    expect(result.netCarbon).toBe('0.00')
   })
 
-  test('uses displayData.netCarbon when netCarbonEstimate is null', () => {
-    const session = makeSession()
-    const costs = extractCarbonCosts(session)
-    const displayData = buildInitialDisplayData(session, costs)
+  test('calculates wholeLifeCarbon as build + operation', () => {
+    const sessionData = {}
+    const carbonCosts = {
+      build: '10.50',
+      operation: '5.25',
+      sequestered: '0',
+      avoided: '0'
+    }
+    const result = buildInitialDisplayData(sessionData, carbonCosts)
+    expect(result.wholeLifeCarbon).toBe('15.75')
+  })
+
+  test('calculates netCarbon as build + operation - sequestered - avoided', () => {
+    const sessionData = {}
+    const carbonCosts = {
+      build: '20.00',
+      operation: '10.00',
+      sequestered: '8.00',
+      avoided: '4.00'
+    }
+    const result = buildInitialDisplayData(sessionData, carbonCosts)
+    expect(result.netCarbon).toBe('18.00')
+  })
+
+  test('produces negative netCarbon when sequestered+avoided exceed build+operation', () => {
+    const sessionData = {}
+    const carbonCosts = {
+      build: '5.00',
+      operation: '3.00',
+      sequestered: '10.00',
+      avoided: '2.00'
+    }
+    const result = buildInitialDisplayData(sessionData, carbonCosts)
+    // 5 + 3 - 10 - 2 = -4
+    expect(result.netCarbon).toBe('-4.00')
+  })
+
+  test('preserves full precision for large values without floating-point error', () => {
+    const sessionData = {}
+    const carbonCosts = {
+      build: '999999999999999.99',
+      operation: '1.01',
+      sequestered: '0',
+      avoided: '0'
+    }
+    const result = buildInitialDisplayData(sessionData, carbonCosts)
+    // JavaScript Number would lose precision here; BigInt should not
+    expect(result.wholeLifeCarbon).toBe('1000000000000001.00')
+  })
+
+  test('returns 0.00 for all fields when carbonCosts has null values', () => {
+    // When carbonCosts fields are null, formatTonnes returns null and ?? '0.00' kicks in
+    const result = buildInitialDisplayData(
+      {},
+      { build: null, operation: null, sequestered: null, avoided: null }
+    )
+    expect(result.build).toBe('0.00')
+    expect(result.operation).toBe('0.00')
+    expect(result.sequestered).toBe('0.00')
+    expect(result.avoided).toBe('0.00')
+  })
+
+  test('extracts benefit and forecast from session data', () => {
+    const sessionData = {
+      [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: '5000',
+      [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: '2500'
+    }
+    const result = buildInitialDisplayData(sessionData, {
+      build: '',
+      operation: '',
+      sequestered: '',
+      avoided: ''
+    })
+    expect(result.benefit).toBe('5000')
+    expect(result.forecast).toBe('2500')
+  })
+
+  test('formats *Formatted fields with thousands commas without float precision loss', () => {
+    // Number('100000000000001001.00') loses precision (float64 ULP ~16 at 10^17)
+    // formatBigDecimalString must use string arithmetic instead
+    const result = buildInitialDisplayData(
+      {},
+      {
+        build: '100000000000000001',
+        operation: '1000',
+        sequestered: '0',
+        avoided: '0'
+      }
+    )
+    expect(result.wholeLifeCarbon).toBe('100000000000001001.00')
+    expect(result.wholeLifeCarbonFormatted).toBe('100,000,000,000,001,001.00')
+    expect(result.buildFormatted).toBe('100,000,000,000,000,001.00')
+  })
+
+  test('formats decimal part precisely in *Formatted fields', () => {
+    // Number('1000000000001000.23') rounds .23 to .25 at float64 ULP 0.125
+    const result = buildInitialDisplayData(
+      {},
+      {
+        build: '1000000000000000.23',
+        operation: '1000',
+        sequestered: '0',
+        avoided: '0'
+      }
+    )
+    expect(result.wholeLifeCarbon).toBe('1000000000001000.23')
+    expect(result.wholeLifeCarbonFormatted).toBe('1,000,000,000,001,000.23')
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// mergeCalculatedValues
+// ─────────────────────────────────────────────────────────────────────────────
+describe('mergeCalculatedValues', () => {
+  const baseDisplayData = {
+    build: '10.00',
+    operation: '5.00',
+    sequestered: '0.00',
+    avoided: '0.00',
+    wholeLifeCarbon: '15.00',
+    netCarbon: '15.00',
+    benefit: null,
+    forecast: null,
+    benefitDisplay: 'Not provided',
+    forecastDisplay: 'Not provided',
+    capitalCostEstimateDisplay: 'Not provided'
+  }
+
+  test('formats tCO2e API values to 2dp strings', () => {
     const calcData = {
-      capitalCarbonBaseline: null,
-      capitalCarbonTarget: null,
-      operationalCarbonBaseline: null,
-      operationalCarbonTarget: null,
+      capitalCarbonBaseline: 100,
+      capitalCarbonTarget: 90,
+      operationalCarbonBaseline: 50,
+      operationalCarbonTarget: 45,
+      netCarbonEstimate: 150,
+      netCarbonWithBlanks: 120,
+      constructionTotalFunding: 500000,
+      carbonCostBuild: '10.0',
+      carbonCostOperation: '5.0',
+      carbonCostSequestered: '2.0',
+      carbonCostAvoided: '1.0'
+    }
+    const result = mergeCalculatedValues(baseDisplayData, calcData)
+    expect(result.capitalCarbonBaseline).toBe('100.00')
+    expect(result.capitalCarbonTarget).toBe('90.00')
+    expect(result.operationalCarbonBaseline).toBe('50.00')
+    expect(result.operationalCarbonTarget).toBe('45.00')
+    expect(result.netCarbonEstimate).toBe('150.00')
+    expect(result.netCarbonWithBlanks).toBe('120.00')
+  })
+
+  test('falls back to displayData.netCarbon when netCarbonEstimate is null', () => {
+    const calcData = {
+      capitalCarbonBaseline: 100,
+      capitalCarbonTarget: 90,
+      operationalCarbonBaseline: 50,
+      operationalCarbonTarget: 45,
       netCarbonEstimate: null,
       netCarbonWithBlanks: null,
       constructionTotalFunding: null,
-      carbonCostBuild: null,
-      carbonCostOperation: null,
+      carbonCostBuild: '10',
+      carbonCostOperation: '5',
       carbonCostSequestered: null,
       carbonCostAvoided: null
     }
-    const result = mergeCalculatedValues(displayData, calcData)
-    expect(result.netCarbonEstimate).toBe(displayData.netCarbon)
+    const result = mergeCalculatedValues(baseDisplayData, calcData)
+    expect(result.netCarbonEstimate).toBe('15.00')
+  })
+
+  test('sets allCarbonValuesPresent true when all four fields present', () => {
+    const calcData = {
+      capitalCarbonBaseline: 1,
+      capitalCarbonTarget: 1,
+      operationalCarbonBaseline: 1,
+      operationalCarbonTarget: 1,
+      netCarbonEstimate: 1,
+      netCarbonWithBlanks: 1,
+      constructionTotalFunding: 1,
+      carbonCostBuild: '1',
+      carbonCostOperation: '1',
+      carbonCostSequestered: '1',
+      carbonCostAvoided: '1'
+    }
+    const result = mergeCalculatedValues(baseDisplayData, calcData)
+    expect(result.allCarbonValuesPresent).toBe(true)
+  })
+
+  test('sets allCarbonValuesPresent false when a field is missing', () => {
+    const calcData = {
+      capitalCarbonBaseline: 1,
+      capitalCarbonTarget: 1,
+      operationalCarbonBaseline: 1,
+      operationalCarbonTarget: 1,
+      netCarbonEstimate: 1,
+      netCarbonWithBlanks: 1,
+      constructionTotalFunding: 1,
+      carbonCostBuild: '1',
+      carbonCostOperation: '1',
+      carbonCostSequestered: null,
+      carbonCostAvoided: '1'
+    }
+    const result = mergeCalculatedValues(baseDisplayData, calcData)
     expect(result.allCarbonValuesPresent).toBe(false)
+  })
+
+  test('does not mutate the original displayData', () => {
+    const calcData = {
+      capitalCarbonBaseline: 1,
+      capitalCarbonTarget: 1,
+      operationalCarbonBaseline: 1,
+      operationalCarbonTarget: 1,
+      netCarbonEstimate: 1,
+      netCarbonWithBlanks: 1,
+      constructionTotalFunding: 100,
+      carbonCostBuild: '1',
+      carbonCostOperation: '1',
+      carbonCostSequestered: '1',
+      carbonCostAvoided: '1'
+    }
+    const original = { ...baseDisplayData }
+    mergeCalculatedValues(baseDisplayData, calcData)
+    expect(baseDisplayData).toEqual(original)
   })
 })
 
+// ─────────────────────────────────────────────────────────────────────────────
+// hasAllCarbonValues
+// ─────────────────────────────────────────────────────────────────────────────
 describe('hasAllCarbonValues', () => {
-  test('returns true when all fields are present', () => {
+  test('returns true when all four fields are present', () => {
     expect(
       hasAllCarbonValues({
-        carbonCostBuild: 1,
-        carbonCostOperation: 2,
-        carbonCostSequestered: 3,
-        carbonCostAvoided: 4
+        carbonCostBuild: '10',
+        carbonCostOperation: '5',
+        carbonCostSequestered: '2',
+        carbonCostAvoided: '1'
       })
     ).toBe(true)
   })
 
-  test('returns false when a field is null', () => {
+  test('returns false when build is null', () => {
     expect(
       hasAllCarbonValues({
-        carbonCostBuild: 1,
+        carbonCostBuild: null,
+        carbonCostOperation: '5',
+        carbonCostSequestered: '2',
+        carbonCostAvoided: '1'
+      })
+    ).toBe(false)
+  })
+
+  test('returns false when any field is null', () => {
+    expect(
+      hasAllCarbonValues({
+        carbonCostBuild: '10',
         carbonCostOperation: null,
-        carbonCostSequestered: 3,
-        carbonCostAvoided: 4
+        carbonCostSequestered: null,
+        carbonCostAvoided: null
       })
     ).toBe(false)
   })
 })
 
+// ─────────────────────────────────────────────────────────────────────────────
+// applyFallbackValues
+// ─────────────────────────────────────────────────────────────────────────────
 describe('applyFallbackValues', () => {
-  test('sets netCarbonEstimate to netCarbon and allCarbonValuesPresent to false', () => {
-    const displayData = {
-      netCarbon: 999,
-      netCarbonEstimate: 0,
-      allCarbonValuesPresent: true
-    }
+  test('sets netCarbonEstimate to netCarbon', () => {
+    const displayData = { netCarbon: '12.34', allCarbonValuesPresent: true }
     applyFallbackValues(displayData)
-    expect(displayData.netCarbonEstimate).toBe(999)
+    expect(displayData.netCarbonEstimate).toBe('12.34')
+  })
+
+  test('sets allCarbonValuesPresent to false', () => {
+    const displayData = { netCarbon: '12.34', allCarbonValuesPresent: true }
+    applyFallbackValues(displayData)
     expect(displayData.allCarbonValuesPresent).toBe(false)
   })
 })
 
+// ─────────────────────────────────────────────────────────────────────────────
+// logError
+// ─────────────────────────────────────────────────────────────────────────────
 describe('logError', () => {
-  test('calls request.log when it exists', () => {
-    const mockLog = vi.fn()
-    const request = { log: mockLog }
-    logError(request, ['error'], 'something went wrong')
-    expect(mockLog).toHaveBeenCalledWith(['error'], 'something went wrong')
+  test('calls request.log with tags and message', () => {
+    const mockRequest = { log: vi.fn() }
+    logError(mockRequest, ['warn', 'carbon'], 'something went wrong')
+    expect(mockRequest.log).toHaveBeenCalledWith(
+      ['warn', 'carbon'],
+      'something went wrong'
+    )
   })
 
-  test('does nothing when request.log is absent', () => {
-    expect(() => logError({}, ['error'], 'msg')).not.toThrow()
+  test('does not throw when request.log is absent', () => {
+    const mockRequest = {}
+    expect(() => logError(mockRequest, ['warn'], 'message')).not.toThrow()
   })
 })

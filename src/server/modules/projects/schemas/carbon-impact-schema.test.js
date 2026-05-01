@@ -119,7 +119,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
+        'Enter a number with up to 16 digits before the decimal point and no more than 2 after'
       )
     })
 
@@ -134,7 +134,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
+        'Enter a number with up to 16 digits before the decimal point and no more than 2 after'
       )
     })
 
@@ -149,7 +149,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
+        'Enter a number with up to 16 digits before the decimal point and no more than 2 after'
       )
     })
 
@@ -164,7 +164,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'For non decimal values, Please enter a whole number up to 18 digits.'
+        'Enter a whole number with no more than 18 digits'
       )
     })
 
@@ -179,7 +179,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a whole number with no more than 18 digits.'
+        'Enter a whole number with no more than 18 digits'
       )
     })
 
@@ -195,7 +195,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a whole number with no more than 18 digits.'
+        'Enter a whole number with no more than 18 digits'
       )
     })
 
@@ -210,7 +210,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'You must enter a value. If there is no operation or maintenance element enter 0. Otherwise enter an estimate above 0.'
+        'Enter a value. If there is no operation or maintenance element, enter 0. Otherwise enter an estimate above 0'
       )
     })
 
@@ -265,7 +265,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a whole number with no more than 18 digits.'
+        'Enter a whole number with no more than 18 digits'
       )
     })
   })
@@ -309,7 +309,7 @@ describe('carbon-impact-schema', () => {
         ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: 'abc' })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
+          'Enter a number with up to 16 digits before the decimal point and no more than 2 after'
         )
       })
 
@@ -428,7 +428,7 @@ describe('carbon-impact-schema', () => {
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Please enter a whole number with no more than 18 digits.'
+          'Enter a whole number with no more than 18 digits'
         )
       })
     })
@@ -451,7 +451,7 @@ describe('carbon-impact-schema', () => {
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'You must enter a value. If there is no operation or maintenance element enter 0. Otherwise enter an estimate above 0.'
+          'Enter a value. If there is no operation or maintenance element, enter 0. Otherwise enter an estimate above 0'
         )
       })
 
@@ -463,7 +463,7 @@ describe('carbon-impact-schema', () => {
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Please enter a whole number with no more than 18 digits.'
+          'Enter a whole number with no more than 18 digits'
         )
       })
 

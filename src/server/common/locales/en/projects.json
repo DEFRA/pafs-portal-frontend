@@ -136,7 +136,55 @@
       "hectares": "hectares",
       "kilometres": "kilometres"
     },
-    "submission_info": "By submitting this proposal you confirm all the information provided is accurate and complete.",
+    "submission": {
+      "title": "All information needs to be completed before you can submit your proposal.",
+      "notice": "By submitting this proposal you confirm that you have read and accepted the standard data notice (below) and are happy to proceed.",
+      "errors": {
+        "summary_title": "There is a problem",
+        "not_allowed": "You do not have permission to submit this proposal",
+        "not_draft": "This proposal cannot be submitted because it is not in draft or revise status",
+        "save_failed": "Something went wrong. Please try again",
+        "project_type_incomplete": "Tell us about the project's project type, intervention types and primary benefit intervention.",
+        "project_type_basic_incomplete": "Tell us about the project's project type.",
+        "financial_start_year_incomplete": "Tell us the financial year the project will first require funding",
+        "financial_end_year_incomplete": "Tell us the financial year the project will stop spending funds",
+        "financial_end_year_not_after_start": "The financial end year must be after the financial start year",
+        "benefit_area_incomplete": "Tell us the location of your project",
+        "important_dates_incomplete": "Tell us the project's important dates",
+        "important_dates_out_of_range": "You can't proceed with submission if important dates are outside the financial year range.",
+        "funding_sources_incomplete": "Tell us the project's funding sources and estimated spend",
+        "risk_properties_incomplete": "Tell us the risks the project protects against and the properties benefitting.",
+        "goals_incomplete": "Tell us how the project will achieve its goals",
+        "environmental_benefits_incomplete": "Tell us about the project's environmental outcomes",
+        "nfm_incomplete": "Tell us about the project's natural flood risk measures",
+        "urgency_incomplete": "Tell us whether the project is urgent.",
+        "wlc_incomplete": "Tell us about the whole life costs.",
+        "wlb_incomplete": "Tell us about the whole life benefits.",
+        "confidence_incomplete": "Tell us how confident you are in the project.",
+        "carbon_incomplete": "Tell us about the carbon cost of the project."
+      },
+      "submitted_message": "Your proposal has been submitted successfully",
+      "success_title": "Success",
+      "data_notice": {
+        "summary": "Standard data notice",
+        "how_we_use_heading": "How we will use your personal information?",
+        "how_we_use_intro": "The Environment Agency will process the information you provide so that we can:",
+        "how_we_use_items": [
+          "review your proposal",
+          "prioritise your proposal",
+          "determine eligibility for indicative grant-in-aid funding"
+        ],
+        "may_also_heading": "We may also process or release the information to:",
+        "may_also_items": [
+          "offer you documents or services relating to environmental matters",
+          "consult the public, public organisations and other organisations (for example, the Health and Safety Executive) on environmental issues",
+          "carry out research and development work on environmental issues",
+          "assess whether customers are satisfied with our service, and improve our service",
+          "respond to information requests under the Freedom of Information Act 2000 and the Environmental Information Regulations 2004 (if the Data Protection Act allows)"
+        ],
+        "agents_notice": "We may pass the information on to our agents or representatives to do these things for us."
+      }
+    },
     "nfm_summary_card": {
       "title": "Natural Flood Management",
       "not_added": "No natural flood management measures added yet",
@@ -1480,10 +1528,14 @@
       "proposal_in_aims_pd": "Proposal in AIMS PD"
     },
     "notifications": {
-      "marked_in_aims_pd": "Submission has been marked as received in AIMS PD."
+      "marked_in_aims_pd": "Submission has been marked as received in AIMS PD.",
+      "marked_in_aims_pd_title": "Proposal in AIMS PD",
+      "resubmitted": "Proposal has been resent to AIMS PD successfully.",
+      "resubmitted_title": "Proposal resubmitted"
     },
     "errors": {
-      "mark_failed": "Failed to mark submission as received in AIMS PD. Please try again."
+      "mark_failed": "Failed to mark submission as received in AIMS PD. Please try again.",
+      "resend_failed": "Failed to resend proposal to AIMS PD. Please try again or contact the helpdesk."
     },
     "footer": {
       "label": "How to manage failed submissions",
@@ -1671,7 +1723,7 @@
     "benefit_label": "Net carbon savings economic benefit",
     "forecast_label": "Operation and maintenance cost forcast",
     "capital_cost_estimate": "Estimated capital cost",
-    "capital_cost_estimate_hint": "The sum of spending in the years between the start of construction date and ready for service date.",
+    "capital_cost_estimate_hint": "The sum of spending in the years between the start of construction date and ready for service date (Gateway 4 important dates).",
     "capital_cost_label": "Capital cost estimate",
     "units": "tonnes"
   },

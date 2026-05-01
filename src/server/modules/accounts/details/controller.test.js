@@ -5,6 +5,10 @@ vi.mock('../../../common/services/accounts/accounts-service.js')
 vi.mock('../schema.js')
 vi.mock('../helpers/session-helpers.js')
 vi.mock('../../../common/helpers/error-renderer/index.js')
+vi.mock('../helpers/view-data-helper.js')
+vi.mock('../helpers/navigation-helper.js')
+vi.mock('../../../common/helpers/security/encoder.js')
+vi.mock('../../../common/helpers/auth/session-manager.js')
 
 const { validateEmail } =
   await import('../../../common/services/accounts/accounts-service.js')
@@ -12,6 +16,13 @@ const { detailsSchema } = await import('../schema.js')
 const { getSessionKey } = await import('../helpers/session-helpers.js')
 const { extractApiValidationErrors, extractApiError, extractJoiErrors } =
   await import('../../../common/helpers/error-renderer/index.js')
+const { addEditModeContext } = await import('../helpers/view-data-helper.js')
+const { getNextRouteAfterDetails } =
+  await import('../helpers/navigation-helper.js')
+const { decodeUserId } =
+  await import('../../../common/helpers/security/encoder.js')
+const { getAuthSession } =
+  await import('../../../common/helpers/auth/session-manager.js')
 
 describe('DetailsController', () => {
   let mockRequest
@@ -20,6 +31,7 @@ describe('DetailsController', () => {
   beforeEach(() => {
     mockRequest = {
       path: '/request-account/details',
+      params: {},
       payload: {},
       yar: {
         get: vi.fn(),
@@ -39,7 +51,18 @@ describe('DetailsController', () => {
     }
 
     getSessionKey.mockReturnValue('accountData')
+    // addEditModeContext passthrough by default
+    addEditModeContext.mockImplementation((_req, viewData) => viewData)
+    getNextRouteAfterDetails.mockReturnValue('/request-account/main-area')
+    decodeUserId.mockReturnValue(null)
+    getAuthSession.mockReturnValue(null)
     vi.clearAllMocks()
+    // Re-apply defaults after clearAllMocks
+    getSessionKey.mockReturnValue('accountData')
+    addEditModeContext.mockImplementation((_req, viewData) => viewData)
+    getNextRouteAfterDetails.mockReturnValue('/request-account/main-area')
+    decodeUserId.mockReturnValue(null)
+    getAuthSession.mockReturnValue(null)
   })
 
   describe('GET handler', () => {
@@ -160,7 +183,7 @@ describe('DetailsController', () => {
 
       await detailsPostController.handler(mockRequest, mockH)
 
-      expect(validateEmail).toHaveBeenCalledWith('john@example.com', null)
+      expect(validateEmail).toHaveBeenCalledWith('john@example.com', null, null)
     })
 
     test('handles backend validation errors', async () => {
@@ -230,6 +253,9 @@ describe('DetailsController', () => {
         value: { ...mockRequest.payload, admin: true }
       })
       validateEmail.mockResolvedValue({ success: true })
+      getNextRouteAfterDetails.mockReturnValue(
+        '/admin/user-account/check-answers'
+      )
 
       await detailsPostController.handler(mockRequest, mockH)
 
@@ -245,6 +271,9 @@ describe('DetailsController', () => {
         value: mockRequest.payload
       })
       validateEmail.mockResolvedValue({ success: true })
+      getNextRouteAfterDetails.mockReturnValue(
+        '/request-account/parent-areas/ea'
+      )
 
       await detailsPostController.handler(mockRequest, mockH)
 
@@ -260,6 +289,9 @@ describe('DetailsController', () => {
         value: mockRequest.payload
       })
       validateEmail.mockResolvedValue({ success: true })
+      getNextRouteAfterDetails.mockReturnValue(
+        '/request-account/parent-areas/ea'
+      )
 
       await detailsPostController.handler(mockRequest, mockH)
 
@@ -290,6 +322,9 @@ describe('DetailsController', () => {
         value: mockRequest.payload
       })
       validateEmail.mockResolvedValue({ success: true })
+      getNextRouteAfterDetails.mockReturnValue(
+        '/admin/user-account/parent-areas/ea'
+      )
 
       await detailsPostController.handler(mockRequest, mockH)
 
@@ -314,6 +349,276 @@ describe('DetailsController', () => {
           errorCode: 'NETWORK_ERROR'
         })
       )
+    })
+  })
+
+  describe('GET handler — edit mode', () => {
+    test('renders with isEditMode true when encodedId param present', () => {
+      mockRequest.params = { encodedId: 'enc123' }
+      mockRequest.yar.get.mockReturnValue({ firstName: 'Jane' })
+      addEditModeContext.mockImplementation((_req, viewData) => ({
+        ...viewData,
+        isEditMode: true,
+        cancelRoute: '/admin/user-account/enc123'
+      }))
+
+      detailsController.handler(mockRequest, mockH)
+
+      expect(addEditModeContext).toHaveBeenCalled()
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.isEditMode).toBe(true)
+    })
+
+    test('renders with isEditMode false when no encodedId', () => {
+      mockRequest.yar.get.mockReturnValue({})
+
+      detailsController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.isEditMode).toBe(false)
+    })
+
+    test('falls back to empty object when session has no data', () => {
+      mockRequest.yar.get.mockReturnValue(null)
+
+      detailsController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.accountData).toEqual({})
+    })
+  })
+
+  describe('buildViewData', () => {
+    test('uses responsibility_legend for non-admin context', () => {
+      mockRequest.yar.get.mockReturnValue({})
+
+      detailsController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.responsibilityLegendKey).toBe('responsibility_legend')
+    })
+
+    test('uses responsibility_legend_admin for admin context', () => {
+      mockRequest.path = '/admin/accounts/details'
+      mockRequest.yar.get.mockReturnValue({ admin: true })
+
+      detailsController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.responsibilityLegendKey).toBe(
+        'responsibility_legend_admin'
+      )
+    })
+
+    test('submitRoute is general accounts route for non-admin', () => {
+      mockRequest.yar.get.mockReturnValue({})
+
+      detailsController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.submitRoute).toBe('/request-account/details')
+    })
+
+    test('submitRoute is admin accounts route for admin', () => {
+      mockRequest.path = '/admin/accounts/details'
+      mockRequest.yar.get.mockReturnValue({ admin: true })
+
+      detailsController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.submitRoute).toBe('/admin/user-account/details')
+    })
+
+    test('uses edit_title suffix when encodedId param is present', () => {
+      mockRequest.params = { encodedId: 'enc123' }
+      mockRequest.yar.get.mockReturnValue({})
+
+      detailsController.handler(mockRequest, mockH)
+
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        expect.stringContaining('edit_title')
+      )
+    })
+
+    test('uses title suffix when no encodedId param', () => {
+      mockRequest.yar.get.mockReturnValue({})
+
+      detailsController.handler(mockRequest, mockH)
+
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        expect.stringContaining('.title')
+      )
+    })
+  })
+
+  describe('getPageTitleKey', () => {
+    test('returns request_account.details for non-admin', () => {
+      mockRequest.yar.get.mockReturnValue({})
+
+      detailsController.handler(mockRequest, mockH)
+
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        expect.stringContaining('request_account.details')
+      )
+    })
+
+    test('returns add_user.admin_details for admin with admin flag true', () => {
+      mockRequest.path = '/admin/accounts/details'
+      mockRequest.yar.get.mockReturnValue({ admin: true })
+
+      detailsController.handler(mockRequest, mockH)
+
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        expect.stringContaining('add_user.admin_details')
+      )
+    })
+
+    test('returns add_user.details for admin with admin flag false', () => {
+      mockRequest.path = '/admin/accounts/details'
+      mockRequest.yar.get.mockReturnValue({ admin: false })
+
+      detailsController.handler(mockRequest, mockH)
+
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        expect.stringContaining('add_user.details')
+      )
+    })
+  })
+
+  describe('getBackLink', () => {
+    test('returns GENERAL start route for non-admin', () => {
+      mockRequest.yar.get.mockReturnValue({})
+
+      detailsController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.backLink).toBe('/request-account')
+    })
+
+    test('returns admin IS_ADMIN route when admin flag is defined', () => {
+      mockRequest.path = '/admin/accounts/details'
+      mockRequest.yar.get.mockReturnValue({ admin: true })
+
+      detailsController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.backLink).toBe('/admin/user-account/is-admin')
+    })
+
+    test('returns admin START route when admin flag is undefined', () => {
+      mockRequest.path = '/admin/accounts/details'
+      mockRequest.yar.get.mockReturnValue({})
+
+      detailsController.handler(mockRequest, mockH)
+
+      const [, context] = mockH.view.mock.calls[0]
+      expect(context.backLink).toBe('/admin/user-account')
+    })
+  })
+
+  describe('POST handler — edit mode (admin with encodedId)', () => {
+    beforeEach(() => {
+      mockRequest.path = '/admin/accounts/details'
+      mockRequest.params = { encodedId: 'enc456' }
+      mockRequest.payload = {
+        firstName: 'Jane',
+        lastName: 'Smith',
+        email: 'jane@example.com',
+        responsibility: 'EA'
+      }
+      mockRequest.yar.get.mockReturnValue({ admin: false })
+      decodeUserId.mockReturnValue(42)
+      getAuthSession.mockReturnValue({ accessToken: 'bearer-token-xyz' })
+      detailsSchema.validate.mockReturnValue({
+        error: null,
+        value: { ...mockRequest.payload }
+      })
+    })
+
+    test('decodes encodedId from params', async () => {
+      validateEmail.mockResolvedValue({ success: true })
+
+      await detailsPostController.handler(mockRequest, mockH)
+
+      expect(decodeUserId).toHaveBeenCalledWith('enc456')
+    })
+
+    test('passes accessToken from session to validateEmail when userId present', async () => {
+      validateEmail.mockResolvedValue({ success: true })
+
+      await detailsPostController.handler(mockRequest, mockH)
+
+      expect(getAuthSession).toHaveBeenCalledWith(mockRequest)
+      expect(validateEmail).toHaveBeenCalledWith(
+        'jane@example.com',
+        42,
+        'bearer-token-xyz'
+      )
+    })
+
+    test('passes null accessToken when getAuthSession returns null', async () => {
+      getAuthSession.mockReturnValue(null)
+      validateEmail.mockResolvedValue({ success: true })
+
+      await detailsPostController.handler(mockRequest, mockH)
+
+      expect(validateEmail).toHaveBeenCalledWith('jane@example.com', 42, null)
+    })
+
+    test('redirects to next route on success', async () => {
+      validateEmail.mockResolvedValue({ success: true })
+      getNextRouteAfterDetails.mockReturnValue(
+        '/admin/user-account/check-answers/enc456'
+      )
+
+      await detailsPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        '/admin/user-account/check-answers/enc456'
+      )
+    })
+  })
+
+  describe('POST handler — admin flag logic', () => {
+    test('sets admin:false on payload for non-admin path regardless of session', async () => {
+      mockRequest.path = '/request-account/details'
+      mockRequest.yar.get.mockReturnValue({ admin: true })
+      mockRequest.payload = {
+        firstName: 'A',
+        lastName: 'B',
+        email: 'a@b.com',
+        responsibility: 'EA'
+      }
+      detailsSchema.validate.mockReturnValue({
+        error: null,
+        value: { ...mockRequest.payload, admin: false }
+      })
+      validateEmail.mockResolvedValue({ success: true })
+
+      await detailsPostController.handler(mockRequest, mockH)
+
+      const setCall = mockRequest.yar.set.mock.calls[0][1]
+      expect(setCall.admin).toBe(false)
+    })
+
+    test('preserves admin:true from session on admin path', async () => {
+      mockRequest.path = '/admin/accounts/details'
+      mockRequest.yar.get.mockReturnValue({ admin: true })
+      mockRequest.payload = {
+        firstName: 'A',
+        lastName: 'B',
+        email: 'a@b.com',
+        responsibility: 'EA'
+      }
+      detailsSchema.validate.mockReturnValue({
+        error: null,
+        value: { ...mockRequest.payload, admin: true }
+      })
+      validateEmail.mockResolvedValue({ success: true })
+
+      await detailsPostController.handler(mockRequest, mockH)
+
+      expect(mockH.redirect).toHaveBeenCalled()
     })
   })
 })

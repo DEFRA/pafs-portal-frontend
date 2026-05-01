@@ -40,6 +40,7 @@ export async function validateResetToken(token) {
 export async function resetPassword(token, newPassword, confirmPassword) {
   return apiRequest('/api/v1/auth/reset-password', {
     method: 'POST',
+    retries: 0,
     body: JSON.stringify({ token, password: newPassword, confirmPassword })
   })
 }
@@ -54,6 +55,7 @@ export async function validateInvitationToken(token) {
 export async function setPassword(token, newPassword, confirmPassword) {
   return apiRequest('/api/v1/auth/set-password', {
     method: 'POST',
+    retries: 0,
     body: JSON.stringify({ token, password: newPassword, confirmPassword })
   })
 }

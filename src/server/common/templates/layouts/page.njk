@@ -150,9 +150,7 @@
   </div>
 {% endblock %}
 
-{% block pageTitle %}
-  {{ pageTitle }} - {{ currentServiceName }} - GOV.UK
-{% endblock %}
+{% block pageTitle %}{% if (fieldErrors | length) or errorCode or (errors and errors.length) or globalError %}Error: {% endif %}{% block titleText %}{{ pageTitle }}{% endblock %} - {{ currentServiceName }} - GOV.UK{% endblock %}
 
 {% block beforeContent %}
   {% if breadcrumbs.length > 1 %}

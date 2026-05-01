@@ -35,7 +35,7 @@ describe('Project Overview Routes', () => {
       projectOverview.plugin.register(mockServer)
 
       expect(mockServer.route).toHaveBeenCalled()
-      expect(registeredRoutes).toHaveLength(1)
+      expect(registeredRoutes).toHaveLength(2)
 
       const route = registeredRoutes[0]
       expect(route.method).toBe('GET')
@@ -107,7 +107,7 @@ describe('Project Overview Routes', () => {
       projectOverview.plugin.register(mockServer)
 
       expect(mockServer.route).toHaveBeenCalledTimes(1)
-      expect(registeredRoutes).toHaveLength(1)
+      expect(registeredRoutes).toHaveLength(2)
     })
 
     test('should pass array of routes to server.route', () => {

@@ -3,7 +3,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
-{% block pageTitle %}{{ t('projects.nfm.land_use.enclosed_arable_farmland.title') }}{% endblock %}
+{% block titleText %}{{ t('projects.nfm.land_use.enclosed_arable_farmland.title') }}{% endblock %}
 
 {% block body %}
   {% if errors and errors.length > 0 %}

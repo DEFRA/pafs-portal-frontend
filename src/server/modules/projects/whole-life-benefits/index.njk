@@ -3,7 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
-{% block pageTitle %}{{ t('projects.whole_life_benefits.title') }}{% endblock %}
+{% block titleText %}{{ t('projects.whole_life_benefits.title') }}{% endblock %}
 
 {% block body %}
   {% set wlbErrorMessages = {
@@ -110,8 +110,6 @@
                 data-wlb-input="true"
                 value="{{ formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] if formData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_RECREATION_TOURISM_BENEFITS] is not none else '' }}"
               >
-            </td>
-              {% endif %}
             </td>
             <td class="govuk-table__cell">
               <input

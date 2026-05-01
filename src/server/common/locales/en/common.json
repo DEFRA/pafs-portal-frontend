@@ -11,6 +11,7 @@
   "switch_to_admin": "Switch to Admin journey",
   "switch_to_user": "Switch to User journey",
   "error_summary_title": "There is a problem",
+  "error_prefix": "Error:",
   "header_navigation_label": "Profile",
   "header_navigation_menu_button_label": "Show or hide Profile menu",
   "service_navigation_menu_button_text": "Menu",

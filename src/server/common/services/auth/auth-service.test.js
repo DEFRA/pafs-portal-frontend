@@ -224,6 +224,7 @@ describe('Auth Service', () => {
 
       expect(apiRequest).toHaveBeenCalledWith('/api/v1/auth/reset-password', {
         method: 'POST',
+        retries: 0,
         body: JSON.stringify({
           token: 'token123',
           password: 'NewPass123!',
@@ -319,6 +320,7 @@ describe('Auth Service', () => {
 
       expect(apiRequest).toHaveBeenCalledWith('/api/v1/auth/set-password', {
         method: 'POST',
+        retries: 0,
         body: JSON.stringify({
           token: 'invitation-token-123',
           password: 'NewPass123!',

@@ -196,3 +196,53 @@ export async function getCarbonImpactCalc(referenceNumber, accessToken) {
     headers
   })
 }
+
+/**
+ * Submit a draft project proposal for review.
+ * Runs backend submission validation and transitions the project to submitted state.
+ * @param {string} referenceNumber - The project reference number (slug format with dashes)
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} API response — success or validation/permission errors
+ */
+export async function submitProjectProposal(referenceNumber, accessToken) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(`/api/v1/project/${referenceNumber}/submit`, {
+    method: 'POST',
+    headers
+  })
+}
+
+/**
+ * Admin: retry sending an already-submitted proposal to the external system.
+ * @param {string} referenceNumber - The project reference number (slug format with dashes)
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} API response with externalSubmission outcome
+ */
+export async function resubmitProject(referenceNumber, accessToken) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(`/api/v1/project/${referenceNumber}/resubmit`, {
+    method: 'POST',
+    headers
+  })
+}
+
+/**
+ * Admin: mark a proposal as received in POL/AIMS PD.
+ * Stamps submitted_to_pol on the project — no status change.
+ * @param {string} referenceNumber - The project reference number (slug format with dashes)
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} API response
+ */
+export async function markProjectSubmittedToPol(referenceNumber, accessToken) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(
+    `/api/v1/project/${referenceNumber}/mark-submitted-to-pol`,
+    {
+      method: 'POST',
+      headers
+    }
+  )
+}

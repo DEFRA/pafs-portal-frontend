@@ -68,12 +68,12 @@
         </div>
 
         {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.DEF or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REF or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REP %}
-          {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] %}
-            <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">
-                {{ t('projects.overview.proposal_details_summary_card.intervention_types') }}
-              </dt>
-              <dd class="govuk-summary-list__value">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              {{ t('projects.overview.proposal_details_summary_card.intervention_types') }}
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] | length %}
                 <ul class="govuk-list govuk-list--bullet">
                   {% for type in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] %}
                     <li>
@@ -81,31 +81,32 @@
                       {% elif type == PROJECT_INTERVENTION_TYPES.SUDS %}{{ t('projects.intervention_type.options.suds') }}
                       {% elif type == PROJECT_INTERVENTION_TYPES.PFR %}{{ t('projects.intervention_type.options.pfr') }}
                       {% elif type == PROJECT_INTERVENTION_TYPES.OTHER %}{{ t('projects.intervention_type.options.other') }}
-                      {% else %}{{ type }}
+                      {% else %}
+                        {{ t('projects.overview.common.na') }}
                       {% endif %}
                     </li>
                   {% endfor %}
                 </ul>
-              </dd>
-            </div>
+              {% else %}
+                {{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
 
-            {% set mainInterventionType = projectData[PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE] %}
-            {% if mainInterventionType %}
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                  {{ t('projects.overview.proposal_details_summary_card.primary_benefit_intervention') }}
-                </dt>
-                <dd class="govuk-summary-list__value">
-                  {% if mainInterventionType == PROJECT_INTERVENTION_TYPES.NFM %}{{ t('projects.intervention_type.options.nfm') }}
-                  {% elif mainInterventionType == PROJECT_INTERVENTION_TYPES.SUDS %}{{ t('projects.intervention_type.options.suds') }}
-                  {% elif mainInterventionType == PROJECT_INTERVENTION_TYPES.PFR %}{{ t('projects.intervention_type.options.pfr') }}
-                  {% elif mainInterventionType == PROJECT_INTERVENTION_TYPES.OTHER %}{{ t('projects.intervention_type.options.other') }}
-                  {% else %}{{ mainInterventionType }}
-                  {% endif %}
-                </dd>
-              </div>
-            {% endif %}
-          {% endif %}
+          {% set mainInterventionType = projectData[PROJECT_PAYLOAD_FIELDS.MAIN_INTERVENTION_TYPE] %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              {{ t('projects.overview.proposal_details_summary_card.primary_benefit_intervention') }}
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {% if mainInterventionType == PROJECT_INTERVENTION_TYPES.NFM %}{{ t('projects.intervention_type.options.nfm') }}
+              {% elif mainInterventionType == PROJECT_INTERVENTION_TYPES.SUDS %}{{ t('projects.intervention_type.options.suds') }}
+              {% elif mainInterventionType == PROJECT_INTERVENTION_TYPES.PFR %}{{ t('projects.intervention_type.options.pfr') }}
+              {% elif mainInterventionType == PROJECT_INTERVENTION_TYPES.OTHER %}{{ t('projects.intervention_type.options.other') }}
+              {% else %}{{ t('projects.overview.common.na') }}
+              {% endif %}
+            </dd>
+          </div>
         {% endif %}
 
         <div class="govuk-summary-list__row">

@@ -1,14 +1,25 @@
+@use "govuk-frontend" as *;
+
 .pafs-table-scroll {
   overflow-x: auto;
-  margin-bottom: 20px;
+  margin-bottom: govuk-spacing(4);
 }
 
 .funding-values-table .section-header,
 .funding_sources_and_spending_detail_table .detail-section-header {
-  background-color: #f3f2f1;
+  background-color: govuk-colour('light-grey');
 }
 
 .funding_sources_and_spending_detail_table .detail-contributor-name {
-  padding-left: 30px;
+  padding-left: govuk-spacing(6);
+  font-weight: normal;
+}
+
+.app-funding-table__source-header {
+  min-width: 250px;
+}
+
+.app-funding-table__indent-cell {
+  padding-left: govuk-spacing(6);
   font-weight: normal;
 }

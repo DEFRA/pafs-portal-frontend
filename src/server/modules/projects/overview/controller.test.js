@@ -15,6 +15,7 @@ import {
 
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
+import { submitProjectProposal } from '../../../common/services/project/project-service.js'
 
 // Mock dependencies
 vi.mock('../../../common/helpers/auth/session-manager.js', () => ({
@@ -40,6 +41,17 @@ vi.mock('../helpers/project-utils.js', () => ({
 
 vi.mock('../helpers/overview/carbon-impact.js')
 
+vi.mock('../../../common/services/project/project-service.js', () => ({
+  submitProjectProposal: vi.fn(),
+  getProjectProposalOverview: vi.fn(),
+  upsertProjectProposal: vi.fn(),
+  deleteProject: vi.fn(),
+  getProjects: vi.fn(),
+  updateProjectStatus: vi.fn(),
+  getCarbonImpactCalc: vi.fn(),
+  checkProjectNameExists: vi.fn()
+}))
+
 describe('OverviewController', () => {
   let mockRequest
   let mockH
@@ -48,7 +60,8 @@ describe('OverviewController', () => {
     vi.clearAllMocks()
 
     mockRequest = {
-      t: vi.fn((key) => key)
+      t: vi.fn((key) => key),
+      yar: { flash: vi.fn().mockReturnValue([]) }
     }
 
     mockH = {
@@ -502,6 +515,41 @@ describe('OverviewController', () => {
         })
       )
     })
+
+    test('still renders view when carbonResult returns null projectData', async () => {
+      getCarbonImpactOverviewData.mockResolvedValue({ projectData: null })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/projects/overview/index',
+        expect.objectContaining({ projectData: null })
+      )
+    })
+
+    test('should pass submissionSuccess to view when flash contains success message', async () => {
+      mockRequest.yar.flash.mockReturnValue([
+        { message: 'Your proposal has been submitted successfully' }
+      ])
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          submissionSuccess: 'Your proposal has been submitted successfully'
+        })
+      )
+    })
+
+    test('should not set submissionSuccess when flash is empty', async () => {
+      mockRequest.yar.flash.mockReturnValue([])
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(viewData.submissionSuccess).toBeUndefined()
+    })
   })
 
   describe('_getProjectStateTag (internal method)', () => {
@@ -775,6 +823,237 @@ describe('OverviewController', () => {
         expect.objectContaining({
           isReadOnly: false
         })
+      )
+    })
+  })
+
+  describe('post', () => {
+    beforeEach(() => {
+      getSessionData.mockReturnValue({
+        id: 1,
+        slug: 'LCR-123-456',
+        referenceNumber: 'LCR/123/456',
+        projectState: PROJECT_STATUS.DRAFT
+      })
+      getAuthSession.mockReturnValue({
+        user: {},
+        accessToken: 'test-token'
+      })
+      mockH.redirect = vi.fn()
+      mockRequest.yar = { flash: vi.fn() }
+    })
+
+    test('redirects to overview on successful submission', async () => {
+      submitProjectProposal.mockResolvedValue({ success: true })
+      await overviewController.postHandler(mockRequest, mockH)
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('LCR-123-456')
+      )
+    })
+
+    test('flashes success message on successful submission', async () => {
+      submitProjectProposal.mockResolvedValue({ success: true })
+      await overviewController.postHandler(mockRequest, mockH)
+      expect(mockRequest.yar.flash).toHaveBeenCalledWith(
+        'success',
+        expect.objectContaining({ message: expect.any(String) })
+      )
+    })
+
+    test('calls submitProjectProposal with slug and access token', async () => {
+      submitProjectProposal.mockResolvedValue({ success: true })
+      await overviewController.postHandler(mockRequest, mockH)
+      expect(submitProjectProposal).toHaveBeenCalledWith(
+        'LCR-123-456',
+        'test-token'
+      )
+    })
+
+    test('calls submitProjectProposal with empty string when no access token', async () => {
+      getAuthSession.mockReturnValue({ user: {} })
+      submitProjectProposal.mockResolvedValue({ success: true })
+      await overviewController.postHandler(mockRequest, mockH)
+      expect(submitProjectProposal).toHaveBeenCalledWith('LCR-123-456', '')
+    })
+
+    test('renders overview view with submissionErrorList on failure with validationErrors', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [
+          { errorCode: 'SUBMISSION_GOALS_INCOMPLETE' },
+          { errorCode: 'SUBMISSION_CARBON_INCOMPLETE' }
+        ],
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          submissionErrorList: expect.arrayContaining([
+            expect.objectContaining({ href: '#section-goals' }),
+            expect.objectContaining({ href: '#section-carbon' })
+          ])
+        })
+      )
+    })
+
+    test('submissionErrors map contains inline section messages', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [{ errorCode: 'SUBMISSION_URGENCY_INCOMPLETE' }],
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      const viewData = mockH.view.mock.calls[0][1]
+      expect(viewData.submissionErrors['section-urgency']).toBeDefined()
+    })
+
+    test('renders general error when errors array is populated', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: null,
+        errors: [{ errorCode: 'NOT_ALLOWED_TO_SUBMIT' }]
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      const viewData = mockH.view.mock.calls[0][1]
+      expect(viewData.submissionErrors.general).toBeDefined()
+    })
+
+    test('renders fallback error when errorCode is unrecognised', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: null,
+        errors: [{ errorCode: 'SOME_UNKNOWN_CODE' }]
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      const viewData = mockH.view.mock.calls[0][1]
+      expect(viewData.submissionErrors.general).toBeDefined()
+    })
+
+    test('renders PROJECT_NOT_DRAFT general error correctly', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: null,
+        errors: [{ errorCode: 'PROJECT_NOT_DRAFT' }]
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      const viewData = mockH.view.mock.calls[0][1]
+      expect(viewData.submissionErrors.general).toBeDefined()
+    })
+
+    test('deduplicates section errors — only first error per sectionId shown', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [
+          { errorCode: 'SUBMISSION_PROJECT_TYPE_INCOMPLETE' },
+          { errorCode: 'SUBMISSION_PROJECT_TYPE_BASIC_INCOMPLETE' },
+          { errorCode: 'SUBMISSION_FINANCIAL_START_YEAR_INCOMPLETE' }
+        ],
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      const viewData = mockH.view.mock.calls[0][1]
+      // All three map to section-proposal-details — only one inline message shown
+      const inlineMsgs = Object.keys(viewData.submissionErrors).filter(
+        (k) => k === 'section-proposal-details'
+      )
+      expect(inlineMsgs).toHaveLength(1)
+    })
+
+    test('submissionErrorList href links to correct section id', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [{ errorCode: 'SUBMISSION_BENEFIT_AREA_INCOMPLETE' }],
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      const viewData = mockH.view.mock.calls[0][1]
+      const item = viewData.submissionErrorList.find(
+        (e) => e.href === '#section-benefit-area'
+      )
+      expect(item).toBeDefined()
+    })
+
+    test('maps SUBMISSION_FINANCIAL_END_YEAR_NOT_AFTER_START to section-proposal-details', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [
+          { errorCode: 'SUBMISSION_FINANCIAL_END_YEAR_NOT_AFTER_START' }
+        ],
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      const viewData = mockH.view.mock.calls[0][1]
+      expect(
+        viewData.submissionErrors['section-proposal-details']
+      ).toBeDefined()
+      expect(
+        viewData.submissionErrorList.find(
+          (e) => e.href === '#section-proposal-details'
+        )
+      ).toBeDefined()
+    })
+
+    test('passes project data through to the view on failure', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [],
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      expect(mockH.view).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ projectData: expect.any(Object) })
+      )
+    })
+
+    test('renders overview view template on failure', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [],
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/projects/overview/index',
+        expect.any(Object)
+      )
+    })
+
+    test('unknown validationError codes are silently ignored', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [{ errorCode: 'TOTALLY_UNKNOWN' }],
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      const viewData = mockH.view.mock.calls[0][1]
+      expect(viewData.submissionErrorList).toHaveLength(0)
+    })
+
+    test('renders view with empty errors when validationErrors is null and no general error', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: null,
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      const viewData = mockH.view.mock.calls[0][1]
+      expect(viewData.submissionErrorList).toHaveLength(0)
+      expect(viewData.submissionErrors).toEqual({})
+    })
+
+    test('still renders view when carbonResult returns null projectData on failure', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [],
+        errors: null
+      })
+      getCarbonImpactOverviewData.mockResolvedValue({ projectData: null })
+      await overviewController.postHandler(mockRequest, mockH)
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/projects/overview/index',
+        expect.objectContaining({ projectData: null })
       )
     })
   })

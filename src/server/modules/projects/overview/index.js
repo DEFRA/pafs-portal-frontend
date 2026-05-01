@@ -29,6 +29,24 @@ export const projectOverview = {
             ],
             handler: overviewController.getHandler
           }
+        },
+        {
+          method: 'POST',
+          path: ROUTES.PROJECT.SUBMIT,
+          options: {
+            pre: [
+              { method: requireAuth },
+              { method: fetchProjectForOverview },
+              {
+                method: (request, h) =>
+                  initializeEditSessionPreHandler(request, h, {
+                    forceRefresh: true
+                  })
+              },
+              { method: requireViewPermission }
+            ],
+            handler: overviewController.postHandler
+          }
         }
       ])
     }

@@ -14,6 +14,7 @@ import {
 import { addEditModeContext } from '../helpers/view-data-helper.js'
 import { getNextRouteAfterDetails } from '../helpers/navigation-helper.js'
 import { decodeUserId } from '../../../common/helpers/security/encoder.js'
+import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 
 class DetailsController {
   get(request, h) {
@@ -59,7 +60,12 @@ class DetailsController {
     email,
     userId
   ) {
-    const result = await validateEmail(email, userId)
+    // Pass the session access token when excluding a userId (admin edit flow)
+    // so the backend can authorise use of excludeUserId.
+    const accessToken = userId
+      ? (getAuthSession(request)?.accessToken ?? null)
+      : null
+    const result = await validateEmail(email, userId, accessToken)
 
     if (!result.success) {
       if (result.validationErrors) {
