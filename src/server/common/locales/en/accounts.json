@@ -413,7 +413,7 @@
       "UNAUTHORIZED": "You do not have permission to perform this action",
       "NETWORK_ERROR": "There was a network problem. Please check your connection and try again.",
       "UNKNOWN_ERROR": "An unexpected error occurred. Please try again later.",
-      "VALIDATION_FAILED": "Check the form for errors and try again"
+      "VALIDATION_FAILED": "Please check the form for errors and try again"
     },
     "request_account": {
       "submit_failed": "There was a problem submitting your account request. Please try again later.",

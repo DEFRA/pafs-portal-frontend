@@ -27,7 +27,7 @@ const validateWlcCostString = (value, helpers) => {
   return value
 }
 
-const WLC_MESSAGE = 'Enter a whole number up to 18 digits (0 is allowed)'
+const WLC_MESSAGE = 'Please enter a whole number up to 18 digits (0 allowed)'
 
 /**
  * A single WLC cost field schema (required variant).

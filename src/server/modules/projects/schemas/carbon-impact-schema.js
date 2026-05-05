@@ -30,13 +30,13 @@ const DECIMAL_REGEX = /^\d+(\.\d{1,2})?$/
 const INTEGER_REGEX = /^\d+$/
 
 const CARBON_EMISSION_INVALID_ERROR =
-  'Enter a number with up to 16 digits before the decimal point and no more than 2 after'
+  'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
 const CARBON_EMISSION_WHOLE_NUMBER_ERROR =
-  'Enter a whole number with no more than 18 digits'
+  'For non decimal values, Please enter a whole number up to 18 digits.'
 const CARBON_COST_INVALID_ERROR =
-  'Enter a whole number with no more than 18 digits'
+  'Please enter a whole number with no more than 18 digits.'
 const CARBON_OPERATIONAL_COST_FORECAST_REQUIRED_ERROR =
-  'Enter a value. If there is no operation or maintenance element, enter 0. Otherwise enter an estimate above 0'
+  'You must enter a value. If there is no operation or maintenance element enter 0. Otherwise enter an estimate above 0.'
 
 const validateCarbonDecimal = (value, helpers) => {
   if (!DECIMAL_REGEX.test(value)) {

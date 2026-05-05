@@ -7,7 +7,7 @@
 
 .funding-values-table .section-header,
 .funding_sources_and_spending_detail_table .detail-section-header {
-  background-color: govuk-colour('light-grey');
+  background-color: govuk-colour("black", $variant: "tint-95");
 }
 
 .funding_sources_and_spending_detail_table .detail-contributor-name {
