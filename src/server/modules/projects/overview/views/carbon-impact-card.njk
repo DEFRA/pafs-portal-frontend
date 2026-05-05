@@ -11,10 +11,10 @@
     {% set netBenefit = projectData[PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT] %}
     {% set opsForecast = projectData[PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST] %}
     {% set calc = projectData.carbonCalc %}
-    {% set NOT_PROVIDED = t('projects.overview.carbon_impact_summary_card.not_provided') %}
+    {% set NOT_PROVIDED = t('projects.overview.common.na') %}
     {% set units = t('projects.overview.carbon_impact_summary_card.units') %}
 
-    {% set hasCarbonData = (costBuild is not none and costBuild != '') or (costOperation is not none and costOperation != '') or (costSequestered is not none and costSequestered != '') or (costAvoided is not none and costAvoided != '') or (netBenefit is not none and netBenefit != '') or (opsForecast is not none and opsForecast != '') %}
+    {% set hasCarbonData = (costBuild is not none and costBuild != '')or(costOperation is not none and costOperation != '')or(costSequestered is not none and costSequestered != '')or(costAvoided is not none and costAvoided != '')or(netBenefit is not none and netBenefit != '')or(opsForecast is not none and opsForecast != '') %}
     {% set display = projectData.carbonDisplay %}
 
     <div class="govuk-summary-card">
@@ -27,7 +27,8 @@
                 {% if hasCarbonData %}{{ t('common.change') }}
                 {% else %}{{ t('common.add') }}
                 {% endif %}
-                <span class="govuk-visually-hidden"> {{ t('projects.overview.carbon_impact_summary_card.title') | lower }}</span>
+                <span class="govuk-visually-hidden">
+                  {{ t('projects.overview.carbon_impact_summary_card.title') | lower }}</span>
               </a>
             </li>
           </ul>
@@ -53,25 +54,36 @@
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.capital_estimated') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if costBuild is not none and costBuild != '' %}{{ (display.buildFormatted if display else costBuild) }} {{ units }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if costBuild is not none and costBuild != '' %}{{ (display.buildFormatted if display else costBuild) }}
+                  {{ units }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.capital_baseline') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if calc and calc.capitalCarbonBaseline is not none %}{{ (display.capitalCarbonBaselineFormatted if display else calc.capitalCarbonBaseline) }} {{ units }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if calc and calc.capitalCarbonBaseline is not none %}{{ (display.capitalCarbonBaselineFormatted if display else calc.capitalCarbonBaseline) }}
+                  {{ units }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.capital_target') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if calc and calc.capitalCarbonTarget is not none %}{{ (display.capitalCarbonTargetFormatted if display else calc.capitalCarbonTarget) }} {{ units }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if calc and calc.capitalCarbonTarget is not none %}{{ (display.capitalCarbonTargetFormatted if display else calc.capitalCarbonTarget) }}
+                  {{ units }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.capital_cost') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if calc and calc.constructionTotalFunding is not none %}£{{ formatNumberWithCommas(calc.constructionTotalFunding) }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if calc and calc.constructionTotalFunding is not none %}£{{ formatNumberWithCommas(calc.constructionTotalFunding) }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
           </dl>
@@ -82,25 +94,36 @@
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.operational_estimated') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if costOperation is not none and costOperation != '' %}{{ (display.operationFormatted if display else costOperation) }} {{ units }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if costOperation is not none and costOperation != '' %}{{ (display.operationFormatted if display else costOperation) }}
+                  {{ units }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.operational_baseline') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if calc and calc.operationalCarbonBaseline is not none %}{{ (display.operationalCarbonBaselineFormatted if display else calc.operationalCarbonBaseline) }} {{ units }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if calc and calc.operationalCarbonBaseline is not none %}{{ (display.operationalCarbonBaselineFormatted if display else calc.operationalCarbonBaseline) }}
+                  {{ units }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.operational_target') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if calc and calc.operationalCarbonTarget is not none %}{{ (display.operationalCarbonTargetFormatted if display else calc.operationalCarbonTarget) }} {{ units }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if calc and calc.operationalCarbonTarget is not none %}{{ (display.operationalCarbonTargetFormatted if display else calc.operationalCarbonTarget) }}
+                  {{ units }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.operational_cost') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if opsForecast is not none and opsForecast != '' %}£{{ formatNumberWithCommas(opsForecast) }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if opsForecast is not none and opsForecast != '' %}£{{ formatNumberWithCommas(opsForecast) }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
           </dl>
@@ -110,33 +133,47 @@
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.sequestered_carbon') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if costSequestered is not none and costSequestered != '' %}{{ (display.sequesteredFormatted if display else costSequestered) }} {{ units }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if costSequestered is not none and costSequestered != '' %}{{ (display.sequesteredFormatted if display else costSequestered) }}
+                  {{ units }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.avoided_carbon') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if costAvoided is not none and costAvoided != '' %}{{ (display.avoidedFormatted if display else costAvoided) }} {{ units }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if costAvoided is not none and costAvoided != '' %}{{ (display.avoidedFormatted if display else costAvoided) }}
+                  {{ units }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.net_carbon') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if calc and calc.netCarbonEstimate is not none %}{{ (display.netCarbonEstimateFormatted if display else calc.netCarbonEstimate) }} {{ units }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if calc and calc.netCarbonEstimate is not none %}{{ (display.netCarbonEstimateFormatted if display else calc.netCarbonEstimate) }}
+                  {{ units }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
             {% if calc and not calc.allCarbonValuesPresent %}
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.net_carbon_with_blanks') }}</dt>
                 <dd class="govuk-summary-list__value">
-                  {% if calc.netCarbonWithBlanks is not none %}{{ (display.netCarbonWithBlanksFormatted if display else calc.netCarbonWithBlanks) }} {{ units }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                  {% if calc.netCarbonWithBlanks is not none %}{{ (display.netCarbonWithBlanksFormatted if display else calc.netCarbonWithBlanks) }}
+                    {{ units }}
+                  {% else %}{{ NOT_PROVIDED }}
+                  {% endif %}
                 </dd>
               </div>
             {% endif %}
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.net_carbon_economic_benefit') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if netBenefit is not none and netBenefit != '' %}£{{ formatNumberWithCommas(netBenefit) }}{% else %}{{ NOT_PROVIDED }}{% endif %}
+                {% if netBenefit is not none and netBenefit != '' %}£{{ formatNumberWithCommas(netBenefit) }}
+                {% else %}{{ NOT_PROVIDED }}
+                {% endif %}
               </dd>
             </div>
           </dl>
