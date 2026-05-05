@@ -244,7 +244,6 @@
       "net_carbon": "Net carbon estimated by you (tCO2)",
       "net_carbon_with_blanks": "Net carbon with blank values calculated (tCO2)",
       "net_carbon_economic_benefit": "Net carbon economic benefit estimated by you",
-      "not_provided": "Not provided",
       "units": "tonnes"
     },
     "funding_sources_summary_card": {
