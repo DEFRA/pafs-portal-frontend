@@ -1,0 +1,10 @@
+{% from "govuk/components/button/macro.njk" import govukButton as _govukButton %}
+
+{#
+  Wrapper around govukButton that enables preventDoubleClick by default for all
+  form submit buttons across the service (GDS Design System recommendation).
+  Callers can still override with preventDoubleClick: false if genuinely needed.
+#}
+{% macro govukButton(params) %}
+  {{ _govukButton(params | assign({ preventDoubleClick: true })) }}
+{% endmacro %}

@@ -1,6 +1,6 @@
 {% extends 'layouts/projects.njk' %}
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "button.njk" import govukButton %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
@@ -9,7 +9,7 @@
   {% if uploadErrors or errorCode %}
     {% set errorList = [] %}
     {% set fileError = false %}
-    
+
     {# Add upload validation errors from session #}
     {% if uploadErrors %}
       {% for error in uploadErrors %}
@@ -18,14 +18,13 @@
         {% else %}
           {% set errorText = error.message or t('projects.project_benefit_area.FAILED_TO_UPLOAD_FILE') %}
         {% endif %}
-        {% set fileError = { text: errorText } %}
-        {% set errorList = (errorList.push({
-          text: errorText,
-          href: '#benefitAreaFile'
-        }), errorList) %}
+        {% set fileError = {
+          text: errorText
+        } %}
+        {% set errorList = (errorList.push({text: errorText, href: '#benefitAreaFile'}), errorList) %}
       {% endfor %}
     {% endif %}
-    
+
     {{ govukErrorSummary({
       titleText: t('common.error_summary_title'),
       errorList: errorList
