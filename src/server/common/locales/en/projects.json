@@ -114,9 +114,9 @@
     },
     "confidence_assessment_summary_card": {
       "title": "Confidence assessment",
-      "homes_better_protected": "Confidence in number of homes better protected",
-      "homes_by_gateway_four": "Confidence in number of homes by gateway 4",
-      "secured_partnership_funding": "Confidence in securing partnership funding",
+      "homes_better_protected": "Confidence in number of properties benefitting",
+      "homes_by_gateway_four": "Confidence in achieving the project's forecast Gateway 4 date",
+      "secured_partnership_funding": "Confidence in securing contributions",
       "not_added": "No confidence assessment added yet"
     },
     "environmental_benefits_summary_card": {

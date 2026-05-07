@@ -41,7 +41,8 @@ describe('project-submission helpers', () => {
     mockRequest = {
       logger: {
         error: vi.fn()
-      }
+      },
+      metrics: { counter: vi.fn() }
     }
 
     mockH = {
@@ -478,6 +479,57 @@ describe('project-submission helpers', () => {
       )
 
       expect(mockH.view).toHaveBeenCalled()
+    })
+
+    test('should record proposalStepVisit metric with submitted on successful save', async () => {
+      upsertProjectProposal.mockResolvedValue({
+        success: true,
+        data: {
+          data: {
+            referenceNumber: 'TEST-001',
+            slug: 'test-001'
+          }
+        }
+      })
+
+      await saveProjectWithErrorHandling(
+        mockRequest,
+        mockH,
+        PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE,
+        viewData,
+        template
+      )
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE, result: 'submitted' }
+      )
+    })
+
+    test('should record proposalStepVisit metric with validation_error on failed save', async () => {
+      upsertProjectProposal.mockResolvedValue({
+        success: false,
+        data: { errors: [{ errorCode: 'CUSTOM_ERROR' }] }
+      })
+      extractApiError.mockReturnValue({ errorCode: 'CUSTOM_ERROR' })
+
+      await saveProjectWithErrorHandling(
+        mockRequest,
+        mockH,
+        PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE,
+        viewData,
+        template
+      )
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        {
+          step: PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE,
+          result: 'validation_error'
+        }
+      )
     })
   })
 })

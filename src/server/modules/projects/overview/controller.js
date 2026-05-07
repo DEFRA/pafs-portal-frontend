@@ -244,6 +244,7 @@ class OverviewController {
     const result = await submitProjectProposal(slug, accessToken)
 
     if (result?.success) {
+      request.metrics?.counter('proposalSubmission', 1, { outcome: 'success' })
       request.yar.flash('success', {
         message: request.t('projects.overview.submission.submitted_message')
       })
@@ -251,6 +252,8 @@ class OverviewController {
         ROUTES.PROJECT.OVERVIEW.replace('{referenceNumber}', slug)
       )
     }
+
+    request.metrics?.counter('proposalSubmission', 1, { outcome: 'error' })
 
     // Build error view
     const { submissionErrors, submissionErrorList } = buildSubmissionErrorData(

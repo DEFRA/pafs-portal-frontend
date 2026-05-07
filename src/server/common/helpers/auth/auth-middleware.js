@@ -54,6 +54,7 @@ function redirectToLogin(request, h, errorMessage) {
   saveReturnUrl(request)
   clearAuthSession(request)
   request.yar.flash('authError', errorMessage)
+  request.metrics?.counter('authEvent', 1, { outcome: 'session_expired' })
   return h.redirect(ROUTES.LOGIN).takeover()
 }
 

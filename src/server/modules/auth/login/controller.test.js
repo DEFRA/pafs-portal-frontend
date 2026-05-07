@@ -27,6 +27,7 @@ describe('Login Controller', () => {
       payload: {},
       t: vi.fn((key) => key),
       server: { logger: { error: vi.fn(), warn: vi.fn() } },
+      metrics: { counter: vi.fn() },
       yar: {
         flash: vi.fn(() => []),
         get: vi.fn(() => null),
@@ -349,6 +350,40 @@ describe('Login Controller', () => {
       await loginPostController.handler(mockRequest, mockH)
 
       expect(mockH.redirect).toHaveBeenCalledWith('/admin/journey-selection')
+    })
+  })
+
+  describe('POST /login - metrics', () => {
+    test('records authEvent success metric on successful login', async () => {
+      mockRequest.payload = { email: 'user@example.com', password: 'password' }
+      login.mockResolvedValue({
+        success: true,
+        data: {
+          user: { id: 1, email: 'user@example.com', admin: false },
+          accessToken: 'token123',
+          refreshToken: 'refresh123'
+        }
+      })
+
+      await loginPostController.handler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith('authEvent', 1, {
+        outcome: 'success'
+      })
+    })
+
+    test('records authEvent failure metric on failed login', async () => {
+      mockRequest.payload = { email: 'user@example.com', password: 'wrong' }
+      login.mockResolvedValue({
+        success: false,
+        errors: [{ errorCode: 'AUTH_INVALID_CREDENTIALS' }]
+      })
+
+      await loginPostController.handler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith('authEvent', 1, {
+        outcome: 'failure'
+      })
     })
   })
 })

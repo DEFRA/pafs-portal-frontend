@@ -26,7 +26,8 @@ describe('Auth Middleware', () => {
       yar: {
         flash: vi.fn(),
         set: vi.fn()
-      }
+      },
+      metrics: { counter: vi.fn() }
     }
     mockH = {
       redirect: vi.fn((url) => ({
@@ -92,6 +93,17 @@ describe('Auth Middleware', () => {
         'session-timeout'
       )
       expect(mockH.redirect).toHaveBeenCalledWith('/login')
+    })
+
+    test('records authEvent session_expired metric when session expires', async () => {
+      getAuthSession.mockReturnValue({ user: { id: 1 } })
+      isSessionExpired.mockReturnValue(true)
+
+      await requireAuth(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith('authEvent', 1, {
+        outcome: 'session_expired'
+      })
     })
 
     test('saves returnTo when session is expired', async () => {

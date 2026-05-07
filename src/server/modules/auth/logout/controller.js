@@ -55,6 +55,8 @@ class LogoutController {
       logger.info({ userId }, 'User logged out (no active session)')
     }
 
+    request.metrics.counter('authEvent', 1, { outcome: 'logout' })
+
     return h.redirect(ROUTES.LOGIN)
   }
 }

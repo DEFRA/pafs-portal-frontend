@@ -6,6 +6,11 @@ class StartController {
   async get(request, h) {
     resetSessionData(request)
 
+    request.metrics?.counter('proposalStepVisit', 1, {
+      step: 'start',
+      result: 'viewed'
+    })
+
     const viewData = buildViewData(request, {
       localKeyPrefix: 'projects.start_proposal',
       backLinkOptions: { targetURL: ROUTES.GENERAL.HOME }

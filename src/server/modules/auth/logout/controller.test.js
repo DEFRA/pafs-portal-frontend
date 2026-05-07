@@ -19,6 +19,7 @@ describe('Logout Controller', () => {
     mockRequest = {
       info: { referrer: '' },
       yar: { set: vi.fn() },
+      metrics: { counter: vi.fn() },
       server: {
         logger: {
           debug: vi.fn(),
@@ -124,5 +125,15 @@ describe('Logout Controller', () => {
     await logoutController.handler(mockRequest, mockH)
 
     expect(mockRequest.yar.set).not.toHaveBeenCalled()
+  })
+
+  test('records authEvent logout metric on logout', async () => {
+    getAuthSession.mockReturnValue({ accessToken: 'token123', user: { id: 1 } })
+
+    await logoutController.handler(mockRequest, mockH)
+
+    expect(mockRequest.metrics.counter).toHaveBeenCalledWith('authEvent', 1, {
+      outcome: 'logout'
+    })
   })
 })

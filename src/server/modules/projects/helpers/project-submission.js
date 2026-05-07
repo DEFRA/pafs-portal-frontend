@@ -171,6 +171,10 @@ export async function saveProjectWithErrorHandling(
   const result = await submitProject(request, level)
 
   if (!result.success) {
+    request.metrics?.counter('proposalStepVisit', 1, {
+      step: level,
+      result: 'validation_error'
+    })
     return handleServiceConsumptionError(
       request,
       h,
@@ -194,6 +198,11 @@ export async function saveProjectWithErrorHandling(
       })
     }
   }
+
+  request.metrics?.counter('proposalStepVisit', 1, {
+    step: level,
+    result: 'submitted'
+  })
 
   return null // No error
 }
