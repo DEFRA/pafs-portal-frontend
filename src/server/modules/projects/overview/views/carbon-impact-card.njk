@@ -38,7 +38,7 @@
         {% if hasCarbonData %}
 
           {# ── Change warning banner ──────────────────────────────────── #}
-          {% if calc and calc.hasValuesChanged %}
+          {% if not isReadOnly and calc and calc.hasValuesChanged %}
             <div class="govuk-warning-text govuk-!-margin-bottom-4">
               <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
               <strong class="govuk-warning-text__text">
