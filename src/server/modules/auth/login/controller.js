@@ -83,11 +83,13 @@ export const loginPostController = {
       const result = await login(value.email, value.password)
 
       if (!result.success) {
+        request.metrics.counter('authEvent', 1, { outcome: 'failure' })
         return handleLoginFailure(request, h, result, email)
       }
 
       await invalidateAccountsCacheOnAuth(request, 'login')
       setAuthSession(request, result.data)
+      request.metrics.counter('authEvent', 1, { outcome: 'success' })
 
       return h.redirect(resolvePostLoginRedirect(request, result))
     } catch (err) {

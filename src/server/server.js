@@ -19,6 +19,7 @@ import { secureContext } from '@defra/hapi-secure-context'
 import { contentSecurityPolicy } from './common/helpers/content-security-policy.js'
 import { i18nPlugin } from './common/helpers/i18n/index.js'
 import { areasPreloader } from './common/helpers/areas/areas-preloader.js'
+import { metrics } from '@defra/cdp-metrics'
 
 const INSECURE_COOKIE_DEFAULT =
   'the-password-must-be-at-least-32-characters-long'
@@ -111,6 +112,7 @@ export async function createServer() {
     },
     contentSecurityPolicy,
     areasPreloader, // Preload areas on first request
+    metrics, // AWS EMF metrics (must be after requestTracing)
     router // Register all the controllers/routes defined in src/server/router.js
   ])
 

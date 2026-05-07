@@ -1,5 +1,6 @@
 import { config } from '../../../../config/config.js'
 import { statusCodes } from '../../constants/status-codes.js'
+import { getTraceId } from '@defra/hapi-tracing'
 
 const BASE_URL = config.get('backendApi.url')
 const TIMEOUT = config.get('backendApi.timeout')
@@ -65,11 +66,14 @@ function buildNetworkErrorResponse(error) {
 }
 
 async function executeRequest(url, options, controller) {
+  const traceId = getTraceId()
+  const traceHeader = traceId ? { [config.get('tracing.header')]: traceId } : {}
   const response = await fetch(url, {
     ...options,
     signal: controller.signal,
     headers: {
       'Content-Type': 'application/json',
+      ...traceHeader,
       ...options.headers
     }
   })

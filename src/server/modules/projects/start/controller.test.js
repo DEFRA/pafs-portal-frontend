@@ -14,7 +14,9 @@ describe('StartController', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockRequest = {}
+    mockRequest = {
+      metrics: { counter: vi.fn() }
+    }
 
     mockH = {
       view: vi.fn()
@@ -49,6 +51,16 @@ describe('StartController', () => {
         pageTitle: 'Start Proposal',
         backLink: ROUTES.GENERAL.HOME
       })
+    })
+
+    test('should record proposalStepVisit metric', async () => {
+      await startController.getHandler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: 'start', result: 'viewed' }
+      )
     })
   })
 })

@@ -61,7 +61,8 @@ describe('OverviewController', () => {
 
     mockRequest = {
       t: vi.fn((key) => key),
-      yar: { flash: vi.fn().mockReturnValue([]) }
+      yar: { flash: vi.fn().mockReturnValue([]) },
+      metrics: { counter: vi.fn() }
     }
 
     mockH = {
@@ -874,6 +875,30 @@ describe('OverviewController', () => {
       submitProjectProposal.mockResolvedValue({ success: true })
       await overviewController.postHandler(mockRequest, mockH)
       expect(submitProjectProposal).toHaveBeenCalledWith('LCR-123-456', '')
+    })
+
+    test('records proposalSubmission success metric on successful submission', async () => {
+      submitProjectProposal.mockResolvedValue({ success: true })
+      await overviewController.postHandler(mockRequest, mockH)
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalSubmission',
+        1,
+        { outcome: 'success' }
+      )
+    })
+
+    test('records proposalSubmission error metric on failed submission', async () => {
+      submitProjectProposal.mockResolvedValue({
+        success: false,
+        validationErrors: [{ errorCode: 'SUBMISSION_GOALS_INCOMPLETE' }],
+        errors: null
+      })
+      await overviewController.postHandler(mockRequest, mockH)
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalSubmission',
+        1,
+        { outcome: 'error' }
+      )
     })
 
     test('renders overview view with submissionErrorList on failure with validationErrors', async () => {
