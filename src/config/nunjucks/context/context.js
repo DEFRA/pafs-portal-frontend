@@ -12,17 +12,19 @@ const logger = createLogger()
 const assetPath = config.get('assetPath')
 const manifestPath = path.join(
   config.get('root'),
-  '.public/assets-manifest.json'
+  '.public/.vite/manifest.json'
 )
 
-let webpackManifest
+let viteManifest
 
 export function context(request) {
-  if (!webpackManifest) {
+  // Always re-read in development so vite build --watch rebuilds are picked up.
+  // Cache in production for performance.
+  if (!viteManifest || !config.get('isProduction')) {
     try {
-      webpackManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
+      viteManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
     } catch (error) {
-      logger.error(error, `Webpack ${path.basename(manifestPath)} not found`)
+      logger.error(error, `Vite ${path.basename(manifestPath)} not found`)
     }
   }
 
@@ -48,8 +50,8 @@ export function context(request) {
     crumb: request.plugins?.crumb ?? '',
     t: (key, params) => translate(key, 'en', params),
     getAssetPath(asset) {
-      const webpackAssetPath = webpackManifest?.[asset]
-      return `${assetPath}/${webpackAssetPath ?? asset}`
+      const viteAssetPath = viteManifest?.[asset]?.file
+      return `${assetPath}/${viteAssetPath ?? asset}`
     }
   }
 }

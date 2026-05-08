@@ -28,7 +28,9 @@ export const areasPreloader = {
       // Skip areas preloading for the not-found catch-all route — it doesn't
       // need areas data, and the API calls (with retries) would otherwise hang
       // in environments where the backend is not running (e.g. unit tests).
-      if (request.route.path === '/{p*}') {
+      // Also skip the health endpoint — it doesn't need areas and the log
+      // noise from health probes pollutes OpenSearch with cache hit logs.
+      if (request.route.path === '/{p*}' || request.route.path === '/health') {
         return h.continue
       }
 
