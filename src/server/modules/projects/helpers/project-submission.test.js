@@ -507,6 +507,28 @@ describe('project-submission helpers', () => {
       )
     })
 
+    test('should not emit success metric when emitSuccessMetric is false', async () => {
+      upsertProjectProposal.mockResolvedValue({
+        success: true,
+        data: { data: { referenceNumber: 'TEST-001', slug: 'test-001' } }
+      })
+
+      await saveProjectWithErrorHandling(
+        mockRequest,
+        mockH,
+        PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE,
+        viewData,
+        template,
+        { emitSuccessMetric: false }
+      )
+
+      expect(mockRequest.metrics.counter).not.toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE, result: 'submitted' }
+      )
+    })
+
     test('should record proposalStepVisit metric with validation_error on failed save', async () => {
       upsertProjectProposal.mockResolvedValue({
         success: false,
