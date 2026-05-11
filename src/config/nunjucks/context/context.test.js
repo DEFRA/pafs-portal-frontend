@@ -165,14 +165,19 @@ describe('Nunjucks context builder', () => {
       contextImport = await import('./context.js')
     })
 
-    describe('with valid webpack manifest', () => {
+    describe('with valid vite manifest', () => {
       beforeEach(() => {
         mockReadFileSync.mockReturnValue(
           JSON.stringify({
-            'application.js': 'javascripts/application.abc123.js',
-            'stylesheets/application.scss':
-              'stylesheets/application.def456.css',
-            'images/logo.png': 'images/logo.xyz789.png'
+            'src/client/javascripts/application.js': {
+              file: 'assets/application-abc123.js'
+            },
+            'src/client/stylesheets/application.scss': {
+              file: 'assets/applicationCss-def456.css'
+            },
+            'src/client/images/logo.png': {
+              file: 'assets/logo-xyz789.png'
+            }
           })
         )
 
@@ -183,20 +188,20 @@ describe('Nunjucks context builder', () => {
       })
 
       test('resolves JavaScript file with hash', () => {
-        expect(result.getAssetPath('application.js')).toBe(
-          '/public/javascripts/application.abc123.js'
-        )
+        expect(
+          result.getAssetPath('src/client/javascripts/application.js')
+        ).toBe('/public/assets/application-abc123.js')
       })
 
       test('resolves CSS file with hash', () => {
-        expect(result.getAssetPath('stylesheets/application.scss')).toBe(
-          '/public/stylesheets/application.def456.css'
-        )
+        expect(
+          result.getAssetPath('src/client/stylesheets/application.scss')
+        ).toBe('/public/assets/applicationCss-def456.css')
       })
 
       test('resolves image file with hash', () => {
-        expect(result.getAssetPath('images/logo.png')).toBe(
-          '/public/images/logo.xyz789.png'
+        expect(result.getAssetPath('src/client/images/logo.png')).toBe(
+          '/public/assets/logo-xyz789.png'
         )
       })
 
@@ -213,7 +218,7 @@ describe('Nunjucks context builder', () => {
       })
     })
 
-    describe('without webpack manifest', () => {
+    describe('without vite manifest', () => {
       beforeEach(async () => {
         // Reset modules to clear cached manifest
         vi.resetModules()
@@ -240,13 +245,13 @@ describe('Nunjucks context builder', () => {
       test('logs error when manifest cannot be read', () => {
         expect(mockLoggerError).toHaveBeenCalledWith(
           expect.any(Error),
-          'Webpack assets-manifest.json not found'
+          'Vite manifest.json not found'
         )
       })
     })
   })
 
-  describe('webpack manifest caching', () => {
+  describe('vite manifest caching', () => {
     let contextImport
 
     beforeAll(async () => {
@@ -256,7 +261,9 @@ describe('Nunjucks context builder', () => {
     beforeEach(() => {
       mockReadFileSync.mockReturnValue(
         JSON.stringify({
-          'application.js': 'javascripts/application.js'
+          'src/client/javascripts/application.js': {
+            file: 'assets/application-hash.js'
+          }
         })
       )
     })
@@ -266,13 +273,13 @@ describe('Nunjucks context builder', () => {
       expect(mockReadFileSync).toHaveBeenCalledTimes(1)
     })
 
-    test('uses cached manifest on subsequent calls', () => {
+    test('re-reads manifest on each call in development (supports vite build --watch)', () => {
       mockReadFileSync.mockClear()
 
       contextImport.context({ path: '/', yar: { get: vi.fn(() => null) } })
       contextImport.context({ path: '/other', yar: { get: vi.fn(() => null) } })
 
-      expect(mockReadFileSync).not.toHaveBeenCalled()
+      expect(mockReadFileSync).toHaveBeenCalledTimes(2)
     })
 
     test('cached context has correct structure', () => {
@@ -360,7 +367,7 @@ describe('Nunjucks context builder', () => {
       expect(result.navigation).toBeInstanceOf(Array)
     })
 
-    test('handles malformed webpack manifest', async () => {
+    test('handles malformed vite manifest', async () => {
       // Reset modules to clear cached manifest
       vi.resetModules()
       mockReadFileSync.mockReturnValue('not valid json')

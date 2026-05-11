@@ -27,6 +27,9 @@ describe('AreaController', () => {
       payload: {},
       logger: {
         error: vi.fn()
+      },
+      metrics: {
+        counter: vi.fn()
       }
     }
 
@@ -116,6 +119,42 @@ describe('AreaController', () => {
 
       expect(result).toBe(validationError)
       expect(mockH.redirect).not.toHaveBeenCalled()
+    })
+
+    test('should record proposalStepVisit validation_error metric when validation fails', async () => {
+      const validationError = { error: 'validation failed' }
+      validatePayload.mockReturnValue(validationError)
+
+      await areaController.postHandler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: 'PROJECT_AREA', result: 'validation_error' }
+      )
+    })
+
+    test('should record proposalStepVisit submitted metric on successful validation', async () => {
+      mockRequest.payload = { areaId: '1' }
+      validatePayload.mockReturnValue(null)
+
+      await areaController.postHandler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: 'PROJECT_AREA', result: 'submitted' }
+      )
+    })
+
+    test('should not record metrics when an exception is thrown', async () => {
+      validatePayload.mockImplementation(() => {
+        throw new Error('Test error')
+      })
+
+      await areaController.postHandler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).not.toHaveBeenCalled()
     })
 
     test('should redirect to TYPE on successful validation', async () => {

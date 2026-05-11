@@ -331,11 +331,19 @@ class BenefitAreaController {
       if (pollResult.success) {
         storeUploadSuccess(request, pollResult.data.filename)
         request.logger.info({ uploadId }, 'Upload successful')
+        request.metrics?.counter('proposalStepVisit', 1, {
+          step: 'BENEFIT_AREA',
+          result: 'submitted'
+        })
         // Redirect to overview page on success
         return h.redirect(overviewUrl)
       } else {
         storeUploadErrors(request, pollResult.errors)
         request.logger.warn({ uploadId }, 'Upload failed')
+        request.metrics?.counter('proposalStepVisit', 1, {
+          step: 'BENEFIT_AREA',
+          result: 'validation_error'
+        })
         // Redirect back to benefit area page on error
         return h.redirect(benefitAreaUrl)
       }
