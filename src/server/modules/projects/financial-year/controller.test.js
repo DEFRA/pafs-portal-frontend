@@ -408,7 +408,8 @@ describe('FinancialYearController', () => {
         mockH,
         PROJECT_PAYLOAD_LEVELS.FINANCIAL_START_YEAR,
         expect.any(Object),
-        PROJECT_VIEWS.FINANCIAL_YEAR
+        PROJECT_VIEWS.FINANCIAL_YEAR,
+        { emitSuccessMetric: true }
       )
     })
 
