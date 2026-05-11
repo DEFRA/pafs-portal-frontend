@@ -260,6 +260,20 @@ class FinancialYearController {
     return h.view(PROJECT_VIEWS.FINANCIAL_YEAR, this._getViewData(request))
   }
 
+  _emitCreationMetrics(request) {
+    for (const step of [
+      PROJECT_PAYLOAD_LEVELS.PROJECT_NAME,
+      PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE,
+      PROJECT_PAYLOAD_LEVELS.FINANCIAL_START_YEAR,
+      PROJECT_PAYLOAD_LEVELS.FINANCIAL_END_YEAR
+    ]) {
+      request.metrics?.counter('proposalStepVisit', 1, {
+        step,
+        result: 'submitted'
+      })
+    }
+  }
+
   async _postSubmission(request, h) {
     const referenceNumber = request.params?.referenceNumber || ''
     const isEditMode = !!referenceNumber
@@ -287,13 +301,25 @@ class FinancialYearController {
         : PROJECT_PAYLOAD_LEVELS.FINANCIAL_END_YEAR
     }
 
-    return saveProjectWithErrorHandling(
+    const submissionError = await saveProjectWithErrorHandling(
       request,
       h,
       level,
       viewData,
-      PROJECT_VIEWS.FINANCIAL_YEAR
+      PROJECT_VIEWS.FINANCIAL_YEAR,
+      // In create mode the start controller already emitted INITIAL_SAVE;
+      // suppress the duplicate and let our per-step block below handle metrics.
+      { emitSuccessMetric: isEditMode }
     )
+
+    // On successful creation (create mode, end-year step), emit metrics for all
+    // steps completed silently in session — they have no individual API save
+    // during creation so would otherwise never appear in the dashboard.
+    if (!submissionError && !isEditMode) {
+      this._emitCreationMetrics(request)
+    }
+
+    return submissionError
   }
 
   async post(request, h) {

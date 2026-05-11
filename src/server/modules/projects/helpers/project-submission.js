@@ -159,6 +159,9 @@ export function handleServiceConsumptionError(
  * @param {string} level - Project payload level
  * @param {Object} viewData - View data for error rendering
  * @param {string} template - View template to render on error
+ * @param {Object} [options]
+ * @param {boolean} [options.emitSuccessMetric=true] - Whether to emit the success metric.
+ *   Pass false when the caller takes responsibility for emitting per-step metrics.
  * @returns {Promise<Object|null>} Null on success, view response on error
  */
 export async function saveProjectWithErrorHandling(
@@ -166,7 +169,8 @@ export async function saveProjectWithErrorHandling(
   h,
   level,
   viewData,
-  template
+  template,
+  { emitSuccessMetric = true } = {}
 ) {
   const result = await submitProject(request, level)
 
@@ -199,10 +203,12 @@ export async function saveProjectWithErrorHandling(
     }
   }
 
-  request.metrics?.counter('proposalStepVisit', 1, {
-    step: level,
-    result: 'submitted'
-  })
+  if (emitSuccessMetric) {
+    request.metrics?.counter('proposalStepVisit', 1, {
+      step: level,
+      result: 'submitted'
+    })
+  }
 
   return null // No error
 }

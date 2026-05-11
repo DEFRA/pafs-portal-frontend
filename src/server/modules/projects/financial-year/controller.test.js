@@ -42,6 +42,9 @@ describe('FinancialYearController', () => {
       logger: {
         error: vi.fn()
       },
+      metrics: {
+        counter: vi.fn()
+      },
       t: vi.fn((key, params) => `${key}_${JSON.stringify(params || {})}`)
     }
 
@@ -439,8 +442,51 @@ describe('FinancialYearController', () => {
         mockH,
         PROJECT_PAYLOAD_LEVELS.INITIAL_SAVE,
         expect.any(Object),
-        PROJECT_VIEWS.FINANCIAL_YEAR
+        PROJECT_VIEWS.FINANCIAL_YEAR,
+        { emitSuccessMetric: false }
       )
+    })
+
+    test('should emit per-step metrics for creation-mode steps on successful project creation', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.FINANCIAL_END_YEAR)
+      saveProjectWithErrorHandling.mockResolvedValue(null)
+      getSessionData.mockReturnValue({ projectType: 'FRM' })
+
+      await financialYearController.postHandler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: PROJECT_PAYLOAD_LEVELS.PROJECT_NAME, result: 'submitted' }
+      )
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE, result: 'submitted' }
+      )
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        {
+          step: PROJECT_PAYLOAD_LEVELS.FINANCIAL_START_YEAR,
+          result: 'submitted'
+        }
+      )
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: PROJECT_PAYLOAD_LEVELS.FINANCIAL_END_YEAR, result: 'submitted' }
+      )
+    })
+
+    test('should not emit creation-mode step metrics when saveProjectWithErrorHandling returns an error', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.FINANCIAL_END_YEAR)
+      saveProjectWithErrorHandling.mockResolvedValue({ error: 'save failed' })
+      getSessionData.mockReturnValue({ projectType: 'FRM' })
+
+      await financialYearController.postHandler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).not.toHaveBeenCalled()
     })
 
     test('should navigate to overview in create mode for FINANCIAL_END_YEAR', async () => {
@@ -474,7 +520,8 @@ describe('FinancialYearController', () => {
         mockH,
         PROJECT_PAYLOAD_LEVELS.FINANCIAL_END_YEAR,
         expect.any(Object),
-        PROJECT_VIEWS.FINANCIAL_YEAR
+        PROJECT_VIEWS.FINANCIAL_YEAR,
+        { emitSuccessMetric: true }
       )
     })
 
@@ -526,7 +573,8 @@ describe('FinancialYearController', () => {
         mockH,
         PROJECT_PAYLOAD_LEVELS.INITIAL_SAVE,
         expect.any(Object),
-        PROJECT_VIEWS.FINANCIAL_YEAR
+        PROJECT_VIEWS.FINANCIAL_YEAR,
+        { emitSuccessMetric: false }
       )
     })
 
