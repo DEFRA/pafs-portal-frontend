@@ -37,9 +37,17 @@ class AreaController {
         viewData
       })
       if (validationError) {
+        request.metrics?.counter('proposalStepVisit', 1, {
+          step: 'PROJECT_AREA',
+          result: 'validation_error'
+        })
         return validationError
       }
 
+      request.metrics?.counter('proposalStepVisit', 1, {
+        step: 'PROJECT_AREA',
+        result: 'submitted'
+      })
       return h.redirect(ROUTES.PROJECT.TYPE).takeover()
     } catch (error) {
       request.logger.error('Error project area POST', error)

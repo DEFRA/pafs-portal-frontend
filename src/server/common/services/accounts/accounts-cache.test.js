@@ -205,8 +205,9 @@ describe('AccountsCacheService', () => {
       test('handles cache error gracefully', async () => {
         mockCache.set.mockRejectedValue(new Error('Cache error'))
 
-        // Should not throw
-        await cacheService.setByKey('pending:::1', { data: [] })
+        await expect(
+          cacheService.setByKey('pending:::1', { data: [] })
+        ).resolves.toBeUndefined()
       })
     })
 
@@ -220,8 +221,9 @@ describe('AccountsCacheService', () => {
       test('handles cache error gracefully', async () => {
         mockCache.drop.mockRejectedValue(new Error('Cache error'))
 
-        // Should not throw
-        await cacheService.dropByKey('pending:*')
+        await expect(
+          cacheService.dropByKey('pending:*')
+        ).resolves.toBeUndefined()
       })
     })
 

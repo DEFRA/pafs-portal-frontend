@@ -42,7 +42,10 @@ describe('BenefitAreaController', () => {
       params: { referenceNumber: 'TEST-001' },
       query: {},
       payload: {},
-      logger: mockLogger
+      logger: mockLogger,
+      metrics: {
+        counter: vi.fn()
+      }
     }
 
     mockH = {
@@ -569,6 +572,46 @@ describe('BenefitAreaController', () => {
       await benefitAreaController.uploadStatusHandler(mockRequest, mockH)
 
       expect(getUploadStatus).toHaveBeenCalledTimes(2)
+    })
+
+    test('should record proposalStepVisit submitted metric on successful upload', async () => {
+      getUploadStatus.mockResolvedValue({
+        success: true,
+        data: {
+          data: {
+            uploadStatus: UPLOAD_STATUS.READY,
+            filename: 'benefit-area.zip'
+          }
+        }
+      })
+
+      await benefitAreaController.uploadStatusHandler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: 'BENEFIT_AREA', result: 'submitted' }
+      )
+    })
+
+    test('should record proposalStepVisit validation_error metric on failed upload', async () => {
+      getUploadStatus.mockResolvedValue({
+        success: true,
+        data: {
+          data: {
+            uploadStatus: UPLOAD_STATUS.FAILED,
+            rejectionReason: 'Invalid file format'
+          }
+        }
+      })
+
+      await benefitAreaController.uploadStatusHandler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: 'BENEFIT_AREA', result: 'validation_error' }
+      )
     })
 
     test('should use empty referenceNumber when not provided', async () => {

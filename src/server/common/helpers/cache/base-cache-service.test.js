@@ -121,8 +121,9 @@ describe('BaseCacheService', () => {
       test('handles cache error gracefully', async () => {
         mockCache.set.mockRejectedValue(new Error('Cache error'))
 
-        // Should not throw
-        await cacheService.setByKey('test-key', { test: 'data' })
+        await expect(
+          cacheService.setByKey('test-key', { test: 'data' })
+        ).resolves.toBeUndefined()
       })
     })
 
@@ -136,8 +137,9 @@ describe('BaseCacheService', () => {
       test('handles cache error gracefully', async () => {
         mockCache.drop.mockRejectedValue(new Error('Cache error'))
 
-        // Should not throw
-        await cacheService.dropByKey('test-key')
+        await expect(
+          cacheService.dropByKey('test-key')
+        ).resolves.toBeUndefined()
       })
     })
 
@@ -189,8 +191,7 @@ describe('BaseCacheService', () => {
       test('handles error gracefully', async () => {
         mockCache.drop.mockRejectedValue(new Error('Cache error'))
 
-        // Should not throw
-        await cacheService.invalidateAll()
+        await expect(cacheService.invalidateAll()).resolves.toBeUndefined()
       })
     })
   })
