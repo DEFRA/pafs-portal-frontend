@@ -20,6 +20,7 @@ export default defineConfig({
         '**/*.md',
         '**/*.json',
         '**/*.njk',
+        '**/assets.html',
         '**/.DS_Store'
       ]
     }

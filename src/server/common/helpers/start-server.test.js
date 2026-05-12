@@ -4,9 +4,16 @@ import hapi from '@hapi/hapi'
 import { statusCodes } from '../constants/status-codes.js'
 
 const mockCheckBackendHealth = vi.fn()
+const mockPingBackendHealth = vi.fn()
+const mockCheckRedisHealth = vi.fn()
 
 vi.mock('./backend-health-check/index.js', () => ({
-  checkBackendHealth: () => mockCheckBackendHealth()
+  checkBackendHealth: () => mockCheckBackendHealth(),
+  pingBackendHealth: () => mockPingBackendHealth()
+}))
+
+vi.mock('../../modules/health/checks/redis-health-check.js', () => ({
+  checkRedisHealth: () => mockCheckRedisHealth()
 }))
 
 describe('#startServer', () => {
@@ -29,6 +36,18 @@ describe('#startServer', () => {
   beforeEach(() => {
     mockCheckBackendHealth.mockReset()
     mockCheckBackendHealth.mockResolvedValue(true)
+    mockPingBackendHealth.mockReset()
+    mockPingBackendHealth.mockResolvedValue({
+      healthy: true,
+      status: 'connected',
+      responseTime: 5
+    })
+    mockCheckRedisHealth.mockReset()
+    mockCheckRedisHealth.mockResolvedValue({
+      healthy: true,
+      status: 'connected',
+      responseTime: 2
+    })
   })
 
   afterAll(() => {
@@ -56,7 +75,7 @@ describe('#startServer', () => {
         url: '/health'
       })
 
-      expect(result).toEqual({ message: 'success' })
+      expect(result).toEqual({ status: 'healthy' })
       expect(statusCode).toBe(statusCodes.ok)
     }, 120000)
 
