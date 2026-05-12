@@ -38,10 +38,10 @@
           </div>
           <div>
             <p class="govuk-body govuk-!-margin-bottom-1">
-              {% if projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_DOWNLOAD_URL] %}
-                <a class="govuk-link" href="{{ projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_DOWNLOAD_URL] }}" download>
-                  {{ projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] }}
-                </a>
+              {% if projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] %}
+              <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/benefit-area-file/download">
+                {{ projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] }}
+              </a>
               {% else %}
                 {{ projectData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] }}
               {% endif %}

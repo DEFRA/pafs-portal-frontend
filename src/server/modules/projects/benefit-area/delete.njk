@@ -8,8 +8,8 @@
       <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
 
       <p class="govuk-body">
-        {% if formData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_DOWNLOAD_URL] %}
-          <a class="govuk-link" href="{{ formData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_DOWNLOAD_URL] }}" download>
+        {% if formData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] %}
+          <a class="govuk-link" href="/project/{{ formData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/benefit-area-file/download">
             {{ formData[PROJECT_PAYLOAD_FIELDS.BENEFIT_AREA_FILE_NAME] }}
           </a>
         {% else %}

@@ -1,13 +1,22 @@
 import { buildRedisClient } from '../../../common/helpers/redis-client.js'
 import { config } from '../../../../config/config.js'
 
+let _redisClient = null
+
+function getRedisClient() {
+  if (!_redisClient) {
+    _redisClient = buildRedisClient(config.get('redis'))
+  }
+  return _redisClient
+}
+
 /**
  * Check Redis connectivity by issuing a PING command.
- * Builds a short-lived client, pings, then disconnects.
+ * Reuses a shared client to avoid repeated connection events.
  * @returns {Promise<{healthy: boolean, status: string, responseTime?: number, error?: string}>}
  */
 export async function checkRedisHealth() {
-  const client = buildRedisClient(config.get('redis'))
+  const client = getRedisClient()
 
   try {
     const start = Date.now()
@@ -25,7 +34,5 @@ export async function checkRedisHealth() {
       status: 'error',
       error: error.message
     }
-  } finally {
-    client.disconnect()
   }
 }

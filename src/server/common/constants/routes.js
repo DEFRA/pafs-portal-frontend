@@ -100,6 +100,8 @@ export const ROUTES = {
     ARCHIVE: '/project/{referenceNumber}/archive',
     REVERT_TO_DRAFT: '/project/{referenceNumber}/revert-to-draft',
     ARCHIVE_CONFIRMATION: '/project/{referenceNumber}/archive/confirmation',
+    BENEFIT_AREA_FILE_DOWNLOAD:
+      '/project/{referenceNumber}/benefit-area-file/download',
     START: `/project/${PROJECT_STEPS.START}`,
     NAME: `/project/${PROJECT_STEPS.NAME}`,
     AREA: `/project/${PROJECT_STEPS.AREA}`,

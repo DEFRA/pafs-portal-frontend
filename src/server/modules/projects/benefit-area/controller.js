@@ -11,7 +11,10 @@ import {
   initiateFileUpload,
   getUploadStatus
 } from '../../../common/services/file-upload/file-upload-service.js'
-import { deleteProject } from '../../../common/services/project/project-service.js'
+import {
+  deleteProject,
+  getBenefitAreaFileDownloadUrl
+} from '../../../common/services/project/project-service.js'
 import {
   buildViewData,
   getSessionData,
@@ -365,6 +368,29 @@ class BenefitAreaController {
     )
   }
 
+  async download(request, h) {
+    const session = getAuthSession(request)
+    const accessToken = session?.accessToken
+    const { referenceNumber } = request.params
+
+    const result = await getBenefitAreaFileDownloadUrl(
+      referenceNumber,
+      accessToken
+    )
+
+    if (!result.success || !result.data?.downloadUrl) {
+      request.logger.warn(
+        { referenceNumber },
+        'Failed to get benefit area file download URL'
+      )
+      return h.redirect(
+        ROUTES.PROJECT.OVERVIEW.replace(REFERENCE_NUMBER_PARAM, referenceNumber)
+      )
+    }
+
+    return h.redirect(result.data.downloadUrl)
+  }
+
   async postDeleteHandler(request, h) {
     const session = getAuthSession(request)
     const accessToken = session?.accessToken
@@ -436,6 +462,7 @@ const controller = new BenefitAreaController()
 export const benefitAreaController = {
   getHandler: (request, h) => controller.get(request, h),
   uploadStatusHandler: (request, h) => controller.uploadStatus(request, h),
+  downloadHandler: (request, h) => controller.download(request, h),
   getDeleteHandler: (request, h) => controller.getDeleteHandler(request, h),
   postDeleteHandler: (request, h) => controller.postDeleteHandler(request, h)
 }
