@@ -44,8 +44,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: 'Submit a flood risk management proposal',
-    env: 'SERVICE_NAME'
+    default: 'Submit a flood risk management proposal'
   },
   root: {
     doc: 'Project root',
