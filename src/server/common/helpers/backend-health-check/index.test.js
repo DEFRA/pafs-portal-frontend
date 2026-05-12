@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest'
-import { checkBackendHealth } from './index.js'
+import { checkBackendHealth, pingBackendHealth } from './index.js'
 
 vi.mock('../../../../config/config.js', () => ({
   config: {
@@ -135,5 +135,78 @@ describe('Backend health check', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(3)
 
     await promise
+  })
+})
+
+describe('pingBackendHealth', () => {
+  let fetchSpy
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    fetchSpy = vi.spyOn(globalThis, 'fetch')
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.useRealTimers()
+  })
+
+  test('Should return healthy result when backend responds ok', async () => {
+    fetchSpy.mockResolvedValue({ ok: true, status: 200 })
+
+    const promise = pingBackendHealth()
+    await vi.runAllTimersAsync()
+    const result = await promise
+
+    expect(result.healthy).toBe(true)
+    expect(result.status).toBe('connected')
+    expect(result.responseTime).toBeTypeOf('number')
+  })
+
+  test('Should return unhealthy result when backend returns error status', async () => {
+    fetchSpy.mockResolvedValue({ ok: false, status: 503 })
+
+    const promise = pingBackendHealth()
+    await vi.runAllTimersAsync()
+    const result = await promise
+
+    expect(result.healthy).toBe(false)
+    expect(result.status).toBe('unhealthy')
+  })
+
+  test('Should return unhealthy result when fetch throws', async () => {
+    fetchSpy.mockRejectedValue(new Error('Connection refused'))
+
+    const promise = pingBackendHealth()
+    await vi.runAllTimersAsync()
+    const result = await promise
+
+    expect(result.healthy).toBe(false)
+    expect(result.status).toBe('error')
+    expect(result.error).toBe('Connection refused')
+  })
+
+  test('Should return error status on timeout', async () => {
+    const abortError = new Error('The operation was aborted')
+    abortError.name = 'AbortError'
+    fetchSpy.mockRejectedValue(abortError)
+
+    const promise = pingBackendHealth()
+    await vi.runAllTimersAsync()
+    const result = await promise
+
+    expect(result.healthy).toBe(false)
+    expect(result.status).toBe('error')
+    expect(result.error).toBe('Request timeout')
+  })
+
+  test('Should only make one attempt (no retries)', async () => {
+    fetchSpy.mockRejectedValue(new Error('Connection refused'))
+
+    const promise = pingBackendHealth()
+    await vi.runAllTimersAsync()
+    await promise
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
   })
 })
