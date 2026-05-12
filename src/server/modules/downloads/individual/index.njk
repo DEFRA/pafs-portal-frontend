@@ -71,13 +71,13 @@
     {% if hasBenefitAreaFile %}
       <section class="gem-c-attachment govuk-!-margin-bottom-6">
         <div class="gem-c-attachment__thumbnail">
-          <a href="{{ projectData.benefitAreaFileDownloadUrl }}" class="govuk-link gem-c-attachment__thumbnail-image" tabindex="-1" aria-hidden="true" download>
+          <a href="/project/{{ projectData.slug }}/benefit-area-file/download" class="govuk-link gem-c-attachment__thumbnail-image" tabindex="-1" aria-hidden="true">
             <img src="/public/assets/images/pub-cover-shapefile.png" width="99" height="140" alt="" aria-hidden="true">
           </a>
         </div>
         <div class="gem-c-attachment__details">
           <h3 class="gem-c-attachment__title">
-            <a href="{{ projectData.benefitAreaFileDownloadUrl }}" class="govuk-link gem-c-attachment__link" download>
+            <a href="/project/{{ projectData.slug }}/benefit-area-file/download" class="govuk-link gem-c-attachment__link">
               {{ t('projects.downloads.main_downloads.benefit_area') }}
             </a>
           </h3>

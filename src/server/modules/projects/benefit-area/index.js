@@ -17,6 +17,14 @@ export const projectBenefitArea = {
       server.route([
         {
           method: 'GET',
+          path: ROUTES.PROJECT.BENEFIT_AREA_FILE_DOWNLOAD,
+          options: {
+            pre: [{ method: requireAuth }],
+            handler: benefitAreaController.downloadHandler
+          }
+        },
+        {
+          method: 'GET',
           path: ROUTES.PROJECT.EDIT.BENEFIT_AREA,
           options: {
             pre: [

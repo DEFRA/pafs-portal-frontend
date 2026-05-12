@@ -9,7 +9,10 @@ import {
   initiateFileUpload,
   getUploadStatus
 } from '../../../common/services/file-upload/file-upload-service.js'
-import { deleteProject } from '../../../common/services/project/project-service.js'
+import {
+  deleteProject,
+  getBenefitAreaFileDownloadUrl
+} from '../../../common/services/project/project-service.js'
 import {
   buildViewData,
   getSessionData,
@@ -1001,6 +1004,94 @@ describe('BenefitAreaController', () => {
         benefitAreaFileDownloadUrl: null,
         benefitAreaFileDownloadExpiry: null
       })
+    })
+  })
+
+  describe('downloadHandler', () => {
+    test('should redirect to the presigned S3 URL returned by the API', async () => {
+      const freshUrl =
+        'https://s3.amazonaws.com/pafs-bucket/key?X-Amz-Token=fresh'
+      getBenefitAreaFileDownloadUrl.mockResolvedValue({
+        success: true,
+        data: { downloadUrl: freshUrl, filename: 'benefit_area.zip' }
+      })
+
+      await benefitAreaController.downloadHandler(mockRequest, mockH)
+
+      expect(getAuthSession).toHaveBeenCalledWith(mockRequest)
+      expect(getBenefitAreaFileDownloadUrl).toHaveBeenCalledWith(
+        'TEST-001',
+        'test-token'
+      )
+      expect(mockH.redirect).toHaveBeenCalledWith(freshUrl)
+    })
+
+    test('should redirect to overview when API returns success:false', async () => {
+      getBenefitAreaFileDownloadUrl.mockResolvedValue({
+        success: false,
+        status: 404,
+        errors: [{ errorCode: 'FILE_NOT_FOUND' }]
+      })
+
+      await benefitAreaController.downloadHandler(mockRequest, mockH)
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        { referenceNumber: 'TEST-001' },
+        'Failed to get benefit area file download URL'
+      )
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('TEST-001')
+      )
+    })
+
+    test('should redirect to overview when downloadUrl is missing from response', async () => {
+      getBenefitAreaFileDownloadUrl.mockResolvedValue({
+        success: true,
+        data: { filename: 'benefit_area.zip' } // no downloadUrl
+      })
+
+      await benefitAreaController.downloadHandler(mockRequest, mockH)
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        { referenceNumber: 'TEST-001' },
+        'Failed to get benefit area file download URL'
+      )
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('TEST-001')
+      )
+    })
+
+    test('should use the access token from the auth session', async () => {
+      getAuthSession.mockReturnValue({ accessToken: 'specific-token-xyz' })
+      getBenefitAreaFileDownloadUrl.mockResolvedValue({
+        success: true,
+        data: { downloadUrl: 'https://s3.amazonaws.com/file' }
+      })
+
+      await benefitAreaController.downloadHandler(mockRequest, mockH)
+
+      expect(getBenefitAreaFileDownloadUrl).toHaveBeenCalledWith(
+        'TEST-001',
+        'specific-token-xyz'
+      )
+    })
+
+    test('should handle a null auth session gracefully', async () => {
+      getAuthSession.mockReturnValue(null)
+      getBenefitAreaFileDownloadUrl.mockResolvedValue({
+        success: false,
+        errors: [{ errorCode: 'UNAUTHORIZED' }]
+      })
+
+      await benefitAreaController.downloadHandler(mockRequest, mockH)
+
+      expect(getBenefitAreaFileDownloadUrl).toHaveBeenCalledWith(
+        'TEST-001',
+        undefined
+      )
+      expect(mockH.redirect).toHaveBeenCalledWith(
+        expect.stringContaining('TEST-001')
+      )
     })
   })
 })

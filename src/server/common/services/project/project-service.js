@@ -161,6 +161,25 @@ export async function deleteProject(referenceNumber, accessToken) {
 }
 
 /**
+ * Get a fresh presigned S3 download URL for a project's benefit area file.
+ * Always regenerates — never relies on the URL cached in the database.
+ * @param {string} referenceNumber - The project reference number (slug format with dashes)
+ * @param {string} accessToken - JWT access token
+ * @returns {Promise<Object>} API response with { downloadUrl, filename }
+ */
+export async function getBenefitAreaFileDownloadUrl(
+  referenceNumber,
+  accessToken
+) {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+  return apiRequest(
+    `/api/v1/project/${referenceNumber}/benefit-area-file/download`,
+    { method: 'GET', headers }
+  )
+}
+
+/**
  * Update a project's status
  * @param {string} referenceNumber - The project reference number
  * @param {string} status - The new status value

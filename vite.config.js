@@ -11,8 +11,9 @@ const govukFrontendPath = dirname(
 
 /**
  * Copies govuk-frontend assets (fonts, images, icons) into .public/assets/
- * after each build. With webpack, CopyPlugin handled this; Vite has no built-in
- * equivalent so we do it here. Runs on every build including --watch rebuilds.
+ * and custom client images into .public/assets/images/ after each build.
+ * With webpack, CopyPlugin handled this; Vite has no built-in equivalent
+ * so we do it here. Runs on every build including --watch rebuilds.
  */
 function copyGovukAssets() {
   return {
@@ -23,6 +24,9 @@ function copyGovukAssets() {
         resolve('.public/assets'),
         { recursive: true }
       )
+      cpSync(resolve('src/client/images'), resolve('.public/assets/images'), {
+        recursive: true
+      })
     }
   }
 }

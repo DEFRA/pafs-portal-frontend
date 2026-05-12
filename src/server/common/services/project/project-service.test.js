@@ -4,6 +4,7 @@ import {
   getProjectProposalOverview,
   upsertProjectProposal,
   deleteProject,
+  getBenefitAreaFileDownloadUrl,
   getProjects,
   updateProjectStatus,
   getCarbonImpactCalc,
@@ -989,6 +990,100 @@ describe('project-service', () => {
           method: 'DELETE'
         })
       )
+    })
+  })
+
+  describe('getBenefitAreaFileDownloadUrl', () => {
+    test('Should call apiRequest with the correct endpoint and GET method', async () => {
+      apiRequest.mockResolvedValue({
+        success: true,
+        data: {
+          downloadUrl: 'https://s3.example.com/file.zip',
+          filename: 'map.zip'
+        }
+      })
+
+      await getBenefitAreaFileDownloadUrl('REF-123', 'mock-token')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF-123/benefit-area-file/download',
+        expect.objectContaining({ method: 'GET' })
+      )
+    })
+
+    test('Should include Authorization header when accessToken is provided', async () => {
+      apiRequest.mockResolvedValue({
+        success: true,
+        data: { downloadUrl: 'https://s3.example.com' }
+      })
+
+      await getBenefitAreaFileDownloadUrl('REF-456', 'test-token-abc')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF-456/benefit-area-file/download',
+        expect.objectContaining({
+          headers: { Authorization: 'Bearer test-token-abc' }
+        })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is not provided', async () => {
+      apiRequest.mockResolvedValue({
+        success: true,
+        data: { downloadUrl: 'https://s3.example.com' }
+      })
+
+      await getBenefitAreaFileDownloadUrl('REF-123')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF-123/benefit-area-file/download',
+        expect.objectContaining({ headers: {} })
+      )
+    })
+
+    test('Should not include Authorization header when accessToken is null', async () => {
+      apiRequest.mockResolvedValue({
+        success: true,
+        data: { downloadUrl: 'https://s3.example.com' }
+      })
+
+      await getBenefitAreaFileDownloadUrl('REF-123', null)
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/project/REF-123/benefit-area-file/download',
+        expect.objectContaining({ headers: {} })
+      )
+    })
+
+    test('Should return the API response', async () => {
+      const mockResponse = {
+        success: true,
+        data: {
+          downloadUrl: 'https://s3.amazonaws.com/pafs/key?token=fresh',
+          filename: 'benefit_area.zip'
+        }
+      }
+      apiRequest.mockResolvedValue(mockResponse)
+
+      const result = await getBenefitAreaFileDownloadUrl('REF-123', 'token')
+
+      expect(result).toEqual(mockResponse)
+    })
+
+    test('Should return failure response when API call fails', async () => {
+      const errorResponse = {
+        success: false,
+        status: 404,
+        errors: [{ errorCode: 'FILE_NOT_FOUND' }]
+      }
+      apiRequest.mockResolvedValue(errorResponse)
+
+      const result = await getBenefitAreaFileDownloadUrl(
+        'REF-NOTFOUND',
+        'token'
+      )
+
+      expect(result).toEqual(errorResponse)
     })
   })
 
