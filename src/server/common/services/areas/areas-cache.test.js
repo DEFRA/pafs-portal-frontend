@@ -831,29 +831,31 @@ describe('AreasCacheService', () => {
 
       await cacheService.invalidateAllAreasCache()
 
-      // Verify all keys were dropped
-      expect(mockCache.drop).toHaveBeenCalledTimes(3)
+      // 'areas-by-type' is dropped twice: once explicitly by invalidateAreasByType
+      // and once via _dropAllTrackedKeys (it's also in the registry).
+      // The other two dynamic keys are dropped once each. Total = 4 drops.
       expect(mockCache.drop).toHaveBeenCalledWith('areas-by-type')
       expect(mockCache.drop).toHaveBeenCalledWith(
         'areas-by-list:search=:type=:page=1:pageSize=10'
       )
       expect(mockCache.drop).toHaveBeenCalledWith('area-123')
+      expect(mockCache.drop).toHaveBeenCalledTimes(4)
 
       // Verify registry was cleared
       expect(cacheService.cacheKeys.size).toBe(0)
     })
 
-    test('handles empty cache registry gracefully', async () => {
-      // No keys added to registry
+    test('always drops BY_TYPE key even when cache key registry is empty', async () => {
+      // Simulates a pod that has never served an area request (empty registry),
+      // but other pods may have stored 'areas-by-type' in the shared Redis cache.
+      // The explicit invalidateAreasByType() call bridges this cross-pod gap.
       expect(cacheService.cacheKeys.size).toBe(0)
 
       await cacheService.invalidateAllAreasCache()
 
-      // Should not attempt to drop any keys
-      expect(mockCache.drop).not.toHaveBeenCalled()
-      expect(mockServer.logger.debug).toHaveBeenCalledWith(
-        'No tracked cache keys to drop'
-      )
+      // BY_TYPE must be dropped even though it was never tracked locally
+      expect(mockCache.drop).toHaveBeenCalledWith('areas-by-type')
+      expect(mockCache.drop).toHaveBeenCalledTimes(1)
     })
 
     test('handles drop errors gracefully (base class catches them)', async () => {
@@ -891,7 +893,8 @@ describe('AreasCacheService', () => {
 
       await cacheService.invalidateAllAreasCache()
 
-      expect(mockCache.drop).toHaveBeenCalledTimes(6)
+      // 6 tracked keys + 1 extra explicit BY_TYPE drop = 7 total
+      expect(mockCache.drop).toHaveBeenCalledTimes(7)
       expect(cacheService.cacheKeys.size).toBe(0)
     })
 
