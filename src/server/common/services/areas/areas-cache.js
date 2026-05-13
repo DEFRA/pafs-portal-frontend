@@ -257,7 +257,9 @@ export class AreasCacheService extends BaseCacheService {
     )
 
     try {
-      // Drop all tracked keys individually since Catbox doesn't support wildcard deletion
+      await this.invalidateAreasByType()
+
+      // Drop remaining tracked dynamic keys (list pages, individual areas)
       await this._dropAllTrackedKeys()
 
       this.server.logger.info(
