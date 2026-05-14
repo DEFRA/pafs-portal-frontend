@@ -54,10 +54,11 @@ export async function generateAdminProgramme(accessToken) {
 }
 
 /**
- * Get a presigned download URL for the admin system-wide FCERM1 file.
+ * Get a presigned download URL for the admin system-wide file.
+ * type: 'fcerm1' | 'benefit-areas'
  */
-export async function getAdminProgrammeFileUrl(accessToken) {
-  return apiRequest('/api/v1/admin/downloads/programme/file', {
+export async function getAdminProgrammeFileUrl(accessToken, type) {
+  return apiRequest(`/api/v1/admin/downloads/programme/file/${type}`, {
     method: 'GET',
     headers: { Authorization: `Bearer ${accessToken}` }
   })

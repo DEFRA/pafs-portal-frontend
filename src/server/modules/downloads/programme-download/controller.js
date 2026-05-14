@@ -155,7 +155,7 @@ export const downloadFileController = {
     try {
       let result
       if (isAdmin) {
-        result = await getAdminProgrammeFileUrl(accessToken)
+        result = await getAdminProgrammeFileUrl(accessToken, type)
       } else {
         result = await getUserProgrammeFileUrl(accessToken, type)
       }
