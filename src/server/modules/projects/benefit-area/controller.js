@@ -22,16 +22,7 @@ import {
   updateSessionData
 } from '../helpers/project-utils.js'
 
-// Constants for polling configuration
-const MAX_POLL_ATTEMPTS = 10
-const POLL_INTERVAL_MS = 2000
-
 const projectBenefitAreaLocalKeyPrefix = 'projects.project_benefit_area'
-
-/**
- * Delay helper for synchronous polling
- */
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 /**
  * Retrieve and clear upload errors from session
@@ -95,44 +86,6 @@ function storeUploadSession(request, uploadId, uploadUrl) {
 }
 
 /**
- * Check if status indicates completion
- */
-function isUploadComplete(uploadStatus) {
-  return (
-    uploadStatus === UPLOAD_STATUS.READY ||
-    uploadStatus === UPLOAD_STATUS.COMPLETE
-  )
-}
-
-/**
- * Check if status indicates failure
- */
-function isUploadFailed(uploadStatus) {
-  return uploadStatus === UPLOAD_STATUS.FAILED
-}
-
-/**
- * Build failure result from rejection reason
- */
-function buildFailureResult(rejectionReason) {
-  const errors = rejectionReason
-    ? [{ message: rejectionReason }]
-    : [{ message: 'Upload failed' }]
-  return { success: false, errors }
-}
-
-/**
- * Build timeout result
- */
-function buildTimeoutResult() {
-  return {
-    success: false,
-    timeout: true,
-    errors: [{ message: 'Upload processing timeout - please try again' }]
-  }
-}
-
-/**
  * Process single status check response
  */
 function processStatusResponse(statusResponse) {
@@ -140,62 +93,24 @@ function processStatusResponse(statusResponse) {
     return null
   }
   const statusResponseData = statusResponse.data
+  if (!statusResponseData?.data) return null
   const { uploadStatus, rejectionReason } = statusResponseData.data
 
-  if (isUploadComplete(uploadStatus)) {
+  if (
+    uploadStatus === UPLOAD_STATUS.READY ||
+    uploadStatus === UPLOAD_STATUS.COMPLETE
+  ) {
     return { success: true, data: statusResponseData.data }
   }
 
-  if (isUploadFailed(uploadStatus)) {
-    return buildFailureResult(rejectionReason)
+  if (uploadStatus === UPLOAD_STATUS.FAILED) {
+    const errors = rejectionReason
+      ? [{ message: rejectionReason }]
+      : [{ message: 'Upload failed' }]
+    return { success: false, errors }
   }
 
   return null
-}
-
-/**
- * Execute single polling attempt
- */
-async function executePollAttempt(uploadId, accessToken, attempt, logger) {
-  try {
-    logger.info({ uploadId, attempt }, 'Polling upload status')
-    const statusResponse = await getUploadStatus(uploadId, accessToken)
-    return processStatusResponse(statusResponse)
-  } catch (error) {
-    logger.error({ error, uploadId, attempt }, 'Error polling upload status')
-    return null
-  }
-}
-
-/**
- * Wait before next poll attempt
- */
-async function waitBeforeNextPoll(attempt) {
-  if (attempt < MAX_POLL_ATTEMPTS) {
-    await delay(POLL_INTERVAL_MS)
-  }
-}
-
-/**
- * Poll upload status synchronously
- */
-async function pollUploadStatusSync(uploadId, accessToken, logger) {
-  for (let attempt = 1; attempt <= MAX_POLL_ATTEMPTS; attempt++) {
-    const result = await executePollAttempt(
-      uploadId,
-      accessToken,
-      attempt,
-      logger
-    )
-
-    if (result) {
-      return result
-    }
-
-    await waitBeforeNextPoll(attempt)
-  }
-
-  return buildTimeoutResult()
 }
 
 /**
@@ -312,8 +227,11 @@ class BenefitAreaController {
     const uploadId = sessionData?.benefitAreaUploadId
 
     const benefitAreaUrl = this._getBenefitAreaEditLink(referenceNumber)
-
     const overviewUrl = ROUTES.PROJECT.OVERVIEW.replace(
+      REFERENCE_NUMBER_PARAM,
+      referenceNumber
+    )
+    const selfUrl = ROUTES.PROJECT.EDIT.BENEFIT_AREA_UPLOAD_STATUS.replace(
       REFERENCE_NUMBER_PARAM,
       referenceNumber
     )
@@ -323,33 +241,37 @@ class BenefitAreaController {
     }
 
     try {
-      request.logger.info({ uploadId }, 'Starting synchronous upload polling')
+      const statusResponse = await getUploadStatus(uploadId, accessToken)
+      const result = processStatusResponse(statusResponse)
 
-      const pollResult = await pollUploadStatusSync(
-        uploadId,
-        accessToken,
-        request.logger
-      )
-
-      if (pollResult.success) {
-        storeUploadSuccess(request, pollResult.data.filename)
+      if (result?.success) {
+        storeUploadSuccess(request, result.data.filename)
         request.logger.info({ uploadId }, 'Upload successful')
         request.metrics?.counter('proposalStepVisit', 1, {
           step: 'BENEFIT_AREA',
           result: 'submitted'
         })
-        // Redirect to overview page on success
         return h.redirect(overviewUrl)
-      } else {
-        storeUploadErrors(request, pollResult.errors)
+      }
+
+      if (result && !result.success) {
+        storeUploadErrors(request, result.errors)
         request.logger.warn({ uploadId }, 'Upload failed')
         request.metrics?.counter('proposalStepVisit', 1, {
           step: 'BENEFIT_AREA',
           result: 'validation_error'
         })
-        // Redirect back to benefit area page on error
         return h.redirect(benefitAreaUrl)
       }
+
+      // Still PENDING - render processing page, browser will auto-refresh
+      return h.view(
+        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        this._getViewData(request, {
+          localKeyPrefix: projectBenefitAreaLocalKeyPrefix,
+          selfUrl
+        })
+      )
     } catch (error) {
       request.logger.error({ error, uploadId }, 'Failed to check upload status')
       storeUploadErrors(request, [

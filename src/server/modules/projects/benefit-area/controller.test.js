@@ -339,7 +339,7 @@ describe('BenefitAreaController', () => {
       expect(getUploadStatus).not.toHaveBeenCalled()
     })
 
-    test('should poll upload status and redirect to overview on READY status', async () => {
+    test('should redirect to overview on READY status', async () => {
       getUploadStatus.mockResolvedValue({
         success: true,
         data: {
@@ -352,10 +352,7 @@ describe('BenefitAreaController', () => {
 
       await benefitAreaController.uploadStatusHandler(mockRequest, mockH)
 
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        { uploadId: 'upload-123' },
-        'Starting synchronous upload polling'
-      )
+      expect(getUploadStatus).toHaveBeenCalledTimes(1)
       expect(getUploadStatus).toHaveBeenCalledWith('upload-123', 'test-token')
       expect(updateSessionData).toHaveBeenCalledWith(mockRequest, {
         benefitAreaFileName: 'benefit-area.zip',
@@ -466,54 +463,36 @@ describe('BenefitAreaController', () => {
       })
     })
 
-    test('should continue polling on PENDING status until success', async () => {
-      getUploadStatus
-        .mockResolvedValueOnce({
-          success: true,
-          data: { data: { uploadStatus: UPLOAD_STATUS.PENDING } }
-        })
-        .mockResolvedValueOnce({
-          success: true,
-          data: {
-            data: {
-              uploadStatus: UPLOAD_STATUS.READY,
-              filename: 'benefit-area.zip'
-            }
-          }
-        })
+    test('should render processing view when upload is still PENDING', async () => {
+      getUploadStatus.mockResolvedValue({
+        success: true,
+        data: { data: { uploadStatus: UPLOAD_STATUS.PENDING } }
+      })
 
       await benefitAreaController.uploadStatusHandler(mockRequest, mockH)
 
-      expect(getUploadStatus).toHaveBeenCalledTimes(2)
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        { uploadId: 'upload-123', attempt: 1 },
-        'Polling upload status'
-      )
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        { uploadId: 'upload-123', attempt: 2 },
-        'Polling upload status'
+      expect(getUploadStatus).toHaveBeenCalledTimes(1)
+      expect(mockH.redirect).not.toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        expect.any(Object)
       )
     })
 
-    test('should continue polling on PROCESSING status', async () => {
-      getUploadStatus
-        .mockResolvedValueOnce({
-          success: true,
-          data: { data: { uploadStatus: UPLOAD_STATUS.PROCESSING } }
-        })
-        .mockResolvedValueOnce({
-          success: true,
-          data: {
-            data: {
-              uploadStatus: UPLOAD_STATUS.READY,
-              filename: 'benefit-area.zip'
-            }
-          }
-        })
+    test('should render processing view when upload is in PROCESSING status', async () => {
+      getUploadStatus.mockResolvedValue({
+        success: true,
+        data: { data: { uploadStatus: UPLOAD_STATUS.PROCESSING } }
+      })
 
       await benefitAreaController.uploadStatusHandler(mockRequest, mockH)
 
-      expect(getUploadStatus).toHaveBeenCalledTimes(2)
+      expect(getUploadStatus).toHaveBeenCalledTimes(1)
+      expect(mockH.redirect).not.toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        expect.any(Object)
+      )
     })
 
     test('should handle FAILED status with truthy rejectionReason', async () => {
@@ -536,45 +515,33 @@ describe('BenefitAreaController', () => {
       })
     })
 
-    test('should handle status response with missing success field', async () => {
-      getUploadStatus
-        .mockResolvedValueOnce({
-          data: { data: { uploadStatus: UPLOAD_STATUS.PENDING } }
-        })
-        .mockResolvedValueOnce({
-          success: true,
-          data: {
-            data: {
-              uploadStatus: UPLOAD_STATUS.READY,
-              filename: 'benefit-area.zip'
-            }
-          }
-        })
+    test('should render processing view when status response has no success field', async () => {
+      getUploadStatus.mockResolvedValue({
+        data: { data: { uploadStatus: UPLOAD_STATUS.PENDING } }
+      })
 
       await benefitAreaController.uploadStatusHandler(mockRequest, mockH)
 
-      expect(getUploadStatus).toHaveBeenCalledTimes(2)
+      expect(getUploadStatus).toHaveBeenCalledTimes(1)
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        expect.any(Object)
+      )
     })
 
-    test('should handle status response with null statusResponseData.data', async () => {
-      getUploadStatus
-        .mockResolvedValueOnce({
-          success: true,
-          data: { data: null }
-        })
-        .mockResolvedValueOnce({
-          success: true,
-          data: {
-            data: {
-              uploadStatus: UPLOAD_STATUS.READY,
-              filename: 'benefit-area.zip'
-            }
-          }
-        })
+    test('should render processing view when status data is null', async () => {
+      getUploadStatus.mockResolvedValue({
+        success: true,
+        data: { data: null }
+      })
 
       await benefitAreaController.uploadStatusHandler(mockRequest, mockH)
 
-      expect(getUploadStatus).toHaveBeenCalledTimes(2)
+      expect(getUploadStatus).toHaveBeenCalledTimes(1)
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        expect.any(Object)
+      )
     })
 
     test('should record proposalStepVisit submitted metric on successful upload', async () => {
@@ -648,8 +615,7 @@ describe('BenefitAreaController', () => {
       expect(mockRequest.logger.info).toHaveBeenCalled()
     })
 
-    test('should timeout after max polling attempts and redirect with timeout error', async () => {
-      // Mock to return PENDING status for all 10 attempts to trigger timeout
+    test('should render processing view when upload remains PENDING', async () => {
       getUploadStatus.mockResolvedValue({
         success: true,
         data: { data: { uploadStatus: UPLOAD_STATUS.PENDING } }
@@ -657,27 +623,16 @@ describe('BenefitAreaController', () => {
 
       await benefitAreaController.uploadStatusHandler(mockRequest, mockH)
 
-      expect(getUploadStatus).toHaveBeenCalledTimes(10)
-      expect(updateSessionData).toHaveBeenCalledWith(mockRequest, {
-        benefitAreaUploadErrors: [
-          { message: 'Upload processing timeout - please try again' }
-        ],
-        benefitAreaUploadId: null,
-        benefitAreaFileName: null
-      })
-      expect(mockH.redirect).toHaveBeenCalledWith(
-        ROUTES.PROJECT.EDIT.BENEFIT_AREA.replace(
-          '{referenceNumber}',
-          'TEST-001'
-        )
+      expect(getUploadStatus).toHaveBeenCalledTimes(1)
+      expect(mockH.redirect).not.toHaveBeenCalled()
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        expect.any(Object)
       )
-    }, 25000)
+    })
 
     test('should handle outer try-catch error when an unexpected error occurs', async () => {
-      // Mock logger.info to throw an error to trigger outer try-catch
-      mockLogger.info.mockImplementation(() => {
-        throw new Error('Unexpected logger error')
-      })
+      getUploadStatus.mockRejectedValue(new Error('Network error'))
 
       await benefitAreaController.uploadStatusHandler(mockRequest, mockH)
 
