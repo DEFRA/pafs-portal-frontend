@@ -93,7 +93,9 @@ function processStatusResponse(statusResponse) {
     return null
   }
   const statusResponseData = statusResponse.data
-  if (!statusResponseData?.data) return null
+  if (!statusResponseData?.data) {
+    return null
+  }
   const { uploadStatus, rejectionReason } = statusResponseData.data
 
   if (

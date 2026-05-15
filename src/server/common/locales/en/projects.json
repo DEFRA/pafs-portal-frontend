@@ -487,6 +487,11 @@
         "help_text": "If you are unable to upload or create a shapefile, contact your local partnership and strategic overview officer and they will be able to help you."
       }
     },
+    "processing": {
+      "heading": "We are checking your file",
+      "description": "This may take a few seconds. The page will refresh automatically.",
+      "refresh_link": "Refresh to check again"
+    },
     "delete": {
       "title": "Delete project benefit area",
       "heading": "Are you sure you want to delete this shapefile?",
