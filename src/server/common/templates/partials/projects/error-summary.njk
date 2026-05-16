@@ -116,11 +116,19 @@
         href: "#financialStartYear"
     }
   ]) %}
-{% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_INVALID or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_INVALID %}
+{% elif fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_INVALID or errorCode == ERROR_CODES.FINANCIAL_END_YEAR_INVALID %}
   {% set errorList = errorList.concat([
     {
       text: t(financialLocalePrefixKey + '.errors.invalid_format')if financialLocalePrefixKey else
-        t('projects.financial_year_start_manual.errors.invalid_format'),
+        t('projects.financial_year_end_manual.errors.invalid_format'),
+        href: "#financialEndYear"
+    }
+  ]) %}
+{% elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or errorCode == ERROR_CODES.FINANCIAL_START_YEAR_INVALID %}
+  {% set errorList = errorList.concat([
+    {
+      text: t(financialLocalePrefixKey + '.errors.invalid_start')if financialLocalePrefixKey else
+        t('projects.financial_year_start_manual.errors.invalid_start'),
         href: "#financialStartYear"
     }
   ]) %}

@@ -29,7 +29,8 @@
       "legacy_banner_title": "Important",
       "legacy_banner_draft": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. Please review and complete any empty sections before submitting your proposal.",
       "legacy_banner_submitted": "This proposal was originally submitted in the previous system. Following the 2025 policy reforms, some sections have been updated. Certain sections may appear empty as the information was not collected under the previous system. To access your legacy data use the download function.",
-      "legacy_banner_archived": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. To make changes, you will need to revert this proposal to draft status first."
+      "legacy_banner_archived": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. To make changes, you will need to revert this proposal to draft status first.",
+      "stale_financial_years_warning": "The Financial Year Start and Stop years for this record were in the past. As a result, the Financial Year Start and Stop years, Funding Sources data, and Important Dates have been removed. Please update these sections."
     },
     "proposal_details_summary_card": {
       "title": "Proposal details",
@@ -329,11 +330,12 @@
   "intervention_type": {
     "heading": "Which of these interventions feature in your proposed project?",
     "title": "Which of these interventions feature in your proposed project?",
+    "hint": "Tick all that feature in your proposed project",
     "options": {
-      "nfm": "Natural Flood Management",
-      "pfr": "Property Flood Resilience",
-      "suds": "Sustainable Drainage Systems",
-      "other": "Other"
+      "nfm": "Natural flood management measures",
+      "suds": "Sustainable drainage systems",
+      "pfr": "Property flood resilience",
+      "other": "Something else"
     },
     "errors": {
       "required": "Select at least one intervention feature"
@@ -352,6 +354,7 @@
     "after_march_link": "The project starts after March {{afterMarchYear}}",
     "errors": {
       "required": "Select the financial year when the project first requires funding",
+      "invalid_start": "Enter a financial year in the correct format",
       "after_last_year": "Your first financial year should be less than or equal to your last financial year",
       "invalid_range": "Your first financial year should be less than or equal to your last financial year"
     }
@@ -363,7 +366,7 @@
     "hint": "For example, 2033",
     "errors": {
       "required": "Enter a financial year",
-      "invalid_format": "Enter a financial year in the correct format",
+      "invalid_start": "Enter a financial year in the correct format",
       "out_of_range": "Enter a financial year less than or equal to 2100",
       "should_be_in_future": "Enter a financial year that is the current year or later",
       "invalid_range": "Your first financial year should be less than or equal to your last financial year"
@@ -376,6 +379,7 @@
     "after_march_link": "The project stops spending funds after March {{afterMarchYear}}",
     "errors": {
       "required": "Select the financial year when the project stops spending funds",
+      "invalid_start": "Enter a valid financial year start",
       "invalid_range": "Your last financial year should be greater than or equal to your first financial year"
     }
   },
@@ -387,6 +391,7 @@
     "input_hint": "For example, 2033",
     "errors": {
       "required": "Enter a financial year",
+      "invalid_start": "Enter a valid financial year start",
       "invalid_format": "Enter a financial year in the correct format",
       "out_of_range": "Enter a financial year less than or equal to 2100",
       "should_be_in_future": "Enter a financial year that is the current year or later",
@@ -440,8 +445,8 @@
       "previousStagePlaceholder": "to start the work"
     },
     "could_start_earlier": {
-      "title": "Could the project begin sooner if Grant-in-Aid funding were made available earlier?",
-      "heading": "Could the project begin sooner if Grant-in-Aid funding were made available earlier?",
+      "title": "Could the project start sooner if Grant in Aid funding was made available earlier?",
+      "heading": "Could the project start sooner if Grant in Aid funding was made available earlier?",
       "hint": "Without impacting deliverability or outcomes"
     },
     "earliest_date": {
@@ -1845,8 +1850,8 @@
     "missing_financial_years": {
       "title": "Financial years required",
       "heading": "Financial years are required to continue",
-      "warning": "You cannot manage funding sources until the start financial year and end financial year have been set.",
-      "body": "Please return to the project overview and set the start financial year and end financial year before continuing with funding sources.",
+      "warning": "You cannot manage important dates or funding sources until the start financial year and end financial year have been set.",
+      "body": "Please return to the project overview and set the start financial year and end financial year before continuing with important dates or funding sources.",
       "return_to_overview_button": "Return to overview"
     }
   },
