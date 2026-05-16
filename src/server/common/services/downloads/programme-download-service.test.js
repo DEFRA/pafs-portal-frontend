@@ -108,13 +108,24 @@ describe('programme-download-service', () => {
   })
 
   describe('getAdminProgrammeFileUrl', () => {
-    test('calls GET /api/v1/admin/downloads/programme/file (no type param)', async () => {
+    test('calls GET /api/v1/admin/downloads/programme/file/fcerm1 for fcerm1 type', async () => {
       apiRequest.mockResolvedValue({ success: true })
 
-      await getAdminProgrammeFileUrl(TOKEN)
+      await getAdminProgrammeFileUrl(TOKEN, 'fcerm1')
 
       expect(apiRequest).toHaveBeenCalledWith(
-        '/api/v1/admin/downloads/programme/file',
+        '/api/v1/admin/downloads/programme/file/fcerm1',
+        expect.objectContaining({ method: 'GET' })
+      )
+    })
+
+    test('calls GET /api/v1/admin/downloads/programme/file/benefit-areas for benefit-areas type', async () => {
+      apiRequest.mockResolvedValue({ success: true })
+
+      await getAdminProgrammeFileUrl(TOKEN, 'benefit-areas')
+
+      expect(apiRequest).toHaveBeenCalledWith(
+        '/api/v1/admin/downloads/programme/file/benefit-areas',
         expect.objectContaining({ method: 'GET' })
       )
     })
@@ -122,7 +133,7 @@ describe('programme-download-service', () => {
     test('passes the bearer token in Authorization header', async () => {
       apiRequest.mockResolvedValue({ success: true })
 
-      await getAdminProgrammeFileUrl('my-token')
+      await getAdminProgrammeFileUrl('my-token', 'fcerm1')
 
       expect(apiRequest).toHaveBeenCalledWith(
         expect.any(String),
