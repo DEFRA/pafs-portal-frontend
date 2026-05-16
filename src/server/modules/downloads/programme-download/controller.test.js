@@ -381,7 +381,7 @@ describe('#downloadFileController', () => {
     const h = makeH()
     await downloadFileController.handler(request, h)
 
-    expect(getAdminProgrammeFileUrl).toHaveBeenCalledWith('tok-123')
+    expect(getAdminProgrammeFileUrl).toHaveBeenCalledWith('tok-123', 'fcerm1')
     expect(getUserProgrammeFileUrl).not.toHaveBeenCalled()
     expect(h.redirect).toHaveBeenCalledWith('https://s3.example.com/admin.xlsx')
   })

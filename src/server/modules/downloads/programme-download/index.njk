@@ -226,8 +226,8 @@
           </section>
         {% endif %}
 
-        {# Benefit areas ZIP — user downloads only #}
-        {% if not isAdmin and downloadStatus.hasBenefitAreas %}
+        {# Benefit areas ZIP #}
+        {% if downloadStatus.hasBenefitAreas %}
           <section class="gem-c-attachment govuk-!-margin-bottom-6">
             <div class="gem-c-attachment__thumbnail">
               <a href="{{ routes.benefitAreas }}" class="govuk-link gem-c-attachment__thumbnail-image" tabindex="-1" aria-hidden="true">
