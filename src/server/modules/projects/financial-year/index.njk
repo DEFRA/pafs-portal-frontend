@@ -25,6 +25,7 @@
 
     {# Financial Start & End Year Step #}
     {% if step == projectSteps.FINANCIAL_START_YEAR or step == projectSteps.FINANCIAL_END_YEAR %}
+      {% set radiosHint = { text: t(localKeyPrefix + '.hint') } if step == projectSteps.FINANCIAL_END_YEAR else undefined %}
       {{ govukRadios({
       id: fieldName,
       name: fieldName,
@@ -35,6 +36,7 @@
           isPageHeading: true
         }
       },
+      hint: radiosHint,
       value: formData[fieldName],
       items: yearOptions,
       classes: "govuk-!-width-full",
@@ -49,6 +51,10 @@
     {%- elif step == projectSteps.FINANCIAL_START_YEAR_MANUAL or step == projectSteps.FINANCIAL_END_YEAR_MANUAL -%}
       <h1 class="govuk-heading-xl">{{ t(localKeyPrefix + '.heading') }}</h1>
 
+      {% if step == projectSteps.FINANCIAL_END_YEAR_MANUAL %}
+        <p class="govuk-hint">{{ t(localKeyPrefix + '.hint') }}</p>
+      {% endif %}
+
       {{ govukInput({
         id: fieldName,
         name: fieldName,
@@ -57,7 +63,7 @@
           text: t(localKeyPrefix + '.label')
         },
         hint: {
-          text: t(localKeyPrefix + '.hint')
+          text: t(localKeyPrefix + '.input_hint') if step == projectSteps.FINANCIAL_END_YEAR_MANUAL else t(localKeyPrefix + '.hint')
         },
         classes: "govuk-!-width-full",
         value: formData[fieldName],

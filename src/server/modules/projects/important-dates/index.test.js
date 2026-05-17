@@ -11,179 +11,94 @@ import {
   initializeEditSessionPreHandler
 } from '../helpers/project-edit-session.js'
 import { importantDatesController } from './controller.js'
+import { requireFinancialYears } from '../helpers/require-financial-years.js'
 
 // Mock dependencies
 vi.mock('../../../common/helpers/auth/auth-middleware.js')
 vi.mock('../helpers/permissions.js')
 vi.mock('../helpers/project-edit-session.js')
 vi.mock('./controller.js')
+vi.mock('../helpers/require-financial-years.js', () => ({
+  requireFinancialYears: vi.fn()
+}))
+
+const ROUTE_STEPS = 7
+const METHODS_PER_STEP = 2
+const STEP_ROUTE_KEYS = [
+  'START_OUTLINE_BUSINESS_CASE',
+  'COMPLETE_OUTLINE_BUSINESS_CASE',
+  'AWARD_MAIN_CONTRACT',
+  'START_WORK',
+  'START_BENEFITS',
+  'COULD_START_EARLY',
+  'EARLIEST_START_DATE'
+]
+const EXPECTED_PRE_HANDLERS = [
+  { method: requireAuth },
+  { method: fetchProjectForEdit },
+  { method: initializeEditSessionPreHandler },
+  { method: requireEditableStatus },
+  { method: requireEditPermission },
+  { method: requireFinancialYears }
+]
 
 describe('projectImportantDates plugin', () => {
-  let mockServer
-
-  beforeEach(() => {
-    mockServer = {
-      route: vi.fn()
-    }
-  })
-
-  test('should have correct plugin name', () => {
+  test('plugin has the correct name', () => {
     expect(projectImportantDates.plugin.name).toBe('Project - Important Dates')
   })
 
-  test('should register 14 routes (7 steps × 2 methods)', () => {
-    projectImportantDates.plugin.register(mockServer)
+  describe('register(server)', () => {
+    let registeredRoutes
 
-    expect(mockServer.route).toHaveBeenCalledTimes(1)
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-    expect(registeredRoutes).toHaveLength(14) // 7 steps × (GET + POST)
-  })
-
-  test('should register GET and POST routes for START_OUTLINE_BUSINESS_CASE', () => {
-    projectImportantDates.plugin.register(mockServer)
-
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-    const getRoute = registeredRoutes.find(
-      (r) =>
-        r.method === 'GET' &&
-        r.path === ROUTES.PROJECT.EDIT.START_OUTLINE_BUSINESS_CASE
-    )
-    const postRoute = registeredRoutes.find(
-      (r) =>
-        r.method === 'POST' &&
-        r.path === ROUTES.PROJECT.EDIT.START_OUTLINE_BUSINESS_CASE
-    )
-
-    expect(getRoute).toBeDefined()
-    expect(postRoute).toBeDefined()
-    expect(getRoute.options.handler).toBe(importantDatesController.getHandler)
-    expect(postRoute.options.handler).toBe(importantDatesController.postHandler)
-  })
-
-  test('should register GET and POST routes for COMPLETE_OUTLINE_BUSINESS_CASE', () => {
-    projectImportantDates.plugin.register(mockServer)
-
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-    const getRoute = registeredRoutes.find(
-      (r) =>
-        r.method === 'GET' &&
-        r.path === ROUTES.PROJECT.EDIT.COMPLETE_OUTLINE_BUSINESS_CASE
-    )
-    const postRoute = registeredRoutes.find(
-      (r) =>
-        r.method === 'POST' &&
-        r.path === ROUTES.PROJECT.EDIT.COMPLETE_OUTLINE_BUSINESS_CASE
-    )
-
-    expect(getRoute).toBeDefined()
-    expect(postRoute).toBeDefined()
-  })
-
-  test('should register GET and POST routes for AWARD_MAIN_CONTRACT', () => {
-    projectImportantDates.plugin.register(mockServer)
-
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-    const routes = registeredRoutes.filter(
-      (r) => r.path === ROUTES.PROJECT.EDIT.AWARD_MAIN_CONTRACT
-    )
-
-    expect(routes).toHaveLength(2)
-    expect(routes[0].method).toBe('GET')
-    expect(routes[1].method).toBe('POST')
-  })
-
-  test('should register GET and POST routes for START_WORK', () => {
-    projectImportantDates.plugin.register(mockServer)
-
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-    const routes = registeredRoutes.filter(
-      (r) => r.path === ROUTES.PROJECT.EDIT.START_WORK
-    )
-
-    expect(routes).toHaveLength(2)
-  })
-
-  test('should register GET and POST routes for START_BENEFITS', () => {
-    projectImportantDates.plugin.register(mockServer)
-
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-    const routes = registeredRoutes.filter(
-      (r) => r.path === ROUTES.PROJECT.EDIT.START_BENEFITS
-    )
-
-    expect(routes).toHaveLength(2)
-  })
-
-  test('should register GET and POST routes for COULD_START_EARLY', () => {
-    projectImportantDates.plugin.register(mockServer)
-
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-    const routes = registeredRoutes.filter(
-      (r) => r.path === ROUTES.PROJECT.EDIT.COULD_START_EARLY
-    )
-
-    expect(routes).toHaveLength(2)
-  })
-
-  test('should register GET and POST routes for EARLIEST_START_DATE', () => {
-    projectImportantDates.plugin.register(mockServer)
-
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-    const routes = registeredRoutes.filter(
-      (r) => r.path === ROUTES.PROJECT.EDIT.EARLIEST_START_DATE
-    )
-
-    expect(routes).toHaveLength(2)
-  })
-
-  test('should configure all routes with correct pre-handlers', () => {
-    projectImportantDates.plugin.register(mockServer)
-
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-
-    registeredRoutes.forEach((route) => {
-      expect(route.options.pre).toEqual([
-        { method: requireAuth },
-        { method: fetchProjectForEdit },
-        { method: initializeEditSessionPreHandler },
-        { method: requireEditableStatus },
-        { method: requireEditPermission }
-      ])
-    })
-  })
-
-  test('should use the same controller for all routes', () => {
-    projectImportantDates.plugin.register(mockServer)
-
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-    const getRoutes = registeredRoutes.filter((r) => r.method === 'GET')
-    const postRoutes = registeredRoutes.filter((r) => r.method === 'POST')
-
-    getRoutes.forEach((route) => {
-      expect(route.options.handler).toBe(importantDatesController.getHandler)
+    beforeEach(() => {
+      const mockServer = { route: vi.fn() }
+      projectImportantDates.plugin.register(mockServer)
+      registeredRoutes = mockServer.route.mock.calls[0][0]
     })
 
-    postRoutes.forEach((route) => {
-      expect(route.options.handler).toBe(importantDatesController.postHandler)
+    test('registers one route per method per step', () => {
+      expect(registeredRoutes).toHaveLength(ROUTE_STEPS * METHODS_PER_STEP)
     })
-  })
 
-  test('should register routes in correct order', () => {
-    projectImportantDates.plugin.register(mockServer)
+    test.each(STEP_ROUTE_KEYS)(
+      'registers GET and POST routes for %s',
+      (routeKey) => {
+        const routes = registeredRoutes.filter(
+          (r) => r.path === ROUTES.PROJECT.EDIT[routeKey]
+        )
+        expect(routes).toHaveLength(METHODS_PER_STEP)
+        expect(routes[0].method).toBe('GET')
+        expect(routes[1].method).toBe('POST')
+      }
+    )
 
-    const registeredRoutes = mockServer.route.mock.calls[0][0]
-    const routePaths = registeredRoutes
-      .filter((r) => r.method === 'GET')
-      .map((r) => r.path)
+    test('steps are registered in the correct order', () => {
+      const paths = registeredRoutes
+        .filter((r) => r.method === 'GET')
+        .map((r) => r.path)
+      expect(paths).toEqual(STEP_ROUTE_KEYS.map((k) => ROUTES.PROJECT.EDIT[k]))
+    })
 
-    expect(routePaths).toEqual([
-      ROUTES.PROJECT.EDIT.START_OUTLINE_BUSINESS_CASE,
-      ROUTES.PROJECT.EDIT.COMPLETE_OUTLINE_BUSINESS_CASE,
-      ROUTES.PROJECT.EDIT.AWARD_MAIN_CONTRACT,
-      ROUTES.PROJECT.EDIT.START_WORK,
-      ROUTES.PROJECT.EDIT.START_BENEFITS,
-      ROUTES.PROJECT.EDIT.COULD_START_EARLY,
-      ROUTES.PROJECT.EDIT.EARLIEST_START_DATE
-    ])
+    test('all routes include the requireFinancialYears gate', () => {
+      registeredRoutes.forEach((route) => {
+        expect(route.options.pre).toEqual(EXPECTED_PRE_HANDLERS)
+      })
+    })
+
+    test('GET routes use importantDatesController.getHandler', () => {
+      registeredRoutes
+        .filter((r) => r.method === 'GET')
+        .forEach((r) =>
+          expect(r.options.handler).toBe(importantDatesController.getHandler)
+        )
+    })
+
+    test('POST routes use importantDatesController.postHandler', () => {
+      registeredRoutes
+        .filter((r) => r.method === 'POST')
+        .forEach((r) =>
+          expect(r.options.handler).toBe(importantDatesController.postHandler)
+        )
+    })
   })
 })

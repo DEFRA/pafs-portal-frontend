@@ -4,6 +4,7 @@
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "button.njk" import govukButton %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "views/proposal-details-card.njk" import proposalDetailsSummaryCard %}
 {% from "views/project-benefit-area-card.njk" import projectBenefitAreaCard %}
 {% from "views/important-dates-card.njk" import importantDatesSummaryCard %}
@@ -35,6 +36,13 @@
     }) %}
     <p class="govuk-body">{{ legacyBannerMessage }}</p>
     {% endcall %}
+  {% endif %}
+
+  {% if staleFinancialYearsWarning %}
+    {{ govukWarningText({
+      text: t('projects.overview.common.stale_financial_years_warning'),
+      iconFallbackText: 'Warning'
+    }) }}
   {% endif %}
 
   <h1 class="govuk-heading-xl">{{ t('projects.overview.heading') }}</h1>

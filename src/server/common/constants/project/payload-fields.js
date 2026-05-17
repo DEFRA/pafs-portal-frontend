@@ -181,5 +181,6 @@ export const PROJECT_PAYLOAD_FIELDS = {
   FINANCIAL_YEAR: 'financialYear',
   TOTAL: 'total',
   CONTRIBUTOR_TYPE: 'contributorType',
-  AMOUNT: 'amount'
+  AMOUNT: 'amount',
+  STALE_DATA_CLEARED: 'staleDataCleared'
 }

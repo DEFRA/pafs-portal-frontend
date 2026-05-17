@@ -2,8 +2,10 @@
   {%- if fieldErrors and (fieldErrors.financialStartYear or fieldErrors.financialEndYear) -%}
     {%- if fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_REQUIRED or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_REQUIRED -%}
       required
-    {%- elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_INVALID or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_INVALID -%}
+    {%- elif fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_INVALID -%}
       invalid_format
+    {%- elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_INVALID -%}
+      invalid_start
     {%- elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_OUT_OF_RANGE or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_OUT_OF_RANGE -%}
       out_of_range
     {%- elif fieldErrors.financialStartYear == ERROR_CODES.FINANCIAL_START_YEAR_SHOULD_BE_IN_FUTURE or fieldErrors.financialEndYear == ERROR_CODES.FINANCIAL_END_YEAR_SHOULD_BE_IN_FUTURE -%}

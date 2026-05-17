@@ -28,6 +28,10 @@ import {
   computeFundingSourceTotals
 } from '../helpers/project-utils.js'
 import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
+import {
+  hasStaleFinancialYears,
+  flushStaleFinancialYears
+} from '../helpers/stale-financial-years.js'
 import { submitProjectProposal } from '../../../common/services/project/project-service.js'
 
 const SECTION_PROPOSAL_DETAILS = 'section-proposal-details'
@@ -205,7 +209,29 @@ class OverviewController {
     const backLink = getBackLink(request, {
       targetURL: ROUTES.PROJECT.HOME
     })
-    const projectData = getSessionData(request)
+    let projectData = getSessionData(request)
+
+    let staleFinancialYearsWarning = false
+    if (
+      EDITABLE_STATUSES.includes(projectData.projectState) &&
+      hasStaleFinancialYears(projectData)
+    ) {
+      const flushed = await flushStaleFinancialYears(request)
+      if (flushed) {
+        projectData = getSessionData(request)
+      }
+    }
+    // Show warning banner if the system previously cleared stale financial years and they
+    // have not yet been re-entered (either year is still null).
+    // staleDataCleared is persisted to DB — survives session expiry.
+    if (
+      projectData[PROJECT_PAYLOAD_FIELDS.STALE_DATA_CLEARED] === true &&
+      (projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR] == null ||
+        projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR] == null)
+    ) {
+      staleFinancialYearsWarning = true
+    }
+
     const viewData = this._getProjectViewData(request, {
       backLink,
       projectData
@@ -229,6 +255,8 @@ class OverviewController {
     if (flashSuccess) {
       viewData.submissionSuccess = flashSuccess.message
     }
+
+    viewData.staleFinancialYearsWarning = staleFinancialYearsWarning
 
     return h.view(PROJECT_VIEWS.OVERVIEW, viewData)
   }

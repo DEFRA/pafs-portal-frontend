@@ -96,13 +96,34 @@ describe('TypeController', () => {
           additionalData: expect.objectContaining({
             step: PROJECT_STEPS.TYPE,
             projectTypeOptions: expect.arrayContaining([
-              expect.objectContaining({ value: PROJECT_TYPES.DEF }),
-              expect.objectContaining({ value: PROJECT_TYPES.REP }),
-              expect.objectContaining({ value: PROJECT_TYPES.REF }),
-              expect.objectContaining({ value: PROJECT_TYPES.HCR }),
-              expect.objectContaining({ value: PROJECT_TYPES.STR }),
-              expect.objectContaining({ value: PROJECT_TYPES.STU }),
-              expect.objectContaining({ value: PROJECT_TYPES.ELO })
+              expect.objectContaining({
+                value: PROJECT_TYPES.DEF,
+                html: expect.stringContaining('<strong>')
+              }),
+              expect.objectContaining({
+                value: PROJECT_TYPES.REP,
+                html: expect.stringContaining('<strong>')
+              }),
+              expect.objectContaining({
+                value: PROJECT_TYPES.REF,
+                html: expect.stringContaining('<strong>')
+              }),
+              expect.objectContaining({
+                value: PROJECT_TYPES.HCR,
+                html: expect.stringContaining('<strong>')
+              }),
+              expect.objectContaining({
+                value: PROJECT_TYPES.STR,
+                html: expect.stringContaining('<strong>')
+              }),
+              expect.objectContaining({
+                value: PROJECT_TYPES.STU,
+                html: expect.stringContaining('<strong>')
+              }),
+              expect.objectContaining({
+                value: PROJECT_TYPES.ELO,
+                html: expect.stringContaining('<strong>')
+              })
             ])
           })
         })
@@ -113,11 +134,12 @@ describe('TypeController', () => {
       )
     })
 
-    test('should include all project type options', async () => {
+    test('should include all project type options with bold prefixes', async () => {
       await typeController.getHandler(mockRequest, mockH)
 
       const callArgs = buildViewData.mock.calls[0][1]
       const options = callArgs.additionalData.projectTypeOptions
+      const localKeyPrefix = 'projects.project_type'
 
       expect(options).toHaveLength(7)
       expect(options.map((o) => o.value)).toEqual([
@@ -129,6 +151,15 @@ describe('TypeController', () => {
         PROJECT_TYPES.STU,
         PROJECT_TYPES.ELO
       ])
+      options.forEach((option) => {
+        const key = option.value.toLowerCase()
+        const expectedPrefix = `translated_${localKeyPrefix}.prefixes.${key}`
+        const expectedDescription = `translated_${localKeyPrefix}.options.${key}`
+        expect(option.html).toBe(
+          `<strong>${expectedPrefix}</strong> ${expectedDescription}`
+        )
+        expect(option).not.toHaveProperty('text')
+      })
     })
 
     test('should render INTERVENTION_TYPE view with intervention type options', async () => {
