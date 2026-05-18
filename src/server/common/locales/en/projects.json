@@ -530,14 +530,14 @@
       }
     },
     "main_risk": {
-      "title": "What is the main risk?",
+      "title": "What is the main risk your proposed project will protect against?",
       "heading": "What is the main risk your proposed project will protect against?",
       "errors": {
         "required": "Please select the main source of risk"
       }
     },
     "property_affected_flooding": {
-      "title": "Properties affected by flooding",
+      "title": "How many properties affected by flooding is the project likely to benefit",
       "heading": "How many properties affected by flooding is the project likely to benefit",
       "description": "These are properties that are at risk today",
       "no_properties_checkbox": "My project does not benefit any properties at risk of flooding",
@@ -556,7 +556,7 @@
       }
     },
     "property_affected_coastal_erosion": {
-      "title": "Properties affected by coastal erosion",
+      "title": "How many properties affected by coastal erosion is the project likely to benefit",
       "heading": "How many properties affected by coastal erosion is the project likely to benefit",
       "description": "These are properties that are at risk today.",
       "no_properties_checkbox": "My project does not benefit any properties at risk of coastal erosion",
@@ -571,7 +571,7 @@
       }
     },
     "twenty_percent_deprived": {
-      "title": "Properties in 20% most deprived areas",
+      "title": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
       "heading": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
       "hint": "Enter a whole number between 0 and 100",
       "errors": {
@@ -580,7 +580,7 @@
       }
     },
     "forty_percent_deprived": {
-      "title": "Properties in 40% most deprived areas",
+      "title": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
       "heading": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
       "hint": "Enter a whole number between 0 and 100",
       "errors": {
@@ -589,7 +589,7 @@
       }
     },
     "current_flood_fluvial_risk": {
-      "title": "Current flood risk",
+      "title": "What is the current flood risk (fluvial and tidal) in the area the project is likely to benefit?",
       "heading": "What is the current flood risk (fluvial and tidal) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
@@ -603,8 +603,8 @@
       }
     },
     "current_flood_surface_water_risk": {
-      "title": "Current surface water flood risk",
-      "heading": "What is the current flood risk (Surface water) in the area the project is likely to benefit?",
+      "title": "What is the current flood risk (surface water) in the area the project is likely to benefit?",
+      "heading": "What is the current flood risk (surface water) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
         "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
@@ -617,7 +617,7 @@
       }
     },
     "current_coastal_erosion_risk": {
-      "title": "Current coastal erosion risk",
+      "title": "What is the current coastal erosion risk in the area the project is likely to benefit?",
       "heading": "What is the current coastal erosion risk in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
