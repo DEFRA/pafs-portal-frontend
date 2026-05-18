@@ -31,50 +31,15 @@ class TypeController {
   }
 
   _getProjectTypeOptions(request, localKeyPrefix) {
-    return [
-      {
-        text: request.t(
-          `${localKeyPrefix}.options.${PROJECT_TYPES.DEF.toLowerCase()}`
-        ),
-        value: PROJECT_TYPES.DEF
-      },
-      {
-        text: request.t(
-          `${localKeyPrefix}.options.${PROJECT_TYPES.REP.toLowerCase()}`
-        ),
-        value: PROJECT_TYPES.REP
-      },
-      {
-        text: request.t(
-          `${localKeyPrefix}.options.${PROJECT_TYPES.REF.toLowerCase()}`
-        ),
-        value: PROJECT_TYPES.REF
-      },
-      {
-        text: request.t(
-          `${localKeyPrefix}.options.${PROJECT_TYPES.HCR.toLowerCase()}`
-        ),
-        value: PROJECT_TYPES.HCR
-      },
-      {
-        text: request.t(
-          `${localKeyPrefix}.options.${PROJECT_TYPES.STR.toLowerCase()}`
-        ),
-        value: PROJECT_TYPES.STR
-      },
-      {
-        text: request.t(
-          `${localKeyPrefix}.options.${PROJECT_TYPES.STU.toLowerCase()}`
-        ),
-        value: PROJECT_TYPES.STU
-      },
-      {
-        text: request.t(
-          `${localKeyPrefix}.options.${PROJECT_TYPES.ELO.toLowerCase()}`
-        ),
-        value: PROJECT_TYPES.ELO
+    return Object.values(PROJECT_TYPES).map((type) => {
+      const key = type.toLowerCase()
+      const prefix = request.t(`${localKeyPrefix}.prefixes.${key}`)
+      const description = request.t(`${localKeyPrefix}.options.${key}`)
+      return {
+        html: `<strong>${prefix}</strong> ${description}`,
+        value: type
       }
-    ]
+    })
   }
 
   _getInterventionTypeOptions(request, localKeyPrefix) {

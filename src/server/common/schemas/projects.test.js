@@ -458,6 +458,58 @@ describe('Project Schemas', () => {
       expect(error).toBeDefined()
       expect(error.details[0].type).toBe('number.custom')
     })
+
+    test('should not fire range error when financialEndYear is 0 (stale data default)', () => {
+      vi.setSystemTime(new Date('2024-05-15'))
+      const schema = Joi.object({
+        financialStartYear: projectFinancialStartYearSchema,
+        financialEndYear: Joi.number().allow(null, '')
+      })
+      const { error } = schema.validate({
+        financialStartYear: 2026,
+        financialEndYear: 0
+      })
+      expect(error).toBeUndefined()
+    })
+
+    test('should not fire range error when financialEndYear is the string "0" (raw hidden field value)', () => {
+      vi.setSystemTime(new Date('2024-05-15'))
+      const schema = Joi.object({
+        financialStartYear: projectFinancialStartYearSchema,
+        financialEndYear: Joi.number().allow(null, '')
+      })
+      const { error } = schema.validate({
+        financialStartYear: 2026,
+        financialEndYear: '0'
+      })
+      expect(error).toBeUndefined()
+    })
+
+    test('should not fire range error when financialEndYear is null (stale data cleared)', () => {
+      vi.setSystemTime(new Date('2024-05-15'))
+      const schema = Joi.object({
+        financialStartYear: projectFinancialStartYearSchema,
+        financialEndYear: Joi.number().allow(null, '')
+      })
+      const { error } = schema.validate({
+        financialStartYear: 2026,
+        financialEndYear: null
+      })
+      expect(error).toBeUndefined()
+    })
+
+    test('should not fire range error when financialEndYear is empty string (not yet set)', () => {
+      vi.setSystemTime(new Date('2024-05-15'))
+      const schema = Joi.object({
+        financialStartYear: projectFinancialStartYearSchema,
+        financialEndYear: Joi.number().allow(null, '')
+      })
+      const { error } = schema.validate({
+        financialStartYear: 2026,
+        financialEndYear: ''
+      })
+      expect(error).toBeUndefined()
+    })
   })
 
   describe('projectFinancialEndYearSchema', () => {
@@ -531,6 +583,32 @@ describe('Project Schemas', () => {
       const { error } = schema.validate({
         financialStartYear: 2024,
         financialEndYear: 2024
+      })
+      expect(error).toBeUndefined()
+    })
+
+    test('should not fire range error when financialStartYear is null (stale data cleared)', () => {
+      vi.setSystemTime(new Date('2024-05-15'))
+      const schema = Joi.object({
+        financialStartYear: Joi.number().allow(null),
+        financialEndYear: projectFinancialEndYearSchema
+      })
+      const { error } = schema.validate({
+        financialStartYear: null,
+        financialEndYear: 2026
+      })
+      expect(error).toBeUndefined()
+    })
+
+    test('should not fire range error when financialStartYear is 0 (unset default)', () => {
+      vi.setSystemTime(new Date('2024-05-15'))
+      const schema = Joi.object({
+        financialStartYear: Joi.number().allow(0),
+        financialEndYear: projectFinancialEndYearSchema
+      })
+      const { error } = schema.validate({
+        financialStartYear: 0,
+        financialEndYear: 2026
       })
       expect(error).toBeUndefined()
     })

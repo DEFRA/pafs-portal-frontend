@@ -2,7 +2,8 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { overviewController } from './controller.js'
 import {
   PROJECT_STATUS,
-  PROJECT_TYPES
+  PROJECT_TYPES,
+  PROJECT_PAYLOAD_FIELDS
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import {
@@ -16,6 +17,10 @@ import {
 import { getAuthSession } from '../../../common/helpers/auth/session-manager.js'
 import { getCarbonImpactOverviewData } from '../helpers/overview/carbon-impact.js'
 import { submitProjectProposal } from '../../../common/services/project/project-service.js'
+import {
+  hasStaleFinancialYears,
+  flushStaleFinancialYears
+} from '../helpers/stale-financial-years.js'
 
 // Mock dependencies
 vi.mock('../../../common/helpers/auth/session-manager.js', () => ({
@@ -50,6 +55,11 @@ vi.mock('../../../common/services/project/project-service.js', () => ({
   updateProjectStatus: vi.fn(),
   getCarbonImpactCalc: vi.fn(),
   checkProjectNameExists: vi.fn()
+}))
+
+vi.mock('../helpers/stale-financial-years.js', () => ({
+  hasStaleFinancialYears: vi.fn().mockReturnValue(false),
+  flushStaleFinancialYears: vi.fn().mockResolvedValue(false)
 }))
 
 describe('OverviewController', () => {
@@ -550,6 +560,151 @@ describe('OverviewController', () => {
 
       const [, viewData] = mockH.view.mock.calls[0]
       expect(viewData.submissionSuccess).toBeUndefined()
+    })
+
+    test('should set staleFinancialYearsWarning to false when no stale years and no cleared flag', async () => {
+      hasStaleFinancialYears.mockReturnValue(false)
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(viewData.staleFinancialYearsWarning).toBe(false)
+    })
+
+    test('should not flush when project is not editable', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.SUBMITTED,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2024
+      })
+      hasStaleFinancialYears.mockReturnValue(true)
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(flushStaleFinancialYears).not.toHaveBeenCalled()
+    })
+
+    test('should flush when project is in DRAFT and has stale years', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2024
+      })
+      hasStaleFinancialYears.mockReturnValue(true)
+      flushStaleFinancialYears.mockResolvedValue(true)
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(flushStaleFinancialYears).toHaveBeenCalledWith(mockRequest)
+    })
+
+    test('should flush when project is in REVISE and has stale years', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.REVISE,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2024
+      })
+      hasStaleFinancialYears.mockReturnValue(true)
+      flushStaleFinancialYears.mockResolvedValue(true)
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      expect(flushStaleFinancialYears).toHaveBeenCalledWith(mockRequest)
+    })
+
+    test('should set staleFinancialYearsWarning to true when flush succeeds and years are cleared', async () => {
+      const staleProjectData = {
+        projectState: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2024,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: 2025
+      }
+      const clearedProjectData = {
+        projectState: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: null,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: null,
+        staleDataCleared: true
+      }
+      getSessionData
+        .mockReturnValueOnce(staleProjectData)
+        .mockReturnValueOnce(clearedProjectData)
+      hasStaleFinancialYears.mockReturnValue(true)
+      flushStaleFinancialYears.mockResolvedValue(true)
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(viewData.staleFinancialYearsWarning).toBe(true)
+    })
+
+    test('should set staleFinancialYearsWarning to false when flush fails', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2024
+      })
+      hasStaleFinancialYears.mockReturnValue(true)
+      flushStaleFinancialYears.mockResolvedValue(false)
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(viewData.staleFinancialYearsWarning).toBe(false)
+    })
+
+    test('should show warning on subsequent loads when years still null (AC3 persistence)', async () => {
+      // Simulates a reload after flush: no stale years detected (they’re null),
+      // but the DB field staleDataCleared is true (persisted by the flush API call).
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: null,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: null,
+        staleDataCleared: true
+      })
+      hasStaleFinancialYears.mockReturnValue(false)
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(viewData.staleFinancialYearsWarning).toBe(true)
+    })
+
+    test('should hide warning once financial years are re-entered (AC3 persistence)', async () => {
+      // Both years are re-entered — warning should no longer show
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2027,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: 2029,
+        staleDataCleared: true
+      })
+      hasStaleFinancialYears.mockReturnValue(false)
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(viewData.staleFinancialYearsWarning).toBe(false)
+    })
+
+    test('should refresh projectData from session after successful flush', async () => {
+      const staleProjectData = {
+        projectState: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: 2024
+      }
+      const freshProjectData = {
+        projectState: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: null,
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: null
+      }
+      getSessionData
+        .mockReturnValueOnce(staleProjectData)
+        .mockReturnValueOnce(freshProjectData)
+      hasStaleFinancialYears.mockReturnValue(true)
+      flushStaleFinancialYears.mockResolvedValue(true)
+      getCarbonImpactOverviewData.mockImplementation(
+        async (_req, projectData) => ({ success: true, projectData })
+      )
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(
+        viewData.projectData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]
+      ).toBeNull()
     })
   })
 

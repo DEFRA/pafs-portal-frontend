@@ -63,8 +63,10 @@ const validateFinancialStartYear = (year, helpers) => {
   }
 
   // Check start year is < end year
-  const endYear = helpers.state.ancestors[0]?.financialEndYear
-  if (endYear && endYear < year) {
+  // Parse explicitly: ancestors[0] may hold the raw (uncoerced) value, so '0' would
+  // be truthy and cause a false positive. Guard with > 0 to treat 0/null/'' as unset.
+  const endYear = Number(helpers.state.ancestors[0]?.financialEndYear)
+  if (Number.isFinite(endYear) && endYear > 0 && endYear < year) {
     return helpers.error('number.custom', {
       startYear: year,
       endYear

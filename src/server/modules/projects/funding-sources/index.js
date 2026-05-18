@@ -1,6 +1,6 @@
 import { ROUTES } from '../../../common/constants/routes.js'
 import { createEditRoutePair } from '../helpers/route-helpers.js'
-import { requireFinancialYears } from './helpers/require-financial-years.js'
+import { requireFinancialYears } from '../helpers/require-financial-years.js'
 import { requireFundingSourceGate } from './helpers/require-funding-source-gate.js'
 import {
   additionalFundingSourcesController,

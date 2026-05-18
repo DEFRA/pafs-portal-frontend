@@ -29,7 +29,8 @@
       "legacy_banner_title": "Important",
       "legacy_banner_draft": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. Please review and complete any empty sections before submitting your proposal.",
       "legacy_banner_submitted": "This proposal was originally submitted in the previous system. Following the 2025 policy reforms, some sections have been updated. Certain sections may appear empty as the information was not collected under the previous system. To access your legacy data use the download function.",
-      "legacy_banner_archived": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. To make changes, you will need to revert this proposal to draft status first."
+      "legacy_banner_archived": "This proposal was originally created in the previous system. Following the 2025 policy reforms, some sections have been updated and may require new information. To make changes, you will need to revert this proposal to draft status first.",
+      "stale_financial_years_warning": "The Financial Year Start and Stop years for this record were in the past. As a result, the Financial Year Start and Stop years, Funding Sources data, and Important Dates have been removed. Please update these sections."
     },
     "proposal_details_summary_card": {
       "title": "Proposal details",
@@ -313,6 +314,15 @@
       "stu": "Produce a study to support the case that a project is needed to resolve a flood or coastal erosion risk problem - helping to define the scope, purpose, and viability of any future project(s)",
       "elo": "Implement measures to address impacts arising from existing or historic flood or coastal erosion risk management assets or actions to comply with specified environmental legislation - Sites of Special Scientific Interest (SSSIs) and Water Environment Regulations (WER)"
     },
+    "prefixes": {
+      "def": "Defence (DEF):",
+      "rep": "Asset Replacement (REP):",
+      "ref": "Asset Refurbishment (REF):",
+      "hcr": "Habitat Compensation and Restoration (HCR):",
+      "str": "Strategy (STR):",
+      "stu": "Study (STU):",
+      "elo": "Environmental Legal Obligation (ELO):"
+    },
     "errors": {
       "required": "Select a project type"
     }
@@ -320,11 +330,12 @@
   "intervention_type": {
     "heading": "Which of these interventions feature in your proposed project?",
     "title": "Which of these interventions feature in your proposed project?",
+    "hint": "Tick all that feature in your proposed project",
     "options": {
-      "nfm": "Natural Flood Management",
-      "pfr": "Property Flood Resilience",
-      "suds": "Sustainable Drainage Systems",
-      "other": "Other"
+      "nfm": "Natural flood management measures",
+      "suds": "Sustainable drainage systems",
+      "pfr": "Property flood resilience",
+      "other": "Something else"
     },
     "errors": {
       "required": "Select at least one intervention feature"
@@ -343,6 +354,7 @@
     "after_march_link": "The project starts after March {{afterMarchYear}}",
     "errors": {
       "required": "Select the financial year when the project first requires funding",
+      "invalid_start": "Enter a financial year in the correct format",
       "after_last_year": "Your first financial year should be less than or equal to your last financial year",
       "invalid_range": "Your first financial year should be less than or equal to your last financial year"
     }
@@ -354,7 +366,7 @@
     "hint": "For example, 2033",
     "errors": {
       "required": "Enter a financial year",
-      "invalid_format": "Enter a financial year in the correct format",
+      "invalid_start": "Enter a financial year in the correct format",
       "out_of_range": "Enter a financial year less than or equal to 2100",
       "should_be_in_future": "Enter a financial year that is the current year or later",
       "invalid_range": "Your first financial year should be less than or equal to your last financial year"
@@ -367,6 +379,7 @@
     "after_march_link": "The project stops spending funds after March {{afterMarchYear}}",
     "errors": {
       "required": "Select the financial year when the project stops spending funds",
+      "invalid_start": "Enter a valid financial year start",
       "invalid_range": "Your last financial year should be greater than or equal to your first financial year"
     }
   },
@@ -374,9 +387,11 @@
     "heading": "In what financial year will the project stop spending funds?",
     "title": "In what financial year will the project stop spending funds?",
     "label": "Financial year starting April",
-    "hint": "Don't include years which include maintenance costs. For example, 2033",
+    "hint": "Don't include years which include maintenance costs.",
+    "input_hint": "For example, 2033",
     "errors": {
       "required": "Enter a financial year",
+      "invalid_start": "Enter a valid financial year start",
       "invalid_format": "Enter a financial year in the correct format",
       "out_of_range": "Enter a financial year less than or equal to 2100",
       "should_be_in_future": "Enter a financial year that is the current year or later",
@@ -515,14 +530,14 @@
       }
     },
     "main_risk": {
-      "title": "What is the main risk?",
+      "title": "What is the main risk your proposed project will protect against?",
       "heading": "What is the main risk your proposed project will protect against?",
       "errors": {
         "required": "Please select the main source of risk"
       }
     },
     "property_affected_flooding": {
-      "title": "Properties affected by flooding",
+      "title": "How many properties affected by flooding is the project likely to benefit",
       "heading": "How many properties affected by flooding is the project likely to benefit",
       "description": "These are properties that are at risk today",
       "no_properties_checkbox": "My project does not benefit any properties at risk of flooding",
@@ -541,7 +556,7 @@
       }
     },
     "property_affected_coastal_erosion": {
-      "title": "Properties affected by coastal erosion",
+      "title": "How many properties affected by coastal erosion is the project likely to benefit",
       "heading": "How many properties affected by coastal erosion is the project likely to benefit",
       "description": "These are properties that are at risk today.",
       "no_properties_checkbox": "My project does not benefit any properties at risk of coastal erosion",
@@ -556,7 +571,7 @@
       }
     },
     "twenty_percent_deprived": {
-      "title": "Properties in 20% most deprived areas",
+      "title": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
       "heading": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
       "hint": "Enter a whole number between 0 and 100",
       "errors": {
@@ -565,7 +580,7 @@
       }
     },
     "forty_percent_deprived": {
-      "title": "Properties in 40% most deprived areas",
+      "title": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
       "heading": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
       "hint": "Enter a whole number between 0 and 100",
       "errors": {
@@ -574,7 +589,7 @@
       }
     },
     "current_flood_fluvial_risk": {
-      "title": "Current flood risk",
+      "title": "What is the current flood risk (fluvial and tidal) in the area the project is likely to benefit?",
       "heading": "What is the current flood risk (fluvial and tidal) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
@@ -588,8 +603,8 @@
       }
     },
     "current_flood_surface_water_risk": {
-      "title": "Current surface water flood risk",
-      "heading": "What is the current flood risk (Surface water) in the area the project is likely to benefit?",
+      "title": "What is the current flood risk (surface water) in the area the project is likely to benefit?",
+      "heading": "What is the current flood risk (surface water) in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
         "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
@@ -602,7 +617,7 @@
       }
     },
     "current_coastal_erosion_risk": {
-      "title": "Current coastal erosion risk",
+      "title": "What is the current coastal erosion risk in the area the project is likely to benefit?",
       "heading": "What is the current coastal erosion risk in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
@@ -1835,8 +1850,8 @@
     "missing_financial_years": {
       "title": "Financial years required",
       "heading": "Financial years are required to continue",
-      "warning": "You cannot manage funding sources until the start financial year and end financial year have been set.",
-      "body": "Please return to the project overview and set the start financial year and end financial year before continuing with funding sources.",
+      "warning": "You cannot manage important dates or funding sources until the start financial year and end financial year have been set.",
+      "body": "Please return to the project overview and set the start financial year and end financial year before continuing with important dates or funding sources.",
       "return_to_overview_button": "Return to overview"
     }
   },

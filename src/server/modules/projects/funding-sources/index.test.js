@@ -32,7 +32,7 @@ vi.mock('../../../common/constants/routes.js', () => ({
   }
 }))
 
-vi.mock('./helpers/require-financial-years.js', () => ({
+vi.mock('../helpers/require-financial-years.js', () => ({
   requireFinancialYears: vi.fn()
 }))
 
@@ -41,7 +41,7 @@ vi.mock('./helpers/require-funding-source-gate.js', () => ({
 }))
 
 vi.mock('../helpers/route-helpers.js', () => ({
-  createEditRoutePair: vi.fn((path, controller, pre) => [
+  createEditRoutePair: vi.fn((path, controller, _pre) => [
     { method: 'GET', path, handler: controller.getHandler },
     { method: 'POST', path, handler: controller.postHandler }
   ])
@@ -87,7 +87,7 @@ vi.mock('./controller.js', () => ({
 }))
 
 import { createEditRoutePair } from '../helpers/route-helpers.js'
-import { requireFinancialYears } from './helpers/require-financial-years.js'
+import { requireFinancialYears } from '../helpers/require-financial-years.js'
 import { requireFundingSourceGate } from './helpers/require-funding-source-gate.js'
 import {
   fundingSourcesSelectionController,
@@ -102,6 +102,50 @@ import {
 } from './controller.js'
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
+
+const ROUTE_PAIRS = 9
+const FUNDING_SOURCES_GATE = [
+  { method: requireFinancialYears },
+  { method: requireFundingSourceGate }
+]
+const ROUTE_PAIR_DATA = [
+  [
+    '/project/{referenceNumber}/funding-sources',
+    fundingSourcesSelectionController
+  ],
+  [
+    '/project/{referenceNumber}/funding-sources/additional',
+    additionalFundingSourcesController
+  ],
+  [
+    '/project/{referenceNumber}/funding-sources/public-contributors',
+    publicContributorsController
+  ],
+  [
+    '/project/{referenceNumber}/funding-sources/public-contributors/delete/{index}',
+    publicContributorsDeleteController
+  ],
+  [
+    '/project/{referenceNumber}/funding-sources/private-contributors',
+    privateContributorsController
+  ],
+  [
+    '/project/{referenceNumber}/funding-sources/private-contributors/delete/{index}',
+    privateContributorsDeleteController
+  ],
+  [
+    '/project/{referenceNumber}/funding-sources/other-ea-contributors',
+    otherEaContributorsController
+  ],
+  [
+    '/project/{referenceNumber}/funding-sources/other-ea-contributors/delete/{index}',
+    otherEaContributorsDeleteController
+  ],
+  [
+    '/project/{referenceNumber}/funding-sources/estimated-spend',
+    estimatedSpendController
+  ]
+]
 
 describe('projectFundingSources plugin', () => {
   it('exports a plugin object with the correct name', () => {
@@ -135,130 +179,34 @@ describe('projectFundingSources plugin', () => {
       expect(mockServer.route).toHaveBeenCalledTimes(1)
     })
 
-    it('registers 18 routes total (9 route pairs × 2 methods)', () => {
+    it('registers the correct total number of routes', () => {
       projectFundingSources.plugin.register(mockServer)
-      expect(registeredRoutes).toHaveLength(18)
+      expect(registeredRoutes).toHaveLength(ROUTE_PAIRS * 2)
     })
 
-    it('calls createEditRoutePair 9 times (one per route pair)', () => {
+    it('calls createEditRoutePair once per route pair', () => {
       projectFundingSources.plugin.register(mockServer)
-      expect(createEditRoutePair).toHaveBeenCalledTimes(9)
-    })
-
-    it('registers the funding sources selection route pair', () => {
-      projectFundingSources.plugin.register(mockServer)
-      expect(createEditRoutePair).toHaveBeenCalledWith(
-        '/project/{referenceNumber}/funding-sources',
-        fundingSourcesSelectionController,
-        [
-          { method: requireFinancialYears },
-          { method: requireFundingSourceGate }
-        ]
-      )
-    })
-
-    it('registers the additional funding sources route pair', () => {
-      projectFundingSources.plugin.register(mockServer)
-      expect(createEditRoutePair).toHaveBeenCalledWith(
-        '/project/{referenceNumber}/funding-sources/additional',
-        additionalFundingSourcesController,
-        [
-          { method: requireFinancialYears },
-          { method: requireFundingSourceGate }
-        ]
-      )
-    })
-
-    it('registers the public sector contributors route pair', () => {
-      projectFundingSources.plugin.register(mockServer)
-      expect(createEditRoutePair).toHaveBeenCalledWith(
-        '/project/{referenceNumber}/funding-sources/public-contributors',
-        publicContributorsController,
-        [
-          { method: requireFinancialYears },
-          { method: requireFundingSourceGate }
-        ]
-      )
-    })
-
-    it('registers the public sector contributors delete route pair with index param', () => {
-      projectFundingSources.plugin.register(mockServer)
-      expect(createEditRoutePair).toHaveBeenCalledWith(
-        '/project/{referenceNumber}/funding-sources/public-contributors/delete/{index}',
-        publicContributorsDeleteController,
-        [
-          { method: requireFinancialYears },
-          { method: requireFundingSourceGate }
-        ]
-      )
-    })
-
-    it('registers the private sector contributors route pair', () => {
-      projectFundingSources.plugin.register(mockServer)
-      expect(createEditRoutePair).toHaveBeenCalledWith(
-        '/project/{referenceNumber}/funding-sources/private-contributors',
-        privateContributorsController,
-        [
-          { method: requireFinancialYears },
-          { method: requireFundingSourceGate }
-        ]
-      )
-    })
-
-    it('registers the private sector contributors delete route pair with index param', () => {
-      projectFundingSources.plugin.register(mockServer)
-      expect(createEditRoutePair).toHaveBeenCalledWith(
-        '/project/{referenceNumber}/funding-sources/private-contributors/delete/{index}',
-        privateContributorsDeleteController,
-        [
-          { method: requireFinancialYears },
-          { method: requireFundingSourceGate }
-        ]
-      )
-    })
-
-    it('registers the other EA contributors route pair', () => {
-      projectFundingSources.plugin.register(mockServer)
-      expect(createEditRoutePair).toHaveBeenCalledWith(
-        '/project/{referenceNumber}/funding-sources/other-ea-contributors',
-        otherEaContributorsController,
-        [
-          { method: requireFinancialYears },
-          { method: requireFundingSourceGate }
-        ]
-      )
-    })
-
-    it('registers the other EA contributors delete route pair with index param', () => {
-      projectFundingSources.plugin.register(mockServer)
-      expect(createEditRoutePair).toHaveBeenCalledWith(
-        '/project/{referenceNumber}/funding-sources/other-ea-contributors/delete/{index}',
-        otherEaContributorsDeleteController,
-        [
-          { method: requireFinancialYears },
-          { method: requireFundingSourceGate }
-        ]
-      )
-    })
-
-    it('registers the estimated spend route pair', () => {
-      projectFundingSources.plugin.register(mockServer)
-      expect(createEditRoutePair).toHaveBeenCalledWith(
-        '/project/{referenceNumber}/funding-sources/estimated-spend',
-        estimatedSpendController,
-        [
-          { method: requireFinancialYears },
-          { method: requireFundingSourceGate }
-        ]
-      )
+      expect(createEditRoutePair).toHaveBeenCalledTimes(ROUTE_PAIRS)
     })
 
     it('all registered routes have GET and POST methods', () => {
       projectFundingSources.plugin.register(mockServer)
       const getMethods = registeredRoutes.filter((r) => r.method === 'GET')
       const postMethods = registeredRoutes.filter((r) => r.method === 'POST')
-      expect(getMethods).toHaveLength(9)
-      expect(postMethods).toHaveLength(9)
+      expect(getMethods).toHaveLength(ROUTE_PAIRS)
+      expect(postMethods).toHaveLength(ROUTE_PAIRS)
     })
+
+    it.each(ROUTE_PAIR_DATA)(
+      'registers %s with requireFinancialYears + gate pre-handlers',
+      (path, controller) => {
+        projectFundingSources.plugin.register(mockServer)
+        expect(createEditRoutePair).toHaveBeenCalledWith(
+          path,
+          controller,
+          FUNDING_SOURCES_GATE
+        )
+      }
+    )
   })
 })
