@@ -474,6 +474,7 @@
     "heading": "What area is the project likely to benefit?",
     "introduction": "Upload a shapefile. The shapefile should show the approximate area the project is likely to benefit. Draw as many separate areas as necessary, but make sure they don't overlap.",
     "hint": "Your shapefile files should be in a single compressed folder or zipfile (.zip) to upload successfully",
+    "label": "Upload shapefile",
     "footer": {
       "free_mapping_tool": {
         "title": "Free mapping tool",
@@ -498,7 +499,7 @@
         }
       },
       "unable_to_create_shape_file": {
-        "title": "Unable to create a shapefile?",
+        "title": "Unable to create a shapefile",
         "help_text": "If you are unable to upload or create a shapefile, contact your local partnership and strategic overview officer and they will be able to help you."
       }
     },
@@ -550,7 +551,7 @@
         "reducing_less_50": "Reducing flood risk (less than 50%)",
         "increasing_resilience": "Increasing flood resilience",
         "maintaining_existing_question": "How many properties are estimated to benefit from maintaining existing assets?",
-        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more (excluding property flood resilience)?",
+        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more?",
         "reducing_less_50_question": "How many properties are estimated to benefit from a reduction in flood probability of less than 50% (excluding property flood resilience)?",
         "increasing_resilience_question": "How many properties will benefit from an individual property intervention?"
       }
