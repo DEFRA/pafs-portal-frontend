@@ -169,16 +169,16 @@ describe('isScannerProbe', () => {
       '/api/save.action',
       '/handler.ashx',
       '/page.shtml'
-    ])('%s', (path) => {
-      expect(isScannerProbe(path)).toBe(true)
+    ])('%s', (pathway) => {
+      expect(isScannerProbe(pathway)).toBe(true)
     })
   })
 
   describe('dotfile and traversal probes — returns true', () => {
     test.each(['/.env', '/.git/config', '/.htaccess', '/.DS_Store'])(
       '%s',
-      (path) => {
-        expect(isScannerProbe(path)).toBe(true)
+      (pathway) => {
+        expect(isScannerProbe(pathway)).toBe(true)
       }
     )
   })
@@ -191,8 +191,8 @@ describe('isScannerProbe', () => {
       '/api/v1/projects',
       '/assets/govuk-frontend.min.js',
       '/'
-    ])('%s', (path) => {
-      expect(isScannerProbe(path)).toBe(false)
+    ])('%s', (pathway) => {
+      expect(isScannerProbe(pathway)).toBe(false)
     })
   })
 })
