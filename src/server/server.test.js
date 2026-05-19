@@ -106,6 +106,53 @@ describe('createServer', () => {
       expect(route).toBeDefined()
     })
   })
+
+  describe('scanner probe filter', () => {
+    test.each([
+      '/wp-login.php',
+      '/phpmyadmin/index.php5',
+      '/admin/upload.php7',
+      '/admin/index.asp',
+      '/admin/index.aspx',
+      '/app/index.jsp',
+      '/cgi-bin/test.cgi',
+      '/scripts/test.pl',
+      '/app/index.cfm',
+      '/api/action.do',
+      '/api/save.action',
+      '/handler.ashx',
+      '/page.shtml'
+    ])('returns 404 for server-side script extension: %s', async (url) => {
+      const { statusCode } = await server.inject({ method: 'GET', url })
+      expect(statusCode).toBe(404)
+    })
+
+    test.each(['/.env', '/.git/config', '/.htaccess', '/.DS_Store'])(
+      'returns 404 for dotfile probe: %s',
+      async (url) => {
+        const { statusCode } = await server.inject({ method: 'GET', url })
+        expect(statusCode).toBe(404)
+      }
+    )
+
+    test('scanner probe 404 bypasses the error page (empty response body)', async () => {
+      const { result } = await server.inject({
+        method: 'GET',
+        url: '/wp-login.php'
+      })
+      expect(result).toBeFalsy()
+    })
+
+    test('does not block the health route', async () => {
+      const { statusCode } = await server.inject({
+        method: 'GET',
+        url: '/health'
+      })
+      // Health may return 503 in test when external dependencies are unavailable.
+      // The important thing is the scanner probe filter did not intercept it with 404.
+      expect(statusCode).not.toBe(404)
+    })
+  })
 })
 
 // ---------------------------------------------------------------------------
