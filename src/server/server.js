@@ -96,12 +96,13 @@ function buildServerConfig() {
 
 // Drop scanner probe requests before the logger sees them so they never
 // appear in logs or inflate Grafana 4xx metrics.
+export function isScannerProbe(path) {
+  return SCRIPT_EXTENSION_PATTERN.test(path) || PATH_PROBE_PATTERN.test(path)
+}
+
 function registerScannerProbeFilter(server) {
   server.ext('onRequest', (request, h) => {
-    const isScannerProbe =
-      SCRIPT_EXTENSION_PATTERN.test(request.path) ||
-      PATH_PROBE_PATTERN.test(request.path)
-    if (isScannerProbe) {
+    if (isScannerProbe(request.path)) {
       return h.response().code(statusCodes.notFound).takeover()
     }
     return h.continue
