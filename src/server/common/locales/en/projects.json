@@ -1411,8 +1411,8 @@
       "heading": "How many hectares of pond and/or lake habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
@@ -1439,8 +1439,8 @@
       "heading": "How many hectares of arable land habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."

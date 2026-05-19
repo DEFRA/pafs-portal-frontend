@@ -7,7 +7,11 @@ import {
   afterEach,
   vi
 } from 'vitest'
-import { createServer, collectProductionCookieErrors } from './server.js'
+import {
+  createServer,
+  collectProductionCookieErrors,
+  isScannerProbe
+} from './server.js'
 import { config } from '../config/config.js'
 
 // ---------------------------------------------------------------------------
@@ -104,6 +108,91 @@ describe('createServer', () => {
     test('health route is registered', () => {
       const route = server.lookup('health')
       expect(route).toBeDefined()
+    })
+  })
+
+  describe('scanner probe filter — HTTP behaviour', () => {
+    test.each([
+      '/wp-login.php',
+      '/phpmyadmin/index.php5',
+      '/admin/upload.php7',
+      '/admin/index.asp',
+      '/admin/index.aspx',
+      '/app/index.jsp',
+      '/cgi-bin/test.cgi',
+      '/scripts/test.pl',
+      '/app/index.cfm',
+      '/api/action.do',
+      '/api/save.action',
+      '/handler.ashx',
+      '/page.shtml'
+    ])('returns 404 for server-side script extension: %s', async (url) => {
+      const { statusCode } = await server.inject({ method: 'GET', url })
+      expect(statusCode).toBe(404)
+    })
+
+    test.each(['/.env', '/.git/config', '/.htaccess', '/.DS_Store'])(
+      'returns 404 for dotfile probe: %s',
+      async (url) => {
+        const { statusCode } = await server.inject({ method: 'GET', url })
+        expect(statusCode).toBe(404)
+      }
+    )
+
+    test('scanner probe 404 bypasses the error page (empty response body)', async () => {
+      const { result } = await server.inject({
+        method: 'GET',
+        url: '/wp-login.php'
+      })
+      expect(result).toBeFalsy()
+    })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// isScannerProbe unit tests — no server/HTTP needed, no timeout risk
+// ---------------------------------------------------------------------------
+
+describe('isScannerProbe', () => {
+  describe('server-side script extensions — returns true', () => {
+    test.each([
+      '/wp-login.php',
+      '/phpmyadmin/index.php5',
+      '/admin/upload.php7',
+      '/admin/index.asp',
+      '/admin/index.aspx',
+      '/app/index.jsp',
+      '/cgi-bin/test.cgi',
+      '/scripts/test.pl',
+      '/app/index.cfm',
+      '/api/action.do',
+      '/api/save.action',
+      '/handler.ashx',
+      '/page.shtml'
+    ])('%s', (pathway) => {
+      expect(isScannerProbe(pathway)).toBe(true)
+    })
+  })
+
+  describe('dotfile and traversal probes — returns true', () => {
+    test.each(['/.env', '/.git/config', '/.htaccess', '/.DS_Store'])(
+      '%s',
+      (pathway) => {
+        expect(isScannerProbe(pathway)).toBe(true)
+      }
+    )
+  })
+
+  describe('legitimate application paths — returns false', () => {
+    test.each([
+      '/health',
+      '/login',
+      '/projects',
+      '/api/v1/projects',
+      '/assets/govuk-frontend.min.js',
+      '/'
+    ])('%s', (pathway) => {
+      expect(isScannerProbe(pathway)).toBe(false)
     })
   })
 })
