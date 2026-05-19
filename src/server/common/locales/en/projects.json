@@ -806,7 +806,7 @@
       }
     },
     "land_use_change": {
-      "title": "Tell us what the land use in your project area will be before and after your natural flood measures project",
+      "title": "Tell us which land uses are within your project area. Include existing land uses and new land uses",
       "hint": "Select all that apply",
       "error": "Select at least one land type",
       "options": {
