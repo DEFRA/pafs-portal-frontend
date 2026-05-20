@@ -22,6 +22,11 @@ describe('nfm navigation helpers', () => {
     )
   })
 
+  test('NFM_STEP_SEQUENCE includes saltmarsh and sand dune as conditional (null) steps', () => {
+    expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_SALTMARSH]).toBeNull()
+    expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_SAND_DUNE]).toBeNull()
+  })
+
   test('returns null for selected measures step', () => {
     const result = getDynamicBackLink(PROJECT_STEPS.NFM_SELECTED_MEASURES, {})
     expect(result).toBeNull()

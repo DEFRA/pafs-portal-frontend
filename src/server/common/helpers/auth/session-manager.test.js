@@ -264,11 +264,13 @@ describe('Session Manager', () => {
     })
 
     test('handles token at exact refresh boundary', () => {
+      vi.useFakeTimers()
       const session = {
         expiresAt: Date.now() + 300000 // Exactly 5 minutes (refresh buffer)
       }
 
       expect(shouldRefreshToken(session)).toBe(false)
+      vi.useRealTimers()
     })
 
     test('handles token just before refresh boundary', () => {

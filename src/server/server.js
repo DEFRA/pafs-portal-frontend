@@ -20,9 +20,16 @@ import { contentSecurityPolicy } from './common/helpers/content-security-policy.
 import { i18nPlugin } from './common/helpers/i18n/index.js'
 import { areasPreloader } from './common/helpers/areas/areas-preloader.js'
 import { metrics } from '@defra/cdp-metrics'
+import { statusCodes } from './common/constants/status-codes.js'
 
 const INSECURE_COOKIE_DEFAULT =
   'the-password-must-be-at-least-32-characters-long'
+
+// Matches paths a Node.js app would never serve — short-circuits before the
+// request logger so scanner noise never reaches logs or Grafana metrics.
+const SCRIPT_EXTENSION_PATTERN =
+  /\.(php\d?|aspx?|jsp|cgi|pl|cfm|do|action|ashx|shtml)([?#]|$)/i
+const PATH_PROBE_PATTERN = /(?:^\/\.)|(?:\.\.[\\/])/
 
 export function collectProductionCookieErrors(isProduction, getConfigValue) {
   if (!isProduction) {
@@ -47,10 +54,8 @@ function validateProductionConfig() {
   }
 }
 
-export async function createServer() {
-  validateProductionConfig()
-  setupProxy()
-  const server = hapi.server({
+function buildServerConfig() {
+  return {
     host: config.get('host'),
     port: config.get('port'),
     routes: {
@@ -86,11 +91,48 @@ export async function createServer() {
     state: {
       strictHeader: false
     }
+  }
+}
+
+// Drop scanner probe requests before the logger sees them so they never
+// appear in logs or inflate Grafana 4xx metrics.
+export function isScannerProbe(pathway) {
+  return (
+    SCRIPT_EXTENSION_PATTERN.test(pathway) || PATH_PROBE_PATTERN.test(pathway)
+  )
+}
+
+// This is a server-side rendered GOV.UK frontend: only GET (page loads) and
+// POST (form submissions) are legitimate.  Any other HTTP method is scanner
+// noise and should be silently dropped.  We return 404 rather than 405 to
+// avoid leaking which routes exist.
+export const ALLOWED_METHODS = new Set(['get', 'post'])
+
+function registerScannerProbeFilter(server) {
+  // onRequest: short-circuit scanner probe patterns (PHP/ASP/dotfile etc.)
+  // and unsupported HTTP methods before route matching.
+  server.ext('onRequest', (request, h) => {
+    if (!ALLOWED_METHODS.has(request.method) || isScannerProbe(request.path)) {
+      request.app.silentDrop = true
+      return h.response().code(statusCodes.notFound).takeover()
+    }
+    return h.continue
   })
 
-  // Register cookie state definitions so Hapi knows how to decode them
-  registerCookieStates(server)
+  // onPreResponse: suppress logging for requests that fell through to the
+  // catch-all /{p*} route.  That route handles all unregistered paths, so
+  // any hit on it is bot/noise traffic rather than a genuine application error.
+  // Genuine 4xx from real registered routes (validation errors, auth failures,
+  // etc.) are NOT affected — their route path is specific, not '/{p*}'.
+  server.ext('onPreResponse', (request, h) => {
+    if (request.route?.path === '/{p*}') {
+      request.app.silentDrop = true
+    }
+    return h.continue
+  })
+}
 
+async function registerPlugins(server) {
   await server.register([
     requestLogger,
     requestTracing,
@@ -115,9 +157,16 @@ export async function createServer() {
     metrics, // AWS EMF metrics (must be after requestTracing)
     router // Register all the controllers/routes defined in src/server/router.js
   ])
+}
 
+export async function createServer() {
+  validateProductionConfig()
+  setupProxy()
+  const server = hapi.server(buildServerConfig())
+  registerCookieStates(server)
+  registerScannerProbeFilter(server)
+  await registerPlugins(server)
   server.ext('onPreResponse', catchAll)
   server.ext('onPreResponse', noCacheHeaders)
-
   return server
 }

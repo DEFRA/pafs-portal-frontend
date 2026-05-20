@@ -49,9 +49,7 @@
           } %}
         {% elif errorKey == 'earliest_date_after_obc_start' %}
           {% set dateError = {
-            text: t('projects.important_dates.validation.' + errorKey, {
-              obcStartDate: obcStartDateFormatted
-            })
+            text: t('projects.important_dates.validation.' + errorKey, {obcStartDate: obcStartDateFormatted})
           } %}
         {% elif monthField == 'earliestWithGiaMonth' %}
           {% set dateError = {

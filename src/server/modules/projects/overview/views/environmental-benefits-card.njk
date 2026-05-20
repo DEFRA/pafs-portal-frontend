@@ -1,5 +1,6 @@
 {% macro environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) %}
   {% set hasEnvironmentalBenefits = projectData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENTAL_BENEFITS] %}
+  {% set environmentalBenefitsVisited = projectData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENTAL_BENEFITS] !== null and projectData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENTAL_BENEFITS] !== undefined %}
   <div class="govuk-summary-card">
     <div class="govuk-summary-card__title-wrapper">
       <h2 class="govuk-summary-card__title">{{ t('projects.overview.environmental_benefits_summary_card.title') }}</h2>
@@ -7,7 +8,7 @@
         <ul class="govuk-summary-card__actions">
           <li class="govuk-summary-card__action">
             <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.ENVIRONMENTAL_BENEFITS }}">
-              {% if hasEnvironmentalBenefits %}{{ t('common.change') }}
+              {% if environmentalBenefitsVisited %}{{ t('common.change') }}
               {% else %}{{ t('common.add') }}
               {% endif %}
               <span class="govuk-visually-hidden">

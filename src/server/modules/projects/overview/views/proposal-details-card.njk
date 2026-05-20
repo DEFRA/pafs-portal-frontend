@@ -38,23 +38,35 @@
             {{ t('projects.overview.proposal_details_summary_card.project_type') }}
           </dt>
           <dd class="govuk-summary-list__value">
+            {% set projectTypePrefix = '' %}
             {% set projectTypeLabel = '' %}
             {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.DEF %}
+              {% set projectTypePrefix = t('projects.project_type.prefixes.def') %}
               {% set projectTypeLabel = t('projects.project_type.options.def') %}
             {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REF %}
+              {% set projectTypePrefix = t('projects.project_type.prefixes.ref') %}
               {% set projectTypeLabel = t('projects.project_type.options.ref') %}
             {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REP %}
+              {% set projectTypePrefix = t('projects.project_type.prefixes.rep') %}
               {% set projectTypeLabel = t('projects.project_type.options.rep') %}
             {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.ELO %}
+              {% set projectTypePrefix = t('projects.project_type.prefixes.elo') %}
               {% set projectTypeLabel = t('projects.project_type.options.elo') %}
             {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.HCR %}
+              {% set projectTypePrefix = t('projects.project_type.prefixes.hcr') %}
               {% set projectTypeLabel = t('projects.project_type.options.hcr') %}
             {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.STR %}
+              {% set projectTypePrefix = t('projects.project_type.prefixes.str') %}
               {% set projectTypeLabel = t('projects.project_type.options.str') %}
             {% elif projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.STU %}
+              {% set projectTypePrefix = t('projects.project_type.prefixes.stu') %}
               {% set projectTypeLabel = t('projects.project_type.options.stu') %}
             {% endif %}
-            {{ projectTypeLabel or t('projects.overview.common.na') }}
+            {% if projectTypeLabel %}
+              <span class="govuk-!-font-weight-bold">{{ projectTypePrefix }}</span> {{ projectTypeLabel }}
+            {% else %}
+              {{ t('projects.overview.common.na') }}
+            {% endif %}
           </dd>
           {% if not isReadOnly %}
             <dd class="govuk-summary-list__actions">

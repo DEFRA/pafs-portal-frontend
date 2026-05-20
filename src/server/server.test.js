@@ -7,7 +7,12 @@ import {
   afterEach,
   vi
 } from 'vitest'
-import { createServer, collectProductionCookieErrors } from './server.js'
+import {
+  createServer,
+  collectProductionCookieErrors,
+  isScannerProbe,
+  ALLOWED_METHODS
+} from './server.js'
 import { config } from '../config/config.js'
 
 // ---------------------------------------------------------------------------
@@ -104,6 +109,203 @@ describe('createServer', () => {
     test('health route is registered', () => {
       const route = server.lookup('health')
       expect(route).toBeDefined()
+    })
+  })
+
+  describe('scanner probe filter — HTTP behaviour', () => {
+    test.each([
+      '/wp-login.php',
+      '/phpmyadmin/index.php5',
+      '/admin/upload.php7',
+      '/admin/index.asp',
+      '/admin/index.aspx',
+      '/app/index.jsp',
+      '/cgi-bin/test.cgi',
+      '/scripts/test.pl',
+      '/app/index.cfm',
+      '/api/action.do',
+      '/api/save.action',
+      '/handler.ashx',
+      '/page.shtml'
+    ])('returns 404 for server-side script extension: %s', async (url) => {
+      const { statusCode } = await server.inject({ method: 'GET', url })
+      expect(statusCode).toBe(404)
+    })
+
+    test.each(['/.env', '/.git/config', '/.htaccess', '/.DS_Store'])(
+      'returns 404 for dotfile probe: %s',
+      async (url) => {
+        const { statusCode } = await server.inject({ method: 'GET', url })
+        expect(statusCode).toBe(404)
+      }
+    )
+
+    test('scanner probe 404 bypasses the error page (empty response body)', async () => {
+      const { result } = await server.inject({
+        method: 'GET',
+        url: '/wp-login.php'
+      })
+      expect(result).toBeFalsy()
+    })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// isScannerProbe unit tests — no server/HTTP needed, no timeout risk
+// ---------------------------------------------------------------------------
+
+describe('isScannerProbe', () => {
+  describe('server-side script extensions — returns true', () => {
+    test.each([
+      '/wp-login.php',
+      '/phpmyadmin/index.php5',
+      '/admin/upload.php7',
+      '/admin/index.asp',
+      '/admin/index.aspx',
+      '/app/index.jsp',
+      '/cgi-bin/test.cgi',
+      '/scripts/test.pl',
+      '/app/index.cfm',
+      '/api/action.do',
+      '/api/save.action',
+      '/handler.ashx',
+      '/page.shtml'
+    ])('%s', (pathway) => {
+      expect(isScannerProbe(pathway)).toBe(true)
+    })
+  })
+
+  describe('dotfile and traversal probes — returns true', () => {
+    test.each(['/.env', '/.git/config', '/.htaccess', '/.DS_Store'])(
+      '%s',
+      (pathway) => {
+        expect(isScannerProbe(pathway)).toBe(true)
+      }
+    )
+  })
+
+  describe('legitimate application paths — returns false', () => {
+    test.each([
+      '/health',
+      '/login',
+      '/projects',
+      '/api/v1/projects',
+      '/assets/govuk-frontend.min.js',
+      '/'
+    ])('%s', (pathway) => {
+      expect(isScannerProbe(pathway)).toBe(false)
+    })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// ALLOWED_METHODS unit tests
+// ---------------------------------------------------------------------------
+
+describe('ALLOWED_METHODS', () => {
+  test('includes get', () => {
+    expect(ALLOWED_METHODS.has('get')).toBe(true)
+  })
+
+  test('includes post', () => {
+    expect(ALLOWED_METHODS.has('post')).toBe(true)
+  })
+
+  test('does not include put', () => {
+    expect(ALLOWED_METHODS.has('put')).toBe(false)
+  })
+
+  test('does not include patch', () => {
+    expect(ALLOWED_METHODS.has('patch')).toBe(false)
+  })
+
+  test('does not include delete', () => {
+    expect(ALLOWED_METHODS.has('delete')).toBe(false)
+  })
+
+  test('does not include head', () => {
+    expect(ALLOWED_METHODS.has('head')).toBe(false)
+  })
+
+  test('does not include options', () => {
+    expect(ALLOWED_METHODS.has('options')).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('route guard — unknown paths', () => {
+  let server
+
+  beforeAll(async () => {
+    server = await createServer()
+  })
+
+  afterAll(async () => {
+    await server.stop({ timeout: 0 })
+  })
+
+  test('returns 404 for a completely unknown path', async () => {
+    const { statusCode } = await server.inject({
+      method: 'GET',
+      url: '/this-path-does-not-exist-anywhere'
+    })
+    expect(statusCode).toBe(404)
+  })
+
+  test('unknown path renders the 404 error page (real users still see it)', async () => {
+    const { statusCode, payload } = await server.inject({
+      method: 'GET',
+      url: '/this-path-does-not-exist-anywhere'
+    })
+    expect(statusCode).toBe(404)
+    expect(payload).toContain('Page not found')
+  })
+
+  test('sets request.app.silentDrop so hapi-pino ignoreFunc suppresses the log', async () => {
+    let capturedApp
+    server.ext('onPreResponse', (request, h) => {
+      if (request.path === '/silent-drop-spy-path') {
+        capturedApp = { ...request.app }
+      }
+      return h.continue
+    })
+    await server.inject({ method: 'GET', url: '/silent-drop-spy-path' })
+    expect(capturedApp?.silentDrop).toBe(true)
+  })
+
+  test('known registered route is NOT dropped by the guard (health resolves to its own route, not catch-all)', () => {
+    // server.match() is synchronous and tests exactly what onPreResponse checks:
+    // silentDrop is only set when request.route.path === '/{p*}'.
+    // If /health has its own specific route path it will never be silently dropped.
+    const route = server.match('get', '/health')
+    expect(route).not.toBeNull()
+    expect(route.path).not.toBe('/{p*}')
+  })
+
+  describe('HTTP method filter — unsupported methods are silently dropped', () => {
+    test.each(['PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'])(
+      '%s /health returns 404 (not leaked as 405)',
+      async (method) => {
+        const { statusCode } = await server.inject({
+          method,
+          url: '/health'
+        })
+        expect(statusCode).toBe(404)
+      }
+    )
+
+    test('PUT response body is empty (no HTML leak)', async () => {
+      const { result } = await server.inject({ method: 'PUT', url: '/health' })
+      expect(result).toBeFalsy()
+    })
+
+    test('GET /health is not blocked by the method filter (GET is in ALLOWED_METHODS)', () => {
+      // server.match() confirms the route resolves without invoking any handler
+      // or connecting to external services — no timeout risk in CI.
+      const route = server.match('get', '/health')
+      expect(route).not.toBeNull()
+      expect(ALLOWED_METHODS.has('get')).toBe(true)
     })
   })
 })

@@ -91,8 +91,8 @@
       "current_coastal_erosion_risk": "Current coastal erosion risk",
       "flood_risk": {
         "high": "High risk (>3.3% annual chance, >1 in 30)",
-        "medium": "Medium risk (1-3.3% annual chance, 1 in 30 to 1 in 100)",
-        "low": "Low risk (0.1-1% annual chance, 1 in 100 to 1 in 1,000)",
+        "medium": "Medium risk (3.3 - 1% annual chance, 1 in 30 to 1 in 100)",
+        "low": "Low risk (1 - 0.1% annual chance, 1 in 100 to 1 in 1,000)",
         "very_low": "Very low risk (<0.1% annual chance, <1 in 1,000)"
       },
       "coastal_erosion_risk": {
@@ -306,13 +306,13 @@
     "title": "Which project type are you proposing?",
     "heading": "Which project type are you proposing?",
     "options": {
-      "def": "Create a new flood and coastal erosion risk management asset, or change an existing approach to risk management in an area already with assets (this could include natural flood management measures, property flood resilience or sustainable drainage systems)",
-      "rep": "Replace an existing flood and coastal erosion risk management asset that is at the end of its life with another asset which sustains the standard of service and the design performance on an equivalent basis (this could include natural flood management measures, property flood resilience or sustainable drainage systems)",
-      "ref": "Substantially renew or replace, one or more asset elements or components in an existing flood and coastal erosion risk management asset (this could include natural flood management measures or sustainable drainage systems)",
-      "hcr": "Protect, compensate or restore habitats and natural functions, to support coastal risk management legal compliance (Habitat Regulations) and wider environmental outcomes",
-      "str": "Produce a strategy for complex flood or coastal erosion risk situations across several interconnected areas",
-      "stu": "Produce a study to support the case that a project is needed to resolve a flood or coastal erosion risk problem - helping to define the scope, purpose, and viability of any future project(s)",
-      "elo": "Implement measures to address impacts arising from existing or historic flood or coastal erosion risk management assets or actions to comply with specified environmental legislation - Sites of Special Scientific Interest (SSSIs) and Water Environment Regulations (WER)"
+      "def": "Create a new flood and coastal erosion risk management asset, or change an existing approach to risk management in an area already with assets (this could include natural flood management measures, property flood resilience or sustainable drainage systems).",
+      "rep": "Replace an existing flood and coastal erosion risk management asset that is at the end of its life with another asset which sustains the standard of service and the design performance on an equivalent basis (this could include natural flood management measures, property flood resilience or sustainable drainage systems).",
+      "ref": "Substantially renew or replace, one or more asset elements or components in an existing flood and coastal erosion risk management asset (this could include natural flood management measures or sustainable drainage systems).",
+      "hcr": "Protect, compensate or restore habitats and natural functions, to support coastal risk management legal compliance (Habitat Regulations) and wider environmental outcomes.",
+      "str": "Produce a strategy for complex flood or coastal erosion risk situations across several interconnected areas.",
+      "stu": "Produce a study to support the case that a project is needed to resolve a flood or coastal erosion risk problem – helping to define the scope, purpose, and viability of any future project(s).",
+      "elo": "Implement measures to address impacts arising from existing or historic flood or coastal erosion risk management assets or actions to comply with specified environmental legislation - Sites of Special Scientific Interest (SSSIs) and Water Environment Regulations (WER)."
     },
     "prefixes": {
       "def": "Defence (DEF):",
@@ -474,6 +474,7 @@
     "heading": "What area is the project likely to benefit?",
     "introduction": "Upload a shapefile. The shapefile should show the approximate area the project is likely to benefit. Draw as many separate areas as necessary, but make sure they don't overlap.",
     "hint": "Your shapefile files should be in a single compressed folder or zipfile (.zip) to upload successfully",
+    "label": "Upload shapefile",
     "footer": {
       "free_mapping_tool": {
         "title": "Free mapping tool",
@@ -498,7 +499,7 @@
         }
       },
       "unable_to_create_shape_file": {
-        "title": "Unable to create a shapefile?",
+        "title": "Unable to create a shapefile",
         "help_text": "If you are unable to upload or create a shapefile, contact your local partnership and strategic overview officer and they will be able to help you."
       }
     },
@@ -555,7 +556,7 @@
         "reducing_less_50": "Reducing flood risk (less than 50%)",
         "increasing_resilience": "Increasing flood resilience",
         "maintaining_existing_question": "How many properties are estimated to benefit from maintaining existing assets?",
-        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more (excluding property flood resilience)?",
+        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more?",
         "reducing_less_50_question": "How many properties are estimated to benefit from a reduction in flood probability of less than 50% (excluding property flood resilience)?",
         "increasing_resilience_question": "How many properties will benefit from an individual property intervention?"
       }
@@ -599,8 +600,8 @@
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
         "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
-        "medium": "Medium risk - this means that each year an area has a chance of flooding between 1% and 3.3% (1 in 30 to a 1 in 100 chance of flooding)",
-        "low": "Low risk - this means that each year an area has a chance of flooding of between 0.1% and 1% (1 in 100 to a 1 in 1,000 chance of flooding)",
+        "medium": "Medium risk - this means that each year an area has a chance of flooding between 3.3% and 1% (1 in 30 to a 1 in 100 chance of flooding)",
+        "low": "Low risk - this means that each year an area has a chance of flooding of between 1% and 0.1% (1 in 100 to a 1 in 1,000 chance of flooding)",
         "very_low": "Very low risk - this means that each year an area has a chance of flooding of less than 0.1% (less than a 1 in 1,000 chance of flooding)"
       },
       "errors": {
@@ -613,8 +614,8 @@
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
         "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
-        "medium": "Medium risk - this means that each year an area has a chance of flooding between 1% and 3.3% (1 in 30 to a 1 in 100 chance of flooding)",
-        "low": "Low risk - this means that each year an area has a chance of flooding of between 0.1% and 1% (1 in 100 to a 1 in 1,000 chance of flooding)",
+        "medium": "Medium risk - this means that each year an area has a chance of flooding between 3.3% and 1% (1 in 30 to a 1 in 100 chance of flooding)",
+        "low": "Low risk - this means that each year an area has a chance of flooding of between 1% and 0.1% (1 in 100 to a 1 in 1,000 chance of flooding)",
         "very_low": "Very low risk - this means that each year an area has a chance of flooding of less than 0.1% (less than a 1 in 1,000 chance of flooding)"
       },
       "errors": {
@@ -810,7 +811,7 @@
       }
     },
     "land_use_change": {
-      "title": "Tell us what the land use in your project area will be before and after your natural flood measures project",
+      "title": "Tell us which land uses are within your project area. Include existing land uses and new land uses",
       "hint": "Select all that apply",
       "error": "Select at least one land type",
       "options": {
@@ -1415,8 +1416,8 @@
       "heading": "How many hectares of pond and/or lake habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
@@ -1443,8 +1444,8 @@
       "heading": "How many hectares of arable land habitat will the project create or enhance?",
       "suffix": "ha",
       "validation": {
-        "required": "You must include the number of hectares your project will create.",
-        "invalid": "You must enter a valid number for hectares.",
+        "required": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "invalid": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "min": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."

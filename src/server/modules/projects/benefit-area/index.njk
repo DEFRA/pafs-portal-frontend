@@ -35,6 +35,8 @@
 
   <p class="govuk-body">{{ t(localKeyPrefix + '.introduction') }}</p>
 
+  <p class="govuk-body">{{ t(localKeyPrefix + '.hint') }}</p>
+
   <form method="post" action="{{ uploadUrl }}" enctype="multipart/form-data" novalidate>
     <input type="hidden" name="crumb" value="{{ crumb }}">
 
@@ -42,11 +44,7 @@
       id: "benefitAreaFile",
       name: "file",
       label: {
-        text: t(localKeyPrefix + '.heading'),
-        classes: "govuk-visually-hidden"
-      },
-      hint: {
-        text: t(localKeyPrefix + '.hint')
+        text: t(localKeyPrefix + '.label')
       },
       errorMessage: fileError,
       attributes: {
@@ -88,9 +86,9 @@
   <p class="govuk-body">{{ t(localKeyPrefix + '.footer.free_mapping_tool.intro') }}</p>
 
   <p class="govuk-body">
-    <a href="{{ t(localKeyPrefix + '.footer.free_mapping_tool.link') }}" 
-           class="govuk-link" 
-           target="_blank" 
+    <a href="{{ t(localKeyPrefix + '.footer.free_mapping_tool.link') }}"
+           class="govuk-link"
+           target="_blank"
            rel="noopener noreferrer">
       {{ t(localKeyPrefix + '.footer.free_mapping_tool.link_text') }}
     </a>
