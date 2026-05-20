@@ -103,7 +103,7 @@ describe('NFM Redirect Helpers', () => {
   })
 
   describe('handleConditionalRedirect - NFM_LEAKY_BARRIERS', () => {
-    test('should redirect to land use change after leaky barriers', async () => {
+    test('should redirect to land use change after leaky barriers when no further measures selected', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'river_floodplain_restoration,leaky_barriers'
@@ -120,6 +120,192 @@ describe('NFM Redirect Helpers', () => {
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
       expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
+    })
+
+    test('should redirect to sand dune when sand dune is selected after leaky barriers', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration,leaky_barriers,sand_dune_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_LEAKY_BARRIERS,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('sand-dune')
+      expect(result.path).toContain('TEST-001')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_OFFLINE_STORAGE', () => {
+    test('should redirect to sand dune when sand dune is selected after offline storage', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'leaky_barriers,offline_storage,sand_dune_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_OFFLINE_STORAGE,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('sand-dune')
+      expect(result.path).toContain('TEST-001')
+    })
+
+    test('should redirect to land use change when no further measures selected after offline storage', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'leaky_barriers,offline_storage'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_OFFLINE_STORAGE,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_WOODLAND', () => {
+    test('should redirect to sand dune when sand dune is selected after woodland', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration,leaky_barriers,offline_storage,woodland,sand_dune_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_WOODLAND,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('sand-dune')
+      expect(result.path).toContain('TEST-001')
+    })
+
+    test('should redirect to land use change when no further measures selected after woodland', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'offline_storage,woodland'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_WOODLAND,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_HEADWATER_DRAINAGE', () => {
+    test('should redirect to sand dune when sand dune is selected after headwater drainage', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'headwater_drainage,sand_dune_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_HEADWATER_DRAINAGE,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('sand-dune')
+      expect(result.path).toContain('TEST-001')
+    })
+
+    test('should redirect to land use change when no further measures selected after headwater drainage', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'headwater_drainage'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_HEADWATER_DRAINAGE,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_RIVER_RESTORATION with sand dune', () => {
+    test('should redirect to sand dune when sand dune is selected and no intermediate measures', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration,sand_dune_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_RIVER_RESTORATION,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('sand-dune')
+      expect(result.path).toContain('TEST-001')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_RUNOFF_MANAGEMENT with sand dune', () => {
+    test('should redirect to sand dune when saltmarsh not selected but sand dune is', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'runoff_management,sand_dune_management'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('sand-dune')
+      expect(result.path).toContain('TEST-001')
     })
   })
 
