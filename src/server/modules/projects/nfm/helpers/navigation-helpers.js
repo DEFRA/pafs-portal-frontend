@@ -152,6 +152,8 @@ export const NFM_STEP_SEQUENCE = {
   [PROJECT_STEPS.NFM_WOODLAND]: null, // Conditional - next measure or overview
   [PROJECT_STEPS.NFM_HEADWATER_DRAINAGE]: null, // Conditional - next measure or overview
   [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]: null, // Conditional - next measure or overview
+  [PROJECT_STEPS.NFM_SALTMARSH]: null, // Conditional - next measure or overview
+  [PROJECT_STEPS.NFM_SAND_DUNE]: null, // Conditional - go to land-use-change
   [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: null,
   [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND]: null,
   [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND]: null,

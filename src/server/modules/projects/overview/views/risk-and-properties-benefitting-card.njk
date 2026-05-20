@@ -45,7 +45,8 @@
             </dd>
           </div>
 
-          {% if projectData[PROJECT_PAYLOAD_FIELDS.MAIN_RISK] != PROJECT_RISK_TYPES.COASTAL_EROSION %}
+          {% set onlyCoastalErosionSelected = projectData[PROJECT_PAYLOAD_FIELDS.RISKS].length == 1 and PROJECT_RISK_TYPES.COASTAL_EROSION in projectData[PROJECT_PAYLOAD_FIELDS.RISKS] %}
+          {% if not onlyCoastalErosionSelected %}
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key">
                 {{ t('projects.overview.risk_and_properties_summary_card.properties_affected_flooding') }}
