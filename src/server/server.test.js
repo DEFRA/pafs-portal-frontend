@@ -10,7 +10,8 @@ import {
 import {
   createServer,
   collectProductionCookieErrors,
-  isScannerProbe
+  isScannerProbe,
+  ALLOWED_METHODS
 } from './server.js'
 import { config } from '../config/config.js'
 
@@ -193,6 +194,118 @@ describe('isScannerProbe', () => {
       '/'
     ])('%s', (pathway) => {
       expect(isScannerProbe(pathway)).toBe(false)
+    })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// ALLOWED_METHODS unit tests
+// ---------------------------------------------------------------------------
+
+describe('ALLOWED_METHODS', () => {
+  test('includes get', () => {
+    expect(ALLOWED_METHODS.has('get')).toBe(true)
+  })
+
+  test('includes post', () => {
+    expect(ALLOWED_METHODS.has('post')).toBe(true)
+  })
+
+  test('does not include put', () => {
+    expect(ALLOWED_METHODS.has('put')).toBe(false)
+  })
+
+  test('does not include patch', () => {
+    expect(ALLOWED_METHODS.has('patch')).toBe(false)
+  })
+
+  test('does not include delete', () => {
+    expect(ALLOWED_METHODS.has('delete')).toBe(false)
+  })
+
+  test('does not include head', () => {
+    expect(ALLOWED_METHODS.has('head')).toBe(false)
+  })
+
+  test('does not include options', () => {
+    expect(ALLOWED_METHODS.has('options')).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('route guard — unknown paths', () => {
+  let server
+
+  beforeAll(async () => {
+    server = await createServer()
+  })
+
+  afterAll(async () => {
+    await server.stop({ timeout: 0 })
+  })
+
+  test('returns 404 for a completely unknown path', async () => {
+    const { statusCode } = await server.inject({
+      method: 'GET',
+      url: '/this-path-does-not-exist-anywhere'
+    })
+    expect(statusCode).toBe(404)
+  })
+
+  test('unknown path renders the 404 error page (real users still see it)', async () => {
+    const { statusCode, payload } = await server.inject({
+      method: 'GET',
+      url: '/this-path-does-not-exist-anywhere'
+    })
+    expect(statusCode).toBe(404)
+    expect(payload).toContain('Page not found')
+  })
+
+  test('sets request.app.silentDrop so hapi-pino ignoreFunc suppresses the log', async () => {
+    let capturedApp
+    server.ext('onPreResponse', (request, h) => {
+      if (request.path === '/silent-drop-spy-path') {
+        capturedApp = { ...request.app }
+      }
+      return h.continue
+    })
+    await server.inject({ method: 'GET', url: '/silent-drop-spy-path' })
+    expect(capturedApp?.silentDrop).toBe(true)
+  })
+
+  test('known registered route is NOT dropped by the guard (health resolves to its own route, not catch-all)', () => {
+    // server.match() is synchronous and tests exactly what onPreResponse checks:
+    // silentDrop is only set when request.route.path === '/{p*}'.
+    // If /health has its own specific route path it will never be silently dropped.
+    const route = server.match('get', '/health')
+    expect(route).not.toBeNull()
+    expect(route.path).not.toBe('/{p*}')
+  })
+
+  describe('HTTP method filter — unsupported methods are silently dropped', () => {
+    test.each(['PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'])(
+      '%s /health returns 404 (not leaked as 405)',
+      async (method) => {
+        const { statusCode } = await server.inject({
+          method,
+          url: '/health'
+        })
+        expect(statusCode).toBe(404)
+      }
+    )
+
+    test('PUT response body is empty (no HTML leak)', async () => {
+      const { result } = await server.inject({ method: 'PUT', url: '/health' })
+      expect(result).toBeFalsy()
+    })
+
+    test('GET /health is not blocked by the method filter (GET is in ALLOWED_METHODS)', () => {
+      // server.match() confirms the route resolves without invoking any handler
+      // or connecting to external services — no timeout risk in CI.
+      const route = server.match('get', '/health')
+      expect(route).not.toBeNull()
+      expect(ALLOWED_METHODS.has('get')).toBe(true)
     })
   })
 })

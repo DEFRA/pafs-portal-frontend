@@ -20,6 +20,11 @@ const formatters = {
 export const loggerOptions = {
   enabled: logConfig.enabled,
   ignorePaths: ['/health'],
+  // Suppress log entries for requests silently dropped by the probe/route
+  // guard (scanner bots, unregistered paths).  Without this, hapi-pino still
+  // emits an ECS entry with http.response.status_code:404, which the Grafana
+  // 4xx alert query would count and breach the threshold.
+  ignoreFunc: (_opts, request) => request.app?.silentDrop === true,
   redact: {
     paths: logConfig.redact,
     remove: true

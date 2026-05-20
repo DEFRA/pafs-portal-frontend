@@ -102,10 +102,31 @@ export function isScannerProbe(pathway) {
   )
 }
 
+// This is a server-side rendered GOV.UK frontend: only GET (page loads) and
+// POST (form submissions) are legitimate.  Any other HTTP method is scanner
+// noise and should be silently dropped.  We return 404 rather than 405 to
+// avoid leaking which routes exist.
+export const ALLOWED_METHODS = new Set(['get', 'post'])
+
 function registerScannerProbeFilter(server) {
+  // onRequest: short-circuit scanner probe patterns (PHP/ASP/dotfile etc.)
+  // and unsupported HTTP methods before route matching.
   server.ext('onRequest', (request, h) => {
-    if (isScannerProbe(request.path)) {
+    if (!ALLOWED_METHODS.has(request.method) || isScannerProbe(request.path)) {
+      request.app.silentDrop = true
       return h.response().code(statusCodes.notFound).takeover()
+    }
+    return h.continue
+  })
+
+  // onPreResponse: suppress logging for requests that fell through to the
+  // catch-all /{p*} route.  That route handles all unregistered paths, so
+  // any hit on it is bot/noise traffic rather than a genuine application error.
+  // Genuine 4xx from real registered routes (validation errors, auth failures,
+  // etc.) are NOT affected — their route path is specific, not '/{p*}'.
+  server.ext('onPreResponse', (request, h) => {
+    if (request.route?.path === '/{p*}') {
+      request.app.silentDrop = true
     }
     return h.continue
   })
