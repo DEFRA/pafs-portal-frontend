@@ -454,7 +454,6 @@
       "heading": "What is the earliest date the project could start if Grant in Aid funding was made available earlier?",
       "hint": "Spend includes any funding source (e.g. local levy, contributions and GiA)."
     },
-    "financial_year_range_hint": "Dates must be within the project's financial year range: {{financialYearStart}} to {{financialYearEnd}}.",
     "validation": {
       "required": "Enter the date you expect {{placeholder}}",
       "invalid": "Enter a valid date for when you expect {{placeholder}}",

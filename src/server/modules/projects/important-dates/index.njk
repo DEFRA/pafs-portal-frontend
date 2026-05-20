@@ -49,9 +49,7 @@
           } %}
         {% elif errorKey == 'earliest_date_after_obc_start' %}
           {% set dateError = {
-            text: t('projects.important_dates.validation.' + errorKey, {
-              obcStartDate: obcStartDateFormatted
-            })
+            text: t('projects.important_dates.validation.' + errorKey, {obcStartDate: obcStartDateFormatted})
           } %}
         {% elif monthField == 'earliestWithGiaMonth' %}
           {% set dateError = {
@@ -86,19 +84,6 @@
           {% set hintHtml = hintHtml + '<br><br>' + dateHint %}
         {% else %}
           {% set hintHtml = dateHint %}
-        {% endif %}
-      {% endif %}
-
-      {# Financial year range context — shown on all date screens except earliest-date #}
-      {% if monthField != 'earliestWithGiaMonth' and financialYearStart and financialYearEnd %}
-        {% set financialRangeHint = t('projects.important_dates.financial_year_range_hint', {
-          financialYearStart: financialYearStart,
-          financialYearEnd: financialYearEnd
-        }) %}
-        {% if hintHtml %}
-          {% set hintHtml = hintHtml + '<br><br>' + financialRangeHint %}
-        {% else %}
-          {% set hintHtml = financialRangeHint %}
         {% endif %}
       {% endif %}
 

@@ -1,4 +1,5 @@
 const GROUP_SIZE = 3
+const MAX_INPUT_LENGTH = 15
 import { initAll } from 'govuk-frontend'
 
 export function setupHeaderNavigation() {
@@ -73,7 +74,12 @@ export const formatInputValueWithCommas = (inputEl) => {
   if (inputEl.value.includes('.')) {
     return
   }
-  inputEl.value = formatNumberWithCommas(inputEl.value)
+  const formatted = formatNumberWithCommas(inputEl.value)
+  inputEl.value = formatted
+  // Per HTML spec, setting .value programmatically resets the cursor to
+  // position 0. With text-align:right that scrolls to show the start of the
+  // value, hiding the most-recently-typed (rightmost) digits. Restore to end.
+  inputEl.setSelectionRange(formatted.length, formatted.length)
 }
 
 export const unformatInputValue = (inputEl) => {
@@ -81,6 +87,17 @@ export const unformatInputValue = (inputEl) => {
     return
   }
   inputEl.value = inputEl.value.replaceAll(',', '')
+}
+
+export const autoSizeInput = (inputEl, minSize = 5) => {
+  if (typeof document === 'undefined' || !inputEl) {
+    return
+  }
+  const digits = inputEl.value.replaceAll(',', '').length
+  inputEl.size = Math.max(
+    digits > MAX_INPUT_LENGTH ? digits + 1 : digits,
+    minSize
+  )
 }
 
 export const bindCommaFormattingToInputs = (selector, options = {}) => {
@@ -125,6 +142,7 @@ globalThis.pafs.numberFormatting = {
   formatNumberWithCommas,
   formatInputValueWithCommas,
   unformatInputValue,
+  autoSizeInput,
   bindCommaFormattingToInputs
 }
 
@@ -341,7 +359,9 @@ bindCommaFormattingToInputs(
     }
 
     form.querySelectorAll('[data-spend-cell]').forEach(function (inp) {
+      autoSizeInput(inp) // initial size for pre-filled values
       inp.addEventListener('input', function () {
+        autoSizeInput(inp) // resize after formatInputValueWithCommas has run
         recalc(form, numCols)
       })
     })

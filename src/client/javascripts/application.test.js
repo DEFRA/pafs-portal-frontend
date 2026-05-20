@@ -12,6 +12,7 @@ import {
   formatNumberWithCommas,
   formatInputValueWithCommas,
   unformatInputValue,
+  autoSizeInput,
   bindCommaFormattingToInputs,
   setupHeaderNavigation,
   initProgrammeDownloadPolling
@@ -75,6 +76,17 @@ describe('input formatting helpers', () => {
     expect(formatInputValueWithCommas(undefined)).toBeUndefined()
   })
 
+  it('formatInputValueWithCommas restores cursor to end after formatting', () => {
+    // Per HTML spec, setting .value programmatically resets cursor to position 0.
+    // With text-align:right that scrolls to show the start of the value,
+    // hiding the most-recently-typed (rightmost) digits. Cursor must be at end.
+    input.value = '1234567'
+    formatInputValueWithCommas(input)
+    expect(input.value).toBe('1,234,567')
+    expect(input.selectionStart).toBe('1,234,567'.length)
+    expect(input.selectionEnd).toBe('1,234,567'.length)
+  })
+
   it('unformatInputValue strips only commas, preserving decimal points', () => {
     input.value = '1,234,567'
     unformatInputValue(input)
@@ -90,6 +102,60 @@ describe('input formatting helpers', () => {
   it('unformatInputValue does nothing if input is falsy', () => {
     expect(unformatInputValue(null)).toBeUndefined()
     expect(unformatInputValue(undefined)).toBeUndefined()
+  })
+})
+
+describe('autoSizeInput', () => {
+  let input
+  beforeEach(() => {
+    input = document.createElement('input')
+  })
+
+  it('sets size to digit count (ignoring commas)', () => {
+    input.value = '500,000'
+    autoSizeInput(input)
+    expect(input.size).toBe(6) // 6 digits, comma excluded
+  })
+
+  it('enforces minimum size when value is shorter than minSize', () => {
+    input.value = '0'
+    autoSizeInput(input)
+    expect(input.size).toBe(5)
+  })
+
+  it('enforces minimum size when value is empty', () => {
+    input.value = ''
+    autoSizeInput(input)
+    expect(input.size).toBe(5)
+  })
+
+  it('accepts a custom minSize', () => {
+    input.value = ''
+    autoSizeInput(input, 10)
+    expect(input.size).toBe(10)
+  })
+
+  it('handles an 18-digit formatted value', () => {
+    input.value = '999,999,999,999,999,999' // 18 digits + 5 commas = 23 chars
+    autoSizeInput(input)
+    expect(input.size).toBe(19) // 18 digits > 15 so +1 added
+  })
+
+  it('does not add extra width at exactly 15 digits', () => {
+    input.value = '999,999,999,999,999' // 15 digits
+    autoSizeInput(input)
+    expect(input.size).toBe(15)
+  })
+
+  it('adds 1 extra width at 16 digits', () => {
+    input.value = '9,999,999,999,999,999' // 16 digits
+    autoSizeInput(input)
+    expect(input.size).toBe(17) // 16 + 1
+  })
+
+  it('does nothing if input is falsy', () => {
+    expect(autoSizeInput(null)).toBeUndefined()
+    expect(autoSizeInput(undefined)).toBeUndefined()
   })
 })
 

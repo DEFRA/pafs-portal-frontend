@@ -23,3 +23,10 @@
   padding-left: govuk-spacing(6);
   font-weight: normal;
 }
+
+.funding-values-table .govuk-input[data-spend-cell] {
+  display: inline-block;
+  width: auto;
+  max-width: none;
+  min-width: 6ch;
+}
