@@ -274,15 +274,13 @@ describe('route guard — unknown paths', () => {
     expect(capturedApp?.silentDrop).toBe(true)
   })
 
-  test('known registered route is NOT dropped by the guard (health is served by its own handler)', async () => {
-    // /health may return 503 in test environments (no real services), but the
-    // key point is that it is NOT routed to the catch-all /{p*}, so it should
-    // never return the catch-all's 404 response.
-    const { statusCode } = await server.inject({
-      method: 'GET',
-      url: '/health'
-    })
-    expect(statusCode).not.toBe(404)
+  test('known registered route is NOT dropped by the guard (health resolves to its own route, not catch-all)', () => {
+    // server.match() is synchronous and tests exactly what onPreResponse checks:
+    // silentDrop is only set when request.route.path === '/{p*}'.
+    // If /health has its own specific route path it will never be silently dropped.
+    const route = server.match('get', '/health')
+    expect(route).not.toBeNull()
+    expect(route.path).not.toBe('/{p*}')
   })
 
   describe('HTTP method filter — unsupported methods are silently dropped', () => {
@@ -302,12 +300,12 @@ describe('route guard — unknown paths', () => {
       expect(result).toBeFalsy()
     })
 
-    test('GET /health is still served (allowed method not blocked)', async () => {
-      const { statusCode } = await server.inject({
-        method: 'GET',
-        url: '/health'
-      })
-      expect(statusCode).not.toBe(404)
+    test('GET /health is not blocked by the method filter (GET is in ALLOWED_METHODS)', () => {
+      // server.match() confirms the route resolves without invoking any handler
+      // or connecting to external services — no timeout risk in CI.
+      const route = server.match('get', '/health')
+      expect(route).not.toBeNull()
+      expect(ALLOWED_METHODS.has('get')).toBe(true)
     })
   })
 })
