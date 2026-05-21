@@ -1342,7 +1342,7 @@
     "grassland": {
       "title": "Will the project create or enhance a grassland habitat?",
       "heading": "Will the project create or enhance a grassland habitat?",
-      "hint": "This is land under permanent-natural or semi-natural grassland, dominated by grassland species with very little or no dwarf shrub, wetland or wooded species within the sward.",
+      "hint": "This is land under permanent natural or semi-natural grassland, dominated by grassland species with very little or no dwarf shrub, wetland or wooded species within the sward.",
       "options": {
         "yes": {
           "label": "Yes"
@@ -1685,7 +1685,7 @@
     "title": "How much carbon will be avoided by this project?",
     "heading": "How much carbon will be avoided by this project?",
     "label": "Avoided emissions",
-    "intro_1": "Avoided emissions are as a result of the level of reduced flood risk and impacts to properties over the whole-life investment.",
+    "intro_1": "Avoided emissions are as a result of the level of reduced flood and coastal erosion risk and impacts to properties over the whole-life investment.",
     "intro_2_prefix": "They are calculated using the",
     "intro_2_link_text": "FCRM Appraisal guide to Carbon impact valuation and supporting tool (opens in a new window)",
     "intro_3": "For Carbon impact data this total will be profiled over the duration of the asset lifetime. Enter the total recorded ‘avoided emissions’ Carbon impact here.",
