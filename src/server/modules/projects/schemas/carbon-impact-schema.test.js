@@ -84,6 +84,18 @@ describe('carbon-impact-schema', () => {
       expect(error).toBeUndefined()
     })
 
+    test('accepts negative values for carbonSavingsNetEconomicBenefit', () => {
+      const payload = {
+        ...validPayload,
+        [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: '-50000'
+      }
+
+      const { error } = carbonImpactSchema.validate(payload, {
+        abortEarly: false
+      })
+      expect(error).toBeUndefined()
+    })
+
     test('accepts valid decimal values up to 2 decimal places', () => {
       const payload = {
         ...validPayload,
@@ -425,6 +437,38 @@ describe('carbon-impact-schema', () => {
           PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT
         ].validate({
           [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: '100.5'
+        })
+        expect(error).toBeDefined()
+        expect(error.details[0].message).toBe(
+          'Please enter a whole number with no more than 18 digits.'
+        )
+      })
+
+      test('accepts negative integer values', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]:
+            '-150000'
+        })
+        expect(error).toBeUndefined()
+      })
+
+      test('accepts negative single digit', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: '-5'
+        })
+        expect(error).toBeUndefined()
+      })
+
+      test('rejects values exceeding 18 digits (excluding minus sign)', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT
+        ].validate({
+          [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]:
+            '-1234567890123456789'
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(

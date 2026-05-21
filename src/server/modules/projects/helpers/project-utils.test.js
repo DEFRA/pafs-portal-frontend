@@ -827,6 +827,17 @@ describe('project-utils', () => {
       expect(formatNumberWithCommas('')).toBeNull()
       expect(formatNumberWithCommas('abc')).toBeNull()
     })
+
+    test('should format negative numbers with comma separators', () => {
+      expect(formatNumberWithCommas(-1234567)).toBe('-1,234,567')
+      expect(formatNumberWithCommas('-150000')).toBe('-150,000')
+      expect(formatNumberWithCommas('-5')).toBe('-5')
+    })
+
+    test('should preserve minus sign when stripping other non-digits', () => {
+      expect(formatNumberWithCommas('-£1234567')).toBe('-1,234,567')
+      expect(formatNumberWithCommas('-1,234,567')).toBe('-1,234,567')
+    })
   })
 
   describe('getProjectStateTag', () => {

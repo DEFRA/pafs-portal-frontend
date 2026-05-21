@@ -34,7 +34,20 @@ export function setupHeaderNavigation() {
 
 // Public number formatting helpers for reuse across sections
 
-export const digitsOnly = (value) => String(value || '').replaceAll(/\D/g, '')
+/**
+ * Extract digits from a value string.
+ * @param {string} value - The input value
+ * @param {boolean} allowNegative - If true, preserve leading minus sign
+ * @returns {string} Digits only (with optional leading minus)
+ */
+export const digitsOnly = (value, allowNegative = false) => {
+  const str = String(value || '')
+  if (allowNegative && str.startsWith('-')) {
+    // Preserve minus sign, strip everything else except digits
+    return '-' + str.slice(1).replaceAll(/\D/g, '')
+  }
+  return str.replaceAll(/\D/g, '')
+}
 
 export const withCommas = (digits) => {
   if (!digits) {
@@ -65,7 +78,15 @@ export const withCommas = (digits) => {
   return out
 }
 
-export const formatNumberWithCommas = (value) => withCommas(digitsOnly(value))
+export const formatNumberWithCommas = (value, allowNegative = false) => {
+  const digits = digitsOnly(value, allowNegative)
+  if (allowNegative && digits.startsWith('-')) {
+    // Format negative numbers: extract sign, format digits, prepend sign
+    const absoluteDigits = digits.slice(1)
+    return absoluteDigits ? '-' + withCommas(absoluteDigits) : '-'
+  }
+  return withCommas(digits)
+}
 
 export const formatInputValueWithCommas = (inputEl) => {
   if (typeof document === 'undefined' || !inputEl) {
@@ -74,7 +95,8 @@ export const formatInputValueWithCommas = (inputEl) => {
   if (inputEl.value.includes('.')) {
     return
   }
-  const formatted = formatNumberWithCommas(inputEl.value)
+  const allowNegative = inputEl.hasAttribute('data-allow-negative')
+  const formatted = formatNumberWithCommas(inputEl.value, allowNegative)
   inputEl.value = formatted
   // Per HTML spec, setting .value programmatically resets the cursor to
   // position 0. With text-align:right that scrolls to show the start of the

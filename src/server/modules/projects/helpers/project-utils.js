@@ -325,7 +325,9 @@ export function formatNumberWithCommas(value) {
     return null
   }
 
-  const digits = String(value).replaceAll(/\D/g, '')
+  const str = String(value)
+  const isNegative = str.startsWith('-')
+  const digits = str.replaceAll(/\D/g, '')
   if (!digits) {
     return null
   }
@@ -334,7 +336,7 @@ export function formatNumberWithCommas(value) {
   // Only works for digit strings, as intended
   const n = digits.length
   if (n <= GROUP_SIZE) {
-    return digits
+    return isNegative ? '-' + digits : digits
   }
   let out = ''
   let i = n % GROUP_SIZE
@@ -351,7 +353,7 @@ export function formatNumberWithCommas(value) {
       out += ','
     }
   }
-  return out
+  return isNegative ? '-' + out : out
 }
 
 const FUNDING_AMOUNT_FIELDS = [

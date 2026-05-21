@@ -171,7 +171,7 @@
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key govuk-!-width-three-quarters">{{ t('projects.overview.carbon_impact_summary_card.net_carbon_economic_benefit') }}</dt>
               <dd class="govuk-summary-list__value">
-                {% if netBenefit is not none and netBenefit != '' %}£{{ formatNumberWithCommas(netBenefit) }}
+                {% if netBenefit is not none and netBenefit != '' %}{{ (display.benefitDisplay if display else ('£' + formatNumberWithCommas(netBenefit))) }}
                 {% else %}{{ NOT_PROVIDED }}
                 {% endif %}
               </dd>

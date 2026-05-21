@@ -28,6 +28,7 @@ const MAX_WHOLE_NUMBER_DIGITS = 18
 const MAX_COST_DIGITS = 18
 const DECIMAL_REGEX = /^\d+(\.\d{1,2})?$/
 const INTEGER_REGEX = /^\d+$/
+const SIGNED_INTEGER_REGEX = /^-?\d+$/
 
 const CARBON_EMISSION_INVALID_ERROR =
   'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
@@ -67,6 +68,18 @@ const validateCarbonInteger = (value, helpers) => {
   return value
 }
 
+const validateCarbonSignedInteger = (value, helpers) => {
+  if (!SIGNED_INTEGER_REGEX.test(value)) {
+    return helpers.error('string.pattern.base')
+  }
+  // Check length excluding minus sign
+  const absValue = value.startsWith('-') ? value.slice(1) : value
+  if (absValue.length > MAX_COST_DIGITS) {
+    return helpers.error('string.max')
+  }
+  return value
+}
+
 const optionalDecimalField = Joi.string()
   .trim()
   .allow(null, '')
@@ -93,6 +106,22 @@ const optionalIntegerField = Joi.string()
       return value
     }
     return validateCarbonInteger(value, helpers)
+  })
+  .messages({
+    'string.base': CARBON_COST_INVALID_ERROR,
+    'string.pattern.base': CARBON_COST_INVALID_ERROR,
+    'string.max': CARBON_COST_INVALID_ERROR
+  })
+
+const optionalSignedIntegerField = Joi.string()
+  .trim()
+  .allow(null, '')
+  .optional()
+  .custom((value, helpers) => {
+    if (value === null || value === undefined || value === '') {
+      return value
+    }
+    return validateCarbonSignedInteger(value, helpers)
   })
   .messages({
     'string.base': CARBON_COST_INVALID_ERROR,
@@ -163,7 +192,7 @@ export const CARBON_STEP_SCHEMAS = {
   }).options({ allowUnknown: true }),
   [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: Joi.object({
     [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]:
-      optionalIntegerField
+      optionalSignedIntegerField
   }).options({ allowUnknown: true }),
   [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: Joi.object({
     [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]:
@@ -182,7 +211,7 @@ export const carbonImpactSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED]: optionalDecimalField,
   [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: optionalDecimalField,
   [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]:
-    optionalIntegerField,
+    optionalSignedIntegerField,
   [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]:
     requiredOperationalCostForecastField
 }).options({ allowUnknown: true })
