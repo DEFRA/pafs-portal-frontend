@@ -315,6 +315,39 @@ export function formatFileSize(bytes) {
 }
 
 /**
+ * Insert commas into a digit string (linear time, no regex).
+ * @param {string} digits - String of digits only
+ * @returns {string} Formatted string with commas
+ * @private
+ */
+function insertCommas(digits) {
+  const n = digits.length
+  if (n <= GROUP_SIZE) {
+    return digits
+  }
+
+  let out = ''
+  let i = n % GROUP_SIZE
+
+  if (i > 0) {
+    out = digits.slice(0, i)
+    if (n > GROUP_SIZE) {
+      out += ','
+    }
+  }
+
+  while (i < n) {
+    out += digits.slice(i, i + GROUP_SIZE)
+    i += GROUP_SIZE
+    if (i < n) {
+      out += ','
+    }
+  }
+
+  return out
+}
+
+/**
  * Format an integer-like value with comma separators.
  * Returns null when value is empty/invalid.
  * @param {string|number|bigint|null|undefined} value
@@ -328,32 +361,13 @@ export function formatNumberWithCommas(value) {
   const str = String(value)
   const isNegative = str.startsWith('-')
   const digits = str.replaceAll(/\D/g, '')
+
   if (!digits) {
     return null
   }
 
-  // Safe, linear-time implementation to insert commas
-  // Only works for digit strings, as intended
-  const n = digits.length
-  if (n <= GROUP_SIZE) {
-    return isNegative ? '-' + digits : digits
-  }
-  let out = ''
-  let i = n % GROUP_SIZE
-  if (i > 0) {
-    out = digits.slice(0, i)
-    if (n > GROUP_SIZE) {
-      out += ','
-    }
-  }
-  while (i < n) {
-    out += digits.slice(i, i + GROUP_SIZE)
-    i += GROUP_SIZE
-    if (i < n) {
-      out += ','
-    }
-  }
-  return isNegative ? '-' + out : out
+  const formatted = insertCommas(digits)
+  return isNegative ? '-' + formatted : formatted
 }
 
 const FUNDING_AMOUNT_FIELDS = [

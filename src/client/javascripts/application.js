@@ -95,7 +95,7 @@ export const formatInputValueWithCommas = (inputEl) => {
   if (inputEl.value.includes('.')) {
     return
   }
-  const allowNegative = inputEl.hasAttribute('data-allow-negative')
+  const allowNegative = 'allowNegative' in inputEl.dataset
   const formatted = formatNumberWithCommas(inputEl.value, allowNegative)
   inputEl.value = formatted
   // Per HTML spec, setting .value programmatically resets the cursor to
