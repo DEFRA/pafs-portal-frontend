@@ -137,7 +137,7 @@
     "analytics_ga_cookie_purpose": "This helps us count how many people visit the service by tracking if you've visited before",
     "analytics_ga_cookie_expires": "2 years",
     "analytics_gid_cookie_name": "_gid",
-    "analytics_gid_cookie_purpose": "This helps us count how many people visit the service on this visit",
+    "analytics_gid_cookie_purpose": "This helps us count how many people visit the service by tracking if you've visited before",
     "analytics_gid_cookie_expires": "1 day",
     "change_settings_heading": "Change your cookie settings",
     "change_settings_link_pre_text": "You can",
