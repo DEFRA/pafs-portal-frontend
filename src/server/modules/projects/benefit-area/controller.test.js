@@ -463,7 +463,7 @@ describe('BenefitAreaController', () => {
       })
     })
 
-    test('should render processing view when upload is still PENDING', async () => {
+    test('should render upload page with processing inset when upload is still PENDING', async () => {
       getUploadStatus.mockResolvedValue({
         success: true,
         data: { data: { uploadStatus: UPLOAD_STATUS.PENDING } }
@@ -474,12 +474,24 @@ describe('BenefitAreaController', () => {
       expect(getUploadStatus).toHaveBeenCalledTimes(1)
       expect(mockH.redirect).not.toHaveBeenCalled()
       expect(mockH.view).toHaveBeenCalledWith(
-        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        PROJECT_VIEWS.BENEFIT_AREA,
         expect.any(Object)
+      )
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            isProcessing: true,
+            selfUrl: ROUTES.PROJECT.EDIT.BENEFIT_AREA_UPLOAD_STATUS.replace(
+              '{referenceNumber}',
+              'TEST-001'
+            )
+          })
+        })
       )
     })
 
-    test('should render processing view when upload is in PROCESSING status', async () => {
+    test('should render upload page with processing inset when upload is in PROCESSING status', async () => {
       getUploadStatus.mockResolvedValue({
         success: true,
         data: { data: { uploadStatus: UPLOAD_STATUS.PROCESSING } }
@@ -490,8 +502,14 @@ describe('BenefitAreaController', () => {
       expect(getUploadStatus).toHaveBeenCalledTimes(1)
       expect(mockH.redirect).not.toHaveBeenCalled()
       expect(mockH.view).toHaveBeenCalledWith(
-        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        PROJECT_VIEWS.BENEFIT_AREA,
         expect.any(Object)
+      )
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          additionalData: expect.objectContaining({ isProcessing: true })
+        })
       )
     })
 
@@ -515,7 +533,7 @@ describe('BenefitAreaController', () => {
       })
     })
 
-    test('should render processing view when status response has no success field', async () => {
+    test('should render upload page with processing inset when status response has no success field', async () => {
       getUploadStatus.mockResolvedValue({
         data: { data: { uploadStatus: UPLOAD_STATUS.PENDING } }
       })
@@ -524,12 +542,12 @@ describe('BenefitAreaController', () => {
 
       expect(getUploadStatus).toHaveBeenCalledTimes(1)
       expect(mockH.view).toHaveBeenCalledWith(
-        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        PROJECT_VIEWS.BENEFIT_AREA,
         expect.any(Object)
       )
     })
 
-    test('should render processing view when status data is null', async () => {
+    test('should render upload page with processing inset when status data is null', async () => {
       getUploadStatus.mockResolvedValue({
         success: true,
         data: { data: null }
@@ -539,7 +557,7 @@ describe('BenefitAreaController', () => {
 
       expect(getUploadStatus).toHaveBeenCalledTimes(1)
       expect(mockH.view).toHaveBeenCalledWith(
-        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        PROJECT_VIEWS.BENEFIT_AREA,
         expect.any(Object)
       )
     })
@@ -615,7 +633,7 @@ describe('BenefitAreaController', () => {
       expect(mockRequest.logger.info).toHaveBeenCalled()
     })
 
-    test('should render processing view when upload remains PENDING', async () => {
+    test('should render upload page with processing inset when upload remains PENDING', async () => {
       getUploadStatus.mockResolvedValue({
         success: true,
         data: { data: { uploadStatus: UPLOAD_STATUS.PENDING } }
@@ -626,7 +644,7 @@ describe('BenefitAreaController', () => {
       expect(getUploadStatus).toHaveBeenCalledTimes(1)
       expect(mockH.redirect).not.toHaveBeenCalled()
       expect(mockH.view).toHaveBeenCalledWith(
-        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        PROJECT_VIEWS.BENEFIT_AREA,
         expect.any(Object)
       )
     })

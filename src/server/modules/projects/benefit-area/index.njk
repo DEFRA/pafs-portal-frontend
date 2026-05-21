@@ -5,6 +5,13 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
+{% block head %}
+  {{ super() }}
+  {% if isProcessing %}
+    <meta http-equiv="refresh" content="2; url={{ selfUrl | safe }}">
+  {% endif %}
+{% endblock %}
+
 {% block body %}
   {% if uploadErrors or errorCode %}
     {% set errorList = [] %}
@@ -37,32 +44,44 @@
 
   <p class="govuk-body">{{ t(localKeyPrefix + '.hint') }}</p>
 
-  <form method="post" action="{{ uploadUrl }}" enctype="multipart/form-data" novalidate>
-    <input type="hidden" name="crumb" value="{{ crumb }}">
-
-    {{ govukFileUpload({
-      id: "benefitAreaFile",
-      name: "file",
-      label: {
-        text: t(localKeyPrefix + '.label')
-      },
-      errorMessage: fileError,
-      attributes: {
-        accept: ".zip"
-      }
+  {% if isProcessing %}
+    {% set processingHtml %}
+    <p class="govuk-body">
+      <strong>{{ t(localKeyPrefix + '.processing.heading') }}</strong>
+    </p>
+    <p class="govuk-body">{{ t(localKeyPrefix + '.processing.description') }}</p>
+    {% endset %}
+    {{ govukInsetText({
+      html: processingHtml
     }) }}
+  {% else %}
+    <form method="post" action="{{ uploadUrl }}" enctype="multipart/form-data" novalidate>
+      <input type="hidden" name="crumb" value="{{ crumb }}">
 
-    {% if benefitAreaFileName %}
-      <p class="govuk-body">
-        <strong>{{ t('common.labels.current_file') }}:</strong>
-        {{ benefitAreaFileName }}
-      </p>
-    {% endif %}
+      {{ govukFileUpload({
+        id: "benefitAreaFile",
+        name: "file",
+        label: {
+          text: t(localKeyPrefix + '.label')
+        },
+        errorMessage: fileError,
+        attributes: {
+          accept: ".zip"
+        }
+      }) }}
 
-    {{ govukButton({
-      text: 'Upload and continue'
-    }) }}
-  </form>
+      {% if benefitAreaFileName %}
+        <p class="govuk-body">
+          <strong>{{ t('common.labels.current_file') }}:</strong>
+          {{ benefitAreaFileName }}
+        </p>
+      {% endif %}
+
+      {{ govukButton({
+        text: 'Upload and continue'
+      }) }}
+    </form>
+  {% endif %}
 
   {% set instructionsDetailsHtml %}
   <p class="govuk-body">{{ t(localKeyPrefix + '.footer.free_mapping_tool.instructions_intro') }}</p>

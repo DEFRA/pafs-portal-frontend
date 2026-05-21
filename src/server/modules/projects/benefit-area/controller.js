@@ -266,11 +266,12 @@ class BenefitAreaController {
         return h.redirect(benefitAreaUrl)
       }
 
-      // Still PENDING - render processing page, browser will auto-refresh
+      // Still PENDING - render upload page with processing inset, browser will auto-refresh
       return h.view(
-        PROJECT_VIEWS.BENEFIT_AREA_PROCESSING,
+        PROJECT_VIEWS.BENEFIT_AREA,
         this._getViewData(request, {
           localKeyPrefix: projectBenefitAreaLocalKeyPrefix,
+          isProcessing: true,
           selfUrl
         })
       )

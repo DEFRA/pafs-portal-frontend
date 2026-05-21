@@ -47,7 +47,6 @@ export const PROJECT_VIEWS = {
   IMPORTANT_DATES: 'modules/projects/important-dates/index',
   BENEFIT_AREA: 'modules/projects/benefit-area/index',
   BENEFIT_AREA_DELETE: 'modules/projects/benefit-area/delete',
-  BENEFIT_AREA_PROCESSING: 'modules/projects/benefit-area/processing',
   RISK_AND_PROPERTIES: 'modules/projects/risk-and-properties/index',
   GOALS_URGENCY_CONFIDENCE: 'modules/projects/goals-urgency-confidence/index',
   ENVIRONMENTAL_BENEFITS: 'modules/projects/environmental-benefits/index',
