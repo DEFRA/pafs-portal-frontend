@@ -96,8 +96,8 @@
         "very_low": "Very low risk (<0.1% annual chance, <1 in 1,000)"
       },
       "coastal_erosion_risk": {
-        "medium_term": "Medium term loss (≤30 years)",
-        "longer_term": "Longer term loss (>30 years)"
+        "medium_term": "Medium term risk (up to the year 2055)",
+        "longer_term": "Longer term risk (up to the year 2105)"
       }
     },
     "goals_approach_summary_card": {
@@ -627,8 +627,8 @@
       "heading": "What is the current coastal erosion risk in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
-        "medium_term": "Medium term loss: Less than or equal to 30 years (1 year to 30 years), in a no future intervention scenario",
-        "longer_term": "Longer term loss: Greater than 30 years (31 years to 100 years), in a no future intervention scenario"
+        "medium_term": "Medium term risk: Up to the year 2055 in a no future intervention scenario",
+        "longer_term": "Longer term risk: Up to the year 2105 in a no future intervention scenario"
       },
       "errors": {
         "required": "Select a coastal erosion risk level"
