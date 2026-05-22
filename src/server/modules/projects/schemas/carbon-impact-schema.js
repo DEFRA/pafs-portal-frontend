@@ -28,6 +28,14 @@ const MAX_WHOLE_NUMBER_DIGITS = 18
 const MAX_COST_DIGITS = 18
 const DECIMAL_REGEX = /^\d+(\.\d{1,2})?$/
 const INTEGER_REGEX = /^\d+$/
+const SIGNED_INTEGER_REGEX = /^-?\d+$/
+
+// Joi error type constants
+const ERROR_STRING_BASE = 'string.base'
+const ERROR_STRING_PATTERN_BASE = 'string.pattern.base'
+const ERROR_STRING_MAX = 'string.max'
+const ERROR_STRING_WHOLE_NUMBER_MAX = 'string.whole_number_max'
+const ERROR_STRING_NEGATIVE = 'string.negative'
 
 const CARBON_EMISSION_INVALID_ERROR =
   'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
@@ -40,17 +48,17 @@ const CARBON_OPERATIONAL_COST_FORECAST_REQUIRED_ERROR =
 
 const validateCarbonDecimal = (value, helpers) => {
   if (!DECIMAL_REGEX.test(value)) {
-    return helpers.error('string.pattern.base')
+    return helpers.error(ERROR_STRING_PATTERN_BASE)
   }
   const [intPart, decPart] = value.split('.')
   if (decPart === undefined) {
     // Whole number: max 18 digits
     if (intPart.length > MAX_WHOLE_NUMBER_DIGITS) {
-      return helpers.error('string.whole_number_max')
+      return helpers.error(ERROR_STRING_WHOLE_NUMBER_MAX)
     }
   } else if (intPart.length > MAX_EMISSION_DIGITS) {
     // Decimal: max 16 digits before decimal point
-    return helpers.error('string.max')
+    return helpers.error(ERROR_STRING_MAX)
   } else {
     // no error
   }
@@ -59,10 +67,22 @@ const validateCarbonDecimal = (value, helpers) => {
 
 const validateCarbonInteger = (value, helpers) => {
   if (!INTEGER_REGEX.test(value)) {
-    return helpers.error('string.pattern.base')
+    return helpers.error(ERROR_STRING_PATTERN_BASE)
   }
   if (value.length > MAX_COST_DIGITS) {
-    return helpers.error('string.max')
+    return helpers.error(ERROR_STRING_MAX)
+  }
+  return value
+}
+
+const validateCarbonSignedInteger = (value, helpers) => {
+  if (!SIGNED_INTEGER_REGEX.test(value)) {
+    return helpers.error(ERROR_STRING_PATTERN_BASE)
+  }
+  // Check length excluding minus sign
+  const absValue = value.startsWith('-') ? value.slice(1) : value
+  if (absValue.length > MAX_COST_DIGITS) {
+    return helpers.error(ERROR_STRING_MAX)
   }
   return value
 }
@@ -78,13 +98,13 @@ const optionalDecimalField = Joi.string()
     return validateCarbonDecimal(value, helpers)
   })
   .messages({
-    'string.base': CARBON_EMISSION_INVALID_ERROR,
-    'string.pattern.base': CARBON_EMISSION_INVALID_ERROR,
-    'string.max': CARBON_EMISSION_INVALID_ERROR,
-    'string.whole_number_max': CARBON_EMISSION_WHOLE_NUMBER_ERROR
+    [ERROR_STRING_BASE]: CARBON_EMISSION_INVALID_ERROR,
+    [ERROR_STRING_PATTERN_BASE]: CARBON_EMISSION_INVALID_ERROR,
+    [ERROR_STRING_MAX]: CARBON_EMISSION_INVALID_ERROR,
+    [ERROR_STRING_WHOLE_NUMBER_MAX]: CARBON_EMISSION_WHOLE_NUMBER_ERROR
   })
 
-const optionalIntegerField = Joi.string()
+const optionalSignedIntegerField = Joi.string()
   .trim()
   .allow(null, '')
   .optional()
@@ -92,12 +112,12 @@ const optionalIntegerField = Joi.string()
     if (value === null || value === undefined || value === '') {
       return value
     }
-    return validateCarbonInteger(value, helpers)
+    return validateCarbonSignedInteger(value, helpers)
   })
   .messages({
-    'string.base': CARBON_COST_INVALID_ERROR,
-    'string.pattern.base': CARBON_COST_INVALID_ERROR,
-    'string.max': CARBON_COST_INVALID_ERROR
+    [ERROR_STRING_BASE]: CARBON_COST_INVALID_ERROR,
+    [ERROR_STRING_PATTERN_BASE]: CARBON_COST_INVALID_ERROR,
+    [ERROR_STRING_MAX]: CARBON_COST_INVALID_ERROR
   })
 
 const requiredOperationalCostForecastField = Joi.string()
@@ -106,9 +126,9 @@ const requiredOperationalCostForecastField = Joi.string()
   .required()
   .custom(validateCarbonInteger)
   .messages({
-    'string.base': CARBON_COST_INVALID_ERROR,
-    'string.pattern.base': CARBON_COST_INVALID_ERROR,
-    'string.max': CARBON_COST_INVALID_ERROR,
+    [ERROR_STRING_BASE]: CARBON_COST_INVALID_ERROR,
+    [ERROR_STRING_PATTERN_BASE]: CARBON_COST_INVALID_ERROR,
+    [ERROR_STRING_MAX]: CARBON_COST_INVALID_ERROR,
     'any.required': CARBON_OPERATIONAL_COST_FORECAST_REQUIRED_ERROR
   })
 
@@ -128,16 +148,16 @@ const optionalDecimalFieldNegativeCheck = Joi.string()
       return value
     }
     if (value.startsWith('-')) {
-      return helpers.error('string.negative')
+      return helpers.error(ERROR_STRING_NEGATIVE)
     }
     return validateCarbonDecimal(value, helpers)
   })
   .messages({
-    'string.base': CARBON_EMISSION_INVALID_ERROR,
-    'string.negative': CARBON_NEGATIVE_ERROR,
-    'string.pattern.base': CARBON_EMISSION_INVALID_ERROR,
-    'string.max': CARBON_EMISSION_INVALID_ERROR,
-    'string.whole_number_max': CARBON_EMISSION_WHOLE_NUMBER_ERROR
+    [ERROR_STRING_BASE]: CARBON_EMISSION_INVALID_ERROR,
+    [ERROR_STRING_NEGATIVE]: CARBON_NEGATIVE_ERROR,
+    [ERROR_STRING_PATTERN_BASE]: CARBON_EMISSION_INVALID_ERROR,
+    [ERROR_STRING_MAX]: CARBON_EMISSION_INVALID_ERROR,
+    [ERROR_STRING_WHOLE_NUMBER_MAX]: CARBON_EMISSION_WHOLE_NUMBER_ERROR
   })
 
 /**
@@ -163,7 +183,7 @@ export const CARBON_STEP_SCHEMAS = {
   }).options({ allowUnknown: true }),
   [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: Joi.object({
     [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]:
-      optionalIntegerField
+      optionalSignedIntegerField
   }).options({ allowUnknown: true }),
   [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: Joi.object({
     [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]:
@@ -182,7 +202,7 @@ export const carbonImpactSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.CARBON_COST_SEQUESTERED]: optionalDecimalField,
   [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: optionalDecimalField,
   [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]:
-    optionalIntegerField,
+    optionalSignedIntegerField,
   [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]:
     requiredOperationalCostForecastField
 }).options({ allowUnknown: true })

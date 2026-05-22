@@ -27,6 +27,13 @@ describe('number formatting helpers', () => {
     expect(digitsOnly('0')).toBe('0')
   })
 
+  it('digitsOnly preserves leading minus when allowNegative is true', () => {
+    expect(digitsOnly('-123abc456', true)).toBe('-123456')
+    expect(digitsOnly('-5', true)).toBe('-5')
+    expect(digitsOnly('-', true)).toBe('-')
+    expect(digitsOnly('123', true)).toBe('123')
+  })
+
   it('withCommas adds commas to numbers', () => {
     expect(withCommas('1234567')).toBe('1,234,567')
     expect(withCommas('1000')).toBe('1,000')
@@ -50,6 +57,13 @@ describe('number formatting helpers', () => {
     expect(formatNumberWithCommas('1000')).toBe('1,000')
     expect(formatNumberWithCommas('')).toBe('')
     expect(formatNumberWithCommas(null)).toBe('')
+  })
+
+  it('formatNumberWithCommas handles negative numbers with allowNegative', () => {
+    expect(formatNumberWithCommas('-1234567', true)).toBe('-1,234,567')
+    expect(formatNumberWithCommas('-5', true)).toBe('-5')
+    expect(formatNumberWithCommas('-', true)).toBe('-')
+    expect(formatNumberWithCommas('1234', true)).toBe('1,234')
   })
 })
 
@@ -102,6 +116,15 @@ describe('input formatting helpers', () => {
   it('unformatInputValue does nothing if input is falsy', () => {
     expect(unformatInputValue(null)).toBeUndefined()
     expect(unformatInputValue(undefined)).toBeUndefined()
+  })
+
+  it('formatInputValueWithCommas handles negative values with data-allow-negative attribute', () => {
+    input.value = '-150000'
+    input.dataset.allowNegative = 'true'
+    formatInputValueWithCommas(input)
+    expect(input.value).toBe('-150,000')
+    expect(input.selectionStart).toBe('-150,000'.length)
+    expect(input.selectionEnd).toBe('-150,000'.length)
   })
 })
 
