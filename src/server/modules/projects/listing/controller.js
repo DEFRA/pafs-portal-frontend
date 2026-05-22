@@ -86,32 +86,76 @@ function getListingContext(request) {
   }
 }
 
-/**
- * Get RMA area filter options for projects
- * Returns 'All RMAs' option plus RMA areas only
- *
- * @param {Function} t - Translation function
- * @param {Object} areasByType - Areas data structure from cache
- * @returns {Array} Area options for dropdown (RMA only)
- */
-function getRmaAreaFilterOptions(t, areasByType) {
-  const options = [
-    { value: '', text: t('projects.manage_projects.filters.all_areas') }
-  ]
+function _getRmasForRmaUser(user, allRmas) {
+  const userAreaIds = new Set((user.areas || []).map((a) => String(a.areaId)))
+  return allRmas.filter((a) => userAreaIds.has(String(a.id)))
+}
 
-  if (!areasByType) {
-    return options
+function _getRmasForPsoUser(user, areasByType) {
+  const psoAreaIds = new Set((user.areas || []).map((a) => String(a.areaId)))
+  return (areasByType[AREAS_RESPONSIBILITIES_MAP.RMA] || []).filter((a) =>
+    psoAreaIds.has(String(a.parent_id))
+  )
+}
+
+function _getRmasForEaUser(user, areasByType) {
+  const eaAreaIds = new Set((user.areas || []).map((a) => String(a.areaId)))
+  const allPsos = areasByType[AREAS_RESPONSIBILITIES_MAP.PSO] || []
+  const psoIds = new Set(
+    allPsos
+      .filter((p) => eaAreaIds.has(String(p.parent_id)))
+      .map((p) => String(p.id))
+  )
+  return (areasByType[AREAS_RESPONSIBILITIES_MAP.RMA] || []).filter((a) =>
+    psoIds.has(String(a.parent_id))
+  )
+}
+
+/**
+ * Build the RMA filter dropdown options scoped to what the current user is allowed to see.
+ *
+ * - Admin : all RMA areas
+ * - RMA   : only the user's own assigned RMA areas
+ * - PSO   : all RMAs whose parent_id matches any of the user's PSO areas
+ * - EA    : all RMAs under the PSOs that belong to the user's EA areas
+ *
+ * Returns null when there is nothing useful to show (fewer than 2 RMA options),
+ * which lets the caller suppress the dropdown entirely.
+ *
+ * @param {Object|undefined} user - Authenticated user object from session
+ * @param {Object|null} areasByType - Areas data structure from cache
+ * @param {Function} t - Translation function
+ * @returns {Array|null} Area options for dropdown, or null if filter should be hidden
+ */
+function getAllowedRmaFilterOptions(user, areasByType, t) {
+  if (!user || !areasByType) {
+    return null
   }
 
-  const rmaAreas = areasByType[AREAS_RESPONSIBILITIES_MAP.RMA] || []
-  options.push(
-    ...rmaAreas.map((area) => ({
-      value: area.id,
-      text: area.name
-    }))
-  )
+  const allRmas = areasByType[AREAS_RESPONSIBILITIES_MAP.RMA] || []
+  let rmaAreas
 
-  return options
+  if (user.admin) {
+    rmaAreas = allRmas
+  } else if (user.isRma) {
+    rmaAreas = _getRmasForRmaUser(user, allRmas)
+  } else if (user.isPso) {
+    rmaAreas = _getRmasForPsoUser(user, areasByType)
+  } else if (user.isEa) {
+    rmaAreas = _getRmasForEaUser(user, areasByType)
+  } else {
+    rmaAreas = []
+  }
+
+  // No point rendering a dropdown with 0 or 1 choice
+  if (rmaAreas.length <= 1) {
+    return null
+  }
+
+  return [
+    { value: '', text: t('projects.manage_projects.filters.all_areas') },
+    ...rmaAreas.map((area) => ({ value: area.id, text: area.name }))
+  ]
 }
 
 async function fetchProjectsData({
@@ -146,12 +190,14 @@ async function fetchProjectsData({
  * @returns {Object} Additional data to merge into view model
  */
 function buildAdditionalViewData(
-  { t, pageHeading, areasByType, listingFlags },
+  { t, pageHeading, areasByType, listingFlags, user },
   extra = {}
 ) {
+  const areaOptions = getAllowedRmaFilterOptions(user, areasByType, t)
   return {
     pageHeading,
-    areas: getRmaAreaFilterOptions(t, areasByType),
+    areas: areaOptions ?? [],
+    showAreaFilter: !!areaOptions,
     ...listingFlags,
     ...extra
   }
@@ -175,7 +221,8 @@ function renderEmptyView(params) {
         t: request.t,
         pageHeading: params.pageHeading,
         areasByType: params.areasByType,
-        listingFlags: params.listingFlags
+        listingFlags: params.listingFlags,
+        user: params.user
       })
     })
   )
@@ -200,7 +247,8 @@ function renderProjectsView(params) {
           t: request.t,
           pageHeading: params.pageHeading,
           areasByType: params.areasByType,
-          listingFlags: params.listingFlags
+          listingFlags: params.listingFlags,
+          user: params.user
         },
         { projects: params.projects }
       )
@@ -286,7 +334,8 @@ export const projectsListingController = {
       successNotification,
       errorNotification,
       areasByType: null,
-      listingFlags
+      listingFlags,
+      user: session?.user
     }
 
     try {

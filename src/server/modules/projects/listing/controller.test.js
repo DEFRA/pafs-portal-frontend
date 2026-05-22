@@ -320,7 +320,7 @@ describe('projectsListingController', () => {
       expect(buildEmptyListingViewModel).toHaveBeenCalled()
     })
 
-    test('Should include RMA areas in filter options', async () => {
+    test('Should include RMA areas in filter options for admin users', async () => {
       const mockAreas = {
         RMA: [
           { id: 1, name: 'Environment Agency' },
@@ -329,8 +329,15 @@ describe('projectsListingController', () => {
         PSO: [{ id: 3, name: 'Some PSO' }]
       }
 
+      // Admin user can see all RMA areas
+      const adminSession = {
+        ...mockSession,
+        user: { ...mockSession.user, admin: true }
+      }
+      getAuthSession.mockReturnValue(adminSession)
+
       buildListingRequestContext.mockReturnValue({
-        session: mockSession,
+        session: adminSession,
         logger: mockLogger,
         successNotification: null,
         errorNotification: null,
@@ -362,6 +369,7 @@ describe('projectsListingController', () => {
                 text: 'Natural England'
               })
             ]),
+            showAreaFilter: true,
             isAdminProjectListing: true,
             isUserProjectListing: false,
             isSubmission: false,
@@ -371,13 +379,20 @@ describe('projectsListingController', () => {
       )
     })
 
-    test('Should include "All RMAs" option in area filter', async () => {
+    test('Should hide area filter when only one RMA is available', async () => {
       const mockAreas = {
         RMA: [{ id: 1, name: 'Environment Agency' }]
       }
 
+      // Admin user — but only 1 RMA exists, so filter should be suppressed
+      const adminSession = {
+        ...mockSession,
+        user: { ...mockSession.user, admin: true }
+      }
+      getAuthSession.mockReturnValue(adminSession)
+
       buildListingRequestContext.mockReturnValue({
-        session: mockSession,
+        session: adminSession,
         logger: mockLogger,
         successNotification: null,
         errorNotification: null,
@@ -399,12 +414,8 @@ describe('projectsListingController', () => {
       expect(buildListingViewModel).toHaveBeenCalledWith(
         expect.objectContaining({
           additionalData: expect.objectContaining({
-            areas: expect.arrayContaining([
-              expect.objectContaining({
-                value: '',
-                text: 'projects.manage_projects.filters.all_areas'
-              })
-            ]),
+            areas: [],
+            showAreaFilter: false,
             isAdminProjectListing: true,
             isUserProjectListing: false,
             isSubmission: false,
@@ -438,12 +449,8 @@ describe('projectsListingController', () => {
       expect(buildListingViewModel).toHaveBeenCalledWith(
         expect.objectContaining({
           additionalData: expect.objectContaining({
-            areas: [
-              expect.objectContaining({
-                value: '',
-                text: 'projects.manage_projects.filters.all_areas'
-              })
-            ],
+            areas: [],
+            showAreaFilter: false,
             isAdminProjectListing: true,
             isUserProjectListing: false,
             isSubmission: false,
@@ -479,12 +486,8 @@ describe('projectsListingController', () => {
       expect(buildListingViewModel).toHaveBeenCalledWith(
         expect.objectContaining({
           additionalData: expect.objectContaining({
-            areas: [
-              expect.objectContaining({
-                value: '',
-                text: 'projects.manage_projects.filters.all_areas'
-              })
-            ],
+            areas: [],
+            showAreaFilter: false,
             isAdminProjectListing: true,
             isUserProjectListing: false,
             isSubmission: false,
@@ -997,9 +1000,8 @@ describe('projectsListingController', () => {
       expect(buildEmptyListingViewModel).toHaveBeenCalledWith(
         expect.objectContaining({
           additionalData: expect.objectContaining({
-            areas: expect.arrayContaining([
-              expect.objectContaining({ value: 1, text: 'EA' })
-            ])
+            areas: [],
+            showAreaFilter: false
           })
         })
       )
