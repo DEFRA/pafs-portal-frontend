@@ -96,8 +96,8 @@
         "very_low": "Very low risk (<0.1% annual chance, <1 in 1,000)"
       },
       "coastal_erosion_risk": {
-        "medium_term": "Medium term loss (≤30 years)",
-        "longer_term": "Longer term loss (>30 years)"
+        "medium_term": "Medium term risk (up to the year 2055)",
+        "longer_term": "Longer term risk (up to the year 2105)"
       }
     },
     "goals_approach_summary_card": {
@@ -173,7 +173,7 @@
         "how_we_use_items": [
           "review your proposal",
           "prioritise your proposal",
-          "determine eligibility for indicative grant-in-aid funding"
+          "determine eligibility for indicative grant in aid funding"
         ],
         "may_also_heading": "We may also process or release the information to:",
         "may_also_items": [
@@ -254,7 +254,7 @@
       "total_estimated_spend": "Total estimated spend (£)",
       "gia": "Grant in aid",
       "local_levy": "Local levy",
-      "additional_gia": "Additional FCRM Grant-in-Aid",
+      "additional_gia": "Additional Grant in Aid",
       "internal_drainage_boards": "Funds recovered from an internal drainage board by the Environment Agency, known as a precept",
       "not_yet_identified": "Funding sources not yet identified",
       "public_sector_contributors": "Public sector contributors",
@@ -627,8 +627,8 @@
       "heading": "What is the current coastal erosion risk in the area the project is likely to benefit?",
       "hint": "Select the risk category that has the most coverage within the area of benefit",
       "options": {
-        "medium_term": "Medium term loss: Less than or equal to 30 years (1 year to 30 years), in a no future intervention scenario",
-        "longer_term": "Longer term loss: Greater than 30 years (31 years to 100 years), in a no future intervention scenario"
+        "medium_term": "Medium term risk: Up to the year 2055 in a no future intervention scenario",
+        "longer_term": "Longer term risk: Up to the year 2105 in a no future intervention scenario"
       },
       "errors": {
         "required": "Select a coastal erosion risk level"
@@ -1775,7 +1775,7 @@
       "options": {
         "grant_in_aid": "Grant in aid",
         "local_levy": "Local levy",
-        "additional_fcrm_grant_in_aid": "Additional FCERM Grant-in-Aid",
+        "additional_fcrm_grant_in_aid": "Additional Grant in Aid",
         "public_contributions": "Public sector contributions",
         "private_contributions": "Private sector contributions",
         "other_ea_contributions": "Contributions from other Environment Agency functions or sources",
@@ -1787,14 +1787,14 @@
       }
     },
     "additional_funding_sources_selection": {
-      "title": "What are the expected additional FCRM Grant in Aid funding sources?",
-      "heading": "What are the expected additional FCRM Grant in Aid funding sources?",
-      "hint": "Select all that apply",
+      "title": "What are the expected additional Grant in Aid funding sources?",
+      "heading": "What are the expected additional Grant in Aid funding sources?",
+      "hint": "Select all that apply. Applicable for projects on the 2020 (or earlier) funding policy only.",
       "options": {
         "asset_replacement_allowance": "Asset replacement allowance",
         "environment_statutory_funding": "Environment statutory funding",
         "frequently_flooded_communities": "Frequently flooded communities",
-        "other_additional_grant_in_aid": "Other additional FCRM Grant in Aid",
+        "other_additional_grant_in_aid": "Other additional Grant in Aid",
         "other_government_department": "Other Government department",
         "recovery": "Recovery",
         "summer_economic_fund": "Summer economic fund"

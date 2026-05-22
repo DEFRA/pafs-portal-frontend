@@ -54,15 +54,16 @@
     {% endif %}
 
     {% if inputType === 'prefix' %}
+      {% set isNegativeAllowed = (fieldName === 'carbonSavingsNetEconomicBenefit') %}
       {{ govukInput({
         label: { text: t(localKeyPrefix + '.label') },
         id: fieldName,
         name: fieldName,
         value: formData[fieldName] if formData[fieldName] is not none else '',
-        inputmode: "numeric",
+        inputmode: "text" if isNegativeAllowed else "numeric",
         classes: "govuk-input--width-20",
         prefix: { text: "£" },
-        attributes: { "data-number-format": "comma" },
+        attributes: { "data-number-format": "comma", "data-allow-negative": "true" if isNegativeAllowed else undefined },
         errorMessage: { text: fieldErrors[fieldName] } if fieldErrors and fieldErrors[fieldName] else undefined
       }) }}
     {% else %}
