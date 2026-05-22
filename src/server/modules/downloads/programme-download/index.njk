@@ -153,7 +153,7 @@
         {% if downloadStatus.requestedOn %}
           <p class="govuk-body govuk-hint">
             {{ t('download.programme.generating.requested_on') }}
-            {{ downloadStatus.requestedOn | formatDate('d MMMM yyyy') }}
+            {{ downloadStatus.requestedOn | formatDate('d MMMM yyyy \'at\' HH:mm') }}
           </p>
         {% endif %}
 
@@ -179,7 +179,7 @@
         {% if downloadStatus.requestedOn %}
           <p class="govuk-body govuk-hint govuk-!-margin-bottom-1">
             {{ t('download.programme.ready.generated_on') }}
-            {{ downloadStatus.requestedOn | formatDate('d MMMM yyyy') }}
+            {{ downloadStatus.requestedOn | formatDate('d MMMM yyyy \'at\' HH:mm') }}
           </p>
         {% endif %}
         {% if downloadStatus.numberOfProposals is not null %}

@@ -89,7 +89,7 @@
           </p>
           {% if projectData.benefitAreaFileUpdatedAt %}
             <p class="gem-c-attachment__metadata">
-              <span class="gem-c-attachment__attribute">Uploaded {{ projectData.benefitAreaFileUpdatedAt | formatDate('d MMMM yyyy') }}</span>
+              <span class="gem-c-attachment__attribute">Uploaded {{ projectData.benefitAreaFileUpdatedAt | formatDate('d MMMM yyyy \'at\' HH:mm') }}</span>
             </p>
           {% endif %}
         </div>
@@ -162,7 +162,7 @@
           </p>
           {% if projectData.fundingCalculatorUpdatedAt %}
             <p class="gem-c-attachment__metadata">
-              <span class="gem-c-attachment__attribute">Uploaded {{ projectData.fundingCalculatorUpdatedAt | formatDate('d MMMM yyyy') }}</span>
+              <span class="gem-c-attachment__attribute">Uploaded {{ projectData.fundingCalculatorUpdatedAt | formatDate('d MMMM yyyy \'at\' HH:mm') }}</span>
             </p>
           {% endif %}
         </div>
@@ -189,7 +189,7 @@
           </p>
           {% if projectData.urgencyDetailsUpdatedAt %}
             <p class="gem-c-attachment__metadata">
-              <span class="gem-c-attachment__attribute">Last updated {{ projectData.urgencyDetailsUpdatedAt | formatDate('d MMMM yyyy') }}</span>
+              <span class="gem-c-attachment__attribute">Last updated {{ projectData.urgencyDetailsUpdatedAt | formatDate('d MMMM yyyy \'at\' HH:mm') }}</span>
             </p>
           {% endif %}
         </div>
