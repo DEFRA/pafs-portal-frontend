@@ -24,3 +24,14 @@
 .app-\!-overflow-x-auto {
   overflow-x: auto;
 }
+
+// Equal-width table column utilities — force a table header or cell to occupy
+// a fixed fraction of the table width, regardless of content length.
+// Use on all <th> elements in a table to prevent unequal column sizing.
+.app-\!-width-one-quarter {
+  width: 25%;
+}
+
+.app-\!-width-one-fifth {
+  width: 20%;
+}

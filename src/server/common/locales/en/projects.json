@@ -445,13 +445,13 @@
       "previousStagePlaceholder": "to start the work"
     },
     "could_start_earlier": {
-      "title": "Could the project start sooner if Grant in Aid funding was made available earlier?",
-      "heading": "Could the project start sooner if Grant in Aid funding was made available earlier?",
+      "title": "Could the project start sooner if funding was made available earlier?",
+      "heading": "Could the project start sooner if funding was made available earlier?",
       "hint": "Without impacting deliverability or outcomes"
     },
     "earliest_date": {
-      "title": "What is the earliest date the project could start if Grant in Aid funding was made available earlier?",
-      "heading": "What is the earliest date the project could start if Grant in Aid funding was made available earlier?",
+      "title": "What is the earliest date the project could start if funding was made available earlier?",
+      "heading": "What is the earliest date the project could start if funding was made available earlier?",
       "hint": "Spend includes any funding source (e.g. local levy, contributions and GiA)."
     },
     "validation": {
@@ -597,7 +597,7 @@
     "current_flood_fluvial_risk": {
       "title": "What is the current flood risk (fluvial and tidal) in the area the project is likely to benefit?",
       "heading": "What is the current flood risk (fluvial and tidal) in the area the project is likely to benefit?",
-      "hint": "Select the risk category that has the most coverage within the area of benefit",
+      "hint": "Select the risk category which affects most properties in the benefit area.",
       "options": {
         "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
         "medium": "Medium risk - this means that each year an area has a chance of flooding between 3.3% and 1% (1 in 30 to a 1 in 100 chance of flooding)",
@@ -611,7 +611,7 @@
     "current_flood_surface_water_risk": {
       "title": "What is the current flood risk (surface water) in the area the project is likely to benefit?",
       "heading": "What is the current flood risk (surface water) in the area the project is likely to benefit?",
-      "hint": "Select the risk category that has the most coverage within the area of benefit",
+      "hint": "Select the risk category which affects most properties in the benefit area.",
       "options": {
         "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
         "medium": "Medium risk - this means that each year an area has a chance of flooding between 3.3% and 1% (1 in 30 to a 1 in 100 chance of flooding)",
@@ -625,7 +625,7 @@
     "current_coastal_erosion_risk": {
       "title": "What is the current coastal erosion risk in the area the project is likely to benefit?",
       "heading": "What is the current coastal erosion risk in the area the project is likely to benefit?",
-      "hint": "Select the risk category that has the most coverage within the area of benefit",
+      "hint": "Select the coastal erosion risk category which affects most properties in the benefit area.",
       "options": {
         "medium_term": "Medium term risk: Up to the year 2055 in a no future intervention scenario",
         "longer_term": "Longer term risk: Up to the year 2105 in a no future intervention scenario"

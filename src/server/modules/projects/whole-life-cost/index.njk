@@ -52,10 +52,10 @@
           {% set optionalSuffix = '' if isMandatory else 
             ' (' + t('projects.whole_life_cost.table.if_known') + ')' %}
           <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_cost.table.whole_life_pv_header') | replace(' ?', optionalSuffix + ' ?') }}</th>
-            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_cost.table.design_construction_header') | replace(' ?', optionalSuffix + ' ?') }}</th>
-            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_cost.table.risk_contingency_header') | replace(' ?', optionalSuffix + ' ?') }}</th>
-            <th scope="col" class="govuk-table__header">{{ t('projects.whole_life_cost.table.future_costs_header') | replace(' ?', optionalSuffix + ' ?') }}</th>
+            <th scope="col" class="govuk-table__header app-!-width-one-quarter">{{ t('projects.whole_life_cost.table.whole_life_pv_header') | replace(' ?', optionalSuffix + ' ?') }}</th>
+            <th scope="col" class="govuk-table__header app-!-width-one-quarter">{{ t('projects.whole_life_cost.table.design_construction_header') | replace(' ?', optionalSuffix + ' ?') }}</th>
+            <th scope="col" class="govuk-table__header app-!-width-one-quarter">{{ t('projects.whole_life_cost.table.risk_contingency_header') | replace(' ?', optionalSuffix + ' ?') }}</th>
+            <th scope="col" class="govuk-table__header app-!-width-one-quarter">{{ t('projects.whole_life_cost.table.future_costs_header') | replace(' ?', optionalSuffix + ' ?') }}</th>
           </tr>
         </thead>
         <tbody class="govuk-table__body">
