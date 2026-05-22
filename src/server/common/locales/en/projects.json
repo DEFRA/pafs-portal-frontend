@@ -625,7 +625,7 @@
     "current_coastal_erosion_risk": {
       "title": "What is the current coastal erosion risk in the area the project is likely to benefit?",
       "heading": "What is the current coastal erosion risk in the area the project is likely to benefit?",
-      "hint": "Select the risk category that has the most coverage within the area of benefit",
+      "hint": "Select the coastal erosion risk category which affects most properties in the benefit area.",
       "options": {
         "medium_term": "Medium term risk: Up to the year 2055 in a no future intervention scenario",
         "longer_term": "Longer term risk: Up to the year 2105 in a no future intervention scenario"
