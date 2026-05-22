@@ -65,7 +65,7 @@ export const submissionsActionsController = {
         const result = await resubmitProject(referenceNumber, accessToken)
         return (
           !result?.success ||
-          result?.data?.externalSubmission?.success === false
+          result?.data?.data?.externalSubmission?.success === false
         )
       },
       successTitle:

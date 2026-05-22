@@ -179,7 +179,7 @@ describe('resubmit', () => {
   test('flashes error when externalSubmission.success is false', async () => {
     resubmitProject.mockResolvedValue({
       success: true,
-      data: { externalSubmission: { success: false } }
+      data: { data: { externalSubmission: { success: false } } }
     })
     await submissionsActionsController.resubmit(mockRequest, mockH)
     expect(mockRequest.yar.flash).toHaveBeenCalledWith('error', {
