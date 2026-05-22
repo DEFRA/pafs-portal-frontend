@@ -445,13 +445,13 @@
       "previousStagePlaceholder": "to start the work"
     },
     "could_start_earlier": {
-      "title": "Could the project start sooner if Grant in Aid funding was made available earlier?",
-      "heading": "Could the project start sooner if Grant in Aid funding was made available earlier?",
+      "title": "Could the project start sooner if funding was made available earlier?",
+      "heading": "Could the project start sooner if funding was made available earlier?",
       "hint": "Without impacting deliverability or outcomes"
     },
     "earliest_date": {
-      "title": "What is the earliest date the project could start if Grant in Aid funding was made available earlier?",
-      "heading": "What is the earliest date the project could start if Grant in Aid funding was made available earlier?",
+      "title": "What is the earliest date the project could start if funding was made available earlier?",
+      "heading": "What is the earliest date the project could start if funding was made available earlier?",
       "hint": "Spend includes any funding source (e.g. local levy, contributions and GiA)."
     },
     "validation": {
