@@ -597,7 +597,7 @@
     "current_flood_fluvial_risk": {
       "title": "What is the current flood risk (fluvial and tidal) in the area the project is likely to benefit?",
       "heading": "What is the current flood risk (fluvial and tidal) in the area the project is likely to benefit?",
-      "hint": "Select the risk category that has the most coverage within the area of benefit",
+      "hint": "Select the risk category which affects most properties in the benefit area.",
       "options": {
         "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
         "medium": "Medium risk - this means that each year an area has a chance of flooding between 3.3% and 1% (1 in 30 to a 1 in 100 chance of flooding)",
@@ -611,7 +611,7 @@
     "current_flood_surface_water_risk": {
       "title": "What is the current flood risk (surface water) in the area the project is likely to benefit?",
       "heading": "What is the current flood risk (surface water) in the area the project is likely to benefit?",
-      "hint": "Select the risk category that has the most coverage within the area of benefit",
+      "hint": "Select the risk category which affects most properties in the benefit area.",
       "options": {
         "high": "High risk - this means that each year an area has a chance of flooding of greater than 3.3% (greater than a 1 in 30 chance of flooding)",
         "medium": "Medium risk - this means that each year an area has a chance of flooding between 3.3% and 1% (1 in 30 to a 1 in 100 chance of flooding)",

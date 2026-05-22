@@ -1263,6 +1263,381 @@ describe('projectsListingController', () => {
         })
       )
     })
+
+    test('Should show RMA filter for RMA user scoped to their assigned areas', async () => {
+      const rmaSession = {
+        ...mockSession,
+        user: {
+          admin: false,
+          isRma: true,
+          isPso: false,
+          isEa: false,
+          areas: [
+            { areaId: 1, name: 'Area A' },
+            { areaId: 2, name: 'Area B' }
+          ]
+        }
+      }
+      getAuthSession.mockReturnValue(rmaSession)
+
+      buildListingRequestContext.mockReturnValue({
+        session: rmaSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({
+        RMA: [
+          { id: 1, name: 'Area A' },
+          { id: 2, name: 'Area B' },
+          { id: 3, name: 'Area C' } // not assigned to this user
+        ]
+      })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      const callArgs = buildListingViewModel.mock.calls[0][0]
+      expect(callArgs.additionalData.showAreaFilter).toBe(true)
+      expect(callArgs.additionalData.areas).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ value: 1, text: 'Area A' }),
+          expect.objectContaining({ value: 2, text: 'Area B' })
+        ])
+      )
+      expect(callArgs.additionalData.areas).not.toEqual(
+        expect.arrayContaining([expect.objectContaining({ value: 3 })])
+      )
+    })
+
+    test('Should hide RMA filter for RMA user with only one assigned area', async () => {
+      const rmaSession = {
+        ...mockSession,
+        user: {
+          admin: false,
+          isRma: true,
+          isPso: false,
+          isEa: false,
+          areas: [{ areaId: 1, name: 'Area A' }]
+        }
+      }
+      getAuthSession.mockReturnValue(rmaSession)
+
+      buildListingRequestContext.mockReturnValue({
+        session: rmaSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({
+        RMA: [
+          { id: 1, name: 'Area A' },
+          { id: 2, name: 'Area B' } // exists but not assigned to user
+        ]
+      })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            showAreaFilter: false,
+            areas: []
+          })
+        })
+      )
+    })
+
+    test('Should show RMA filter for PSO user scoped to child RMA areas', async () => {
+      const psoSession = {
+        ...mockSession,
+        user: {
+          admin: false,
+          isRma: false,
+          isPso: true,
+          isEa: false,
+          areas: [{ areaId: 10, name: 'Some PSO' }]
+        }
+      }
+      getAuthSession.mockReturnValue(psoSession)
+
+      buildListingRequestContext.mockReturnValue({
+        session: psoSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({
+        PSO: [{ id: 10, name: 'Some PSO' }],
+        RMA: [
+          { id: 1, name: 'RMA A', parent_id: 10 },
+          { id: 2, name: 'RMA B', parent_id: 10 },
+          { id: 3, name: 'Other RMA', parent_id: 20 } // different PSO
+        ]
+      })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      const callArgs = buildListingViewModel.mock.calls[0][0]
+      expect(callArgs.additionalData.showAreaFilter).toBe(true)
+      expect(callArgs.additionalData.areas).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ value: 1, text: 'RMA A' }),
+          expect.objectContaining({ value: 2, text: 'RMA B' })
+        ])
+      )
+      expect(callArgs.additionalData.areas).not.toEqual(
+        expect.arrayContaining([expect.objectContaining({ value: 3 })])
+      )
+    })
+
+    test('Should hide RMA filter for PSO user with fewer than 2 child RMA areas', async () => {
+      const psoSession = {
+        ...mockSession,
+        user: {
+          admin: false,
+          isRma: false,
+          isPso: true,
+          isEa: false,
+          areas: [{ areaId: 10, name: 'Some PSO' }]
+        }
+      }
+      getAuthSession.mockReturnValue(psoSession)
+
+      buildListingRequestContext.mockReturnValue({
+        session: psoSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({
+        PSO: [{ id: 10 }],
+        RMA: [{ id: 1, name: 'RMA A', parent_id: 10 }]
+      })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            showAreaFilter: false,
+            areas: []
+          })
+        })
+      )
+    })
+
+    test('Should handle PSO user with no areas property and missing RMA key', async () => {
+      const psoSession = {
+        ...mockSession,
+        user: { admin: false, isRma: false, isPso: true, isEa: false }
+        // no areas property
+      }
+      getAuthSession.mockReturnValue(psoSession)
+
+      buildListingRequestContext.mockReturnValue({
+        session: psoSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      // No RMA key in areasByType
+      mockRequest.getAreas.mockResolvedValue({ PSO: [{ id: 10 }] })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            showAreaFilter: false,
+            areas: []
+          })
+        })
+      )
+    })
+
+    test('Should show RMA filter for EA user scoped through PSO hierarchy', async () => {
+      const eaSession = {
+        ...mockSession,
+        user: {
+          admin: false,
+          isRma: false,
+          isPso: false,
+          isEa: true,
+          areas: [{ areaId: 100, name: 'Some EA' }]
+        }
+      }
+      getAuthSession.mockReturnValue(eaSession)
+
+      buildListingRequestContext.mockReturnValue({
+        session: eaSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({
+        'PSO Area': [
+          { id: 10, parent_id: 100 }, // belongs to this EA
+          { id: 11, parent_id: 100 }, // also belongs to this EA
+          { id: 20, parent_id: 200 } // different EA
+        ],
+        RMA: [
+          { id: 1, name: 'RMA A', parent_id: 10 },
+          { id: 2, name: 'RMA B', parent_id: 11 },
+          { id: 3, name: 'Other RMA', parent_id: 20 } // under different EA
+        ]
+      })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      const callArgs = buildListingViewModel.mock.calls[0][0]
+      expect(callArgs.additionalData.showAreaFilter).toBe(true)
+      expect(callArgs.additionalData.areas).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ value: 1, text: 'RMA A' }),
+          expect.objectContaining({ value: 2, text: 'RMA B' })
+        ])
+      )
+      expect(callArgs.additionalData.areas).not.toEqual(
+        expect.arrayContaining([expect.objectContaining({ value: 3 })])
+      )
+    })
+
+    test('Should hide RMA filter for EA user with fewer than 2 accessible RMA areas', async () => {
+      const eaSession = {
+        ...mockSession,
+        user: {
+          admin: false,
+          isRma: false,
+          isPso: false,
+          isEa: true,
+          areas: [{ areaId: 100, name: 'Some EA' }]
+        }
+      }
+      getAuthSession.mockReturnValue(eaSession)
+
+      buildListingRequestContext.mockReturnValue({
+        session: eaSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      mockRequest.getAreas.mockResolvedValue({
+        'PSO Area': [{ id: 10, parent_id: 100 }],
+        RMA: [{ id: 1, name: 'RMA A', parent_id: 10 }]
+      })
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            showAreaFilter: false,
+            areas: []
+          })
+        })
+      )
+    })
+
+    test('Should handle EA user with no areas property and missing area keys', async () => {
+      const eaSession = {
+        ...mockSession,
+        user: { admin: false, isRma: false, isPso: false, isEa: true }
+        // no areas property
+      }
+      getAuthSession.mockReturnValue(eaSession)
+
+      buildListingRequestContext.mockReturnValue({
+        session: eaSession,
+        logger: mockLogger,
+        successNotification: null,
+        errorNotification: null,
+        page: 1,
+        filters: { search: '', areaId: '' }
+      })
+
+      // Neither 'PSO Area' nor RMA keys present
+      mockRequest.getAreas.mockResolvedValue({})
+
+      getProjects.mockResolvedValue({
+        success: true,
+        data: { data: [], pagination: {} }
+      })
+      buildListingViewModel.mockReturnValue({})
+
+      await projectsListingController.handler(mockRequest, mockH)
+
+      expect(buildListingViewModel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            showAreaFilter: false,
+            areas: []
+          })
+        })
+      )
+    })
   })
 })
 
