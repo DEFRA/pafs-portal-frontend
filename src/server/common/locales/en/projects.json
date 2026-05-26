@@ -984,8 +984,9 @@
       }
     },
     "experience": {
-      "title": "What is your experience of completing natural flood management measures?",
-      "heading": "What is your experience of completing natural flood management measures?",
+      "title": "What is the project team’s experience of implementing natural flood management measures?",
+      "heading": "What is the project team’s experience of implementing natural flood management measures?",
+      "hint": "The combined experience of the project team, including both consultants and contractors.",
       "error": "Please select your experience of completing natural flood management measures.",
       "options": {
         "no_experience": "No experience: not completed natural flood management measures before but have relevant land or environmental project experience",
