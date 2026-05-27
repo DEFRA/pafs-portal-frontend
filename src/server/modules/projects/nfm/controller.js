@@ -315,6 +315,13 @@ class NfmController {
     }
 
     const landUseFieldConfig = LAND_USE_DETAIL_FIELD_CONFIG[step]
+
+    // Get hint from locale only for experience page
+    let hint
+    if (step === PROJECT_STEPS.NFM_EXPERIENCE) {
+      hint = request.t(`${localKeyPrefix}.hint`)
+    }
+
     const additionalData = {
       step,
       projectSteps: PROJECT_STEPS,
@@ -331,6 +338,7 @@ class NfmController {
       nfmExperienceOptions: this._getNfmExperienceOptions(request),
       nfmProjectReadinessOptions: this._getNfmProjectReadinessOptions(request),
       columnWidth: 'full',
+      ...(hint && { hint }),
       ...(landUseFieldConfig && {
         beforeFieldName: landUseFieldConfig.beforeFieldName,
         afterFieldName: landUseFieldConfig.afterFieldName

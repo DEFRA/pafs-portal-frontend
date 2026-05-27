@@ -33,7 +33,11 @@
           </dd>
         </div>
 
-        <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+        {% set projectTypeRowClass = 'govuk-summary-list__row' %}
+        {% if projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.DEF or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REF or projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] == PROJECT_TYPES.REP %}
+          {% set projectTypeRowClass = 'govuk-summary-list__row govuk-summary-list__row--no-border' %}
+        {% endif %}
+        <div class="{{ projectTypeRowClass }}">
           <dt class="govuk-summary-list__key">
             {{ t('projects.overview.proposal_details_summary_card.project_type') }}
           </dt>
