@@ -1,5 +1,7 @@
 const GROUP_SIZE = 3
 const MAX_INPUT_LENGTH = 15
+const COMMA_VISUAL_WIDTH_CH = 0.5
+const INPUT_CURSOR_BUFFER_CH = 0.5
 import { initAll } from 'govuk-frontend'
 
 export function setupHeaderNavigation() {
@@ -116,10 +118,16 @@ export const autoSizeInput = (inputEl, minSize = 5) => {
     return
   }
   const digits = inputEl.value.replaceAll(',', '').length
-  inputEl.size = Math.max(
+  const commas = (inputEl.value.match(/,/g) || []).length
+  const baseWidth = Math.max(
     digits > MAX_INPUT_LENGTH ? digits + 1 : digits,
     minSize
   )
+  // With box-sizing:content-box the ch width is the content area; padding is
+  // outside it. Chrome strictly subtracts padding from ch when border-box is
+  // used, so content-box must be set in CSS. Commas are ~0.5ch wide (0.5 is
+  // exact in IEEE 754, avoiding floating-point string rendering issues).
+  inputEl.style.width = `${baseWidth + commas * COMMA_VISUAL_WIDTH_CH + INPUT_CURSOR_BUFFER_CH}ch`
 }
 
 export const bindCommaFormattingToInputs = (selector, options = {}) => {

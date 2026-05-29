@@ -134,46 +134,52 @@ describe('autoSizeInput', () => {
     input = document.createElement('input')
   })
 
-  it('sets size to digit count (ignoring commas)', () => {
-    input.value = '500,000'
+  it('sizes by digit count plus 0.5ch per comma plus 0.5ch buffer', () => {
+    input.value = '500,000' // 6 digits, 1 comma
     autoSizeInput(input)
-    expect(input.size).toBe(6) // 6 digits, comma excluded
+    expect(input.style.width).toBe('7ch') // 6 + 1*0.5 + 0.5
   })
 
-  it('enforces minimum size when value is shorter than minSize', () => {
-    input.value = '0'
+  it('also accounts for commas above 6 digits', () => {
+    input.value = '1,000,000' // 7 digits, 2 commas
     autoSizeInput(input)
-    expect(input.size).toBe(5)
+    expect(input.style.width).toBe('8.5ch') // 7 + 2*0.5 + 0.5
   })
 
-  it('enforces minimum size when value is empty', () => {
+  it('enforces minimum width when value is shorter than minSize', () => {
+    input.value = '0' // 1 digit, 0 commas
+    autoSizeInput(input)
+    expect(input.style.width).toBe('5.5ch') // minSize 5 + 0 + 0.5
+  })
+
+  it('enforces minimum width when value is empty', () => {
     input.value = ''
     autoSizeInput(input)
-    expect(input.size).toBe(5)
+    expect(input.style.width).toBe('5.5ch') // minSize 5 + 0 + 0.5
   })
 
   it('accepts a custom minSize', () => {
     input.value = ''
     autoSizeInput(input, 10)
-    expect(input.size).toBe(10)
+    expect(input.style.width).toBe('10.5ch') // minSize 10 + 0 + 0.5
   })
 
   it('handles an 18-digit formatted value', () => {
-    input.value = '999,999,999,999,999,999' // 18 digits + 5 commas = 23 chars
+    input.value = '999,999,999,999,999,999' // 18 digits, 5 commas
     autoSizeInput(input)
-    expect(input.size).toBe(19) // 18 digits > 15 so +1 added
+    expect(input.style.width).toBe('22ch') // digits(18)>15 → 19 + 5*0.5 + 0.5
   })
 
-  it('does not add extra width at exactly 15 digits', () => {
-    input.value = '999,999,999,999,999' // 15 digits
+  it('does not add overflow at exactly 15 digits', () => {
+    input.value = '999,999,999,999,999' // 15 digits, 4 commas
     autoSizeInput(input)
-    expect(input.size).toBe(15)
+    expect(input.style.width).toBe('17.5ch') // 15 + 4*0.5 + 0.5
   })
 
-  it('adds 1 extra width at 16 digits', () => {
-    input.value = '9,999,999,999,999,999' // 16 digits
+  it('adds overflow +1 at 16 digits', () => {
+    input.value = '9,999,999,999,999,999' // 16 digits, 5 commas
     autoSizeInput(input)
-    expect(input.size).toBe(17) // 16 + 1
+    expect(input.style.width).toBe('20ch') // digits(16)>15 → 17 + 5*0.5 + 0.5
   })
 
   it('does nothing if input is falsy', () => {

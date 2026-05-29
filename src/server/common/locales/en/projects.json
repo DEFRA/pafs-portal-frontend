@@ -440,7 +440,7 @@
     "start_achieving_its_benefits": {
       "title": "When do you expect the project to start achieving its benefits?",
       "heading": "When do you expect the project to start achieving its benefits?",
-      "hint": "This could be when households start to benefit or new habitat is created.",
+      "hint": "This may occur when properties begin to benefit or when new habitats are created.",
       "placeholder": "the project to start achieving its benefits",
       "previousStagePlaceholder": "to start the work"
     },
@@ -556,7 +556,7 @@
         "reducing_less_50": "Reducing flood risk (less than 50%)",
         "increasing_resilience": "Increasing flood resilience",
         "maintaining_existing_question": "How many properties are estimated to benefit from maintaining existing assets?",
-        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more?",
+        "reducing_50_plus_question": "How many properties are estimated to benefit from a reduction in flood probability of 50% or more (excluding property flood resilience)?",
         "reducing_less_50_question": "How many properties are estimated to benefit from a reduction in flood probability of less than 50% (excluding property flood resilience)?",
         "increasing_resilience_question": "How many properties will benefit from an individual property intervention?"
       }
