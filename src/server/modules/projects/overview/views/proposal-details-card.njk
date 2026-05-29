@@ -68,6 +68,8 @@
             {% endif %}
             {% if projectTypeLabel %}
               <span class="govuk-!-font-weight-bold">{{ projectTypePrefix }}</span> {{ projectTypeLabel }}
+            {% elif projectData[PROJECT_PAYLOAD_FIELDS.IS_LEGACY] %}
+              {{ t('projects.overview.common.none') }}
             {% else %}
               {{ t('projects.overview.common.na') }}
             {% endif %}
