@@ -19,7 +19,7 @@
     </div>
     <div class="govuk-summary-card__content">
       {% if hasApproach %}
-        <p class="govuk-body">{{ projectData[PROJECT_PAYLOAD_FIELDS.APPROACH] }}</p>
+        <p class="govuk-body app-overview-goals-text">{{ projectData[PROJECT_PAYLOAD_FIELDS.APPROACH] }}</p>
       {% else %}
         <p class="govuk-body">{{ t('projects.overview.goals_approach_summary_card.not_added') }}</p>
       {% endif %}

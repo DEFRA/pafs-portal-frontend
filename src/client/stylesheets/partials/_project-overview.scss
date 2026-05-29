@@ -1,5 +1,9 @@
 @use "../govuk-base" as govuk;
 
+.app-overview-goals-text {
+  word-wrap: break-word;
+}
+
 .app-notification-banner--full-width {
   .govuk-notification-banner__content>* {
     max-width: 100%;
