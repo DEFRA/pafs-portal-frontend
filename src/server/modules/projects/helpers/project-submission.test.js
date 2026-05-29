@@ -18,6 +18,7 @@ import {
   updateSessionData
 } from './project-utils.js'
 import { PROJECT_PAYLOAD_LEVEL_FIELDS } from './project-config.js'
+import { detectChanges } from './project-edit-session.js'
 import {
   PROJECT_ERROR_CODES,
   PROJECT_PAYLOAD_FIELDS,
@@ -30,6 +31,7 @@ vi.mock('../../../common/helpers/error-renderer/index.js')
 vi.mock('../../../common/services/project/project-service.js')
 vi.mock('./project-utils.js')
 vi.mock('./project-config.js')
+vi.mock('./project-edit-session.js')
 
 describe('project-submission helpers', () => {
   let mockRequest
@@ -40,7 +42,8 @@ describe('project-submission helpers', () => {
 
     mockRequest = {
       logger: {
-        error: vi.fn()
+        error: vi.fn(),
+        info: vi.fn()
       },
       metrics: { counter: vi.fn() }
     }
@@ -173,6 +176,7 @@ describe('project-submission helpers', () => {
         accessToken: 'test-token'
       })
       requiredInterventionTypesForProjectType.mockReturnValue(true)
+      detectChanges.mockReturnValue({ hasChanges: true, changedFields: [] })
     })
 
     test('should submit project successfully', async () => {
@@ -235,6 +239,73 @@ describe('project-submission helpers', () => {
       )
     })
 
+    test('should skip API and return synthetic success when in edit mode with no changes', async () => {
+      const sessionWithNoChanges = {
+        projectType: 'DEF',
+        projectInterventionTypes: ['NFM'],
+        mainInterventionType: 'NFM',
+        referenceNumber: 'TEST-001',
+        slug: 'test-001',
+        isEdit: true,
+        originalData: { projectType: 'DEF' }
+      }
+      getSessionData.mockReturnValue(sessionWithNoChanges)
+      detectChanges.mockReturnValue({ hasChanges: false, changedFields: [] })
+
+      const result = await submitProject(
+        mockRequest,
+        PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE
+      )
+
+      expect(upsertProjectProposal).not.toHaveBeenCalled()
+      expect(result.success).toBe(true)
+      expect(result.data.data).toBe(sessionWithNoChanges)
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        { level: PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE },
+        'No changes detected, skipping API submission'
+      )
+    })
+
+    test('should call API when in edit mode and changes are detected', async () => {
+      getSessionData.mockReturnValue({
+        projectType: 'DEF',
+        projectInterventionTypes: ['NFM'],
+        mainInterventionType: 'NFM',
+        referenceNumber: 'TEST-001',
+        slug: 'test-001',
+        isEdit: true,
+        originalData: { projectType: 'STU' }
+      })
+      detectChanges.mockReturnValue({
+        hasChanges: true,
+        changedFields: ['projectType']
+      })
+      upsertProjectProposal.mockResolvedValue({
+        success: true,
+        data: { referenceNumber: 'TEST-001' }
+      })
+
+      await submitProject(mockRequest, PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE)
+
+      expect(upsertProjectProposal).toHaveBeenCalled()
+    })
+
+    test('should call API when not in edit mode regardless of originalData', async () => {
+      getSessionData.mockReturnValue({
+        projectType: 'DEF',
+        isEdit: false
+      })
+      detectChanges.mockReturnValue({ hasChanges: false, changedFields: [] })
+      upsertProjectProposal.mockResolvedValue({
+        success: true,
+        data: { referenceNumber: 'TEST-001' }
+      })
+
+      await submitProject(mockRequest, PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE)
+
+      expect(upsertProjectProposal).toHaveBeenCalled()
+    })
+
     test('should log validation errors details', async () => {
       const error = new Error('Validation failed')
       error.response = {
@@ -249,10 +320,8 @@ describe('project-submission helpers', () => {
 
       expect(mockRequest.logger.error).toHaveBeenCalledWith(
         expect.objectContaining({
-          error: expect.objectContaining({
-            validationErrors: error.response.data.validationErrors,
-            errors: error.response.data.errors
-          })
+          err: error,
+          level: PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE
         }),
         'Failed to submit project'
       )

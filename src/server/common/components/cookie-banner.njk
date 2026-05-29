@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="govuk-button-group">
-          <form method="POST" action="/cookies/hide-message" style="display: inline;">
+          <form method="POST" action="/cookies/hide-message" class="app-inline-form">
             <input type="hidden" name="crumb" value="{{ crumb }}">
             {{ govukButton({
               text: t('static-pages:cookie_banner.hide_button')
@@ -46,13 +46,13 @@
           </div>
         </div>
         <div class="govuk-button-group">
-          <form method="POST" action="/cookies/accept" style="display: inline;">
+          <form method="POST" action="/cookies/accept" class="app-inline-form">
             <input type="hidden" name="crumb" value="{{ crumb }}">
             {{ govukButton({
               text: t('static-pages:cookie_banner.accept_button')
             }) }}
           </form>
-          <form method="POST" action="/cookies/reject" style="display: inline;">
+          <form method="POST" action="/cookies/reject" class="app-inline-form">
             <input type="hidden" name="crumb" value="{{ crumb }}">
             {{ govukButton({
               text: t('static-pages:cookie_banner.reject_button')

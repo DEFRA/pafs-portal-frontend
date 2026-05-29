@@ -127,6 +127,83 @@ describe('project-edit-session', () => {
       const result = detectChanges(sessionData, ['value1'])
       expect(result.hasChanges).toBe(true)
     })
+
+    test('should treat numeric string equal to number (form POST vs API)', () => {
+      // API returns number, form POST stores string — should be treated as equal
+      const sessionData = {
+        isEdit: true,
+        financialStartYear: '2025',
+        originalData: { financialStartYear: 2025 }
+      }
+      const result = detectChanges(sessionData, ['financialStartYear'])
+      expect(result.hasChanges).toBe(false)
+    })
+
+    test('should detect change when numeric value actually differs', () => {
+      const sessionData = {
+        isEdit: true,
+        financialStartYear: '2026',
+        originalData: { financialStartYear: 2025 }
+      }
+      const result = detectChanges(sessionData, ['financialStartYear'])
+      expect(result.hasChanges).toBe(true)
+      expect(result.changedFields).toEqual(['financialStartYear'])
+    })
+
+    test('should not coerce boolean false to 0 (boolean guard)', () => {
+      // false == 0 in JavaScript — guard must prevent false negatives
+      const sessionData = {
+        isEdit: true,
+        fcermGia: 0,
+        originalData: { fcermGia: false }
+      }
+      const result = detectChanges(sessionData, ['fcermGia'])
+      expect(result.hasChanges).toBe(true)
+    })
+
+    test('should treat equal booleans as unchanged', () => {
+      const sessionData = {
+        isEdit: true,
+        fcermGia: true,
+        originalData: { fcermGia: true }
+      }
+      const result = detectChanges(sessionData, ['fcermGia'])
+      expect(result.hasChanges).toBe(false)
+    })
+
+    test('should always detect change for array-of-objects (fundingValues)', () => {
+      // Array elements are objects — different references even with same content
+      const row = { financialYear: 2025, fcermGia: '1000' }
+      const sessionData = {
+        isEdit: true,
+        fundingValues: [{ ...row }],
+        originalData: { fundingValues: [{ ...row }] }
+      }
+      const result = detectChanges(sessionData, ['fundingValues'])
+      // Objects are different references → always hasChanges (safe — never skips a save)
+      expect(result.hasChanges).toBe(true)
+    })
+
+    test('should detect change when empty string replaces 0 (Number("") === 0 guard)', () => {
+      // Without the empty-string guard, Number('') === 0 would give a false negative
+      const sessionData = {
+        isEdit: true,
+        noPropertiesAtRisk: '',
+        originalData: { noPropertiesAtRisk: 0 }
+      }
+      const result = detectChanges(sessionData, ['noPropertiesAtRisk'])
+      expect(result.hasChanges).toBe(true)
+    })
+
+    test('should detect change when whitespace-only string replaces 0', () => {
+      const sessionData = {
+        isEdit: true,
+        noPropertiesAtRisk: '   ',
+        originalData: { noPropertiesAtRisk: 0 }
+      }
+      const result = detectChanges(sessionData, ['noPropertiesAtRisk'])
+      expect(result.hasChanges).toBe(true)
+    })
   })
 
   describe('initializeEditSession', () => {

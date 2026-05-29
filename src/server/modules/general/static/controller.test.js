@@ -445,7 +445,13 @@ describe('StaticPageController - hide cookie message', () => {
     vi.clearAllMocks()
   })
 
-  it('clears show_cookie_confirmation cookie', () => {
+  it('clears show_cookie_confirmation cookie with matching SameSite/Secure attributes (Safari fix)', () => {
+    config.get.mockImplementation((key) => {
+      if (key === 'cookie.preferences.ttl') return 31536000
+      if (key === 'session.cookie.secure') return true
+      return null
+    })
+
     const request = {
       headers: { referer: '/home' }
     }
@@ -462,9 +468,15 @@ describe('StaticPageController - hide cookie message', () => {
     const response = staticPageController.hideMessageHandler(request, h)
 
     expect(redirectSpy).toHaveBeenCalledWith('/home')
-    expect(unstateSpy).toHaveBeenCalledWith('show_cookie_confirmation', {
-      path: '/'
-    })
+    expect(unstateSpy).toHaveBeenCalledWith(
+      'show_cookie_confirmation',
+      expect.objectContaining({
+        path: '/',
+        isSameSite: 'Lax',
+        isSecure: true,
+        isHttpOnly: false
+      })
+    )
     expect(response).toBeDefined()
   })
 
