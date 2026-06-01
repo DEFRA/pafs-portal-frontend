@@ -111,10 +111,13 @@ class StaticPageController {
    */
   hideMessage(request, h) {
     const response = h.redirect(request.headers.referer || '/')
-    // Clear the confirmation cookie so banner doesn't show
-    response.unstate(COOKIE_NAMES.SHOW_CONFIRMATION, {
-      path: '/'
-    })
+    // Clear the confirmation cookie so banner doesn't show.
+    // Safari requires SameSite and Secure to match the original Set-Cookie — without them
+    // Safari treats the clearing header as a different cookie and doesn't clear it.
+    response.unstate(
+      COOKIE_NAMES.SHOW_CONFIRMATION,
+      getCookieOptions({ ttl: null, isHttpOnly: false })
+    )
     return response
   }
 

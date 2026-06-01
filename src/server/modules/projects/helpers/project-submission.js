@@ -9,6 +9,7 @@ import {
   requiredInterventionTypesForProjectType,
   updateSessionData
 } from './project-utils.js'
+import { detectChanges } from './project-edit-session.js'
 import { PROJECT_PAYLOAD_LEVEL_FIELDS } from './project-config.js'
 import {
   PROJECT_ERROR_CODES,
@@ -62,6 +63,22 @@ export function buildProjectPayload(sessionData, level) {
 export async function submitProject(request, level) {
   try {
     const sessionData = getSessionData(request)
+
+    // In edit mode, skip the API call when the user hasn't changed any level fields.
+    // detectChanges returns hasChanges:false when originalData is absent (new projects),
+    // but we guard on sessionData.isEdit too so new-project saves always fire.
+    const levelFields = PROJECT_PAYLOAD_LEVEL_FIELDS[level]
+    if (levelFields && sessionData.isEdit && sessionData.originalData) {
+      const { hasChanges } = detectChanges(sessionData, levelFields)
+      if (!hasChanges) {
+        request.logger.info(
+          { level },
+          'No changes detected, skipping API submission'
+        )
+        return { success: true, data: { data: sessionData } }
+      }
+    }
+
     const payload = buildProjectPayload(sessionData, level)
 
     const authSession = getAuthSession(request)
@@ -83,21 +100,7 @@ export async function submitProject(request, level) {
 
     return response
   } catch (error) {
-    const errorDetails = {
-      message: error.message,
-      stack: error.stack,
-      responseData: error.response?.data,
-      validationErrors: error.response?.data?.validationErrors,
-      errors: error.response?.data?.errors
-    }
-
-    request.logger.error(
-      {
-        error: errorDetails,
-        level
-      },
-      'Failed to submit project'
-    )
+    request.logger.error({ err: error, level }, 'Failed to submit project')
 
     return {
       success: false,

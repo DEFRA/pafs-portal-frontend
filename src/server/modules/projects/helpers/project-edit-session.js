@@ -91,6 +91,54 @@ function mapNfmMeasuresToFields(nfmMeasures) {
   return mappedFields
 }
 
+const NFM_LAND_USE_FIELD_MAPPINGS = [
+  {
+    landUseType: 'enclosed_arable_farmland',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER
+  },
+  {
+    landUseType: 'enclosed_livestock_farmland',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_AFTER
+  },
+  {
+    landUseType: 'enclosed_dairying_farmland',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_AFTER
+  },
+  {
+    landUseType: 'semi_natural_grassland',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_AFTER
+  },
+  {
+    landUseType: 'woodland',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
+  },
+  {
+    landUseType: 'mountain_moors_and_heath',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
+  },
+  {
+    landUseType: 'peatland_restoration',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_AFTER
+  },
+  {
+    landUseType: 'rivers_wetlands_and_freshwater_habitats',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER
+  },
+  {
+    landUseType: 'coastal_margins',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER
+  }
+]
+
 function mapNfmLandUseChangesToFields(nfmLandUseChanges) {
   const mappedFields = {}
 
@@ -98,56 +146,7 @@ function mapNfmLandUseChangesToFields(nfmLandUseChanges) {
     return mappedFields
   }
 
-  const LAND_USE_FIELD_MAPPINGS = [
-    {
-      landUseType: 'enclosed_arable_farmland',
-      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
-      afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER
-    },
-    {
-      landUseType: 'enclosed_livestock_farmland',
-      beforeField:
-        PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_BEFORE,
-      afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_AFTER
-    },
-    {
-      landUseType: 'enclosed_dairying_farmland',
-      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_BEFORE,
-      afterField: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_AFTER
-    },
-    {
-      landUseType: 'semi_natural_grassland',
-      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_BEFORE,
-      afterField: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_AFTER
-    },
-    {
-      landUseType: 'woodland',
-      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE,
-      afterField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
-    },
-    {
-      landUseType: 'mountain_moors_and_heath',
-      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
-      afterField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
-    },
-    {
-      landUseType: 'peatland_restoration',
-      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_BEFORE,
-      afterField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_AFTER
-    },
-    {
-      landUseType: 'rivers_wetlands_and_freshwater_habitats',
-      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
-      afterField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER
-    },
-    {
-      landUseType: 'coastal_margins',
-      beforeField: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE,
-      afterField: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER
-    }
-  ]
-
-  LAND_USE_FIELD_MAPPINGS.forEach(
+  NFM_LAND_USE_FIELD_MAPPINGS.forEach(
     ({ landUseType, beforeField, afterField }) => {
       const landUseChange = nfmLandUseChanges.find(
         (item) => item?.landUseType === landUseType
@@ -170,6 +169,26 @@ function mapNfmLandUseChangesToFields(nfmLandUseChanges) {
   return mappedFields
 }
 
+// Arrays: same length and each element recursively equal
+function areArraysEqual(arr1, arr2) {
+  return (
+    arr1.length === arr2.length &&
+    arr1.every((item, index) => areValuesEqual(item, arr2[index]))
+  )
+}
+
+// Number/string coercion: '2025' (form POST) equals 2025 (API response)
+// Guard: Number('') === 0, so '' would falsely equal 0 without this check
+function areNumericStringsEqual(value1, value2) {
+  const str = typeof value1 === 'string' ? value1 : value2
+  if (str.trim() === '') {
+    return false
+  }
+  const num1 = Number(value1)
+  const num2 = Number(value2)
+  return !Number.isNaN(num1) && !Number.isNaN(num2) && num1 === num2
+}
+
 /**
  * Compare two values for equality, handling arrays, strings, and numbers
  * @param {*} value1 - First value
@@ -177,23 +196,24 @@ function mapNfmLandUseChangesToFields(nfmLandUseChanges) {
  * @returns {boolean} True if values are equal
  */
 function areValuesEqual(value1, value2) {
-  // Handle null/undefined
   if (value1 === value2) {
     return true
   }
   if (value1 == null || value2 == null) {
     return false
   }
-
-  // Handle arrays
   if (Array.isArray(value1) && Array.isArray(value2)) {
-    if (value1.length !== value2.length) {
-      return false
-    }
-    return value1.every((item, index) => item === value2[index])
+    return areArraysEqual(value1, value2)
+  }
+  // Booleans must match strictly — never coerce to number (false == 0 in JS)
+  if (typeof value1 === 'boolean' || typeof value2 === 'boolean') {
+    return value1 === value2
+  }
+  // Form inputs are always strings; API returns numbers — coerce only when types differ
+  if (typeof value1 !== typeof value2) {
+    return areNumericStringsEqual(value1, value2)
   }
 
-  // Handle strings and numbers
   return value1 === value2
 }
 
@@ -250,16 +270,11 @@ export function detectChanges(sessionData, fields = []) {
   }
 
   const original = sessionData.originalData
-  const changedFields = []
-
-  // If no fields specified, check all fields in originalData
   const fieldsToCheck = fields.length > 0 ? fields : Object.keys(original)
 
-  fieldsToCheck.forEach((field) => {
-    if (!areValuesEqual(sessionData[field], original[field])) {
-      changedFields.push(field)
-    }
-  })
+  const changedFields = fieldsToCheck.filter(
+    (field) => !areValuesEqual(sessionData[field], original[field])
+  )
 
   return {
     hasChanges: changedFields.length > 0,
@@ -383,13 +398,7 @@ export async function fetchProjectForEdit(
     return h.continue
   } catch (error) {
     logger.error(
-      {
-        error: {
-          message: error.message,
-          stack: error.stack
-        },
-        referenceNumber
-      },
+      { err: error, referenceNumber },
       'Error fetching project for edit'
     )
     return h.redirect(ROUTES.GENERAL.HOME).takeover()
