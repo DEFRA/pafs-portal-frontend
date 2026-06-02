@@ -343,6 +343,41 @@ describe('computeFundingSourceTotals – input value variety', () => {
     const result = computeFundingSourceTotals(rows, active('fcermGia'))
     expect(result.sourceTotals.fcermGia).toBe('0')
   })
+
+  // ── toBigInt L44 branch: String(v).trim() is '' or '0' ──────────────────────
+
+  test('whitespace-only string is treated as zero', () => {
+    // String('   ').trim() === '' → !s is true → return 0n
+    const rows = [{ financialYear: 2025, fcermGia: '   ' }]
+    const result = computeFundingSourceTotals(rows, active('fcermGia'))
+    expect(result.sourceTotals.fcermGia).toBe('0')
+  })
+
+  test('whitespace-padded zero "  0  " is treated as zero', () => {
+    // String('  0  ').trim() === '0' → s === '0' is true → return 0n
+    const rows = [{ financialYear: 2025, fcermGia: '  0  ' }]
+    const result = computeFundingSourceTotals(rows, active('fcermGia'))
+    expect(result.sourceTotals.fcermGia).toBe('0')
+  })
+
+  // ── toBigInt L49 branch: all non-digit characters, digits === '' ─────────────
+
+  test('non-digit string (e.g. "n/a") is treated as zero', () => {
+    // replaceAll(/\D/g, '') on 'n/a' produces '' → !digits is true → return 0n
+    const rows = [{ financialYear: 2025, fcermGia: 'n/a' }]
+    const result = computeFundingSourceTotals(rows, active('fcermGia'))
+    expect(result.sourceTotals.fcermGia).toBe('0')
+  })
+
+  // ── toBigInt L52 branch: negative value → isNegative ? -BigInt : BigInt ─────
+
+  test('negative value string is preserved as a negative total', () => {
+    // '-500' → isNegative=true, digits='500' → -500n
+    const rows = [{ financialYear: 2025, fcermGia: '-500' }]
+    const result = computeFundingSourceTotals(rows, active('fcermGia'))
+    expect(result.sourceTotals.fcermGia).toBe('-500')
+    expect(result.grandTotal).toBe('-500')
+  })
 })
 
 // ─── Contributor array fallback ───────────────────────────────────────────────
