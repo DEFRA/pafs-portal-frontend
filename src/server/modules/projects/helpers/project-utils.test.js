@@ -957,7 +957,7 @@ describe('project-utils', () => {
       const result = buildProcessedFundingValues({
         pafs_core_funding_values: [{ financialYear: 2025, fcermGia: '1000' }]
       })
-      expect(result[0].fcermGia).toBe(1000)
+      expect(result[0].fcermGia).toBe('1000')
     })
 
     test('sets null for absent amount fields', () => {
@@ -1131,27 +1131,27 @@ describe('project-utils', () => {
   describe('computeFundingSourceTotals', () => {
     test('returns zero totals for empty rows', () => {
       const result = computeFundingSourceTotals([], {})
-      expect(result.grandTotal).toBe(0)
+      expect(result.grandTotal).toBe('0')
       expect(result.yearTotals).toEqual([])
-      expect(result.sourceTotals.fcermGia).toBe(0)
+      expect(result.sourceTotals.fcermGia).toBe('0')
     })
 
     test('returns zero totals when no projectData fields are active', () => {
       const rows = [{ financialYear: 2025, fcermGia: 1000, localLevy: 500 }]
       const result = computeFundingSourceTotals(rows, {})
-      expect(result.grandTotal).toBe(0)
-      expect(result.yearTotals).toEqual([0])
-      expect(result.sourceTotals.fcermGia).toBe(0)
+      expect(result.grandTotal).toBe('0')
+      expect(result.yearTotals).toEqual(['0'])
+      expect(result.sourceTotals.fcermGia).toBe('0')
     })
 
     test('sums only active (selected) fields', () => {
       const rows = [{ financialYear: 2025, fcermGia: 1000, localLevy: 500 }]
       const projectData = { fcermGia: true } // localLevy not selected
       const result = computeFundingSourceTotals(rows, projectData)
-      expect(result.sourceTotals.fcermGia).toBe(1000)
-      expect(result.sourceTotals.localLevy).toBe(0)
-      expect(result.yearTotals).toEqual([1000])
-      expect(result.grandTotal).toBe(1000)
+      expect(result.sourceTotals.fcermGia).toBe('1000')
+      expect(result.sourceTotals.localLevy).toBe('0')
+      expect(result.yearTotals).toEqual(['1000'])
+      expect(result.grandTotal).toBe('1000')
     })
 
     test('sums multiple active fields across multiple rows', () => {
@@ -1161,18 +1161,18 @@ describe('project-utils', () => {
       ]
       const projectData = { fcermGia: true, localLevy: true }
       const result = computeFundingSourceTotals(rows, projectData)
-      expect(result.sourceTotals.fcermGia).toBe(1500)
-      expect(result.sourceTotals.localLevy).toBe(500)
-      expect(result.yearTotals).toEqual([1200, 800])
-      expect(result.grandTotal).toBe(2000)
+      expect(result.sourceTotals.fcermGia).toBe('1500')
+      expect(result.sourceTotals.localLevy).toBe('500')
+      expect(result.yearTotals).toEqual(['1200', '800'])
+      expect(result.grandTotal).toBe('2000')
     })
 
     test('treats null/undefined values as zero', () => {
       const rows = [{ financialYear: 2025, fcermGia: null }]
       const projectData = { fcermGia: true }
       const result = computeFundingSourceTotals(rows, projectData)
-      expect(result.sourceTotals.fcermGia).toBe(0)
-      expect(result.grandTotal).toBe(0)
+      expect(result.sourceTotals.fcermGia).toBe('0')
+      expect(result.grandTotal).toBe('0')
     })
 
     test('initialises sourceTotals for all 13 FUNDING_AMOUNT_FIELDS', () => {
@@ -1193,7 +1193,7 @@ describe('project-utils', () => {
         'summerEconomicFund'
       ]
       for (const field of expectedFields) {
-        expect(result.sourceTotals).toHaveProperty(field, 0)
+        expect(result.sourceTotals).toHaveProperty(field, '0')
       }
     })
 
@@ -1201,7 +1201,7 @@ describe('project-utils', () => {
       const rows = [{ financialYear: 2025, fcermGia: 1000 }]
       const result = computeFundingSourceTotals(rows)
       // No active fields → all zeros
-      expect(result.grandTotal).toBe(0)
+      expect(result.grandTotal).toBe('0')
     })
 
     test('does not count deselected contributor fields', () => {
@@ -1215,9 +1215,9 @@ describe('project-utils', () => {
       // Only fcermGia selected, publicContributions not
       const projectData = { fcermGia: true, publicContributions: false }
       const result = computeFundingSourceTotals(rows, projectData)
-      expect(result.sourceTotals.fcermGia).toBe(1000)
-      expect(result.sourceTotals.publicContributions).toBe(0)
-      expect(result.grandTotal).toBe(1000)
+      expect(result.sourceTotals.fcermGia).toBe('1000')
+      expect(result.sourceTotals.publicContributions).toBe('0')
+      expect(result.grandTotal).toBe('1000')
     })
   })
 
@@ -1395,8 +1395,8 @@ describe('project-utils', () => {
       ]
       const projectData = { publicContributions: true }
       const result = computeFundingSourceTotals(rows, projectData)
-      expect(result.sourceTotals.publicContributions).toBe(1500)
-      expect(result.grandTotal).toBe(1500)
+      expect(result.sourceTotals.publicContributions).toBe('1500')
+      expect(result.grandTotal).toBe('1500')
     })
 
     test('falls back to contributor arrays when source field is null', () => {
@@ -1409,7 +1409,7 @@ describe('project-utils', () => {
       ]
       const projectData = { publicContributions: true }
       const result = computeFundingSourceTotals(rows, projectData)
-      expect(result.sourceTotals.publicContributions).toBe(200)
+      expect(result.sourceTotals.publicContributions).toBe('200')
     })
 
     test('does not fall back when source field has non-zero value', () => {
@@ -1423,7 +1423,7 @@ describe('project-utils', () => {
       const projectData = { publicContributions: true }
       const result = computeFundingSourceTotals(rows, projectData)
       // Uses the regular field value, not the contributor array
-      expect(result.sourceTotals.publicContributions).toBe(700)
+      expect(result.sourceTotals.publicContributions).toBe('700')
     })
 
     test('handles contributor array with non-numeric amounts', () => {
@@ -1439,7 +1439,7 @@ describe('project-utils', () => {
       ]
       const projectData = { privateContributions: true }
       const result = computeFundingSourceTotals(rows, projectData)
-      expect(result.sourceTotals.privateContributions).toBe(1000)
+      expect(result.sourceTotals.privateContributions).toBe('1000')
     })
 
     test('handles missing contributor array gracefully', () => {
@@ -1451,7 +1451,7 @@ describe('project-utils', () => {
       ]
       const projectData = { otherEaContributions: true }
       const result = computeFundingSourceTotals(rows, projectData)
-      expect(result.sourceTotals.otherEaContributions).toBe(0)
+      expect(result.sourceTotals.otherEaContributions).toBe('0')
     })
 
     test('falls back for multiple contributor types simultaneously', () => {
@@ -1469,9 +1469,9 @@ describe('project-utils', () => {
         privateContributions: true
       }
       const result = computeFundingSourceTotals(rows, projectData)
-      expect(result.sourceTotals.publicContributions).toBe(100)
-      expect(result.sourceTotals.privateContributions).toBe(200)
-      expect(result.grandTotal).toBe(300)
+      expect(result.sourceTotals.publicContributions).toBe('100')
+      expect(result.sourceTotals.privateContributions).toBe('200')
+      expect(result.grandTotal).toBe('300')
     })
   })
 })

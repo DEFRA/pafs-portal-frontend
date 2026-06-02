@@ -370,22 +370,6 @@ export function formatNumberWithCommas(value) {
   return isNegative ? '-' + formatted : formatted
 }
 
-const FUNDING_AMOUNT_FIELDS = [
-  'fcermGia',
-  'localLevy',
-  'publicContributions',
-  'privateContributions',
-  'otherEaContributions',
-  'notYetIdentified',
-  'assetReplacementAllowance',
-  'environmentStatutoryFunding',
-  'frequentlyFloodedCommunities',
-  'otherAdditionalGrantInAid',
-  'otherGovernmentDepartment',
-  'recovery',
-  'summerEconomicFund'
-]
-
 /**
  * Build ID-to-year mapping from funding values
  */
@@ -435,23 +419,26 @@ export function buildContributorsByYear(dbContributors, idToYear) {
  * @private
  */
 function formatFundingValueRow(fv, contributorsByYear) {
-  const toNum = (v) => (v != null && v !== '' ? Number(v) || 0 : null)
+  // Keep values as strings to preserve full BigInt precision from the API.
+  // Converting to Number loses digits beyond IEEE 754's ~15 significant digit
+  // limit, causing rounding for values with 16+ digits.
+  const toStr = (v) => (v != null && v !== '' ? String(v) : null)
 
   const row = {
     financialYear: Number(fv.financialYear),
-    fcermGia: toNum(fv.fcermGia),
-    localLevy: toNum(fv.localLevy),
-    publicContributions: toNum(fv.publicContributions),
-    privateContributions: toNum(fv.privateContributions),
-    otherEaContributions: toNum(fv.otherEaContributions),
-    notYetIdentified: toNum(fv.notYetIdentified),
-    assetReplacementAllowance: toNum(fv.assetReplacementAllowance),
-    environmentStatutoryFunding: toNum(fv.environmentStatutoryFunding),
-    frequentlyFloodedCommunities: toNum(fv.frequentlyFloodedCommunities),
-    otherAdditionalGrantInAid: toNum(fv.otherAdditionalGrantInAid),
-    otherGovernmentDepartment: toNum(fv.otherGovernmentDepartment),
-    recovery: toNum(fv.recovery),
-    summerEconomicFund: toNum(fv.summerEconomicFund)
+    fcermGia: toStr(fv.fcermGia),
+    localLevy: toStr(fv.localLevy),
+    publicContributions: toStr(fv.publicContributions),
+    privateContributions: toStr(fv.privateContributions),
+    otherEaContributions: toStr(fv.otherEaContributions),
+    notYetIdentified: toStr(fv.notYetIdentified),
+    assetReplacementAllowance: toStr(fv.assetReplacementAllowance),
+    environmentStatutoryFunding: toStr(fv.environmentStatutoryFunding),
+    frequentlyFloodedCommunities: toStr(fv.frequentlyFloodedCommunities),
+    otherAdditionalGrantInAid: toStr(fv.otherAdditionalGrantInAid),
+    otherGovernmentDepartment: toStr(fv.otherGovernmentDepartment),
+    recovery: toStr(fv.recovery),
+    summerEconomicFund: toStr(fv.summerEconomicFund)
   }
 
   const yearContributors = contributorsByYear[String(row.financialYear)] || []
@@ -586,99 +573,7 @@ export function buildProcessedFundingValues(projectData) {
   return fillMissingYears(rows, startYear, endYear)
 }
 
-/**
- * Pre-compute all totals needed by the funding sources overview card,
- * avoiding Nunjucks loop-scope accumulation issues.
- *
- * @param {Array} processedRows - Output of buildProcessedFundingValues
- * @returns {{ sourceTotals: Object, yearTotals: number[], grandTotal: number }}
- */
-/**
- * Map contributor array field → the corresponding source total field.
- * Used to derive contributor totals from the per-contributor arrays when
- * the legacy system stored amounts only in pafs_core_funding_contributors.
- * @private
- */
-const CONTRIBUTOR_ARRAY_TO_SOURCE = {
-  publicContributors: 'publicContributions',
-  privateContributors: 'privateContributions',
-  otherEaContributors: 'otherEaContributions'
-}
-
-/**
- * Check whether a contributor source field has any non-null value in the
- * pafs_core_funding_values rows.  When all values are null / 0 for that
- * field we fall back to summing the contributor array amounts instead.
- * @private
- */
-function hasFundingValueData(processedRows, field) {
-  return processedRows.some(
-    (row) => row[field] != null && Number(row[field]) !== 0
-  )
-}
-
-/**
- * Sum contributor array amounts for a single year row.
- * @private
- */
-function sumContributorArray(row, arrayField) {
-  const items = row[arrayField]
-  if (!Array.isArray(items)) {
-    return 0
-  }
-  return items.reduce(
-    (sum, c) =>
-      sum +
-      (Number.parseInt(String(c.amount || '0').replaceAll(/\D/g, ''), 10) || 0),
-    0
-  )
-}
-
-export function computeFundingSourceTotals(processedRows, projectData = {}) {
-  // Only sum fields whose corresponding boolean flag is selected on the project.
-  // This prevents deselected contributor/source amounts stored in the DB rows
-  // from inflating the displayed totals.
-  const activeFields = FUNDING_AMOUNT_FIELDS.filter((field) =>
-    Boolean(projectData[field])
-  )
-
-  // Determine which contributor fields need fallback to contributor arrays
-  const contributorFallbacks = new Map()
-  for (const [arrayField, sourceField] of Object.entries(
-    CONTRIBUTOR_ARRAY_TO_SOURCE
-  )) {
-    if (
-      activeFields.includes(sourceField) &&
-      !hasFundingValueData(processedRows, sourceField)
-    ) {
-      contributorFallbacks.set(sourceField, arrayField)
-    }
-  }
-
-  const sourceTotals = {}
-  for (const field of FUNDING_AMOUNT_FIELDS) {
-    sourceTotals[field] = 0
-  }
-
-  const yearTotals = processedRows.map((row) => {
-    let yearTotal = 0
-    for (const field of activeFields) {
-      let val
-      if (contributorFallbacks.has(field)) {
-        val = sumContributorArray(row, contributorFallbacks.get(field))
-      } else {
-        val = Number(row[field]) || 0
-      }
-      sourceTotals[field] += val
-      yearTotal += val
-    }
-    return yearTotal
-  })
-
-  const grandTotal = yearTotals.reduce((sum, t) => sum + t, 0)
-
-  return { sourceTotals, yearTotals, grandTotal }
-}
+export { computeFundingSourceTotals } from './funding-value-totals.js'
 
 /**
  * Extract unique contributor names from pafs_core_funding_contributors for a
