@@ -77,14 +77,15 @@
 
       {# Summary totals table – additional GIA sources aggregated into one row #}
       {# Build summary sources: non-GIA sources + single aggregated GIA row #}
+      {# additionalGiaTotal is pre-computed in JS (as a string) to avoid     #}
+      {# Nunjucks string-concatenation when sourceTotals values are strings.  #}
       {% set summarySources = [] %}
-      {% set additionalGiaTotal = 0 %}
+      {% set additionalGiaTotal = projectData.fundingSourceTotals.additionalGiaTotal or 0 %}
       {% set hasAdditionalGia = false %}
 
       {% for source in activeSources %}
         {% if source.additionalGia %}
           {% set hasAdditionalGia = true %}
-          {% set additionalGiaTotal = additionalGiaTotal + (projectData.fundingSourceTotals.sourceTotals[source.field] or 0) %}
         {% else %}
           {% set summarySources = summarySources.concat([source]) %}
         {% endif %}
