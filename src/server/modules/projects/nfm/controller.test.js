@@ -1,6 +1,9 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { nfmController } from './controller.js'
-import { PROJECT_VIEWS } from '../../../common/constants/common.js'
+import {
+  PROJECT_VIEWS,
+  BOOLEAN_OPTION_VALUES
+} from '../../../common/constants/common.js'
 import {
   NFM_EXPERIENCE_LEVEL_OPTIONS,
   NFM_LANDOWNER_CONSENT_OPTIONS,
@@ -974,6 +977,228 @@ describe('NFM Controller', () => {
       await nfmController.postHandler(mockRequest, mockH)
 
       expect(navigateToProjectOverview).toHaveBeenCalledWith('TEST-001', mockH)
+    })
+  })
+
+  describe('NFM Inclusion', () => {
+    describe('getHandler', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_INCLUSION)
+      })
+
+      test('should render NFM_INCLUSION view', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_INCLUSION,
+          expect.any(Object)
+        )
+      })
+
+      test('should build view data with radio items for yes/no', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            localKeyPrefix: expect.any(String),
+            additionalData: expect.objectContaining({
+              step: PROJECT_STEPS.NFM_INCLUSION,
+              radioItems: expect.arrayContaining([
+                expect.objectContaining({
+                  value: BOOLEAN_OPTION_VALUES.YES
+                }),
+                expect.objectContaining({
+                  value: BOOLEAN_OPTION_VALUES.NO
+                })
+              ])
+            })
+          })
+        )
+      })
+
+      test('should pre-select yes when naturalFloodRiskMeasuresIncluded is true', async () => {
+        getSessionData.mockReturnValue({
+          slug: 'TEST-001',
+          naturalFloodRiskMeasuresIncluded: true
+        })
+
+        await nfmController.getHandler(mockRequest, mockH)
+
+        const callArgs = buildViewData.mock.calls[0][1]
+        const radioItems = callArgs.additionalData.radioItems
+
+        expect(radioItems[0].checked).toBe(true)
+        expect(radioItems[1].checked).toBe(false)
+      })
+
+      test('should pre-select no when naturalFloodRiskMeasuresIncluded is false', async () => {
+        getSessionData.mockReturnValue({
+          slug: 'TEST-001',
+          naturalFloodRiskMeasuresIncluded: false
+        })
+
+        await nfmController.getHandler(mockRequest, mockH)
+
+        const callArgs = buildViewData.mock.calls[0][1]
+        const radioItems = callArgs.additionalData.radioItems
+
+        expect(radioItems[0].checked).toBe(false)
+        expect(radioItems[1].checked).toBe(true)
+      })
+
+      test('should not pre-select any option when naturalFloodRiskMeasuresIncluded is undefined', async () => {
+        getSessionData.mockReturnValue({
+          slug: 'TEST-001'
+        })
+
+        await nfmController.getHandler(mockRequest, mockH)
+
+        const callArgs = buildViewData.mock.calls[0][1]
+        const radioItems = callArgs.additionalData.radioItems
+
+        expect(radioItems[0].checked).toBe(false)
+        expect(radioItems[1].checked).toBe(false)
+      })
+    })
+
+    describe('postHandler', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.NFM_INCLUSION)
+        mockRequest.payload = {
+          naturalFloodRiskMeasuresIncluded: BOOLEAN_OPTION_VALUES.YES
+        }
+      })
+
+      test('should validate payload before processing', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(validatePayload).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          expect.objectContaining({
+            template: PROJECT_VIEWS.NFM_INCLUSION,
+            schema: expect.any(Object),
+            viewData: expect.any(Object)
+          })
+        )
+      })
+
+      test('should return validation error if validation fails', async () => {
+        const validationError = { error: 'validation failed' }
+        validatePayload.mockReturnValue(validationError)
+
+        const result = await nfmController.postHandler(mockRequest, mockH)
+
+        expect(result).toBe(validationError)
+        expect(processPayload).not.toHaveBeenCalled()
+      })
+
+      test('should convert yes string to boolean true', async () => {
+        mockRequest.payload = {
+          naturalFloodRiskMeasuresIncluded: BOOLEAN_OPTION_VALUES.YES
+        }
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(updateSessionData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            naturalFloodRiskMeasuresIncluded: true
+          })
+        )
+      })
+
+      test('should convert no string to boolean false', async () => {
+        mockRequest.payload = {
+          naturalFloodRiskMeasuresIncluded: BOOLEAN_OPTION_VALUES.NO
+        }
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(updateSessionData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            naturalFloodRiskMeasuresIncluded: false
+          })
+        )
+      })
+
+      test('should save with correct payload level', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          PROJECT_PAYLOAD_LEVELS.NFM_INCLUSION,
+          expect.any(Object),
+          PROJECT_VIEWS.NFM_INCLUSION
+        )
+      })
+
+      test('should redirect to selected measures when answer is yes', async () => {
+        mockRequest.payload = {
+          naturalFloodRiskMeasuresIncluded: BOOLEAN_OPTION_VALUES.YES
+        }
+        getSessionData.mockReturnValue({
+          slug: 'TEST-001',
+          naturalFloodRiskMeasuresIncluded: true
+        })
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(mockH.redirect).toHaveBeenCalledWith(
+          expect.stringContaining('TEST-001')
+        )
+        expect(mockH.takeover).toHaveBeenCalled()
+      })
+
+      test('should redirect to overview when answer is no', async () => {
+        mockRequest.payload = {
+          naturalFloodRiskMeasuresIncluded: BOOLEAN_OPTION_VALUES.NO
+        }
+        getSessionData.mockReturnValue({
+          slug: 'TEST-001',
+          naturalFloodRiskMeasuresIncluded: false
+        })
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(navigateToProjectOverview).toHaveBeenCalledWith(
+          'TEST-001',
+          mockH
+        )
+      })
+
+      test('should return submission error if save fails', async () => {
+        const submissionError = { error: 'submission failed' }
+        saveProjectWithErrorHandling.mockResolvedValue(submissionError)
+
+        const result = await nfmController.postHandler(mockRequest, mockH)
+
+        expect(result).toBe(submissionError)
+      })
+
+      test('should handle API errors gracefully', async () => {
+        const error = new Error('API Error')
+        const viewResponse = { view: 'error-view' }
+        mockH.view.mockReturnValue(viewResponse)
+        saveProjectWithErrorHandling.mockRejectedValue(error)
+        extractApiError.mockReturnValue('Extracted error message')
+
+        const result = await nfmController.postHandler(mockRequest, mockH)
+
+        expect(mockRequest.logger.error).toHaveBeenCalledWith(
+          'Error NFM POST',
+          error
+        )
+        expect(mockH.view).toHaveBeenCalledWith(PROJECT_VIEWS.NFM_INCLUSION, {
+          pageTitle: 'NFM',
+          backLink: '/project/TEST-001',
+          error: 'Extracted error message'
+        })
+        expect(result).toBe(viewResponse)
+      })
     })
   })
 })

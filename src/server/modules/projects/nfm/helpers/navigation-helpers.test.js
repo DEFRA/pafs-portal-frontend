@@ -27,9 +27,19 @@ describe('nfm navigation helpers', () => {
     expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_SAND_DUNE]).toBeNull()
   })
 
-  test('returns null for selected measures step', () => {
+  test('returns null for selected measures step when not SUDS-only', () => {
     const result = getDynamicBackLink(PROJECT_STEPS.NFM_SELECTED_MEASURES, {})
     expect(result).toBeNull()
+  })
+
+  test('returns inclusion back link for selected measures step when SUDS-only', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_SELECTED_MEASURES, {
+      [PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]: ['SUDS']
+    })
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.INCLUSION,
+      conditionalRedirect: false
+    })
   })
 
   test('returns null for unknown step', () => {

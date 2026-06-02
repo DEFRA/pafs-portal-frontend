@@ -1,6 +1,8 @@
 import {
   PROJECT_STEPS,
-  NFM_MEASURES
+  NFM_MEASURES,
+  PROJECT_PAYLOAD_FIELDS,
+  PROJECT_INTERVENTION_TYPES
 } from '../../../../common/constants/projects.js'
 import { ROUTES } from '../../../../common/constants/routes.js'
 import {
@@ -177,8 +179,21 @@ export const NFM_STEP_SEQUENCE = {
  * @returns {Object|null} Back link options or null
  */
 export function getDynamicBackLink(step, sessionData) {
-  // NFM_SELECTED_MEASURES always goes back to overview
+  // NFM_SELECTED_MEASURES: go back to inclusion page for SUDS-only, or overview
   if (step === PROJECT_STEPS.NFM_SELECTED_MEASURES) {
+    const interventionTypes =
+      sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] || []
+    const hasSudsOnly =
+      (interventionTypes.includes(PROJECT_INTERVENTION_TYPES.SUDS) ||
+        interventionTypes.includes('SUDS')) &&
+      !interventionTypes.includes(PROJECT_INTERVENTION_TYPES.NFM) &&
+      !interventionTypes.includes('NFM')
+    if (hasSudsOnly) {
+      return {
+        targetEditURL: ROUTES.PROJECT.EDIT.NFM.INCLUSION,
+        conditionalRedirect: false
+      }
+    }
     return null
   }
 

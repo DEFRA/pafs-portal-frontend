@@ -1,4 +1,7 @@
-import { PROJECT_VIEWS } from '../../../common/constants/common.js'
+import {
+  PROJECT_VIEWS,
+  BOOLEAN_OPTION_VALUES
+} from '../../../common/constants/common.js'
 import {
   NFM_EXPERIENCE_LEVEL_OPTIONS,
   NFM_LAND_TYPES,
@@ -10,6 +13,7 @@ import {
   NFM_PROJECT_READINESS_OPTIONS
 } from '../../../common/constants/projects.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
+import { ROUTES } from '../../../common/constants/routes.js'
 import { NFM_CONFIG } from '../helpers/project-config.js'
 import { saveProjectWithErrorHandling } from '../helpers/project-submission.js'
 import {
@@ -29,6 +33,7 @@ import { handleConditionalRedirect } from './helpers/redirect-helpers.js'
 
 // Payload level mappings for API submission
 const PAYLOAD_LEVEL_MAP = {
+  [PROJECT_STEPS.NFM_INCLUSION]: PROJECT_PAYLOAD_LEVELS.NFM_INCLUSION,
   [PROJECT_STEPS.NFM_SELECTED_MEASURES]:
     PROJECT_PAYLOAD_LEVELS.NFM_SELECTED_MEASURES,
   [PROJECT_STEPS.NFM_RIVER_RESTORATION]:
@@ -300,6 +305,8 @@ class NfmController {
     }
 
     const fieldNameMap = {
+      [PROJECT_STEPS.NFM_INCLUSION]:
+        PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED,
       [PROJECT_STEPS.NFM_LANDOWNER_CONSENT]:
         PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT,
       [PROJECT_STEPS.NFM_EXPERIENCE]:
@@ -332,12 +339,32 @@ class NfmController {
       radioOptions: radioOptionsType
         ? radioOptionsByType[radioOptionsType]
         : undefined,
+      ...(step === PROJECT_STEPS.NFM_INCLUSION && {
+        radioItems: [
+          {
+            text: request.t('common.yes'),
+            value: BOOLEAN_OPTION_VALUES.YES,
+            checked:
+              sessionData[
+                PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
+              ] === true
+          },
+          {
+            text: request.t('common.no'),
+            value: BOOLEAN_OPTION_VALUES.NO,
+            checked:
+              sessionData[
+                PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
+              ] === false
+          }
+        ]
+      }),
       nfmMeasureOptions: this._getNfmMeasureOptions(request),
       nfmLandUseOptions: this._getNfmLandUseOptions(request),
       nfmLandownerConsentOptions: this._getNfmLandownerConsentOptions(request),
       nfmExperienceOptions: this._getNfmExperienceOptions(request),
       nfmProjectReadinessOptions: this._getNfmProjectReadinessOptions(request),
-      columnWidth: 'full',
+      ...(step !== PROJECT_STEPS.NFM_INCLUSION && { columnWidth: 'full' }),
       ...(hint && { hint }),
       ...(landUseFieldConfig && {
         beforeFieldName: landUseFieldConfig.beforeFieldName,
@@ -360,6 +387,23 @@ class NfmController {
     const sessionData = getSessionData(request)
     const { slug: referenceNumber } = sessionData
     const step = getProjectStep(request)
+
+    // NFM_INCLUSION: yes → selected measures, no → overview
+    if (step === PROJECT_STEPS.NFM_INCLUSION) {
+      const included =
+        sessionData[PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED]
+      if (included === true) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      return navigateToProjectOverview(referenceNumber, h)
+    }
 
     // Handle conditional redirects
     const conditionalRedirect = await handleConditionalRedirect(
@@ -394,6 +438,7 @@ class NfmController {
     }
 
     const STEP_VIEW_MAP = {
+      [PROJECT_STEPS.NFM_INCLUSION]: PROJECT_VIEWS.NFM_INCLUSION,
       [PROJECT_STEPS.NFM_SELECTED_MEASURES]: PROJECT_VIEWS.NFM,
       [PROJECT_STEPS.NFM_RIVER_RESTORATION]:
         PROJECT_VIEWS.NFM_RIVER_RESTORATION,
@@ -467,6 +512,18 @@ class NfmController {
       })
       if (validationError) {
         return validationError
+      }
+
+      // For NFM_INCLUSION, convert yes/no string to boolean after validation
+      if (step === PROJECT_STEPS.NFM_INCLUSION) {
+        const rawValue =
+          request.payload[
+            PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
+          ]
+        const booleanValue = rawValue === BOOLEAN_OPTION_VALUES.YES
+        request.payload[
+          PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
+        ] = booleanValue
       }
 
       // Process and normalize payload (convert array to string for session/API)

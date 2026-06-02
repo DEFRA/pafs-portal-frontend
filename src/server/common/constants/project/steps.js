@@ -69,6 +69,7 @@ export const PROJECT_STEPS = {
   KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_SINGLE:
     'kilometres-of-watercourse-enhanced-or-created-single',
   NFM_SELECTED_MEASURES: 'nfm-selected-measures',
+  NFM_INCLUSION: 'nfm-inclusion',
   NFM_RIVER_RESTORATION: 'nfm-river-restoration',
   NFM_LEAKY_BARRIERS: 'nfm-leaky-barriers',
   NFM_OFFLINE_STORAGE: 'nfm-offline-storage',

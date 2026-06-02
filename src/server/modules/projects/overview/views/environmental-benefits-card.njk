@@ -144,7 +144,11 @@
           </div>
         </dl>
       {% else %}
-        <p class="govuk-body">{{ t('projects.overview.environmental_benefits_summary_card.not_added') }}</p>
+        {% if projectData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENTAL_BENEFITS] === false %}
+          <p class="govuk-body">{{ t('projects.overview.environmental_benefits_summary_card.not_included') }}</p>
+        {% else %}
+          <p class="govuk-body">{{ t('projects.overview.environmental_benefits_summary_card.not_added') }}</p>
+        {% endif %}
       {% endif %}
     </div>
   </div>

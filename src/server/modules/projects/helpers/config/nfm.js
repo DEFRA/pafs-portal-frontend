@@ -5,6 +5,7 @@ import {
 } from '../../../../common/constants/projects.js'
 import {
   nfmHeadwaterDrainageSchema,
+  nfmInclusionSchema,
   nfmLeakyBarriersSchema,
   nfmOfflineStorageSchema,
   nfmRiverRestorationSchema,
@@ -38,6 +39,16 @@ const WIDTH_LABEL = 'width.label'
  * Configuration for NFM (Natural Flood Management) related steps
  */
 export const NFM_CONFIG = {
+  [PROJECT_STEPS.NFM_INCLUSION]: {
+    localKeyPrefix: 'projects.nfm.inclusion',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.OVERVIEW,
+      conditionalRedirect: true
+    },
+    schema: nfmInclusionSchema,
+    fieldName: PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED,
+    fieldType: 'radio'
+  },
   [PROJECT_STEPS.NFM_SELECTED_MEASURES]: {
     localKeyPrefix: 'projects.nfm.selected_measures',
     backLinkOptions: {
