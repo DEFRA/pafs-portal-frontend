@@ -1,15 +1,18 @@
-import { PROJECT_VIEWS } from '../../../common/constants/common.js'
+import {
+  PROJECT_VIEWS,
+  BOOLEAN_OPTION_VALUES
+} from '../../../common/constants/common.js'
 import {
   NFM_EXPERIENCE_LEVEL_OPTIONS,
   NFM_LAND_TYPES,
   NFM_LANDOWNER_CONSENT_OPTIONS,
   NFM_MEASURES,
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_PAYLOAD_LEVELS,
   PROJECT_STEPS,
   NFM_PROJECT_READINESS_OPTIONS
 } from '../../../common/constants/projects.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
+import { ROUTES } from '../../../common/constants/routes.js'
 import { NFM_CONFIG } from '../helpers/project-config.js'
 import { saveProjectWithErrorHandling } from '../helpers/project-submission.js'
 import {
@@ -26,95 +29,10 @@ import {
 } from './helpers/navigation-helpers.js'
 import { processPayload } from './helpers/payload-helpers.js'
 import { handleConditionalRedirect } from './helpers/redirect-helpers.js'
-
-// Payload level mappings for API submission
-const PAYLOAD_LEVEL_MAP = {
-  [PROJECT_STEPS.NFM_SELECTED_MEASURES]:
-    PROJECT_PAYLOAD_LEVELS.NFM_SELECTED_MEASURES,
-  [PROJECT_STEPS.NFM_RIVER_RESTORATION]:
-    PROJECT_PAYLOAD_LEVELS.NFM_RIVER_RESTORATION,
-  [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: PROJECT_PAYLOAD_LEVELS.NFM_LEAKY_BARRIERS,
-  [PROJECT_STEPS.NFM_OFFLINE_STORAGE]:
-    PROJECT_PAYLOAD_LEVELS.NFM_OFFLINE_STORAGE,
-  [PROJECT_STEPS.NFM_WOODLAND]: PROJECT_PAYLOAD_LEVELS.NFM_WOODLAND,
-  [PROJECT_STEPS.NFM_HEADWATER_DRAINAGE]:
-    PROJECT_PAYLOAD_LEVELS.NFM_HEADWATER_DRAINAGE,
-  [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]:
-    PROJECT_PAYLOAD_LEVELS.NFM_RUNOFF_MANAGEMENT,
-  [PROJECT_STEPS.NFM_SALTMARSH]: PROJECT_PAYLOAD_LEVELS.NFM_SALTMARSH,
-  [PROJECT_STEPS.NFM_SAND_DUNE]: PROJECT_PAYLOAD_LEVELS.NFM_SAND_DUNE,
-  [PROJECT_STEPS.NFM_LAND_USE_CHANGE]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_CHANGE,
-  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND,
-  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND,
-  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND,
-  [PROJECT_STEPS.NFM_LAND_USE_SEMI_NATURAL_GRASSLAND]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_SEMI_NATURAL_GRASSLAND,
-  [PROJECT_STEPS.NFM_LAND_USE_WOODLAND]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_WOODLAND,
-  [PROJECT_STEPS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH,
-  [PROJECT_STEPS.NFM_LAND_USE_PEATLAND_RESTORATION]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_PEATLAND_RESTORATION,
-  [PROJECT_STEPS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER,
-  [PROJECT_STEPS.NFM_LAND_USE_COASTAL_MARGINS]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_COASTAL_MARGINS,
-  [PROJECT_STEPS.NFM_LANDOWNER_CONSENT]:
-    PROJECT_PAYLOAD_LEVELS.NFM_LANDOWNER_CONSENT,
-  [PROJECT_STEPS.NFM_EXPERIENCE]: PROJECT_PAYLOAD_LEVELS.NFM_EXPERIENCE_LEVEL,
-  [PROJECT_STEPS.NFM_PROJECT_READINESS]:
-    PROJECT_PAYLOAD_LEVELS.NFM_PROJECT_READINESS
-}
-
-/**
- * Maps each land-use detail step to its before/after field names
- * Used by the generic land-use-detail template
- */
-const LAND_USE_DETAIL_FIELD_CONFIG = {
-  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND]: {
-    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
-    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER
-  },
-  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND]: {
-    beforeFieldName:
-      PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_BEFORE,
-    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_LIVESTOCK_FARMLAND_AFTER
-  },
-  [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_DAIRYING_FARMLAND]: {
-    beforeFieldName:
-      PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_BEFORE,
-    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_DAIRYING_FARMLAND_AFTER
-  },
-  [PROJECT_STEPS.NFM_LAND_USE_SEMI_NATURAL_GRASSLAND]: {
-    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_BEFORE,
-    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_SEMI_NATURAL_GRASSLAND_AFTER
-  },
-  [PROJECT_STEPS.NFM_LAND_USE_WOODLAND]: {
-    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_BEFORE,
-    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
-  },
-  [PROJECT_STEPS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH]: {
-    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
-    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
-  },
-  [PROJECT_STEPS.NFM_LAND_USE_PEATLAND_RESTORATION]: {
-    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_BEFORE,
-    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_AFTER
-  },
-  [PROJECT_STEPS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER]: {
-    beforeFieldName:
-      PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
-    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER
-  },
-  [PROJECT_STEPS.NFM_LAND_USE_COASTAL_MARGINS]: {
-    beforeFieldName: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE,
-    afterFieldName: PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_AFTER
-  }
-}
+import {
+  PAYLOAD_LEVEL_MAP,
+  LAND_USE_DETAIL_FIELD_CONFIG
+} from './helpers/controller-config.js'
 
 /**
  * NFM (Natural Flood Management) Controller
@@ -280,26 +198,13 @@ class NfmController {
     ]
   }
 
-  _getViewData(request) {
-    const step = getProjectStep(request)
-    const config = this._getConfig(step)
-    let {
-      backLinkOptions,
-      localKeyPrefix,
-      fieldType,
-      inputFields,
-      radioFieldName,
-      radioOptionsType
-    } = config
-    const sessionData = getSessionData(request)
-
-    // Get dynamic back link if applicable
-    const dynamicBackLink = getDynamicBackLink(step, sessionData)
-    if (dynamicBackLink) {
-      backLinkOptions = dynamicBackLink
-    }
+  _buildAdditionalData(request, step, config, sessionData) {
+    const { fieldType, inputFields, radioFieldName, radioOptionsType } = config
+    const localKeyPrefix = config.localKeyPrefix
 
     const fieldNameMap = {
+      [PROJECT_STEPS.NFM_INCLUSION]:
+        PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED,
       [PROJECT_STEPS.NFM_LANDOWNER_CONSENT]:
         PROJECT_PAYLOAD_FIELDS.NFM_LANDOWNER_CONSENT,
       [PROJECT_STEPS.NFM_EXPERIENCE]:
@@ -315,14 +220,12 @@ class NfmController {
     }
 
     const landUseFieldConfig = LAND_USE_DETAIL_FIELD_CONFIG[step]
+    const hint =
+      step === PROJECT_STEPS.NFM_EXPERIENCE
+        ? request.t(`${localKeyPrefix}.hint`)
+        : undefined
 
-    // Get hint from locale only for experience page
-    let hint
-    if (step === PROJECT_STEPS.NFM_EXPERIENCE) {
-      hint = request.t(`${localKeyPrefix}.hint`)
-    }
-
-    const additionalData = {
+    return {
       step,
       projectSteps: PROJECT_STEPS,
       fieldType,
@@ -332,18 +235,62 @@ class NfmController {
       radioOptions: radioOptionsType
         ? radioOptionsByType[radioOptionsType]
         : undefined,
+      ...(step === PROJECT_STEPS.NFM_INCLUSION &&
+        this._buildInclusionRadioItems(request, sessionData)),
       nfmMeasureOptions: this._getNfmMeasureOptions(request),
       nfmLandUseOptions: this._getNfmLandUseOptions(request),
       nfmLandownerConsentOptions: this._getNfmLandownerConsentOptions(request),
       nfmExperienceOptions: this._getNfmExperienceOptions(request),
       nfmProjectReadinessOptions: this._getNfmProjectReadinessOptions(request),
-      columnWidth: 'full',
+      ...(step !== PROJECT_STEPS.NFM_INCLUSION && { columnWidth: 'full' }),
       ...(hint && { hint }),
       ...(landUseFieldConfig && {
         beforeFieldName: landUseFieldConfig.beforeFieldName,
         afterFieldName: landUseFieldConfig.afterFieldName
       })
     }
+  }
+
+  _buildInclusionRadioItems(request, sessionData) {
+    return {
+      radioItems: [
+        {
+          text: request.t('common.yes'),
+          value: BOOLEAN_OPTION_VALUES.YES,
+          checked:
+            sessionData[
+              PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
+            ] === true
+        },
+        {
+          text: request.t('common.no'),
+          value: BOOLEAN_OPTION_VALUES.NO,
+          checked:
+            sessionData[
+              PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
+            ] === false
+        }
+      ]
+    }
+  }
+
+  _getViewData(request) {
+    const step = getProjectStep(request)
+    const config = this._getConfig(step)
+    let { backLinkOptions, localKeyPrefix } = config
+    const sessionData = getSessionData(request)
+
+    const dynamicBackLink = getDynamicBackLink(step, sessionData)
+    if (dynamicBackLink) {
+      backLinkOptions = dynamicBackLink
+    }
+
+    const additionalData = this._buildAdditionalData(
+      request,
+      step,
+      config,
+      sessionData
+    )
 
     return buildViewData(request, {
       localKeyPrefix,
@@ -360,6 +307,23 @@ class NfmController {
     const sessionData = getSessionData(request)
     const { slug: referenceNumber } = sessionData
     const step = getProjectStep(request)
+
+    // NFM_INCLUSION: yes → selected measures, no → overview
+    if (step === PROJECT_STEPS.NFM_INCLUSION) {
+      const included =
+        sessionData[PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED]
+      if (included === true) {
+        return h
+          .redirect(
+            ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES.replace(
+              '{referenceNumber}',
+              referenceNumber
+            )
+          )
+          .takeover()
+      }
+      return navigateToProjectOverview(referenceNumber, h)
+    }
 
     // Handle conditional redirects
     const conditionalRedirect = await handleConditionalRedirect(
@@ -394,6 +358,7 @@ class NfmController {
     }
 
     const STEP_VIEW_MAP = {
+      [PROJECT_STEPS.NFM_INCLUSION]: PROJECT_VIEWS.NFM_INCLUSION,
       [PROJECT_STEPS.NFM_SELECTED_MEASURES]: PROJECT_VIEWS.NFM,
       [PROJECT_STEPS.NFM_RIVER_RESTORATION]:
         PROJECT_VIEWS.NFM_RIVER_RESTORATION,
@@ -467,6 +432,18 @@ class NfmController {
       })
       if (validationError) {
         return validationError
+      }
+
+      // For NFM_INCLUSION, convert yes/no string to boolean after validation
+      if (step === PROJECT_STEPS.NFM_INCLUSION) {
+        const rawValue =
+          request.payload[
+            PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
+          ]
+        const booleanValue = rawValue === BOOLEAN_OPTION_VALUES.YES
+        request.payload[
+          PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
+        ] = booleanValue
       }
 
       // Process and normalize payload (convert array to string for session/API)

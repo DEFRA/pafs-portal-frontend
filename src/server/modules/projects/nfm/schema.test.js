@@ -1,5 +1,7 @@
 import { describe, test, expect } from 'vitest'
+import { BOOLEAN_OPTION_VALUES } from '../../../common/constants/common.js'
 import {
+  nfmInclusionSchema,
   nfmSelectedMeasuresSchema,
   nfmRiverRestorationSchema,
   nfmLeakyBarriersSchema,
@@ -449,6 +451,43 @@ describe('NFM Project Readiness Schema', () => {
       [PROJECT_PAYLOAD_FIELDS.NFM_PROJECT_READINESS]: ''
     })
 
+    expect(result.error).toBeDefined()
+  })
+})
+
+describe('NFM Inclusion Schema', () => {
+  const { NATURAL_FLOOD_RISK_MEASURES_INCLUDED } = PROJECT_PAYLOAD_FIELDS
+
+  test('should validate "yes" value', () => {
+    const result = nfmInclusionSchema.validate({
+      [NATURAL_FLOOD_RISK_MEASURES_INCLUDED]: BOOLEAN_OPTION_VALUES.YES
+    })
+    expect(result.error).toBeUndefined()
+  })
+
+  test('should validate "no" value', () => {
+    const result = nfmInclusionSchema.validate({
+      [NATURAL_FLOOD_RISK_MEASURES_INCLUDED]: BOOLEAN_OPTION_VALUES.NO
+    })
+    expect(result.error).toBeUndefined()
+  })
+
+  test('should reject missing value', () => {
+    const result = nfmInclusionSchema.validate({})
+    expect(result.error).toBeDefined()
+  })
+
+  test('should reject invalid value', () => {
+    const result = nfmInclusionSchema.validate({
+      [NATURAL_FLOOD_RISK_MEASURES_INCLUDED]: 'maybe'
+    })
+    expect(result.error).toBeDefined()
+  })
+
+  test('should reject empty string', () => {
+    const result = nfmInclusionSchema.validate({
+      [NATURAL_FLOOD_RISK_MEASURES_INCLUDED]: ''
+    })
     expect(result.error).toBeDefined()
   })
 })

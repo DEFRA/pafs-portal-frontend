@@ -96,6 +96,7 @@ export const PROJECT_PAYLOAD_FIELDS = {
   KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_SINGLE:
     'kilometresOfWatercourseEnhancedOrCreatedSingle',
   NFM_SELECTED_MEASURES: 'nfmSelectedMeasures',
+  NATURAL_FLOOD_RISK_MEASURES_INCLUDED: 'naturalFloodRiskMeasuresIncluded',
   NFM_RIVER_RESTORATION_AREA: 'nfmRiverRestorationArea',
   NFM_RIVER_RESTORATION_VOLUME: 'nfmRiverRestorationVolume',
   NFM_LEAKY_BARRIERS_VOLUME: 'nfmLeakyBarriersVolume',

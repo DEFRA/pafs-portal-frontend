@@ -8,6 +8,7 @@
  */
 
 export {
+  nfmInclusionSchema,
   nfmSelectedMeasuresSchema,
   nfmRiverRestorationSchema,
   nfmLeakyBarriersSchema,

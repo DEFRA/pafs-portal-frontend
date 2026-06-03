@@ -123,7 +123,8 @@
     },
     "environmental_benefits_summary_card": {
       "title": "Environmental benefits",
-      "not_added": "The project does not include any environmental benefits",
+      "not_added": "No environmental benefits data added yet",
+      "not_included": "The project does not include any environmental benefits",
       "intertidal_habitat": "Intertidal wetland habitat",
       "woodland": "Woodland habitat",
       "wet_woodland": "Wet woodland habitat",
@@ -190,6 +191,7 @@
     "nfm_summary_card": {
       "title": "Natural Flood Management",
       "not_added": "No natural flood management measures added yet",
+      "not_included": "The project does not include any Natural Flood Management measures.",
       "selected_measures": "Selected NFM measures",
       "measures_details": "Measure details",
       "landowner_consent": "Landowner consent",
@@ -582,7 +584,7 @@
       "heading": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
       "hint": "Enter a whole number between 0 and 100",
       "errors": {
-        "invalid": "Please enter a whole number between 0 to 100.",
+        "invalid": "Please enter a whole number from 0 to 100.",
         "required": "Enter the percentage of properties benefitting in the 20% most deprived areas"
       }
     },
@@ -591,7 +593,7 @@
       "heading": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
       "hint": "Enter a whole number between 0 and 100",
       "errors": {
-        "invalid": "Please enter a whole number between 0 to 100.",
+        "invalid": "Please enter a whole number from 0 to 100.",
         "required": "Enter the percentage of properties benefitting in the 40% most deprived areas"
       }
     },
@@ -637,6 +639,14 @@
     }
   },
   "nfm": {
+    "inclusion": {
+      "title": "Does the project include any Natural Flood Management measures?",
+      "heading": "Does the project include any Natural Flood Management measures?",
+      "hint": "na",
+      "validation": {
+        "required": "You must select yes or no"
+      }
+    },
     "selected_measures": {
       "title": "Which natural flood management measures are in your project?",
       "heading": "Which natural flood management measures are in your project?",

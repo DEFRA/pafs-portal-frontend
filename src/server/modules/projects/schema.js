@@ -76,6 +76,7 @@ export {
 } from './schemas/environmental-benefits-schemas.js'
 
 export {
+  nfmInclusionSchema,
   nfmSelectedMeasuresSchema,
   nfmRiverRestorationSchema,
   nfmLeakyBarriersSchema,

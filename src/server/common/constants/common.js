@@ -51,6 +51,7 @@ export const PROJECT_VIEWS = {
   GOALS_URGENCY_CONFIDENCE: 'modules/projects/goals-urgency-confidence/index',
   ENVIRONMENTAL_BENEFITS: 'modules/projects/environmental-benefits/index',
   NFM: 'modules/projects/nfm/index',
+  NFM_INCLUSION: 'modules/projects/nfm/inclusion',
   NFM_RIVER_RESTORATION: 'modules/projects/nfm/input-generic',
   NFM_LEAKY_BARRIERS: 'modules/projects/nfm/input-generic',
   NFM_OFFLINE_STORAGE: 'modules/projects/nfm/input-generic',

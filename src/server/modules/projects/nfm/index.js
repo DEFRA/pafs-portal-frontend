@@ -6,6 +6,7 @@ import {
   initializeEditSessionPreHandler
 } from '../helpers/project-edit-session.js'
 import { requireSelectedMeasure } from './helpers/measure-guard.js'
+import { requireNfmInclusion } from './helpers/inclusion-guard.js'
 import { nfmController } from './controller.js'
 
 // Helper function to create route pair (GET and POST)
@@ -32,7 +33,8 @@ const createEditPreHandlers = () => [
   { method: requireAuth },
   { method: fetchProjectForEdit },
   { method: initializeEditSessionPreHandler },
-  { method: requireNfmOrSudIntervention }
+  { method: requireNfmOrSudIntervention },
+  { method: requireNfmInclusion }
 ]
 
 const createMeasureEditPreHandlers = () => [
@@ -162,7 +164,21 @@ export const projectNfm = {
     register(server) {
       const editPreHandlers = createEditPreHandlers()
       const measureEditPreHandlers = createMeasureEditPreHandlers()
+
+      // NFM Inclusion route (SUDS-only intervention types)
+      const inclusionPreHandlers = [
+        { method: requireAuth },
+        { method: fetchProjectForEdit },
+        { method: initializeEditSessionPreHandler },
+        { method: requireNfmOrSudIntervention }
+      ]
+
       server.route([
+        ...createRoutePair(
+          ROUTES.PROJECT.EDIT.NFM.INCLUSION,
+          inclusionPreHandlers,
+          nfmController
+        ),
         ...getNfmMeasureRoutes(editPreHandlers, measureEditPreHandlers),
         ...getNfmLandUseRoutes(editPreHandlers)
       ])

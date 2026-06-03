@@ -373,4 +373,26 @@ describe('Routes Constants', () => {
       expect(ROUTES.PROJECT_PROPOSAL).toHaveProperty('PROPOSAL_OVERVIEW')
     })
   })
+
+  describe('NFM routes', () => {
+    test('NFM INCLUSION route is defined', () => {
+      expect(ROUTES.PROJECT.EDIT.NFM.INCLUSION).toContain('{referenceNumber}')
+      expect(ROUTES.PROJECT.EDIT.NFM.INCLUSION).toContain('nfm-inclusion')
+    })
+
+    test('NFM SELECTED_MEASURES route is defined', () => {
+      expect(ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES).toContain(
+        '{referenceNumber}'
+      )
+    })
+
+    test('NFM routes object has expected keys', () => {
+      expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('INCLUSION')
+      expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('SELECTED_MEASURES')
+      expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('RIVER_RESTORATION')
+      expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('LANDOWNER_CONSENT')
+      expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('EXPERIENCE')
+      expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('PROJECT_READINESS')
+    })
+  })
 })

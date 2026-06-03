@@ -18,6 +18,19 @@ import {
 } from '../../../common/constants/projects.js'
 // Note: PROJECT_VALIDATION_MESSAGES is still used for NFM radio/checkbox schemas (selected_measures, landowner_consent, experience, project_readiness)
 
+import { BOOLEAN_OPTION_VALUES } from '../../../common/constants/common.js'
+
+/**
+ * NFM Inclusion (yes/no gate) schema
+ */
+export const nfmInclusionSchema = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED]: Joi.string()
+    .valid(BOOLEAN_OPTION_VALUES.YES, BOOLEAN_OPTION_VALUES.NO)
+    .required()
+})
+  .options({ abortEarly: false })
+  .label('NFM Inclusion')
+
 /**
  * Maximum digits allowed for whole-number values — matches Decimal(20,2) DB column
  */
