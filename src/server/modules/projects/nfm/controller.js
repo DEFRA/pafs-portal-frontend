@@ -285,24 +285,9 @@ class NfmController {
     ]
   }
 
-  _getViewData(request) {
-    const step = getProjectStep(request)
-    const config = this._getConfig(step)
-    let {
-      backLinkOptions,
-      localKeyPrefix,
-      fieldType,
-      inputFields,
-      radioFieldName,
-      radioOptionsType
-    } = config
-    const sessionData = getSessionData(request)
-
-    // Get dynamic back link if applicable
-    const dynamicBackLink = getDynamicBackLink(step, sessionData)
-    if (dynamicBackLink) {
-      backLinkOptions = dynamicBackLink
-    }
+  _buildAdditionalData(request, step, config, sessionData) {
+    const { fieldType, inputFields, radioFieldName, radioOptionsType } = config
+    const localKeyPrefix = config.localKeyPrefix
 
     const fieldNameMap = {
       [PROJECT_STEPS.NFM_INCLUSION]:
@@ -322,14 +307,12 @@ class NfmController {
     }
 
     const landUseFieldConfig = LAND_USE_DETAIL_FIELD_CONFIG[step]
+    const hint =
+      step === PROJECT_STEPS.NFM_EXPERIENCE
+        ? request.t(`${localKeyPrefix}.hint`)
+        : undefined
 
-    // Get hint from locale only for experience page
-    let hint
-    if (step === PROJECT_STEPS.NFM_EXPERIENCE) {
-      hint = request.t(`${localKeyPrefix}.hint`)
-    }
-
-    const additionalData = {
+    return {
       step,
       projectSteps: PROJECT_STEPS,
       fieldType,
@@ -339,26 +322,8 @@ class NfmController {
       radioOptions: radioOptionsType
         ? radioOptionsByType[radioOptionsType]
         : undefined,
-      ...(step === PROJECT_STEPS.NFM_INCLUSION && {
-        radioItems: [
-          {
-            text: request.t('common.yes'),
-            value: BOOLEAN_OPTION_VALUES.YES,
-            checked:
-              sessionData[
-                PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
-              ] === true
-          },
-          {
-            text: request.t('common.no'),
-            value: BOOLEAN_OPTION_VALUES.NO,
-            checked:
-              sessionData[
-                PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
-              ] === false
-          }
-        ]
-      }),
+      ...(step === PROJECT_STEPS.NFM_INCLUSION &&
+        this._buildInclusionRadioItems(request, sessionData)),
       nfmMeasureOptions: this._getNfmMeasureOptions(request),
       nfmLandUseOptions: this._getNfmLandUseOptions(request),
       nfmLandownerConsentOptions: this._getNfmLandownerConsentOptions(request),
@@ -371,6 +336,48 @@ class NfmController {
         afterFieldName: landUseFieldConfig.afterFieldName
       })
     }
+  }
+
+  _buildInclusionRadioItems(request, sessionData) {
+    return {
+      radioItems: [
+        {
+          text: request.t('common.yes'),
+          value: BOOLEAN_OPTION_VALUES.YES,
+          checked:
+            sessionData[
+              PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
+            ] === true
+        },
+        {
+          text: request.t('common.no'),
+          value: BOOLEAN_OPTION_VALUES.NO,
+          checked:
+            sessionData[
+              PROJECT_PAYLOAD_FIELDS.NATURAL_FLOOD_RISK_MEASURES_INCLUDED
+            ] === false
+        }
+      ]
+    }
+  }
+
+  _getViewData(request) {
+    const step = getProjectStep(request)
+    const config = this._getConfig(step)
+    let { backLinkOptions, localKeyPrefix } = config
+    const sessionData = getSessionData(request)
+
+    const dynamicBackLink = getDynamicBackLink(step, sessionData)
+    if (dynamicBackLink) {
+      backLinkOptions = dynamicBackLink
+    }
+
+    const additionalData = this._buildAdditionalData(
+      request,
+      step,
+      config,
+      sessionData
+    )
 
     return buildViewData(request, {
       localKeyPrefix,

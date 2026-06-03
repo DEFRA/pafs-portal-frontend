@@ -178,26 +178,49 @@ export const NFM_STEP_SEQUENCE = {
  * @param {Object} sessionData - Project session data
  * @returns {Object|null} Back link options or null
  */
-export function getDynamicBackLink(step, sessionData) {
-  // NFM_SELECTED_MEASURES: go back to inclusion page for SUDS-only, or overview
-  if (step === PROJECT_STEPS.NFM_SELECTED_MEASURES) {
-    const interventionTypes =
-      sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] || []
-    const hasSudsOnly =
-      (interventionTypes.includes(PROJECT_INTERVENTION_TYPES.SUDS) ||
-        interventionTypes.includes('SUDS')) &&
-      !interventionTypes.includes(PROJECT_INTERVENTION_TYPES.NFM) &&
-      !interventionTypes.includes('NFM')
-    if (hasSudsOnly) {
-      return {
-        targetEditURL: ROUTES.PROJECT.EDIT.NFM.INCLUSION,
-        conditionalRedirect: false
-      }
+/**
+ * Checks if the project has only SUDS intervention types (no NFM).
+ */
+function isSudsOnlyProject(sessionData) {
+  const interventionTypes =
+    sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] || []
+  return (
+    (interventionTypes.includes(PROJECT_INTERVENTION_TYPES.SUDS) ||
+      interventionTypes.includes('SUDS')) &&
+    !interventionTypes.includes(PROJECT_INTERVENTION_TYPES.NFM) &&
+    !interventionTypes.includes('NFM')
+  )
+}
+
+/**
+ * Returns the back link for the NFM_SELECTED_MEASURES step.
+ */
+function getSelectedMeasuresBackLink(sessionData) {
+  if (isSudsOnlyProject(sessionData)) {
+    return {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.INCLUSION,
+      conditionalRedirect: false
     }
-    return null
+  }
+  return null
+}
+
+const STATIC_BACK_LINKS = {
+  [PROJECT_STEPS.NFM_EXPERIENCE]: {
+    targetEditURL: ROUTES.PROJECT.EDIT.NFM.LANDOWNER_CONSENT,
+    conditionalRedirect: false
+  },
+  [PROJECT_STEPS.NFM_PROJECT_READINESS]: {
+    targetEditURL: ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
+    conditionalRedirect: false
+  }
+}
+
+export function getDynamicBackLink(step, sessionData) {
+  if (step === PROJECT_STEPS.NFM_SELECTED_MEASURES) {
+    return getSelectedMeasuresBackLink(sessionData)
   }
 
-  // Land-use detail steps need dynamic back-link based on previous selected type
   if (LAND_USE_DETAIL_STEPS.has(step)) {
     return getLandUseDetailBackLink(step, sessionData)
   }
@@ -206,18 +229,8 @@ export function getDynamicBackLink(step, sessionData) {
     return getLandownerConsentBackLink(sessionData)
   }
 
-  if (step === PROJECT_STEPS.NFM_EXPERIENCE) {
-    return {
-      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LANDOWNER_CONSENT,
-      conditionalRedirect: false
-    }
-  }
-
-  if (step === PROJECT_STEPS.NFM_PROJECT_READINESS) {
-    return {
-      targetEditURL: ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
-      conditionalRedirect: false
-    }
+  if (step in STATIC_BACK_LINKS) {
+    return STATIC_BACK_LINKS[step]
   }
 
   if (!(step in STEP_PREVIOUS_MEASURES)) {
