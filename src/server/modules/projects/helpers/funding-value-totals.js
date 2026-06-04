@@ -66,6 +66,64 @@ function sumContributorArray(row, arrayField) {
   return items.reduce((sum, c) => sum + toBigInt(c.amount), 0n)
 }
 
+function buildContributorFallbacks(activeFields, processedRows) {
+  const fallbacks = new Map()
+  for (const [arrayField, sourceField] of Object.entries(
+    CONTRIBUTOR_ARRAY_TO_SOURCE
+  )) {
+    if (
+      activeFields.includes(sourceField) &&
+      !hasFundingValueData(processedRows, sourceField)
+    ) {
+      fallbacks.set(sourceField, arrayField)
+    }
+  }
+  return fallbacks
+}
+
+function accumulateYearTotals(
+  processedRows,
+  activeFields,
+  contributorFallbacks,
+  sourceTotalsBig
+) {
+  return processedRows.map((row) => {
+    let yearTotal = 0n
+    for (const field of activeFields) {
+      const val = contributorFallbacks.has(field)
+        ? sumContributorArray(row, contributorFallbacks.get(field))
+        : toBigInt(row[field])
+      sourceTotalsBig[field] += val
+      yearTotal += val
+    }
+    return yearTotal
+  })
+}
+
+function sumContributorsByName(processedRows, arrayField) {
+  const nameMap = {}
+  for (const row of processedRows) {
+    const items = Array.isArray(row[arrayField]) ? row[arrayField] : []
+    for (const c of items) {
+      if (c.name) {
+        nameMap[c.name] = (nameMap[c.name] || 0n) + toBigInt(c.amount)
+      }
+    }
+  }
+  return Object.fromEntries(
+    Object.entries(nameMap).map(([name, total]) => [name, total.toString()])
+  )
+}
+
+function buildContributorRowTotals(processedRows) {
+  return Object.fromEntries(
+    Object.keys(CONTRIBUTOR_ARRAY_TO_SOURCE).map((arrayField) => [
+      arrayField,
+      sumContributorsByName(processedRows, arrayField)
+    ])
+  )
+}
+
 /**
  * Pre-compute all totals needed by the funding sources overview card.
  * Uses BigInt arithmetic to preserve full precision for values with 16+
@@ -81,70 +139,31 @@ export function computeFundingSourceTotals(processedRows, projectData = {}) {
   const activeFields = FUNDING_AMOUNT_FIELDS.filter((field) =>
     Boolean(projectData[field])
   )
-
-  const contributorFallbacks = new Map()
-  for (const [arrayField, sourceField] of Object.entries(
-    CONTRIBUTOR_ARRAY_TO_SOURCE
-  )) {
-    if (
-      activeFields.includes(sourceField) &&
-      !hasFundingValueData(processedRows, sourceField)
-    ) {
-      contributorFallbacks.set(sourceField, arrayField)
-    }
-  }
-
-  const sourceTotalsBig = {}
-  for (const field of FUNDING_AMOUNT_FIELDS) {
-    sourceTotalsBig[field] = 0n
-  }
-
-  const yearTotalsBig = processedRows.map((row) => {
-    let yearTotal = 0n
-    for (const field of activeFields) {
-      let val
-      if (contributorFallbacks.has(field)) {
-        val = sumContributorArray(row, contributorFallbacks.get(field))
-      } else {
-        val = toBigInt(row[field])
-      }
-      sourceTotalsBig[field] += val
-      yearTotal += val
-    }
-    return yearTotal
-  })
-
+  const contributorFallbacks = buildContributorFallbacks(
+    activeFields,
+    processedRows
+  )
+  const sourceTotalsBig = Object.fromEntries(
+    FUNDING_AMOUNT_FIELDS.map((f) => [f, 0n])
+  )
+  const yearTotalsBig = accumulateYearTotals(
+    processedRows,
+    activeFields,
+    contributorFallbacks,
+    sourceTotalsBig
+  )
   const grandTotalBig = yearTotalsBig.reduce((sum, t) => sum + t, 0n)
-
   const additionalGiaTotalBig = ADDITIONAL_GIA_FIELDS.filter((f) =>
     activeFields.includes(f)
   ).reduce((sum, f) => sum + sourceTotalsBig[f], 0n)
-
   const sourceTotals = Object.fromEntries(
     Object.entries(sourceTotalsBig).map(([k, v]) => [k, v.toString()])
   )
-
-  const contributorRowTotals = {}
-  for (const arrayField of Object.keys(CONTRIBUTOR_ARRAY_TO_SOURCE)) {
-    const nameMap = {}
-    for (const row of processedRows) {
-      const items = Array.isArray(row[arrayField]) ? row[arrayField] : []
-      for (const c of items) {
-        if (c.name) {
-          nameMap[c.name] = (nameMap[c.name] || 0n) + toBigInt(c.amount)
-        }
-      }
-    }
-    contributorRowTotals[arrayField] = Object.fromEntries(
-      Object.entries(nameMap).map(([name, total]) => [name, total.toString()])
-    )
-  }
-
   return {
     sourceTotals,
     yearTotals: yearTotalsBig.map((t) => t.toString()),
     grandTotal: grandTotalBig.toString(),
     additionalGiaTotal: additionalGiaTotalBig.toString(),
-    contributorRowTotals
+    contributorRowTotals: buildContributorRowTotals(processedRows)
   }
 }
