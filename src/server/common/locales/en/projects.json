@@ -582,7 +582,7 @@
     "twenty_percent_deprived": {
       "title": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
       "heading": "What is the percentage of total properties benefitting in the 20% most deprived areas?",
-      "hint": "Enter a whole number between 0 and 100",
+      "hint": "Enter a whole number from 0 to 100",
       "errors": {
         "invalid": "Please enter a whole number from 0 to 100.",
         "required": "Enter the percentage of properties benefitting in the 20% most deprived areas"
@@ -591,7 +591,7 @@
     "forty_percent_deprived": {
       "title": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
       "heading": "What is the percentage of total properties benefitting in the 40% most deprived areas?",
-      "hint": "Enter a whole number between 0 and 100",
+      "hint": "Enter a whole number from 0 to 100",
       "errors": {
         "invalid": "Please enter a whole number from 0 to 100.",
         "required": "Enter the percentage of properties benefitting in the 40% most deprived areas"
