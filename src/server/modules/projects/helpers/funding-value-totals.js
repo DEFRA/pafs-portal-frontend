@@ -75,7 +75,7 @@ function sumContributorArray(row, arrayField) {
  *
  * @param {Array} processedRows - Output of buildProcessedFundingValues
  * @param {Object} projectData - Project session data (boolean flags per source)
- * @returns {{ sourceTotals: Object, yearTotals: string[], grandTotal: string, additionalGiaTotal: string }}
+ * @returns {{ sourceTotals: Object, yearTotals: string[], grandTotal: string, additionalGiaTotal: string, contributorRowTotals: Object }}
  */
 export function computeFundingSourceTotals(processedRows, projectData = {}) {
   const activeFields = FUNDING_AMOUNT_FIELDS.filter((field) =>
@@ -124,10 +124,27 @@ export function computeFundingSourceTotals(processedRows, projectData = {}) {
     Object.entries(sourceTotalsBig).map(([k, v]) => [k, v.toString()])
   )
 
+  const contributorRowTotals = {}
+  for (const arrayField of Object.keys(CONTRIBUTOR_ARRAY_TO_SOURCE)) {
+    const nameMap = {}
+    for (const row of processedRows) {
+      const items = Array.isArray(row[arrayField]) ? row[arrayField] : []
+      for (const c of items) {
+        if (c.name) {
+          nameMap[c.name] = (nameMap[c.name] || 0n) + toBigInt(c.amount)
+        }
+      }
+    }
+    contributorRowTotals[arrayField] = Object.fromEntries(
+      Object.entries(nameMap).map(([name, total]) => [name, total.toString()])
+    )
+  }
+
   return {
     sourceTotals,
     yearTotals: yearTotalsBig.map((t) => t.toString()),
     grandTotal: grandTotalBig.toString(),
-    additionalGiaTotal: additionalGiaTotalBig.toString()
+    additionalGiaTotal: additionalGiaTotalBig.toString(),
+    contributorRowTotals
   }
 }

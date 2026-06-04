@@ -188,17 +188,16 @@
                     {% for name in contribNames %}
                       <tr class="govuk-table__row">
                         <td class="govuk-table__cell detail-contributor-name">{{ name }}</td>
-                        {% set rowTotal = 0 %}
                         {% for row in fundingValues %}
-                          {% set val = 0 %}
+                          {% set val = null %}
                           {% for contrib in (row[source.contributorArrayField] or []) %}
                             {% if contrib.name == name %}
-                              {% set val = contrib.amount | int %}
+                              {% set val = contrib.amount %}
                             {% endif %}
                           {% endfor %}
-                          {% set rowTotal = rowTotal + val %}
                           <td class="govuk-table__cell govuk-table__cell--numeric">{{ formatNumberWithCommas(val) if val > 0 else '0' }}</td>
                         {% endfor %}
+                        {% set rowTotal = projectData.fundingSourceTotals.contributorRowTotals[source.contributorArrayField][name] or '0' %}
                         <td class="govuk-table__cell govuk-table__cell--numeric">{{ formatNumberWithCommas(rowTotal) if rowTotal > 0 else '0' }}</td>
                       </tr>
                     {% endfor %}

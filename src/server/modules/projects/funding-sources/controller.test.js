@@ -1684,9 +1684,9 @@ describe('_calculateServerTotals (via getEstimatedSpend)', () => {
       expect.objectContaining({
         additionalData: expect.objectContaining({
           serverTotals: expect.objectContaining({
-            grandTotal: 1000,
-            colTotals: [1000],
-            rowTotals: { fcermGia: 1000 }
+            grandTotal: '1000',
+            colTotals: ['1000'],
+            rowTotals: { fcermGia: '1000' }
           })
         })
       })
@@ -1719,8 +1719,8 @@ describe('_calculateServerTotals (via getEstimatedSpend)', () => {
       expect.objectContaining({
         additionalData: expect.objectContaining({
           serverTotals: expect.objectContaining({
-            grandTotal: 500,
-            rowTotals: { 'publicContributors-0': 500 }
+            grandTotal: '500',
+            rowTotals: { 'publicContributors-0': '500' }
           })
         })
       })
@@ -1743,7 +1743,7 @@ describe('_calculateServerTotals (via getEstimatedSpend)', () => {
       request,
       expect.objectContaining({
         additionalData: expect.objectContaining({
-          serverTotals: expect.objectContaining({ grandTotal: 0 })
+          serverTotals: expect.objectContaining({ grandTotal: '0' })
         })
       })
     )
@@ -1765,7 +1765,7 @@ describe('_calculateServerTotals (via getEstimatedSpend)', () => {
       request,
       expect.objectContaining({
         additionalData: expect.objectContaining({
-          serverTotals: expect.objectContaining({ grandTotal: 0 })
+          serverTotals: expect.objectContaining({ grandTotal: '0' })
         })
       })
     )
@@ -1792,7 +1792,7 @@ describe('_calculateServerTotals (via getEstimatedSpend)', () => {
       request,
       expect.objectContaining({
         additionalData: expect.objectContaining({
-          serverTotals: expect.objectContaining({ grandTotal: 0 })
+          serverTotals: expect.objectContaining({ grandTotal: '0' })
         })
       })
     )
@@ -1822,7 +1822,7 @@ describe('_calculateServerTotals (via getEstimatedSpend)', () => {
       request,
       expect.objectContaining({
         additionalData: expect.objectContaining({
-          serverTotals: expect.objectContaining({ grandTotal: 0 })
+          serverTotals: expect.objectContaining({ grandTotal: '0' })
         })
       })
     )

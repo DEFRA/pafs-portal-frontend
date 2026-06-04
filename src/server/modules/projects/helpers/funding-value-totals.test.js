@@ -41,6 +41,7 @@ describe('computeFundingSourceTotals – return shape', () => {
     expect(result).toHaveProperty('yearTotals')
     expect(result).toHaveProperty('grandTotal')
     expect(result).toHaveProperty('additionalGiaTotal')
+    expect(result).toHaveProperty('contributorRowTotals')
   })
 
   test('all numeric values are returned as strings, not numbers', () => {
@@ -519,5 +520,86 @@ describe('computeFundingSourceTotals – contributor array fallback', () => {
     expect(result.sourceTotals.privateContributions).toBe('200')
     expect(result.sourceTotals.otherEaContributions).toBe('300')
     expect(result.grandTotal).toBe('600')
+  })
+})
+
+// ─── contributorRowTotals ─────────────────────────────────────────────────────
+
+describe('computeFundingSourceTotals – contributorRowTotals', () => {
+  test('returns contributorRowTotals with all three array keys', () => {
+    const result = computeFundingSourceTotals([], {})
+    expect(result.contributorRowTotals).toHaveProperty('publicContributors')
+    expect(result.contributorRowTotals).toHaveProperty('privateContributors')
+    expect(result.contributorRowTotals).toHaveProperty('otherEaContributors')
+  })
+
+  test('sums amounts per contributor name across rows', () => {
+    const rows = [
+      {
+        financialYear: 2025,
+        publicContributors: [
+          { name: 'Alice', amount: '1000' },
+          { name: 'Bob', amount: '500' }
+        ]
+      },
+      {
+        financialYear: 2026,
+        publicContributors: [{ name: 'Alice', amount: '2000' }]
+      }
+    ]
+    const result = computeFundingSourceTotals(rows, {})
+    expect(result.contributorRowTotals.publicContributors.Alice).toBe('3000')
+    expect(result.contributorRowTotals.publicContributors.Bob).toBe('500')
+  })
+
+  test('preserves full precision for 16+ digit contributor amounts', () => {
+    const rows = [
+      {
+        financialYear: 2025,
+        publicContributors: [{ name: 'Alice', amount: '10000000000000001' }]
+      },
+      {
+        financialYear: 2026,
+        publicContributors: [{ name: 'Alice', amount: '10000000000000002' }]
+      }
+    ]
+    const result = computeFundingSourceTotals(rows, {})
+    expect(result.contributorRowTotals.publicContributors.Alice).toBe(
+      '20000000000000003'
+    )
+  })
+
+  test('returns totals as strings, not numbers or BigInt', () => {
+    const rows = [
+      {
+        financialYear: 2025,
+        privateContributors: [{ name: 'Corp', amount: '5000' }]
+      }
+    ]
+    const result = computeFundingSourceTotals(rows, {})
+    expect(typeof result.contributorRowTotals.privateContributors.Corp).toBe(
+      'string'
+    )
+  })
+
+  test('ignores contributor entries without a name', () => {
+    const rows = [
+      {
+        financialYear: 2025,
+        publicContributors: [
+          { name: '', amount: '999' },
+          { name: 'Alice', amount: '100' }
+        ]
+      }
+    ]
+    const result = computeFundingSourceTotals(rows, {})
+    expect(result.contributorRowTotals.publicContributors['']).toBeUndefined()
+    expect(result.contributorRowTotals.publicContributors.Alice).toBe('100')
+  })
+
+  test('handles non-array contributor field gracefully', () => {
+    const rows = [{ financialYear: 2025, publicContributors: null }]
+    const result = computeFundingSourceTotals(rows, {})
+    expect(result.contributorRowTotals.publicContributors).toEqual({})
   })
 })

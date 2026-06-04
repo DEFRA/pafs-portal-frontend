@@ -242,6 +242,19 @@ describe('setSourceTotalsFromContributorArrays', () => {
     setSourceTotalsFromContributorArrays(row)
     expect(row[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]).toBe('500')
   })
+
+  it('preserves full precision for amounts with 16+ significant digits', () => {
+    const row = {
+      publicContributors: [
+        { amount: '12345678901234567' },
+        { amount: '10000000000000000' }
+      ]
+    }
+    setSourceTotalsFromContributorArrays(row)
+    expect(row[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]).toBe(
+      '22345678901234567'
+    )
+  })
 })
 
 // ─── stripEmptyContributorEntries ────────────────────────────────────────────

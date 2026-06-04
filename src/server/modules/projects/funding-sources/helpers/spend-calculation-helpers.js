@@ -35,12 +35,31 @@ export function getRowValue(row, fvRow) {
 // ─── Server-side totals ─────────────────────────────────────────────────────
 
 /**
+ * Extract a cell value as BigInt directly from string data, bypassing Number
+ * conversion so values with 16+ significant digits are not rounded.
+ * @private
+ */
+function _toBigIntCellValue(row, fvRow) {
+  let digits
+  if (row.kind === 'source') {
+    digits = String(fvRow[row.field] || '').replaceAll(/\D/g, '')
+  } else if (row.kind === 'contributor') {
+    const items = fvRow[row.contributorArrayField] || []
+    const match = items.find((c) => c.name === row.contributorName)
+    digits = String(match?.amount || '').replaceAll(/\D/g, '')
+  } else {
+    return 0n
+  }
+  return digits ? BigInt(digits) : 0n
+}
+
+/**
  * Calculate row totals, column totals, and grand total server-side
  * for no-JS rendering.
  * @param {Array} spendRows
  * @param {Array} existingValues
  * @param {Array} financialYears
- * @returns {{ rowTotals: object, colTotals: number[], grandTotal: number }}
+ * @returns {{ rowTotals: object, colTotals: string[], grandTotal: string }}
  */
 export function calculateServerTotals(
   spendRows,
@@ -70,22 +89,17 @@ export function calculateServerTotals(
         continue
       }
 
-      const val = BigInt(
-        Number.parseInt(
-          String(getRowValue(row, fvRow) || '0').replaceAll(/\D/g, '') || '0',
-          10
-        ) || 0
-      )
+      const val = _toBigIntCellValue(row, fvRow)
       rowTotal += val
       colTotalsBig[colIdx] += val
     }
 
-    // Store as regular number for Nunjucks template rendering
-    rowTotals[rowKey] = Number(rowTotal)
+    rowTotals[rowKey] = rowTotal.toString()
   }
 
-  const colTotals = colTotalsBig.map(Number)
-  const grandTotal = colTotals.reduce((sum, ct) => sum + ct, 0)
+  const grandTotalBig = colTotalsBig.reduce((sum, ct) => sum + ct, 0n)
+  const colTotals = colTotalsBig.map((v) => v.toString())
+  const grandTotal = grandTotalBig.toString()
 
   return { rowTotals, colTotals, grandTotal }
 }
