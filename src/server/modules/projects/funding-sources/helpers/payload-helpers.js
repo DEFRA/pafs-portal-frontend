@@ -103,21 +103,25 @@ export function setSourceTotalsFromContributorArrays(row) {
       if (!amount) {
         return sum
       }
-      return sum + (Number.parseInt(amount, 10) || 0)
-    }, 0)
+      try {
+        return sum + BigInt(amount)
+      } catch {
+        return sum
+      }
+    }, 0n)
 
   const publicTotal = sumAmounts(toArray(row.publicContributors))
-  if (publicTotal > 0) {
+  if (publicTotal > 0n) {
     row[PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS] = `${publicTotal}`
   }
 
   const privateTotal = sumAmounts(toArray(row.privateContributors))
-  if (privateTotal > 0) {
+  if (privateTotal > 0n) {
     row[PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS] = `${privateTotal}`
   }
 
   const otherEaTotal = sumAmounts(toArray(row.otherEaContributors))
-  if (otherEaTotal > 0) {
+  if (otherEaTotal > 0n) {
     row[PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS] = `${otherEaTotal}`
   }
 

@@ -1199,7 +1199,7 @@ describe('estimatedSpendController', () => {
 
       const viewData = mockBuildViewData.mock.calls[0][1]
       const totals = viewData.additionalData.serverTotals
-      expect(totals.grandTotal).toBe(0)
+      expect(totals.grandTotal).toBe('0')
     })
 
     it('handles contributor row with no matching name', async () => {
@@ -1225,7 +1225,7 @@ describe('estimatedSpendController', () => {
       await estimatedSpendController.getHandler(request, h)
 
       const viewData = mockBuildViewData.mock.calls[0][1]
-      expect(viewData.additionalData.serverTotals.grandTotal).toBe(0)
+      expect(viewData.additionalData.serverTotals.grandTotal).toBe('0')
     })
 
     it('handles contributor row with missing contributor array', async () => {
@@ -1246,7 +1246,7 @@ describe('estimatedSpendController', () => {
       await estimatedSpendController.getHandler(request, h)
 
       const viewData = mockBuildViewData.mock.calls[0][1]
-      expect(viewData.additionalData.serverTotals.grandTotal).toBe(0)
+      expect(viewData.additionalData.serverTotals.grandTotal).toBe('0')
     })
 
     it('strips non-numeric chars from source values', async () => {
@@ -1262,7 +1262,7 @@ describe('estimatedSpendController', () => {
       await estimatedSpendController.getHandler(request, h)
 
       const viewData = mockBuildViewData.mock.calls[0][1]
-      expect(viewData.additionalData.serverTotals.grandTotal).toBe(1234)
+      expect(viewData.additionalData.serverTotals.grandTotal).toBe('1234')
     })
   })
 

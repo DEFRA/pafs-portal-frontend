@@ -40,7 +40,8 @@ vi.mock('../helpers/project-utils.js', () => ({
   computeFundingSourceTotals: vi.fn().mockReturnValue({
     sourceTotals: {},
     yearTotals: [],
-    grandTotal: 0
+    grandTotal: 0,
+    contributorRowTotals: {}
   })
 }))
 
