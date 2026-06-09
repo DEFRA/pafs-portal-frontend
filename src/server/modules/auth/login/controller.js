@@ -87,9 +87,16 @@ export const loginPostController = {
         return handleLoginFailure(request, h, result, email)
       }
 
-      await invalidateAccountsCacheOnAuth(request, 'login')
+      // Session must be set before redirect; cache invalidation is fire-and-forget
+      // — a brief stale window is acceptable and avoids blocking the redirect.
       setAuthSession(request, result.data)
       request.metrics.counter('authEvent', 1, { outcome: 'success' })
+      invalidateAccountsCacheOnAuth(request, 'login').catch((err) => {
+        request.server.logger.warn(
+          { err },
+          'Background cache invalidation failed on login'
+        )
+      })
 
       return h.redirect(resolvePostLoginRedirect(request, result))
     } catch (err) {
