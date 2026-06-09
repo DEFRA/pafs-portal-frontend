@@ -133,6 +133,21 @@ describe('Login Controller', () => {
         })
       )
     })
+
+    test('treats null payload as empty and shows validation errors', async () => {
+      mockRequest.payload = null
+      await loginPostController.handler(mockRequest, mockH)
+      expect(mockH.view).toHaveBeenCalledWith(
+        'modules/auth/login/index',
+        expect.objectContaining({
+          fieldErrors: {
+            email: VALIDATION_CODES.EMAIL_REQUIRED,
+            password: VALIDATION_CODES.PASSWORD_REQUIRED
+          },
+          email: ''
+        })
+      )
+    })
   })
 
   describe('POST /login - successful login', () => {
@@ -263,6 +278,28 @@ describe('Login Controller', () => {
           errorCode: 'NETWORK_ERROR',
           email: 'user@example.com'
         })
+      )
+    })
+
+    test('logs warning when background cache invalidation fails after login', async () => {
+      mockRequest.payload = { email: 'user@example.com', password: 'password' }
+      const cacheError = new Error('Cache failure')
+      invalidateAccountsCacheOnAuth.mockRejectedValue(cacheError)
+      login.mockResolvedValue({
+        success: true,
+        data: {
+          user: { id: 1, email: 'user@example.com', admin: false },
+          accessToken: 'token123',
+          refreshToken: 'refresh123'
+        }
+      })
+
+      await loginPostController.handler(mockRequest, mockH)
+      await Promise.resolve()
+
+      expect(mockRequest.server.logger.warn).toHaveBeenCalledWith(
+        { err: cacheError },
+        'Background cache invalidation failed on login'
       )
     })
   })
