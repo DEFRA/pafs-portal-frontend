@@ -189,6 +189,17 @@ describe('setPasswordPostController', () => {
     )
   })
 
+  it('treats null payload as empty and redirects to link-expired', async () => {
+    mockRequest.payload = null
+
+    await setPasswordPostController.handler(mockRequest, mockH)
+
+    expect(mockRequest.yar.flash).toHaveBeenCalledWith('tokenExpired', true)
+    expect(mockH.redirect).toHaveBeenCalledWith(
+      ROUTES.SET_PASSWORD_TOKEN_EXPIRED
+    )
+  })
+
   it('retrieves email from session', async () => {
     setPassword.mockResolvedValue({ success: true })
     login.mockResolvedValue({
@@ -255,6 +266,24 @@ describe('setPasswordPostController', () => {
     expect(invalidateAccountsCacheOnAuth).toHaveBeenCalledWith(
       mockRequest,
       'auto-login'
+    )
+  })
+
+  it('logs warning when background cache invalidation fails after auto-login', async () => {
+    setPassword.mockResolvedValue({ success: true })
+    const cacheError = new Error('Cache failure')
+    invalidateAccountsCacheOnAuth.mockRejectedValue(cacheError)
+    login.mockResolvedValue({
+      success: true,
+      data: { user: { admin: false } }
+    })
+
+    await setPasswordPostController.handler(mockRequest, mockH)
+    await Promise.resolve()
+
+    expect(mockRequest.server.logger.warn).toHaveBeenCalledWith(
+      { err: cacheError },
+      'Background cache invalidation failed on auto-login'
     )
   })
 
@@ -338,6 +367,23 @@ describe('setPasswordPostController', () => {
       expect.objectContaining({
         flowType: 'invitation',
         errorCode: 'SOME_OTHER_ERROR'
+      })
+    )
+  })
+
+  it('shows unknown error when API returns error with no error code', async () => {
+    setPassword.mockResolvedValue({
+      success: false,
+      errors: [{}]
+    })
+
+    await setPasswordPostController.handler(mockRequest, mockH)
+
+    expect(mockH.view).toHaveBeenCalledWith(
+      'modules/auth/reset-password/index',
+      expect.objectContaining({
+        flowType: 'invitation',
+        errorCode: VIEW_ERROR_CODES.UNKNOWN_ERROR
       })
     )
   })

@@ -150,8 +150,12 @@ async function autoLoginAndRedirect(email, password, request, h) {
     if (loginResult.success) {
       setAuthSession(request, loginResult.data)
 
-      // Invalidate accounts cache after successful login
-      await invalidateAccountsCacheOnAuth(request, 'auto-login')
+      invalidateAccountsCacheOnAuth(request, 'auto-login').catch((err) => {
+        request.server.logger.warn(
+          { err },
+          'Background cache invalidation failed on auto-login'
+        )
+      })
 
       // Redirect based on user role
       if (loginResult.data.user.admin) {
