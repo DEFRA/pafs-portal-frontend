@@ -150,8 +150,6 @@ async function autoLoginAndRedirect(email, password, request, h) {
     if (loginResult.success) {
       setAuthSession(request, loginResult.data)
 
-      // Fire-and-forget — stale cache for a few ms is acceptable and avoids
-      // blocking the redirect after password set.
       invalidateAccountsCacheOnAuth(request, 'auto-login').catch((err) => {
         request.server.logger.warn(
           { err },
