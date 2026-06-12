@@ -4,6 +4,8 @@ import { dirname, resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import { NodePackageImporter } from 'sass-embedded'
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 const require = createRequire(import.meta.url)
 const govukFrontendPath = dirname(
   require.resolve('govuk-frontend/package.json')
@@ -64,7 +66,7 @@ export default defineConfig({
         applicationCss: 'src/client/stylesheets/application.scss'
       }
     },
-    sourcemap: true
+    sourcemap: !isProduction
   },
   css: {
     postcss: {
@@ -82,7 +84,7 @@ export default defineConfig({
           'src/server/common/templates/partials'
         ],
         quietDeps: true,
-        sourceMapIncludeSources: true,
+        sourceMapIncludeSources: !isProduction,
         style: 'expanded'
       }
     },
