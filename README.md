@@ -170,13 +170,7 @@ docker compose down           # Stop all services
 
 ## Environment Variables
 
-| Variable               | Description     | Default                        |
-| ---------------------- | --------------- | ------------------------------ |
-| `NODE_ENV`             | Environment     | `development`                  |
-| `PORT`                 | Server port     | `3000`                         |
-| `LOG_LEVEL`            | Log level       | `info`                         |
-| `SESSION_CACHE_ENGINE` | Cache engine    | `memory` (dev), `redis` (prod) |
-| `API_BASE_URL`         | Backend API URL | -                              |
+For local developer setup see the **[Portal DEVELOPER setup (local)](https://github.com/DEFRA/defra-pafs-docs/blob/main/service_details/environments.md#portal-developer-setup-local)** section in `defra-pafs-docs`.
 
 **CDP Environments:** Manage secrets via [CDP Portal](https://portal.cdp-int.defra.cloud/)
 
