@@ -39,6 +39,7 @@ describe('Auth Service', () => {
 
       expect(apiRequest).toHaveBeenCalledWith('/api/v1/auth/login', {
         method: 'POST',
+        retries: 0,
         body: JSON.stringify({
           email: 'test@example.com',
           password: 'password123'

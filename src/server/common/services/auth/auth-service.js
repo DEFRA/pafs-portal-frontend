@@ -3,6 +3,7 @@ import { apiRequest } from '../../helpers/api-client/index.js'
 export async function login(email, password) {
   return apiRequest('/api/v1/auth/login', {
     method: 'POST',
+    retries: 0,
     body: JSON.stringify({ email, password })
   })
 }
