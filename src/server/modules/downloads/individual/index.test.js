@@ -211,32 +211,22 @@ describe('individualDownloads plugin', () => {
         expect(route.path).toBe(ROUTES.DOWNLOADS.FCERM1_LEGACY)
       })
 
-      test('should have exactly 4 pre-handlers', () => {
-        expect(route.options.pre).toHaveLength(4)
+      test('should have exactly 1 pre-handler', () => {
+        expect(route.options.pre).toHaveLength(1)
       })
 
-      test('should have requireAuth as first pre-handler', () => {
+      test('should have requireAuth as only pre-handler', () => {
         expect(route.options.pre[0].method).toBe(requireAuth)
       })
 
-      test('should have fetchProjectForOverview as second pre-handler', () => {
-        expect(route.options.pre[1].method).toBe(fetchProjectForOverview)
+      test('should not have fetchProjectForOverview (referenceNumber comes from request.params)', () => {
+        const methods = route.options.pre.map((pre) => pre.method)
+        expect(methods).not.toContain(fetchProjectForOverview)
       })
 
-      test('third pre-handler should call initializeEditSessionPreHandler with forceRefresh: true', async () => {
-        const mockRequest = {}
-        const mockH = {}
-        await route.options.pre[2].method(mockRequest, mockH)
-
-        expect(initializeEditSessionPreHandler).toHaveBeenCalledWith(
-          mockRequest,
-          mockH,
-          { forceRefresh: true }
-        )
-      })
-
-      test('should have requireViewPermission as fourth pre-handler', () => {
-        expect(route.options.pre[3].method).toBe(requireViewPermission)
+      test('should not have requireViewPermission (backend enforces validateDownloadPermissions)', () => {
+        const methods = route.options.pre.map((pre) => pre.method)
+        expect(methods).not.toContain(requireViewPermission)
       })
 
       test('should have a handler function defined', () => {
@@ -260,32 +250,22 @@ describe('individualDownloads plugin', () => {
         expect(route.path).toBe(ROUTES.DOWNLOADS.FCERM1_NEW)
       })
 
-      test('should have exactly 4 pre-handlers', () => {
-        expect(route.options.pre).toHaveLength(4)
+      test('should have exactly 1 pre-handler', () => {
+        expect(route.options.pre).toHaveLength(1)
       })
 
-      test('should have requireAuth as first pre-handler', () => {
+      test('should have requireAuth as only pre-handler', () => {
         expect(route.options.pre[0].method).toBe(requireAuth)
       })
 
-      test('should have fetchProjectForOverview as second pre-handler', () => {
-        expect(route.options.pre[1].method).toBe(fetchProjectForOverview)
+      test('should not have fetchProjectForOverview (referenceNumber comes from request.params)', () => {
+        const methods = route.options.pre.map((pre) => pre.method)
+        expect(methods).not.toContain(fetchProjectForOverview)
       })
 
-      test('third pre-handler should call initializeEditSessionPreHandler with forceRefresh: true', async () => {
-        const mockRequest = {}
-        const mockH = {}
-        await route.options.pre[2].method(mockRequest, mockH)
-
-        expect(initializeEditSessionPreHandler).toHaveBeenCalledWith(
-          mockRequest,
-          mockH,
-          { forceRefresh: true }
-        )
-      })
-
-      test('should have requireViewPermission as fourth pre-handler', () => {
-        expect(route.options.pre[3].method).toBe(requireViewPermission)
+      test('should not have requireViewPermission (backend enforces validateDownloadPermissions)', () => {
+        const methods = route.options.pre.map((pre) => pre.method)
+        expect(methods).not.toContain(requireViewPermission)
       })
 
       test('should have a handler function defined', () => {
