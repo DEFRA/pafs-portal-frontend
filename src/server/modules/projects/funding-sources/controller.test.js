@@ -343,6 +343,30 @@ describe('fundingSourcesSelectionController', () => {
         ])
       )
     })
+
+    it('does not call clearFundingValueFields for main sources when all remain selected', async () => {
+      request.payload = {
+        [PROJECT_PAYLOAD_FIELDS.FCERM_GIA]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED]: 'true',
+        additionalFcermGia: 'true'
+      }
+      FUNDING_SOURCES_CONFIG[
+        PROJECT_STEPS.FUNDING_SOURCES
+      ].schema.validate.mockReturnValue({ error: null })
+      saveProjectWithErrorHandling.mockResolvedValue(null)
+      getSessionData.mockReturnValue({})
+
+      await fundingSourcesSelectionController.postHandler(request, h)
+
+      // No main-source fields were deselected, so clearFundingValueFields must
+      // not have been called at all (covers the else branch of deselectedMainFields.length)
+      expect(clearFundingValueFields).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith('/next-selection')
+    })
   })
 })
 
