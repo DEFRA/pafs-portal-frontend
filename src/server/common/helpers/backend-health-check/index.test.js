@@ -6,7 +6,6 @@ vi.mock('../../../../config/config.js', () => ({
     get: vi.fn((key) => {
       const configValues = {
         'backendApi.url': 'http://localhost:3001',
-        'backendApi.timeout': 10000,
         'backendApi.healthCheckRetries': 3,
         'backendApi.healthCheckInterval': 2000
       }

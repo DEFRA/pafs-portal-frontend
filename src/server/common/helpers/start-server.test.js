@@ -79,10 +79,10 @@ describe('#startServer', () => {
       expect(statusCode).toBe(statusCodes.ok)
     }, 120000)
 
-    test('Should disable HTTP timeouts', async () => {
+    test('Should set HTTP timeouts to prevent TCP RST race with load balancer', async () => {
       expect(server.listener.requestTimeout).toBe(0)
-      expect(server.listener.headersTimeout).toBe(0)
-      expect(server.listener.keepAliveTimeout).toBe(0)
+      expect(server.listener.keepAliveTimeout).toBe(65_000)
+      expect(server.listener.headersTimeout).toBe(66_000)
     })
 
     test('Should continue when backend health check fails', async () => {
