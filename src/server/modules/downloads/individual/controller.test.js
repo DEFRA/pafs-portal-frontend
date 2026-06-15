@@ -1000,9 +1000,7 @@ describe('IndividualDownloadsController', () => {
       localMockH = {
         response: vi.fn().mockReturnValue(mockResponseChain)
       }
-      getSessionData.mockReturnValue({
-        [PROJECT_PAYLOAD_FIELDS.SLUG]: 'WXC501E-002A-005A'
-      })
+      mockRequest.params = { referenceNumber: 'WXC501E-002A-005A' }
     })
 
     afterEach(() => {
@@ -1297,9 +1295,7 @@ describe('IndividualDownloadsController', () => {
       localMockH = {
         response: vi.fn().mockReturnValue(mockResponseChain)
       }
-      getSessionData.mockReturnValue({
-        [PROJECT_PAYLOAD_FIELDS.SLUG]: 'WXC501E-002A-005A'
-      })
+      mockRequest.params = { referenceNumber: 'WXC501E-002A-005A' }
     })
 
     afterEach(() => {

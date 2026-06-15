@@ -236,8 +236,7 @@ class IndividualDownloadsController {
    */
   async _proxyFcerm1Download(request, h, format) {
     const { logger } = request.server
-    const projectData = getSessionData(request)
-    const referenceNumber = projectData[PROJECT_PAYLOAD_FIELDS.SLUG]
+    const referenceNumber = request.params.referenceNumber
 
     const session = getAuthSession(request)
     const accessToken = session?.accessToken

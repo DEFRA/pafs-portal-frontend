@@ -7,7 +7,11 @@ import {
 import { individualDownloadsController } from './controller.js'
 import { requireViewPermission } from '../../projects/helpers/permissions.js'
 
-const PRE_HANDLERS = [
+// INDIVIDUAL and MODERATION serve content locally:
+// - fetchProjectForOverview sets request.pre.projectData for requireViewPermission
+// - initializeEditSessionPreHandler refreshes yar session so controllers see saved state
+// - requireViewPermission (canViewProposal) is the authoritative access check
+const VIEW_PRE_HANDLERS = [
   { method: requireAuth },
   { method: fetchProjectForOverview },
   {
@@ -19,6 +23,10 @@ const PRE_HANDLERS = [
   { method: requireViewPermission }
 ]
 
+// FCERM1 routes proxy to the backend which enforces validateDownloadPermissions.
+// referenceNumber comes from request.params — no session fetch needed.
+const DOWNLOAD_PRE_HANDLERS = [{ method: requireAuth }]
+
 export const individualDownloads = {
   plugin: {
     name: 'Downloads - Individual Project',
@@ -28,7 +36,7 @@ export const individualDownloads = {
           method: 'GET',
           path: ROUTES.DOWNLOADS.INDIVIDUAL,
           options: {
-            pre: PRE_HANDLERS,
+            pre: VIEW_PRE_HANDLERS,
             handler: individualDownloadsController.getHandler
           }
         },
@@ -36,7 +44,7 @@ export const individualDownloads = {
           method: 'GET',
           path: ROUTES.DOWNLOADS.MODERATION,
           options: {
-            pre: PRE_HANDLERS,
+            pre: VIEW_PRE_HANDLERS,
             handler: individualDownloadsController.downloadModerationHandler
           }
         },
@@ -44,7 +52,7 @@ export const individualDownloads = {
           method: 'GET',
           path: ROUTES.DOWNLOADS.FCERM1_LEGACY,
           options: {
-            pre: PRE_HANDLERS,
+            pre: DOWNLOAD_PRE_HANDLERS,
             handler: individualDownloadsController.downloadFcerm1LegacyHandler
           }
         },
@@ -52,7 +60,7 @@ export const individualDownloads = {
           method: 'GET',
           path: ROUTES.DOWNLOADS.FCERM1_NEW,
           options: {
-            pre: PRE_HANDLERS,
+            pre: DOWNLOAD_PRE_HANDLERS,
             handler: individualDownloadsController.downloadFcerm1NewHandler
           }
         }
