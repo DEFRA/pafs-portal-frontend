@@ -111,6 +111,130 @@ describe('clearFundingValueFields', () => {
     // Original row should be unchanged
     expect(originalRow.fcermGia).toBe('1000')
   })
+
+  it('removes companion contributor arrays when a contributor source field is cleared', () => {
+    mockGetSessionData.mockReturnValue({
+      [PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]: [
+        {
+          financialYear: 2025,
+          publicContributions: '5000',
+          publicContributors: [
+            {
+              name: 'ABC Ltd',
+              contributorType: 'public_contributions',
+              amount: '5000'
+            }
+          ],
+          fcermGia: '1000'
+        }
+      ]
+    })
+
+    clearFundingValueFields(mockRequest, ['publicContributions'])
+
+    expect(mockUpdateSessionData).toHaveBeenCalledWith(mockRequest, {
+      [PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]: [
+        {
+          financialYear: 2025,
+          publicContributions: null,
+          fcermGia: '1000'
+          // publicContributors deleted
+        }
+      ]
+    })
+  })
+
+  it('removes all three contributor arrays when all three contributor sources are cleared', () => {
+    mockGetSessionData.mockReturnValue({
+      [PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]: [
+        {
+          financialYear: 2025,
+          publicContributions: '1000',
+          publicContributors: [
+            {
+              name: 'A',
+              contributorType: 'public_contributions',
+              amount: '1000'
+            }
+          ],
+          privateContributions: '2000',
+          privateContributors: [
+            {
+              name: 'B',
+              contributorType: 'private_contributions',
+              amount: '2000'
+            }
+          ],
+          otherEaContributions: '3000',
+          otherEaContributors: [
+            {
+              name: 'C',
+              contributorType: 'other_ea_contributions',
+              amount: '3000'
+            }
+          ],
+          fcermGia: '500'
+        }
+      ]
+    })
+
+    clearFundingValueFields(mockRequest, [
+      'publicContributions',
+      'privateContributions',
+      'otherEaContributions'
+    ])
+
+    expect(mockUpdateSessionData).toHaveBeenCalledWith(mockRequest, {
+      [PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]: [
+        {
+          financialYear: 2025,
+          publicContributions: null,
+          privateContributions: null,
+          otherEaContributions: null,
+          fcermGia: '500'
+          // all three contributor arrays deleted
+        }
+      ]
+    })
+  })
+
+  it('does not remove contributor arrays for non-contributor source fields', () => {
+    mockGetSessionData.mockReturnValue({
+      [PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]: [
+        {
+          financialYear: 2025,
+          fcermGia: '1000',
+          publicContributions: '5000',
+          publicContributors: [
+            {
+              name: 'ABC Ltd',
+              contributorType: 'public_contributions',
+              amount: '5000'
+            }
+          ]
+        }
+      ]
+    })
+
+    clearFundingValueFields(mockRequest, ['fcermGia'])
+
+    expect(mockUpdateSessionData).toHaveBeenCalledWith(mockRequest, {
+      [PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]: [
+        {
+          financialYear: 2025,
+          fcermGia: null,
+          publicContributions: '5000',
+          publicContributors: [
+            {
+              name: 'ABC Ltd',
+              contributorType: 'public_contributions',
+              amount: '5000'
+            }
+          ]
+        }
+      ]
+    })
+  })
 })
 
 // ─── sanitiseFundingValueRow ─────────────────────────────────────────────────

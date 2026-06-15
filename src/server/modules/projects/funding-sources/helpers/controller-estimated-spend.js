@@ -37,7 +37,6 @@ import {
   checkContributorCoverage
 } from './spend-calculation-helpers.js'
 import { buildSpendValidationErrors } from './spend-validation-helpers.js'
-
 // --- View data builder -----------------------------------------------------
 
 /**

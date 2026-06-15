@@ -5,9 +5,26 @@ import {
 } from '../../helpers/project-utils.js'
 
 /**
+ * Map from aggregate-total field name to the companion contributor array field.
+ * Used by clearFundingValueFields so that deselecting a contributor-backed
+ * source also removes the associated contributor data from every session row.
+ * @private
+ */
+const CONTRIBUTOR_ARRAY_BY_SOURCE = {
+  publicContributions: 'publicContributors',
+  privateContributions: 'privateContributors',
+  otherEaContributions: 'otherEaContributors'
+}
+
+/**
  * Zero out specified fields in every session fundingValues row.
  * Called when a funding source is deselected so the estimated-spend page
  * does not render or submit stale values for that source.
+ *
+ * For contributor-backed sources (publicContributions, privateContributions,
+ * otherEaContributions) the companion contributor array (publicContributors
+ * etc.) is also removed so stale per-contributor amounts do not persist in
+ * session after the source is deselected.
  *
  * @param {object} request - Hapi request object
  * @param {string[]} fields - Array of field names to clear
@@ -23,6 +40,10 @@ export function clearFundingValueFields(request, fields) {
     const copy = { ...row }
     for (const field of fields) {
       copy[field] = null
+      const arrayField = CONTRIBUTOR_ARRAY_BY_SOURCE[field]
+      if (arrayField) {
+        delete copy[arrayField]
+      }
     }
     return copy
   })
