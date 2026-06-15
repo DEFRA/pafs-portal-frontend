@@ -127,6 +127,14 @@ class FundingSourcesSelectionController {
       clearFundingValueFields(request, ADDITIONAL_GIA_FIELDS)
     }
 
+    const mainSourceFields = checkboxFields.filter(
+      (f) => f !== 'additionalFcermGia'
+    )
+    const deselectedMainFields = mainSourceFields.filter((f) => !normalised[f])
+    if (deselectedMainFields.length) {
+      clearFundingValueFields(request, deselectedMainFields)
+    }
+
     const sessionData = getSessionData(request)
     return h
       .redirect(nextRouteAfterSelection(sessionData, referenceNumber))

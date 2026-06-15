@@ -6,7 +6,6 @@ vi.mock('../../../../config/config.js', () => ({
     get: vi.fn((key) => {
       const configValues = {
         'backendApi.url': 'http://localhost:3001',
-        'backendApi.timeout': 10000,
         'backendApi.healthCheckRetries': 3,
         'backendApi.healthCheckInterval': 2000
       }
@@ -208,5 +207,30 @@ describe('pingBackendHealth', () => {
     await promise
 
     expect(fetchSpy).toHaveBeenCalledTimes(1)
+  })
+
+  test('Should invoke abort callback when timeout elapses while fetch is pending', async () => {
+    // Fetch never resolves on its own — it only rejects when the abort signal fires.
+    // This ensures the () => controller.abort() setTimeout callback actually executes.
+    fetchSpy.mockImplementation((_url, { signal }) => {
+      return new Promise((_resolve, reject) => {
+        signal.addEventListener('abort', () => {
+          const err = new Error('The operation was aborted')
+          err.name = 'AbortError'
+          reject(err)
+        })
+      })
+    })
+
+    const promise = pingBackendHealth()
+
+    // Advance past HEALTH_CHECK_TIMEOUT_MS (3000ms) to fire controller.abort()
+    await vi.advanceTimersByTimeAsync(3001)
+
+    const result = await promise
+
+    expect(result.healthy).toBe(false)
+    expect(result.status).toBe('error')
+    expect(result.error).toBe('Request timeout')
   })
 })

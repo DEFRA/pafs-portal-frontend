@@ -1,12 +1,13 @@
 import { buildRedisClient } from '../../../common/helpers/redis-client.js'
 import { config } from '../../../../config/config.js'
 
-let _redisClient = null
+// Eagerly create the client so the TCP connection to Redis is established at
+// module load time, not on the first health check. Without this, the first
+// /health request on a cold or long-idle server blocks until the socket
+// handshake completes, adding several hundred milliseconds to the response.
+const _redisClient = buildRedisClient(config.get('redis'))
 
 function getRedisClient() {
-  if (!_redisClient) {
-    _redisClient = buildRedisClient(config.get('redis'))
-  }
   return _redisClient
 }
 

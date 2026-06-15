@@ -3,6 +3,12 @@ import { createLogger } from '../logging/logger.js'
 
 const logger = createLogger()
 
+// Intentionally shorter than the general API client timeout (backendApi.timeout).
+// The health probe must respond quickly enough for the platform liveness check;
+// a stalled backend connection should fail fast rather than holding the /health
+// response for 10 seconds.
+const HEALTH_CHECK_TIMEOUT_MS = 3000
+
 async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -14,10 +20,12 @@ async function sleep(ms) {
  */
 async function pingBackendHealth() {
   const backendUrl = config.get('backendApi.url')
-  const timeout = config.get('backendApi.timeout')
 
   const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), timeout)
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    HEALTH_CHECK_TIMEOUT_MS
+  )
 
   try {
     const start = Date.now()

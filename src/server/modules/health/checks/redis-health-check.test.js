@@ -1,6 +1,6 @@
 import { vi, describe, test, expect, beforeEach } from 'vitest'
 
-const mockPing = vi.fn()
+const { mockPing } = vi.hoisted(() => ({ mockPing: vi.fn() }))
 
 vi.mock('../../../common/helpers/redis-client.js', () => ({
   buildRedisClient: vi.fn(() => ({

@@ -316,7 +316,7 @@ describe('fundingSourcesSelectionController', () => {
       expect(clearFundingValueFields).toHaveBeenCalled()
     })
 
-    it('does not reset additional GIA fields when additionalFcermGia stays selected', async () => {
+    it('does not reset additional GIA fields but clears deselected main source fields when additionalFcermGia stays selected', async () => {
       request.payload = { additionalFcermGia: 'true' }
       FUNDING_SOURCES_CONFIG[
         PROJECT_STEPS.FUNDING_SOURCES
@@ -326,7 +326,46 @@ describe('fundingSourcesSelectionController', () => {
       saveProjectWithErrorHandling.mockResolvedValue(null)
       getSessionData.mockReturnValue({})
       await fundingSourcesSelectionController.postHandler(request, h)
+      // All 6 main source fields are deselected (not in payload) so they get cleared
+      expect(clearFundingValueFields).toHaveBeenCalledWith(expect.anything(), [
+        PROJECT_PAYLOAD_FIELDS.FCERM_GIA,
+        PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY,
+        PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS,
+        PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS,
+        PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS,
+        PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED
+      ])
+      // Additional GIA fields must NOT be cleared (additionalFcermGia is still selected)
+      expect(clearFundingValueFields).not.toHaveBeenCalledWith(
+        expect.anything(),
+        expect.arrayContaining([
+          PROJECT_PAYLOAD_FIELDS.ASSET_REPLACEMENT_ALLOWANCE
+        ])
+      )
+    })
+
+    it('does not call clearFundingValueFields for main sources when all remain selected', async () => {
+      request.payload = {
+        [PROJECT_PAYLOAD_FIELDS.FCERM_GIA]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS]: 'true',
+        [PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED]: 'true',
+        additionalFcermGia: 'true'
+      }
+      FUNDING_SOURCES_CONFIG[
+        PROJECT_STEPS.FUNDING_SOURCES
+      ].schema.validate.mockReturnValue({ error: null })
+      saveProjectWithErrorHandling.mockResolvedValue(null)
+      getSessionData.mockReturnValue({})
+
+      await fundingSourcesSelectionController.postHandler(request, h)
+
+      // No main-source fields were deselected, so clearFundingValueFields must
+      // not have been called at all (covers the else branch of deselectedMainFields.length)
       expect(clearFundingValueFields).not.toHaveBeenCalled()
+      expect(h.redirect).toHaveBeenCalledWith('/next-selection')
     })
   })
 })
