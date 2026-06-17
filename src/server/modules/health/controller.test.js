@@ -193,7 +193,7 @@ describe('#healthDetailedController (/health-detailed)', () => {
     )
   })
 
-  test('Should have auth disabled', () => {
-    expect(healthDetailedController.options?.auth).toBe(false)
+  test('Should not define auth options (auth is configured at route level)', () => {
+    expect(healthDetailedController.options).toBeUndefined()
   })
 })
