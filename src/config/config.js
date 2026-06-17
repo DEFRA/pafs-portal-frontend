@@ -357,6 +357,13 @@ export const config = convict({
       default: 'change-this-to-a-secure-random-secret-key-at-least-32-chars',
       env: 'ID_SECRET',
       sensitive: true
+    },
+    healthBearerToken: {
+      doc: 'Static bearer token required in the Authorization header to access /health-detailed',
+      format: String,
+      default: '',
+      sensitive: true,
+      env: 'HEALTH_BEARER_TOKEN'
     }
   }
 })

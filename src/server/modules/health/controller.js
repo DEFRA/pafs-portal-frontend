@@ -45,7 +45,6 @@ export const healthController = {
  * Includes Redis and backend API health, uptime, and timestamp.
  */
 export const healthDetailedController = {
-  options: { auth: false },
   async handler(_request, h) {
     const health = await performHealthChecks()
     const statusCode =
