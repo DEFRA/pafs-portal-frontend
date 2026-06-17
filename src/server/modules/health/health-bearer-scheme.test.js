@@ -35,7 +35,7 @@ describe('health-bearer-scheme', () => {
     })
 
     test('returns null when the header does not use the Bearer scheme', () => {
-      expect(extractToken('Basic dXNlcjpwYXNz')).toBeNull()
+      expect(extractToken('Basic not-a-bearer-token')).toBeNull()
     })
 
     test('returns null when the header uses an unrecognised scheme', () => {
