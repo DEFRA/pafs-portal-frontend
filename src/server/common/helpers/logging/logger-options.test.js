@@ -24,8 +24,12 @@ describe('Logger options', () => {
     expect(typeof loggerOptions.enabled).toBe('boolean')
   })
 
-  test('ignores health check path', () => {
-    expect(loggerOptions.ignorePaths).toContain('/health')
+  test('does not use ignorePaths (ignoreFunc takes full control in hapi-pino v13)', () => {
+    expect(loggerOptions.ignorePaths).toBeUndefined()
+  })
+
+  test('has ignoreFunc defined', () => {
+    expect(typeof loggerOptions.ignoreFunc).toBe('function')
   })
 
   test('has redaction configured', () => {
@@ -41,24 +45,39 @@ describe('Logger options', () => {
     expect(loggerOptions.nesting).toBe(true)
   })
 
-  describe('ignoreFunc — silent-drop suppression', () => {
+  describe('ignoreFunc — health paths and silent-drop suppression', () => {
+    test('returns true for /health path', () => {
+      const request = { path: '/health', app: {} }
+      expect(loggerOptions.ignoreFunc({}, request)).toBe(true)
+    })
+
+    test('returns true for /health-detailed path', () => {
+      const request = { path: '/health-detailed', app: {} }
+      expect(loggerOptions.ignoreFunc({}, request)).toBe(true)
+    })
+
+    test('returns false for a non-health path', () => {
+      const request = { path: '/projects', app: {} }
+      expect(loggerOptions.ignoreFunc({}, request)).toBe(false)
+    })
+
     test('returns true when request.app.silentDrop is true', () => {
-      const request = { app: { silentDrop: true } }
+      const request = { path: '/some-path', app: { silentDrop: true } }
       expect(loggerOptions.ignoreFunc({}, request)).toBe(true)
     })
 
     test('returns false when request.app.silentDrop is false', () => {
-      const request = { app: { silentDrop: false } }
+      const request = { path: '/some-path', app: { silentDrop: false } }
       expect(loggerOptions.ignoreFunc({}, request)).toBe(false)
     })
 
     test('returns false when silentDrop is absent from request.app', () => {
-      const request = { app: {} }
+      const request = { path: '/some-path', app: {} }
       expect(loggerOptions.ignoreFunc({}, request)).toBe(false)
     })
 
     test('returns false when request.app is undefined', () => {
-      const request = { app: undefined }
+      const request = { path: '/some-path', app: undefined }
       expect(loggerOptions.ignoreFunc({}, request)).toBe(false)
     })
 
