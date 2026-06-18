@@ -17,14 +17,15 @@ const formatters = {
   'pino-pretty': { transport: { target: 'pino-pretty' } }
 }
 
+const IGNORED_PATHS = new Set(['/health', '/health-detailed'])
+
 export const loggerOptions = {
   enabled: logConfig.enabled,
-  ignorePaths: ['/health'],
-  // Suppress log entries for requests silently dropped by the probe/route
-  // guard (scanner bots, unregistered paths).  Without this, hapi-pino still
-  // emits an ECS entry with http.response.status_code:404, which the Grafana
-  // 4xx alert query would count and breach the threshold.
-  ignoreFunc: (_opts, request) => request.app?.silentDrop === true,
+  // ignorePaths and ignoreFunc are mutually exclusive in hapi-pino v13 —
+  // when ignoreFunc is present it takes full control.  Health paths and
+  // silently-dropped scanner probes are both handled here.
+  ignoreFunc: (_opts, request) =>
+    IGNORED_PATHS.has(request.path) || request.app?.silentDrop === true,
   redact: {
     paths: logConfig.redact,
     remove: true
