@@ -60,7 +60,13 @@ describe('#buildRedisClient', () => {
           dnsLookup: expect.any(Function),
           enableReadyCheck: false,
           keyPrefix: 'pafs-portal-frontend:',
-          redisOptions: { db: 0, password: 'pass', tls: {}, username: 'user' },
+          redisOptions: {
+            db: 0,
+            enableReadyCheck: false,
+            password: 'pass',
+            tls: {},
+            username: 'user'
+          },
           slotsRefreshTimeout: 10000
         }
       )
