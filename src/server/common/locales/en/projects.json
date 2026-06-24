@@ -291,7 +291,7 @@
     "intro_paragraph": "The project name should be meaningful and understandable and should not include abbreviations. For example, South Chesham River Colne Flood Alleviation Scheme or Clacton-on-Sea Coastal Erosion Project Phase 4.",
     "errors": {
       "required": "Enter a project name",
-      "invalid_format": "The project name must only contain letters, spaces, underscores, hyphens and numbers",
+      "invalid_format": "The project name must only contain letters, numbers, spaces, underscores, hyphens, brackets and forward slashes",
       "too_long": "Please enter no more than 200 characters",
       "already_exists": "The project name already exists. Your project must have a unique name."
     }
