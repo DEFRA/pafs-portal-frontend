@@ -78,8 +78,8 @@ class CheckAnswersController {
         return this._redirectToDetails(h, isAdmin, isEditMode, encodedId)
       }
 
-      const mainArea = areas.find((a) => a.primary)
-      if (!mainArea) {
+      const hasMainArea = areas.some((a) => a.primary)
+      if (!hasMainArea) {
         return this._redirectToMainArea(h, isAdmin, isEditMode, encodedId)
       }
     }

@@ -54,8 +54,7 @@ $thumbnail-icon-border-colour: govuk-colour("black", $variant: "tint-80");
 }
 
 .gem-c-attachment__link {
-  word-break: break-word;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .gem-c-attachment__metadata {

@@ -31,7 +31,7 @@ export const projectReferenceNumberSchema = Joi.string()
  */
 export const projectNameSchema = Joi.string()
   .trim()
-  .custom((value) => value.split(/\s+/).join(' '))
+  .custom((value) => value.trim().replaceAll(/\s+/g, ' '))
   .pattern(VALIDATION_PATTERNS.NAME_WITH_ALPHANUMERIC_SPACE_UNDERSCORE_DASH)
   .max(MAX_PROJECT_NAME_LENGTH)
   .required()
