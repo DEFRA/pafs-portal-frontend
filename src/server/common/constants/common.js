@@ -172,10 +172,10 @@ export const SIZE = {
  * Common regex patterns for field validation
  */
 export const VALIDATION_PATTERNS = {
-  // Names: letters, spaces, hyphens, apostrophes
-  NAME: /^[a-zA-Z\s'-]+$/,
+  // Names: letters, spaces, hyphens, apostrophes, brackets
+  NAME: /^[a-zA-Z\s'()-]+$/,
 
-  NAME_WITH_ALPHANUMERIC_SPACE_UNDERSCORE_DASH: /^[a-zA-Z0-9_ -]+$/,
+  NAME_WITH_ALPHANUMERIC_SPACE_UNDERSCORE_DASH: /^[a-zA-Z0-9_ ()/-]+$/,
 
   PROJECT_REFERENCE_NUMBER: /^[A-Z]{2}C501E\/\d{3}A\/\d{3}A$/,
 
