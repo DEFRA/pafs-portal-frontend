@@ -14,7 +14,8 @@
       "revise": "Revise (legacy)",
       "approved": "Approved",
       "rejected": "Rejected",
-      "archived": "Archived"
+      "archived": "Archived",
+      "completed": "Completed"
     },
     "empty": {
       "description": "You have not generated a programme download yet. Generate a programme to download all proposals in your account as an Excel spreadsheet.",
@@ -61,6 +62,7 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "archived": "Archived",
+      "completed": "Completed",
       "note": "Archived projects are excluded from the system-wide download."
     },
     "empty": {
