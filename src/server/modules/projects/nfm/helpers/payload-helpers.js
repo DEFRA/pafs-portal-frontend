@@ -166,6 +166,16 @@ function clearSandDuneData(payload) {
 }
 
 /**
+ * Clear floodplain wetland restoration data from payload
+ * @param {Object} payload - Request payload
+ */
+function clearFloodplainWetlandRestorationData(payload) {
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA] = null
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME] =
+    null
+}
+
+/**
  * Clear land-use detail data for a given land type from payload
  * @param {Object} payload - Request payload
  * @param {string} landType - NFM_LAND_TYPES value
@@ -235,6 +245,9 @@ function processNfmMeasureChanges(previousMeasures, newMeasures, payload) {
         break
       case NFM_MEASURES.SAND_DUNE_MANAGEMENT:
         clearSandDuneData(payload)
+        break
+      case NFM_MEASURES.FLOODPLAIN_WETLAND_RESTORATION:
+        clearFloodplainWetlandRestorationData(payload)
         break
       default:
         break
@@ -378,6 +391,22 @@ function processSandDune(payload) {
 }
 
 /**
+ * Process floodplain wetland restoration payload
+ * @param {Object} payload - Request payload
+ */
+function processFloodplainWetlandRestoration(payload) {
+  payload.nfmFloodplainWetlandRestorationVolume = convertEmptyToNull(
+    payload.nfmFloodplainWetlandRestorationVolume
+  )
+  payload.nfmFloodplainWetlandRestorationArea = keepAsDecimalString(
+    payload.nfmFloodplainWetlandRestorationArea
+  )
+  payload.nfmFloodplainWetlandRestorationVolume = keepAsDecimalString(
+    payload.nfmFloodplainWetlandRestorationVolume
+  )
+}
+
+/**
  * Process land-use detail payload for any land type step.
  * Converts before/after string values to floats.
  * @param {Object} payload - Request payload
@@ -411,6 +440,8 @@ export function processPayload(step, payload, sessionData) {
       processRunoffManagement(payload),
     [PROJECT_STEPS.NFM_SALTMARSH]: () => processSaltmarsh(payload),
     [PROJECT_STEPS.NFM_SAND_DUNE]: () => processSandDune(payload),
+    [PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION]: () =>
+      processFloodplainWetlandRestoration(payload),
     [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: () =>
       processLandUseChange(payload, sessionData)
   }

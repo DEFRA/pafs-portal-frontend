@@ -274,6 +274,38 @@ export const nfmRunoffManagementSchema = Joi.object({
 }).unknown(true)
 
 /**
+ * NFM Floodplain Wetland Restoration Schema
+ * Validates area (hectares) and volume (m³)
+ */
+export const nfmFloodplainWetlandRestorationSchema = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]: Joi.number()
+    .unsafe()
+    .empty('')
+    .positive()
+    .custom(maxTwoDecimalPlaces)
+    .required()
+    .messages({
+      'number.base': 'area_invalid',
+      'number.positive': 'area_invalid',
+      'number.precision': 'area_precision',
+      'number.integer.max': 'area_whole_number_precision',
+      'any.required': 'area_required'
+    }),
+  [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]:
+    Joi.number()
+      .unsafe()
+      .min(0)
+      .custom(maxTwoDecimalPlaces)
+      .allow(null, '')
+      .messages({
+        'number.base': 'volume_invalid',
+        'number.min': 'volume_invalid',
+        'number.precision': 'volume_precision',
+        'number.integer.max': 'volume_whole_number_precision'
+      })
+}).unknown(true)
+
+/**
  * NFM Saltmarsh Schema
  * Validates area (hectares) and length (km) for saltmarsh or mudflat management
  */

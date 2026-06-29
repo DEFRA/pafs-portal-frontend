@@ -653,21 +653,22 @@
       "hint": "Select all that apply",
       "error": "Select at least one natural flood management measure",
       "options": {
-        "river_floodplain_restoration": "River and floodplain restoration",
+        "river_floodplain_restoration": "River restoration",
         "leaky_barriers": "Leaky barriers and in-channel storage",
         "leaky_barriers_in_channel_storage": "Leaky barriers and in-channel storage",
         "offline_storage": "Offline storage areas",
         "woodland": "Woodland",
-        "headwater_drainage": "Headwater drainage management",
-        "headwater_drainage_management": "Headwater drainage management",
-        "runoff_management": "Runoff attenuation or management",
-        "runoff_attenuation_management": "Runoff attenuation or management",
+        "headwater_drainage": "Peatland restoration (headwater drainage management)",
+        "headwater_drainage_management": "Peatland restoration (headwater drainage management)",
+        "runoff_management": "Runoff pathway management",
+        "runoff_attenuation_management": "Runoff pathway management",
         "saltmarsh_management": "Saltmarsh or mudflat management",
-        "sand_dune_management": "Sand dune management"
+        "sand_dune_management": "Sand dune management",
+        "floodplain_wetland_restoration": "Floodplain and floodplain wetland restoration"
       }
     },
     "river_restoration": {
-      "title": "Details of new river and floodplain restoration",
+      "title": "Details of new river restoration",
       "area": {
         "label": "Area"
       },
@@ -748,7 +749,7 @@
       }
     },
     "headwater_drainage": {
-      "title": "Details of new headwater drainage management",
+      "title": "Details of new peatland restoration (headwater drainage management)",
       "area": {
         "label": "Area",
         "hint": "Enter the area in hectares",
@@ -762,7 +763,7 @@
       }
     },
     "runoff_management": {
-      "title": "Details of new runoff attenuation or management",
+      "title": "Details of new runoff pathway management",
       "area": {
         "label": "Area"
       },
@@ -819,6 +820,26 @@
         "length_invalid": "Length must be a number greater than 0",
         "length_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "length_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
+      }
+    },
+    "floodplain_wetland_restoration": {
+      "title": "Details of new floodplain and floodplain wetland restoration",
+      "area": {
+        "label": "Area"
+      },
+      "volume": {
+        "label": "Design storage volume",
+        "hint": "If known"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_invalid": "Volume must be a number 0 or greater",
+        "NFM_MEASURE_VOLUME_INVALID": "Volume must be a number 0 or greater",
+        "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
     "land_use_change": {

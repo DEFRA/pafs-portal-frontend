@@ -113,13 +113,13 @@ describe('NFM Controller', () => {
         )
       })
 
-      test('should include all 8 NFM measure options', async () => {
+      test('should include all 9 NFM measure options', async () => {
         await nfmController.getHandler(mockRequest, mockH)
 
         const callArgs = buildViewData.mock.calls[0][1]
         const options = callArgs.additionalData.nfmMeasureOptions
 
-        expect(options).toHaveLength(8)
+        expect(options).toHaveLength(9)
         expect(options[0].value).toBe(NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION)
         expect(options[1].value).toBe(NFM_MEASURES.LEAKY_BARRIERS)
         expect(options[2].value).toBe(NFM_MEASURES.OFFLINE_STORAGE)
@@ -128,6 +128,9 @@ describe('NFM Controller', () => {
         expect(options[5].value).toBe(NFM_MEASURES.RUNOFF_MANAGEMENT)
         expect(options[6].value).toBe(NFM_MEASURES.SALTMARSH_MANAGEMENT)
         expect(options[7].value).toBe(NFM_MEASURES.SAND_DUNE_MANAGEMENT)
+        expect(options[8].value).toBe(
+          NFM_MEASURES.FLOODPLAIN_WETLAND_RESTORATION
+        )
       })
 
       test('should translate measure option labels', async () => {
@@ -138,6 +141,9 @@ describe('NFM Controller', () => {
         )
         expect(mockRequest.t).toHaveBeenCalledWith(
           'projects.nfm.selected_measures.options.leaky_barriers'
+        )
+        expect(mockRequest.t).toHaveBeenCalledWith(
+          'projects.nfm.selected_measures.options.floodplain_wetland_restoration'
         )
       })
     })
@@ -300,6 +306,34 @@ describe('NFM Controller', () => {
           mockRequest,
           expect.objectContaining({
             localKeyPrefix: 'projects.nfm.sand_dune'
+          })
+        )
+      })
+    })
+
+    describe('NFM Floodplain Wetland Restoration', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(
+          PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION
+        )
+      })
+
+      test('should render NFM_FLOODPLAIN_WETLAND_RESTORATION view', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(mockH.view).toHaveBeenCalledWith(
+          PROJECT_VIEWS.NFM_FLOODPLAIN_WETLAND_RESTORATION,
+          expect.any(Object)
+        )
+      })
+
+      test('should build view data with correct localKeyPrefix', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            localKeyPrefix: 'projects.nfm.floodplain_wetland_restoration'
           })
         )
       })
@@ -806,6 +840,56 @@ describe('NFM Controller', () => {
         expect(navigateToProjectOverview).toHaveBeenCalledWith(
           'TEST-001',
           mockH
+        )
+      })
+    })
+
+    describe('NFM Floodplain Wetland Restoration', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(
+          PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION
+        )
+        mockRequest.payload = {
+          [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]:
+            '15.5',
+          [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]:
+            '500'
+        }
+      })
+
+      test('should save floodplain wetland restoration data with correct payload level', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          PROJECT_PAYLOAD_LEVELS.NFM_FLOODPLAIN_WETLAND_RESTORATION,
+          expect.any(Object),
+          PROJECT_VIEWS.NFM_FLOODPLAIN_WETLAND_RESTORATION
+        )
+      })
+
+      test('should process payload for floodplain wetland restoration step', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(processPayload).toHaveBeenCalledWith(
+          PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION,
+          expect.any(Object),
+          expect.any(Object)
+        )
+      })
+
+      test('should handle empty volume as null', async () => {
+        mockRequest.payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
+        ] = ''
+
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(processPayload).toHaveBeenCalledWith(
+          PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION,
+          expect.any(Object),
+          expect.any(Object)
         )
       })
     })

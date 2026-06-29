@@ -78,6 +78,7 @@ export const PROJECT_STEPS = {
   NFM_RUNOFF_MANAGEMENT: 'nfm-runoff-management',
   NFM_SALTMARSH: 'nfm-saltmarsh',
   NFM_SAND_DUNE: 'nfm-sand-dune',
+  NFM_FLOODPLAIN_WETLAND_RESTORATION: 'nfm-floodplain-wetland-restoration',
   NFM_LAND_USE_CHANGE: 'nfm-land-use-change',
   NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND:
     'nfm-land-use-enclosed-arable-farmland',

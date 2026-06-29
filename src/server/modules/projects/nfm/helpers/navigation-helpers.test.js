@@ -25,6 +25,9 @@ describe('nfm navigation helpers', () => {
   test('NFM_STEP_SEQUENCE includes saltmarsh and sand dune as conditional (null) steps', () => {
     expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_SALTMARSH]).toBeNull()
     expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_SAND_DUNE]).toBeNull()
+    expect(
+      NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION]
+    ).toBeNull()
   })
 
   test('returns null for selected measures step when not SUDS-only', () => {
@@ -203,6 +206,33 @@ describe('nfm navigation helpers', () => {
 
     expect(result).toEqual({
       targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+      conditionalRedirect: false
+    })
+  })
+
+  test('floodplain wetland restoration prefers sand dune as back link', () => {
+    const result = getDynamicBackLink(
+      PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION,
+      {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'sand_dune_management,floodplain_wetland_restoration'
+      }
+    )
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
+      conditionalRedirect: false
+    })
+  })
+
+  test('land use change prefers floodplain wetland restoration as back link when selected', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_LAND_USE_CHANGE, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+        'sand_dune_management,floodplain_wetland_restoration'
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.FLOODPLAIN_WETLAND_RESTORATION,
       conditionalRedirect: false
     })
   })

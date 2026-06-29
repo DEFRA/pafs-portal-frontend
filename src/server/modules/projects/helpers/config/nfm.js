@@ -5,6 +5,7 @@ import {
 } from '../../../../common/constants/projects.js'
 import {
   nfmHeadwaterDrainageSchema,
+  nfmFloodplainWetlandRestorationSchema,
   nfmInclusionSchema,
   nfmLeakyBarriersSchema,
   nfmOfflineStorageSchema,
@@ -228,11 +229,33 @@ export const NFM_CONFIG = {
   [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: {
     localKeyPrefix: 'projects.nfm.land_use_change',
     backLinkOptions: {
-      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.FLOODPLAIN_WETLAND_RESTORATION,
       conditionalRedirect: false
     },
     schema: nfmLandUseChangeSchema,
     fieldType: 'checkbox'
+  },
+  [PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION]: {
+    localKeyPrefix: 'projects.nfm.floodplain_wetland_restoration',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
+      conditionalRedirect: false
+    },
+    schema: nfmFloodplainWetlandRestorationSchema,
+    fieldType: 'input',
+    inputFields: [
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA,
+        labelKey: AREA_LABEL,
+        suffix: 'hectares'
+      },
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME,
+        labelKey: VOLUME_LABEL,
+        hintKey: VOLUME_HINT,
+        suffix: 'm³'
+      }
+    ]
   },
   [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND]: {
     localKeyPrefix: 'projects.nfm.land_use.enclosed_arable_farmland',

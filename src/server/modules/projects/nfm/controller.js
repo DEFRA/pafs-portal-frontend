@@ -80,6 +80,12 @@ class NfmController {
       {
         text: request.t(`${localKeyPrefix}.options.sand_dune_management`),
         value: NFM_MEASURES.SAND_DUNE_MANAGEMENT
+      },
+      {
+        text: request.t(
+          `${localKeyPrefix}.options.floodplain_wetland_restoration`
+        ),
+        value: NFM_MEASURES.FLOODPLAIN_WETLAND_RESTORATION
       }
     ]
   }
@@ -371,6 +377,8 @@ class NfmController {
         PROJECT_VIEWS.NFM_RUNOFF_MANAGEMENT,
       [PROJECT_STEPS.NFM_SALTMARSH]: PROJECT_VIEWS.NFM_SALTMARSH,
       [PROJECT_STEPS.NFM_SAND_DUNE]: PROJECT_VIEWS.NFM_SAND_DUNE,
+      [PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION]:
+        PROJECT_VIEWS.NFM_FLOODPLAIN_WETLAND_RESTORATION,
       [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: PROJECT_VIEWS.NFM_LAND_USE_CHANGE,
       [PROJECT_STEPS.NFM_LANDOWNER_CONSENT]:
         PROJECT_VIEWS.NFM_LANDOWNER_CONSENT,

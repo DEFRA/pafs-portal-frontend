@@ -432,6 +432,26 @@ describe('NFM Redirect Helpers', () => {
   })
 
   describe('handleConditionalRedirect - NFM_SAND_DUNE', () => {
+    test('should redirect to floodplain wetland restoration when selected', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'sand_dune_management,floodplain_wetland_restoration'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_SAND_DUNE,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toContain('floodplain-wetland-restoration')
+      expect(result.path).toContain('TEST-001')
+    })
+
     test('should redirect to land use change after sand dune', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
@@ -440,6 +460,27 @@ describe('NFM Redirect Helpers', () => {
 
       const result = await handleConditionalRedirect(
         PROJECT_STEPS.NFM_SAND_DUNE,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_FLOODPLAIN_WETLAND_RESTORATION', () => {
+    test('should redirect to land use change after floodplain wetland restoration', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'sand_dune_management,floodplain_wetland_restoration'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION,
         mockRequest,
         mockH,
         sessionData,

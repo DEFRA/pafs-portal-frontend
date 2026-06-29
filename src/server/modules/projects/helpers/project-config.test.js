@@ -538,6 +538,31 @@ describe('project-config', () => {
       ])
     })
 
+    test('should have fields for NFM_FLOODPLAIN_WETLAND_RESTORATION level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.NFM_FLOODPLAIN_WETLAND_RESTORATION
+        ]
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA,
+        PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
+      ])
+    })
+
+    test('should include floodplain wetland restoration fields in NFM_SELECTED_MEASURES', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.NFM_SELECTED_MEASURES
+        ]
+      expect(fields).toContain(
+        PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA
+      )
+      expect(fields).toContain(
+        PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
+      )
+    })
+
     test('should include reference number in all edit-level payloads', () => {
       const editLevels = [
         PROJECT_PAYLOAD_LEVELS.PROJECT_NAME,

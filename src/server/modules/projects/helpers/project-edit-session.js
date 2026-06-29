@@ -43,6 +43,12 @@ const NFM_MEASURE_FIELD_MAPPINGS = {
   sand_dune_management: {
     areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA,
     lengthKm: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH
+  },
+  floodplain_wetland_restoration: {
+    areaHectares:
+      PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA,
+    storageVolumeM3:
+      PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
   }
 }
 

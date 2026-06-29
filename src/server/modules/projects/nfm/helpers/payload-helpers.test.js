@@ -583,6 +583,47 @@ describe('NFM Payload Helpers', () => {
     })
   })
 
+  describe('processPayload - NFM_FLOODPLAIN_WETLAND_RESTORATION', () => {
+    test('should keep string values for decimal precision', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]:
+          '11.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]:
+          '99.25'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION, payload)
+
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]
+      ).toBe('11.5')
+      expect(
+        payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
+        ]
+      ).toBe('99.25')
+    })
+
+    test('should convert empty string to null for optional volume', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]:
+          '11.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]: ''
+      }
+
+      processPayload(PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION, payload)
+
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]
+      ).toBe('11.5')
+      expect(
+        payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
+        ]
+      ).toBe(null)
+    })
+  })
+
   describe('processPayload - Unknown step', () => {
     test('should not modify payload for unknown step', () => {
       const payload = {

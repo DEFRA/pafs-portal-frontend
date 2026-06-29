@@ -162,4 +162,37 @@ describe('nfm measure guard', () => {
     const result = requireSelectedMeasure(request, h)
     expect(result).toEqual({ redirected: true, path: '/project/TEST-001' })
   })
+
+  test('allows access when floodplain wetland restoration measure is selected', () => {
+    getSessionData.mockReturnValue({
+      nfmSelectedMeasures: 'sand_dune_management,floodplain_wetland_restoration'
+    })
+
+    const request = {
+      route: {
+        path: '/project/{referenceNumber}/nfm-floodplain-wetland-restoration'
+      },
+      params: { referenceNumber: 'TEST-001' }
+    }
+
+    const result = requireSelectedMeasure(request, h)
+    expect(result).toBe(h.continue)
+    expect(navigateToProjectOverview).not.toHaveBeenCalled()
+  })
+
+  test('redirects to overview when floodplain wetland restoration is not selected', () => {
+    getSessionData.mockReturnValue({
+      nfmSelectedMeasures: 'sand_dune_management'
+    })
+
+    const request = {
+      route: {
+        path: '/project/{referenceNumber}/nfm-floodplain-wetland-restoration'
+      },
+      params: { referenceNumber: 'TEST-001' }
+    }
+
+    const result = requireSelectedMeasure(request, h)
+    expect(result).toEqual({ redirected: true, path: '/project/TEST-001' })
+  })
 })

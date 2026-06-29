@@ -84,6 +84,7 @@ export {
   nfmWoodlandSchema,
   nfmHeadwaterDrainageSchema,
   nfmRunoffManagementSchema,
+  nfmFloodplainWetlandRestorationSchema,
   nfmSaltmarshSchema,
   nfmSandDuneSchema,
   nfmLandUseChangeSchema,

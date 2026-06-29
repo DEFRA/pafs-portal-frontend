@@ -19,7 +19,8 @@ export const NFM_MEASURES = {
   HEADWATER_DRAINAGE: 'headwater_drainage',
   RUNOFF_MANAGEMENT: 'runoff_management',
   SALTMARSH_MANAGEMENT: 'saltmarsh_management',
-  SAND_DUNE_MANAGEMENT: 'sand_dune_management'
+  SAND_DUNE_MANAGEMENT: 'sand_dune_management',
+  FLOODPLAIN_WETLAND_RESTORATION: 'floodplain_wetland_restoration'
 }
 
 export const NFM_LANDOWNER_CONSENT_OPTIONS = {

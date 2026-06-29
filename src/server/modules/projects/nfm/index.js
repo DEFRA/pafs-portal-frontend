@@ -87,6 +87,11 @@ const getNfmMeasureRoutes = (editPreHandlers, measureEditPreHandlers) => [
     ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
     measureEditPreHandlers,
     nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.FLOODPLAIN_WETLAND_RESTORATION,
+    measureEditPreHandlers,
+    nfmController
   )
 ]
 

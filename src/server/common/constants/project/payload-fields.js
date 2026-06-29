@@ -112,6 +112,10 @@ export const PROJECT_PAYLOAD_FIELDS = {
   NFM_SALTMARSH_LENGTH: 'nfmSaltmarshLength',
   NFM_SAND_DUNE_AREA: 'nfmSandDuneArea',
   NFM_SAND_DUNE_LENGTH: 'nfmSandDuneLength',
+  NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA:
+    'nfmFloodplainWetlandRestorationArea',
+  NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME:
+    'nfmFloodplainWetlandRestorationVolume',
   NFM_LAND_USE_CHANGE: 'nfmLandUseChange',
   NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE: 'nfmEnclosedArableFarmlandBefore',
   NFM_ENCLOSED_ARABLE_FARMLAND_AFTER: 'nfmEnclosedArableFarmlandAfter',
