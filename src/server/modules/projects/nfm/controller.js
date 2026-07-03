@@ -116,8 +116,18 @@ class NfmController {
         value: NFM_LAND_TYPES.WOODLAND
       },
       {
+        text: request.t(
+          `${localKeyPrefix}.options.woodland_for_timber_harvesting`
+        ),
+        value: NFM_LAND_TYPES.WOODLAND_FOR_TIMBER_HARVESTING
+      },
+      {
         text: request.t(`${localKeyPrefix}.options.mountain_moors_and_heath`),
         value: NFM_LAND_TYPES.MOUNTAIN_MOORS_AND_HEATH
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.peatland_degraded`),
+        value: NFM_LAND_TYPES.PEATLAND_DEGRADED
       },
       {
         text: request.t(`${localKeyPrefix}.options.peatland_restoration`),

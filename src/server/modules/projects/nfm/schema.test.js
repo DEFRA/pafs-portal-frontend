@@ -13,6 +13,8 @@ import {
   nfmSandDuneSchema,
   nfmLandUseChangeSchema,
   nfmLandUseEnclosedArableFarmlandSchema,
+  nfmLandUseWoodlandForTimberHarvestingSchema,
+  nfmLandUsePeatlandDegradedSchema,
   nfmLandownerConsentSchema,
   nfmExperienceLevelSchema,
   nfmProjectReadinessSchema
@@ -322,7 +324,8 @@ describe('NFM Land-use Schemas', () => {
     const result = nfmLandUseChangeSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [
         NFM_LAND_TYPES.ENCLOSED_ARABLE_FARMLAND,
-        NFM_LAND_TYPES.WOODLAND
+        NFM_LAND_TYPES.WOODLAND_FOR_TIMBER_HARVESTING,
+        NFM_LAND_TYPES.PEATLAND_DEGRADED
       ]
     })
 
@@ -395,6 +398,24 @@ describe('NFM Land-use Schemas', () => {
 
     expect(negativeResult.error).toBeDefined()
     expect(negativeResult.error.details[0].message).toBe('invalid')
+  })
+
+  test('validates woodland for timber harvesting before and after values', () => {
+    const result = nfmLandUseWoodlandForTimberHarvestingSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE]: 5.5,
+      [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]: 4.25
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('validates peatland degraded before and after values', () => {
+    const result = nfmLandUsePeatlandDegradedSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE]: 3,
+      [PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER]: 2.5
+    })
+
+    expect(result.error).toBeUndefined()
   })
 })
 

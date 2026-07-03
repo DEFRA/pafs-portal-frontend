@@ -127,7 +127,17 @@ const getNfmLandUseRoutes = (editPreHandlers) => [
     nfmController
   ),
   ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
     ROUTES.PROJECT.EDIT.NFM.LAND_USE_MOUNTAIN_MOORS_AND_HEATH,
+    editPreHandlers,
+    nfmController
+  ),
+  ...createRoutePair(
+    ROUTES.PROJECT.EDIT.NFM.LAND_USE_PEATLAND_DEGRADED,
     editPreHandlers,
     nfmController
   ),

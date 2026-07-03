@@ -449,9 +449,20 @@ export const nfmLandUseWoodlandSchema = createLandUseDetailSchema(
   PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
 )
 
+export const nfmLandUseWoodlandForTimberHarvestingSchema =
+  createLandUseDetailSchema(
+    PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE,
+    PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER
+  )
+
 export const nfmLandUseMountainMoorsAndHeathSchema = createLandUseDetailSchema(
   PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
   PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
+)
+
+export const nfmLandUsePeatlandDegradedSchema = createLandUseDetailSchema(
+  PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE,
+  PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER
 )
 
 export const nfmLandUsePeatlandRestorationSchema = createLandUseDetailSchema(

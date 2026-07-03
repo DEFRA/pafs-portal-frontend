@@ -284,6 +284,22 @@ describe('nfm navigation helpers', () => {
     })
   })
 
+  test('new land-use detail goes back to previous selected land type', () => {
+    const result = getDynamicBackLink(
+      PROJECT_STEPS.NFM_LAND_USE_PEATLAND_DEGRADED,
+      {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+          'woodland_for_timber_harvesting,peatland_degraded'
+      }
+    )
+
+    expect(result).toEqual({
+      targetEditURL:
+        ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING,
+      conditionalRedirect: false
+    })
+  })
+
   test('landowner consent goes back to last selected land-use detail', () => {
     const result = getDynamicBackLink(PROJECT_STEPS.NFM_LANDOWNER_CONSENT, {
       [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
@@ -292,6 +308,19 @@ describe('nfm navigation helpers', () => {
 
     expect(result).toEqual({
       targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_COASTAL_MARGINS,
+      conditionalRedirect: false
+    })
+  })
+
+  test('landowner consent uses woodland for timber harvesting when it is the only selected new land type', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_LANDOWNER_CONSENT, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+        'woodland_for_timber_harvesting'
+    })
+
+    expect(result).toEqual({
+      targetEditURL:
+        ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING,
       conditionalRedirect: false
     })
   })

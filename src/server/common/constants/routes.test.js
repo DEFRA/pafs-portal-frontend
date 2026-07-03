@@ -390,6 +390,12 @@ describe('Routes Constants', () => {
       expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('INCLUSION')
       expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('SELECTED_MEASURES')
       expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('RIVER_RESTORATION')
+      expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty(
+        'LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING'
+      )
+      expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty(
+        'LAND_USE_PEATLAND_DEGRADED'
+      )
       expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('LANDOWNER_CONSENT')
       expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('EXPERIENCE')
       expect(ROUTES.PROJECT.EDIT.NFM).toHaveProperty('PROJECT_READINESS')

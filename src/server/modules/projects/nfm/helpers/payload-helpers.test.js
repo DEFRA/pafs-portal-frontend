@@ -2,7 +2,8 @@ import { describe, test, expect } from 'vitest'
 import { processPayload } from './payload-helpers.js'
 import {
   PROJECT_STEPS,
-  PROJECT_PAYLOAD_FIELDS
+  PROJECT_PAYLOAD_FIELDS,
+  NFM_LAND_TYPES
 } from '../../../../common/constants/projects.js'
 
 describe('NFM Payload Helpers', () => {
@@ -434,6 +435,40 @@ describe('NFM Payload Helpers', () => {
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]).toBe('')
     })
+
+    test('should clear deselected new land-use detail fields', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [
+          NFM_LAND_TYPES.ENCLOSED_ARABLE_FARMLAND
+        ],
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE]: 12,
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]: 8,
+        [PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE]: 4,
+        [PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER]: 5
+      }
+
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+          'enclosed_arable_farmland,woodland_for_timber_harvesting,peatland_degraded'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_LAND_USE_CHANGE, payload, sessionData)
+
+      expect(
+        payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE
+        ]
+      ).toBe(null)
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]
+      ).toBe(null)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE]).toBe(
+        null
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER]).toBe(
+        null
+      )
+    })
   })
 
   describe('processPayload - NFM land-use detail steps', () => {
@@ -454,6 +489,28 @@ describe('NFM Payload Helpers', () => {
       expect(
         payload[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]
       ).toBe('9.4')
+    })
+
+    test('should preserve string precision for woodland for timber harvesting values', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE]:
+          '11.25',
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]: '7.5'
+      }
+
+      processPayload(
+        PROJECT_STEPS.NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING,
+        payload
+      )
+
+      expect(
+        payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE
+        ]
+      ).toBe('11.25')
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]
+      ).toBe('7.5')
     })
   })
 

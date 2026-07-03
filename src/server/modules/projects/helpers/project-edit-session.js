@@ -124,9 +124,20 @@ const NFM_LAND_USE_FIELD_MAPPINGS = [
     afterField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
   },
   {
+    landUseType: 'woodland_for_timber_harvesting',
+    beforeField:
+      PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER
+  },
+  {
     landUseType: 'mountain_moors_and_heath',
     beforeField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
     afterField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
+  },
+  {
+    landUseType: 'peatland_degraded',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER
   },
   {
     landUseType: 'peatland_restoration',

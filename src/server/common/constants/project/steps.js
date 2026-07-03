@@ -88,8 +88,11 @@ export const PROJECT_STEPS = {
     'nfm-land-use-enclosed-dairying-farmland',
   NFM_LAND_USE_SEMI_NATURAL_GRASSLAND: 'nfm-land-use-semi-natural-grassland',
   NFM_LAND_USE_WOODLAND: 'nfm-land-use-woodland',
+  NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING:
+    'nfm-land-use-woodland-for-timber-harvesting',
   NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH:
     'nfm-land-use-mountain-moors-and-heath',
+  NFM_LAND_USE_PEATLAND_DEGRADED: 'nfm-land-use-peatland-degraded',
   NFM_LAND_USE_PEATLAND_RESTORATION: 'nfm-land-use-peatland-restoration',
   NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER:
     'nfm-land-use-rivers-wetlands-freshwater-habitats',

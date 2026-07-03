@@ -632,6 +632,52 @@ describe('NFM Redirect Helpers', () => {
       )
     })
 
+    test('should redirect from new land-use detail step to the next selected new land type', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [
+          NFM_LAND_TYPES.WOODLAND_FOR_TIMBER_HARVESTING,
+          NFM_LAND_TYPES.PEATLAND_DEGRADED
+        ]
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result.path).toBe(
+        ROUTES.PROJECT.EDIT.NFM.LAND_USE_PEATLAND_DEGRADED.replace(
+          '{referenceNumber}',
+          'TEST-001'
+        )
+      )
+    })
+
+    test('should redirect to woodland for timber harvesting from land-use-change when it is the first selected land type', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+          'woodland_for_timber_harvesting,coastal_margins'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_LAND_USE_CHANGE,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result.path).toBe(
+        ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING.replace(
+          '{referenceNumber}',
+          'TEST-001'
+        )
+      )
+    })
+
     test('should redirect to landowner consent from last selected land-use detail step', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [NFM_LAND_TYPES.WOODLAND]

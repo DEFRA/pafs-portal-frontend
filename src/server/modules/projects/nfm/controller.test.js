@@ -6,6 +6,7 @@ import {
 } from '../../../common/constants/common.js'
 import {
   NFM_EXPERIENCE_LEVEL_OPTIONS,
+  NFM_LAND_TYPES,
   NFM_LANDOWNER_CONSENT_OPTIONS,
   NFM_MEASURES,
   PROJECT_PAYLOAD_FIELDS,
@@ -362,6 +363,28 @@ describe('NFM Controller', () => {
                 PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE,
               afterFieldName:
                 PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER
+            })
+          })
+        )
+      })
+
+      test('should build woodland for timber harvesting land-use detail fields', async () => {
+        getProjectStep.mockReturnValue(
+          PROJECT_STEPS.NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING
+        )
+
+        await nfmController.getHandler(mockRequest, mockH)
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            localKeyPrefix:
+              'projects.nfm.land_use.woodland_for_timber_harvesting',
+            additionalData: expect.objectContaining({
+              beforeFieldName:
+                PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE,
+              afterFieldName:
+                PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER
             })
           })
         )
@@ -902,6 +925,27 @@ describe('NFM Controller', () => {
         }
       })
 
+      test('should include the new land-use options in the rendered view data', async () => {
+        await nfmController.getHandler(mockRequest, mockH)
+
+        const callArgs = buildViewData.mock.calls[0][1]
+        const options = callArgs.additionalData.nfmLandUseOptions
+
+        expect(options).toHaveLength(11)
+        expect(options.map((option) => option.value)).toContain(
+          NFM_LAND_TYPES.WOODLAND_FOR_TIMBER_HARVESTING
+        )
+        expect(options.map((option) => option.value)).toContain(
+          NFM_LAND_TYPES.PEATLAND_DEGRADED
+        )
+        expect(mockRequest.t).toHaveBeenCalledWith(
+          'projects.nfm.land_use_change.options.woodland_for_timber_harvesting'
+        )
+        expect(mockRequest.t).toHaveBeenCalledWith(
+          'projects.nfm.land_use_change.options.peatland_degraded'
+        )
+      })
+
       test('should normalize single land-use value into array before validation', async () => {
         await nfmController.postHandler(mockRequest, mockH)
 
@@ -940,6 +984,30 @@ describe('NFM Controller', () => {
           PROJECT_PAYLOAD_LEVELS.NFM_LANDOWNER_CONSENT,
           expect.any(Object),
           PROJECT_VIEWS.NFM_LANDOWNER_CONSENT
+        )
+      })
+    })
+
+    describe('NFM Peatland Degraded Land-use detail', () => {
+      beforeEach(() => {
+        getProjectStep.mockReturnValue(
+          PROJECT_STEPS.NFM_LAND_USE_PEATLAND_DEGRADED
+        )
+        mockRequest.payload = {
+          [PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE]: '4.2',
+          [PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER]: '3.1'
+        }
+      })
+
+      test('should save using peatland degraded land-use payload level', async () => {
+        await nfmController.postHandler(mockRequest, mockH)
+
+        expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+          mockRequest,
+          mockH,
+          PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_PEATLAND_DEGRADED,
+          expect.any(Object),
+          PROJECT_VIEWS.NFM_LAND_USE_DETAIL
         )
       })
     })

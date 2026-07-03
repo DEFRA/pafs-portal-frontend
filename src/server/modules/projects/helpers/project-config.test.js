@@ -563,6 +563,50 @@ describe('project-config', () => {
       )
     })
 
+    test('should include new land-use cleanup fields in NFM_LAND_USE_CHANGE', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_CHANGE]
+
+      expect(fields).toContain(
+        PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE
+      )
+      expect(fields).toContain(
+        PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER
+      )
+      expect(fields).toContain(
+        PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE
+      )
+      expect(fields).toContain(
+        PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER
+      )
+    })
+
+    test('should have fields for NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING
+        ]
+
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE,
+        PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER
+      ])
+    })
+
+    test('should have fields for NFM_LAND_USE_PEATLAND_DEGRADED level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[
+          PROJECT_PAYLOAD_LEVELS.NFM_LAND_USE_PEATLAND_DEGRADED
+        ]
+
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE,
+        PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER
+      ])
+    })
+
     test('should include reference number in all edit-level payloads', () => {
       const editLevels = [
         PROJECT_PAYLOAD_LEVELS.PROJECT_NAME,

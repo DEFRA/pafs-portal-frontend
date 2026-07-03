@@ -4,7 +4,9 @@ export const NFM_LAND_TYPES = {
   ENCLOSED_DAIRYING_FARMLAND: 'enclosed_dairying_farmland',
   SEMI_NATURAL_GRASSLAND: 'semi_natural_grassland',
   WOODLAND: 'woodland',
+  WOODLAND_FOR_TIMBER_HARVESTING: 'woodland_for_timber_harvesting',
   MOUNTAIN_MOORS_AND_HEATH: 'mountain_moors_and_heath',
+  PEATLAND_DEGRADED: 'peatland_degraded',
   PEATLAND_RESTORATION: 'peatland_restoration',
   RIVERS_WETLANDS_FRESHWATER_HABITATS:
     'rivers_wetlands_and_freshwater_habitats',

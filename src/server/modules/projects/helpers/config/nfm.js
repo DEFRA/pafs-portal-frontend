@@ -17,7 +17,9 @@ import {
   nfmLandUseEnclosedDairyingFarmlandSchema,
   nfmLandUseSemiNaturalGrasslandSchema,
   nfmLandUseWoodlandSchema,
+  nfmLandUseWoodlandForTimberHarvestingSchema,
   nfmLandUseMountainMoorsAndHeathSchema,
+  nfmLandUsePeatlandDegradedSchema,
   nfmLandUsePeatlandRestorationSchema,
   nfmLandUseRiversWetlandsFreshwaterSchema,
   nfmLandUseCoastalMarginsSchema,
@@ -302,6 +304,15 @@ export const NFM_CONFIG = {
     schema: nfmLandUseWoodlandSchema,
     fieldType: 'input'
   },
+  [PROJECT_STEPS.NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING]: {
+    localKeyPrefix: 'projects.nfm.land_use.woodland_for_timber_harvesting',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseWoodlandForTimberHarvestingSchema,
+    fieldType: 'input'
+  },
   [PROJECT_STEPS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH]: {
     localKeyPrefix: 'projects.nfm.land_use.mountain_moors_and_heath',
     backLinkOptions: {
@@ -309,6 +320,15 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmLandUseMountainMoorsAndHeathSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_PEATLAND_DEGRADED]: {
+    localKeyPrefix: 'projects.nfm.land_use.peatland_degraded',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUsePeatlandDegradedSchema,
     fieldType: 'input'
   },
   [PROJECT_STEPS.NFM_LAND_USE_PEATLAND_RESTORATION]: {

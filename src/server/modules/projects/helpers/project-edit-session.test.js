@@ -407,6 +407,16 @@ describe('project-edit-session', () => {
             areaAfterHectares: 12
           },
           {
+            landUseType: 'woodland_for_timber_harvesting',
+            areaBeforeHectares: 6,
+            areaAfterHectares: 9
+          },
+          {
+            landUseType: 'peatland_degraded',
+            areaBeforeHectares: 3.5,
+            areaAfterHectares: 2
+          },
+          {
             landUseType: 'coastal_margins',
             areaBeforeHectares: null,
             areaAfterHectares: 2.5
@@ -428,6 +438,16 @@ describe('project-edit-session', () => {
       expect(result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER]).toBe(
         12
       )
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE]
+      ).toBe(6)
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]
+      ).toBe(9)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE]).toBe(
+        3.5
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER]).toBe(2)
       expect(result[PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE]).toBe(
         undefined
       )
