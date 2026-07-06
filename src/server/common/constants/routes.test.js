@@ -86,6 +86,10 @@ describe('Routes Constants', () => {
       )
     })
 
+    test('AREA edit route is defined', () => {
+      expect(ROUTES.PROJECT.EDIT.AREA).toBe('/project/{referenceNumber}/area')
+    })
+
     describe('FUNDING_SOURCES edit routes', () => {
       test('FUNDING_SOURCES_SELECTION route is defined', () => {
         expect(
