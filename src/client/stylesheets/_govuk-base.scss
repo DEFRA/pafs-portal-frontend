@@ -1,5 +1,3 @@
-// Forward govuk-frontend base with configured assets path
-// Use this in partial files instead of importing govuk-frontend/dist/govuk/base directly
-@forward "govuk-frontend/dist/govuk/base" with (
-  $govuk-assets-path: "../../../node_modules/govuk-frontend/dist/govuk/assets/"
-);
+// Forward govuk-frontend base for use in partial files
+// Assets path is handled by Vite's NodePackageImporter and the copyGovukAssets plugin
+@forward "govuk-frontend/dist/govuk/base";

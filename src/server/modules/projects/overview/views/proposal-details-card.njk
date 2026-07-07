@@ -31,6 +31,15 @@
           <dd class="govuk-summary-list__value">
             {{ projectData.rmaName or t('projects.overview.common.na') }}
           </dd>
+          {% if not isReadOnly %}
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="/project/{{ projectData[PROJECT_PAYLOAD_FIELDS.SLUG] }}/{{ PROJECT_STEPS.AREA }}">
+                {{ t('common.change') }}
+                <span class="govuk-visually-hidden">
+                  {{ t('projects.overview.proposal_details_summary_card.rma') }}</span>
+              </a>
+            </dd>
+          {% endif %}
         </div>
 
         {% set projectTypeRowClass = 'govuk-summary-list__row' %}

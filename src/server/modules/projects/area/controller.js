@@ -1,12 +1,15 @@
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
+import { PROJECT_PAYLOAD_LEVELS } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
 import {
   buildViewData,
   loggedInUserAreaOptions,
+  navigateToProjectOverview,
   updateSessionData,
   validatePayload
 } from '../helpers/project-utils.js'
+import { saveProjectWithErrorHandling } from '../helpers/project-submission.js'
 import { validateAreaId } from '../schema.js'
 
 class AreaController {
@@ -14,7 +17,8 @@ class AreaController {
     return buildViewData(request, {
       localKeyPrefix: 'projects.area_selection',
       backLinkOptions: {
-        targetURL: ROUTES.PROJECT.NAME
+        targetURL: ROUTES.PROJECT.NAME,
+        conditionalRedirect: true
       },
       additionalData: {
         areaOptions: loggedInUserAreaOptions(request)
@@ -24,6 +28,30 @@ class AreaController {
 
   async get(request, h) {
     return h.view(PROJECT_VIEWS.AREA, this._getViewData(request))
+  }
+
+  async _postEditMode(request, h) {
+    const referenceNumber = request.params?.referenceNumber || ''
+    if (!referenceNumber) {
+      return null
+    }
+    const viewData = this._getViewData(request)
+    const saveError = await saveProjectWithErrorHandling(
+      request,
+      h,
+      PROJECT_PAYLOAD_LEVELS.PROJECT_AREA,
+      viewData,
+      PROJECT_VIEWS.AREA,
+      { emitSuccessMetric: false }
+    )
+    if (saveError) {
+      return saveError
+    }
+    request.metrics?.counter('proposalStepVisit', 1, {
+      step: 'PROJECT_AREA',
+      result: 'submitted'
+    })
+    return navigateToProjectOverview(referenceNumber, h)
   }
 
   async post(request, h) {
@@ -42,6 +70,11 @@ class AreaController {
           result: 'validation_error'
         })
         return validationError
+      }
+
+      const editResponse = await this._postEditMode(request, h)
+      if (editResponse) {
+        return editResponse
       }
 
       request.metrics?.counter('proposalStepVisit', 1, {

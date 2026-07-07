@@ -1,19 +1,23 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { areaController } from './controller.js'
 import { PROJECT_VIEWS } from '../../../common/constants/common.js'
+import { PROJECT_PAYLOAD_LEVELS } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
 import {
   buildViewData,
   loggedInUserAreaOptions,
+  navigateToProjectOverview,
   updateSessionData,
   validatePayload
 } from '../helpers/project-utils.js'
+import { saveProjectWithErrorHandling } from '../helpers/project-submission.js'
 import { validateAreaId } from '../schema.js'
 
 // Mock dependencies
 vi.mock('../../../common/helpers/error-renderer/index.js')
 vi.mock('../helpers/project-utils.js')
+vi.mock('../helpers/project-submission.js')
 vi.mock('../schema.js')
 
 describe('AreaController', () => {
@@ -25,6 +29,7 @@ describe('AreaController', () => {
 
     mockRequest = {
       payload: {},
+      params: {},
       logger: {
         error: vi.fn()
       },
@@ -53,6 +58,8 @@ describe('AreaController', () => {
     })
 
     validatePayload.mockReturnValue(null)
+    saveProjectWithErrorHandling.mockResolvedValue(null)
+    navigateToProjectOverview.mockReturnValue(Symbol('overview-redirect'))
   })
 
   describe('getHandler', () => {
@@ -68,7 +75,8 @@ describe('AreaController', () => {
       expect(buildViewData).toHaveBeenCalledWith(mockRequest, {
         localKeyPrefix: 'projects.area_selection',
         backLinkOptions: {
-          targetURL: ROUTES.PROJECT.NAME
+          targetURL: ROUTES.PROJECT.NAME,
+          conditionalRedirect: true
         },
         additionalData: {
           areaOptions: expect.any(Array)
@@ -186,6 +194,61 @@ describe('AreaController', () => {
           error: { message: 'API error' }
         })
       )
+    })
+  })
+
+  describe('postHandler — edit mode (referenceNumber present)', () => {
+    beforeEach(() => {
+      mockRequest.params = { referenceNumber: 'TEST-REF-001' }
+      mockRequest.payload = { areaId: '2' }
+    })
+
+    test('should save via saveProjectWithErrorHandling with PROJECT_AREA level', async () => {
+      await areaController.postHandler(mockRequest, mockH)
+
+      expect(saveProjectWithErrorHandling).toHaveBeenCalledWith(
+        mockRequest,
+        mockH,
+        PROJECT_PAYLOAD_LEVELS.PROJECT_AREA,
+        expect.any(Object),
+        PROJECT_VIEWS.AREA,
+        { emitSuccessMetric: false }
+      )
+    })
+
+    test('should redirect to overview on successful save', async () => {
+      await areaController.postHandler(mockRequest, mockH)
+
+      expect(navigateToProjectOverview).toHaveBeenCalledWith(
+        'TEST-REF-001',
+        mockH
+      )
+    })
+
+    test('should return save error view when saveProjectWithErrorHandling returns error', async () => {
+      const saveError = { error: 'save failed' }
+      saveProjectWithErrorHandling.mockResolvedValue(saveError)
+
+      const result = await areaController.postHandler(mockRequest, mockH)
+
+      expect(result).toBe(saveError)
+      expect(navigateToProjectOverview).not.toHaveBeenCalled()
+    })
+
+    test('should record submitted metric on successful save', async () => {
+      await areaController.postHandler(mockRequest, mockH)
+
+      expect(mockRequest.metrics.counter).toHaveBeenCalledWith(
+        'proposalStepVisit',
+        1,
+        { step: 'PROJECT_AREA', result: 'submitted' }
+      )
+    })
+
+    test('should not redirect to TYPE step in edit mode', async () => {
+      await areaController.postHandler(mockRequest, mockH)
+
+      expect(mockH.redirect).not.toHaveBeenCalledWith(ROUTES.PROJECT.TYPE)
     })
   })
 })

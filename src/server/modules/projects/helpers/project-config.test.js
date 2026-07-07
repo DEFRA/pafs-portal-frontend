@@ -347,6 +347,15 @@ describe('project-config', () => {
       ])
     })
 
+    test('should have fields for PROJECT_AREA level', () => {
+      const fields =
+        PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.PROJECT_AREA]
+      expect(fields).toEqual([
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.AREA_ID
+      ])
+    })
+
     test('should have fields for FINANCIAL_START_YEAR level', () => {
       const fields =
         PROJECT_PAYLOAD_LEVEL_FIELDS[
