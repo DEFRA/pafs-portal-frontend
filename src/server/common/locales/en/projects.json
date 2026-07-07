@@ -227,7 +227,8 @@
       "estimated_property_damages_avoided": "Estimated property damages avoided",
       "estimated_environmental_benefits": "Estimated environmental benefits",
       "estimated_recreation_tourism_benefits": "Estimated recreation and tourism benefits",
-      "estimated_land_value_uplift_benefits": "Estimated land value uplift and regeneration benefits"
+      "estimated_land_value_uplift_benefits": "Estimated land value uplift and regeneration benefits",
+      "benefit_cost_ratio": "Benefit cost ratio"
     },
     "carbon_impact_summary_card": {
       "title": "Carbon impact",

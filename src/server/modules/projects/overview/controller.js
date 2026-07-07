@@ -34,6 +34,64 @@ import {
 } from '../helpers/stale-financial-years.js'
 import { submitProjectProposal } from '../../../common/services/project/project-service.js'
 
+/**
+ * Computes the Benefit Cost Ratio from project data.
+ *
+ * Formula: wlbEstimatedWholeLifePvBenefits ÷ sum(all four WLC cost fields)
+ *
+ * Returns a string formatted to 2 decimal places, or null when the result
+ * cannot be reliably computed.
+ *
+ * OPTION A (current): returns null unless ALL five inputs are non-null.
+ * This prevents a partial denominator from producing a misleadingly high ratio.
+ *
+ * To switch to Option B (always visible, N/A when any input is missing),
+ * remove the `allCostFieldsPresent` null-guard and handle null in the template.
+ *
+ * @param {Object} projectData - Flat project data from the session
+ * @returns {string|null} Ratio to 2 dp (e.g. "1.50"), or null
+ */
+// Accepts numeric strings ('0', '1000000'), plain numbers, and bigint strings.
+// Rejects null, undefined, empty string, and non-finite conversions (NaN, ±Infinity).
+const isValidNumeric = (value) =>
+  value != null && value !== '' && Number.isFinite(Number(value))
+
+export function computeBenefitCostRatio(projectData) {
+  const benefits =
+    projectData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]
+  const pvCosts =
+    projectData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]
+  const designCosts =
+    projectData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]
+  const riskCosts =
+    projectData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS]
+  const futureCosts =
+    projectData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS]
+
+  // Option A: all five inputs must be valid numerics for a sound calculation
+  const allCostFieldsPresent =
+    isValidNumeric(pvCosts) &&
+    isValidNumeric(designCosts) &&
+    isValidNumeric(riskCosts) &&
+    isValidNumeric(futureCosts)
+
+  if (!isValidNumeric(benefits) || !allCostFieldsPresent) {
+    return null
+  }
+
+  const totalCosts =
+    Number(pvCosts) +
+    Number(designCosts) +
+    Number(riskCosts) +
+    Number(futureCosts)
+
+  if (totalCosts === 0) {
+    return null
+  }
+
+  return (Number(benefits) / totalCosts).toFixed(2)
+}
+
 const SECTION_PROPOSAL_DETAILS = 'section-proposal-details'
 
 // Maps backend submission error codes to { sectionId, localeKey }
@@ -251,6 +309,10 @@ class OverviewController {
       )
     }
 
+    viewData.benefitCostRatio = viewData.projectData
+      ? computeBenefitCostRatio(viewData.projectData)
+      : null
+
     const [flashSuccess] = request.yar.flash('success')
     if (flashSuccess) {
       viewData.submissionSuccess = flashSuccess.message
@@ -306,6 +368,9 @@ class OverviewController {
       )
     }
 
+    viewData.benefitCostRatio = viewData.projectData
+      ? computeBenefitCostRatio(viewData.projectData)
+      : null
     viewData.submissionErrors = submissionErrors
     viewData.submissionErrorList = submissionErrorList
     return h.view(PROJECT_VIEWS.OVERVIEW, viewData)

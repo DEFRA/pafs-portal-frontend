@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest'
-import { overviewController } from './controller.js'
+import { overviewController, computeBenefitCostRatio } from './controller.js'
 import {
   PROJECT_STATUS,
   PROJECT_TYPES,
@@ -561,6 +561,52 @@ describe('OverviewController', () => {
 
       const [, viewData] = mockH.view.mock.calls[0]
       expect(viewData.submissionSuccess).toBeUndefined()
+    })
+
+    test('passes benefitCostRatio to view when all five WLB/WLC fields are present', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]: '4000000',
+        [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: '1000000',
+        [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]:
+          '500000',
+        [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS]: '250000',
+        [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS]: '250000'
+      })
+      getCarbonImpactOverviewData.mockImplementation(
+        async (_req, projectData) => ({ success: true, projectData })
+      )
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      // 4000000 / 2000000 = 2.00
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(viewData.benefitCostRatio).toBe('2.00')
+    })
+
+    test('passes benefitCostRatio as null when WLB field is missing', async () => {
+      getSessionData.mockReturnValue({
+        projectState: PROJECT_STATUS.DRAFT,
+        [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: '1000000',
+        [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]:
+          '500000',
+        [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS]: '250000',
+        [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS]: '250000'
+      })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(viewData.benefitCostRatio).toBeNull()
+    })
+
+    test('passes benefitCostRatio as null when projectData is null', async () => {
+      getCarbonImpactOverviewData.mockResolvedValue({ projectData: null })
+
+      await overviewController.getHandler(mockRequest, mockH)
+
+      const [, viewData] = mockH.view.mock.calls[0]
+      expect(viewData.benefitCostRatio).toBeNull()
     })
 
     test('should set staleFinancialYearsWarning to false when no stale years and no cleared flag', async () => {
@@ -1236,6 +1282,147 @@ describe('OverviewController', () => {
         'modules/projects/overview/index',
         expect.objectContaining({ projectData: null })
       )
+    })
+  })
+
+  describe('computeBenefitCostRatio', () => {
+    const field = PROJECT_PAYLOAD_FIELDS
+
+    const makeProjectData = (overrides = {}) => ({
+      [field.ESTIMATED_WHOLE_LIFE_BENEFITS]: '5000000',
+      [field.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: '1000000',
+      [field.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]: '500000',
+      [field.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS]: '250000',
+      [field.WLC_ESTIMATED_FUTURE_COSTS]: '250000',
+      ...overrides
+    })
+
+    test('returns correct ratio to 2 decimal places when all fields present', () => {
+      // 5000000 / (1000000 + 500000 + 250000 + 250000) = 5000000 / 2000000 = 2.50
+      expect(computeBenefitCostRatio(makeProjectData())).toBe('2.50')
+    })
+
+    test('returns null when benefits field is null', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({ [field.ESTIMATED_WHOLE_LIFE_BENEFITS]: null })
+        )
+      ).toBeNull()
+    })
+
+    test('returns null when benefits field is undefined', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({ [field.ESTIMATED_WHOLE_LIFE_BENEFITS]: undefined })
+        )
+      ).toBeNull()
+    })
+
+    test('returns null when any WLC field is null', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({
+            [field.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: null
+          })
+        )
+      ).toBeNull()
+    })
+
+    test('returns null when all WLC fields are null', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({
+            [field.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: null,
+            [field.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]: null,
+            [field.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS]: null,
+            [field.WLC_ESTIMATED_FUTURE_COSTS]: null
+          })
+        )
+      ).toBeNull()
+    })
+
+    test('returns null when total cost is zero', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({
+            [field.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: '0',
+            [field.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]: '0',
+            [field.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS]: '0',
+            [field.WLC_ESTIMATED_FUTURE_COSTS]: '0'
+          })
+        )
+      ).toBeNull()
+    })
+
+    test('returns "0.00" when benefits is zero and costs are non-zero', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({ [field.ESTIMATED_WHOLE_LIFE_BENEFITS]: '0' })
+        )
+      ).toBe('0.00')
+    })
+
+    test('handles string inputs (API format) correctly', () => {
+      const result = computeBenefitCostRatio(
+        makeProjectData({
+          [field.ESTIMATED_WHOLE_LIFE_BENEFITS]: '3000000',
+          [field.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: '1000000',
+          [field.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]: '0',
+          [field.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS]: '0',
+          [field.WLC_ESTIMATED_FUTURE_COSTS]: '0'
+        })
+      )
+      expect(result).toBe('3.00')
+    })
+
+    test('rounds to 2 decimal places', () => {
+      // 10000000 / 3000000 = 3.3333... → "3.33"
+      const result = computeBenefitCostRatio(
+        makeProjectData({
+          [field.ESTIMATED_WHOLE_LIFE_BENEFITS]: '10000000',
+          [field.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: '3000000',
+          [field.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]: '0',
+          [field.WLC_ESTIMATED_RISK_CONTINGENCY_COSTS]: '0',
+          [field.WLC_ESTIMATED_FUTURE_COSTS]: '0'
+        })
+      )
+      expect(result).toBe('3.33')
+    })
+
+    test('returns null when benefits field is empty string', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({ [field.ESTIMATED_WHOLE_LIFE_BENEFITS]: '' })
+        )
+      ).toBeNull()
+    })
+
+    test('returns null when a WLC field is empty string', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({
+            [field.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: ''
+          })
+        )
+      ).toBeNull()
+    })
+
+    test('returns null when benefits field is non-numeric', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({ [field.ESTIMATED_WHOLE_LIFE_BENEFITS]: 'abc' })
+        )
+      ).toBeNull()
+    })
+
+    test('returns null when a WLC field is non-numeric', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({
+            [field.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]: 'abc'
+          })
+        )
+      ).toBeNull()
     })
   })
 })
