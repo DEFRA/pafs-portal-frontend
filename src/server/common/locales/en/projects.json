@@ -434,7 +434,8 @@
       "title": "What date do you expect to complete your study?",
       "heading": "What date do you expect to complete your study?",
       "hint": "na",
-      "placeholder": "to complete your study"
+      "placeholder": "to complete your study",
+      "previousStagePlaceholder": "to start your study"
     },
     "strategy_start": {
       "title": "When do you expect to start the project's Strategic Appraisal Report?",
@@ -446,7 +447,8 @@
       "title": "When do you expect to complete the project's Strategic Appraisal Report?",
       "heading": "When do you expect to complete the project's Strategic Appraisal Report?",
       "hint": "na",
-      "placeholder": "to complete your strategy"
+      "placeholder": "to complete your strategy",
+      "previousStagePlaceholder": "to start your strategy"
     },
     "complete_outline_business_case": {
       "title": "When do you expect to complete the project's outline business case?",

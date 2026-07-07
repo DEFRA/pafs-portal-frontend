@@ -21,6 +21,12 @@
         <input type="hidden" name="startOutlineBusinessCaseMonth" value="{{ formData.startOutlineBusinessCaseMonth }}"/>
         <input type="hidden" name="startOutlineBusinessCaseYear" value="{{ formData.startOutlineBusinessCaseYear }}"/>
       {% endif %}
+
+      {# For simplified end-date (STU/STR), include OBC start date as previous-stage context #}
+      {% if useObcAsPreviousStage %}
+        <input type="hidden" name="startOutlineBusinessCaseMonth" value="{{ formData.startOutlineBusinessCaseMonth }}"/>
+        <input type="hidden" name="startOutlineBusinessCaseYear" value="{{ formData.startOutlineBusinessCaseYear }}"/>
+      {% endif %}
     {% endif %}
 
     {% if fieldType == 'date' %}

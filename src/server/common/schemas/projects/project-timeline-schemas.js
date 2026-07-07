@@ -364,6 +364,29 @@ export const readyForServiceYearSchema = yearSchema.label(
 )
 
 /**
+ * Ready for Service schema for simplified journey (STU / STR).
+ * Validates readyForService against startOutlineBusinessCase (not startConstruction),
+ * because the simplified journey only collects start + end dates.
+ */
+export const readyForServiceSimplifiedMonthSchema = monthSchema
+  .custom(
+    validateStandardTimelineDate(
+      PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+      PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR,
+      PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH,
+      PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR,
+      'Study/Strategy End Date'
+    )
+  )
+  .messages({
+    'custom.date_outside_financial_range':
+      PROJECT_VALIDATION_MESSAGES.DATE_OUTSIDE_FINANCIAL_RANGE,
+    'custom.date_not_after_previous_stage':
+      PROJECT_VALIDATION_MESSAGES.DATE_BEFORE_PREVIOUS_STAGE
+  })
+  .label(PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH)
+
+/**
  * Could Start Early schema - boolean field
  */
 export const couldStartEarlySchema = Joi.boolean()

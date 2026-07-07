@@ -10,6 +10,7 @@ import {
   startConstructionYearSchema,
   readyForServiceMonthSchema,
   readyForServiceYearSchema,
+  readyForServiceSimplifiedMonthSchema,
   couldStartEarlySchema,
   earliestWithGiaMonthSchema,
   earliestWithGiaYearSchema
@@ -82,6 +83,24 @@ export const validateStartBenefits = Joi.object({
 })
   .options({ abortEarly: false })
   .label('Start Benefits')
+
+/**
+ * Simplified end-date schema for STU / STR.
+ * Validates readyForService against startOutlineBusinessCase (not startConstruction).
+ */
+export const validateStartBenefitsSimplified = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]:
+    Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]:
+    Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]:
+    readyForServiceSimplifiedMonthSchema,
+  [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: readyForServiceYearSchema
+})
+  .options({ abortEarly: false })
+  .label('Start Benefits Simplified')
 
 export const validateCouldStartEarlier = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.COULD_START_EARLY]: couldStartEarlySchema

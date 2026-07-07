@@ -9,6 +9,7 @@ import {
 import { ROUTES } from '../../../common/constants/routes.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
 import { IMPORTANT_DATES_CONFIG } from '../helpers/project-config.js'
+import { validateStartBenefitsSimplified } from '../schema.js'
 import { saveProjectWithErrorHandling } from '../helpers/project-submission.js'
 import {
   buildViewData,
@@ -39,6 +40,8 @@ const SIMPLIFIED_CONFIG_OVERRIDES = {
     },
     [PROJECT_STEPS.START_BENEFITS]: {
       localKeyPrefix: 'projects.important_dates.study_end',
+      schema: validateStartBenefitsSimplified,
+      useObcAsPreviousStage: true,
       backLinkOptions: {
         targetURL: ROUTES.PROJECT.OVERVIEW,
         targetEditURL: ROUTES.PROJECT.EDIT.START_OUTLINE_BUSINESS_CASE,
@@ -52,12 +55,23 @@ const SIMPLIFIED_CONFIG_OVERRIDES = {
     },
     [PROJECT_STEPS.START_BENEFITS]: {
       localKeyPrefix: 'projects.important_dates.strategy_end',
+      schema: validateStartBenefitsSimplified,
+      useObcAsPreviousStage: true,
       backLinkOptions: {
         targetURL: ROUTES.PROJECT.OVERVIEW,
         targetEditURL: ROUTES.PROJECT.EDIT.START_OUTLINE_BUSINESS_CASE,
         conditionalRedirect: false
       }
     }
+  }
+}
+
+// Previous-stage mapping for the simplified journey's end-date step.
+// For STR/STU, the previous stage is the study/strategy start (OBC start).
+const SIMPLIFIED_PREVIOUS_STAGE_MAP = {
+  [PROJECT_STEPS.START_BENEFITS]: {
+    monthField: PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH,
+    yearField: PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR
   }
 }
 
@@ -128,12 +142,6 @@ class ImportantDatesController {
     return STR_STU_SIMPLIFIED_TYPES.has(projectType)
   }
 
-  _getEffectiveLocalKeyPrefix(step, projectType) {
-    return (
-      SIMPLIFIED_CONFIG_OVERRIDES[projectType]?.[step]?.localKeyPrefix ?? null
-    )
-  }
-
   _getConfig(step, projectType) {
     const base = IMPORTANT_DATES_CONFIG[step]
     const overrides = SIMPLIFIED_CONFIG_OVERRIDES[projectType]?.[step]
@@ -144,7 +152,11 @@ class ImportantDatesController {
   }
 
   _getPreviousStageData(step, sessionData) {
-    const previousStage = PREVIOUS_STAGE_MAP[step]
+    const projectType = sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]
+    const stageMap = this._isSimplifiedType(projectType)
+      ? SIMPLIFIED_PREVIOUS_STAGE_MAP
+      : PREVIOUS_STAGE_MAP
+    const previousStage = stageMap[step]
     if (!previousStage) {
       return null
     }
@@ -208,7 +220,8 @@ class ImportantDatesController {
       fieldType,
       monthField,
       yearField,
-      fieldName
+      fieldName,
+      useObcAsPreviousStage = false
     } = config
 
     const previousStageDate = this._getPreviousStageData(step, sessionData)
@@ -224,6 +237,7 @@ class ImportantDatesController {
       monthField,
       yearField,
       fieldName,
+      useObcAsPreviousStage,
       sectionHint: request.t(localKeyPrefix + '.hint'),
       dateHint: request.t('projects.common.date_hint'),
       previousStageDate: previousStageDate || '',

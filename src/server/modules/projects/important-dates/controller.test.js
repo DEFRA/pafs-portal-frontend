@@ -192,6 +192,34 @@ describe('ImportantDatesController', () => {
 
       expect(mockH.view).toHaveBeenCalled()
     })
+
+    test('uses previous calendar year for FY start when current month is before April', async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2025-03-01')) // March = month 3 < 4
+
+      await importantDatesController.getHandler(mockRequest, mockH)
+
+      // March 2025 → FY 2024 starts in April 2024
+      expect(formatDate).toHaveBeenCalledWith('4', 2024)
+
+      vi.useRealTimers()
+    })
+
+    test('currentFinancialYearStart falls back to empty string when formatDate returns falsy', async () => {
+      // Make formatDate return null for all calls to exercise the || '' guard
+      formatDate.mockReturnValue(null)
+
+      await importantDatesController.getHandler(mockRequest, mockH)
+
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            currentFinancialYearStart: ''
+          })
+        })
+      )
+    })
   })
 
   describe('postHandler', () => {
@@ -437,6 +465,29 @@ describe('ImportantDatesController', () => {
         expect.stringContaining('undefined')
       )
     })
+
+    test('falls back to overview when step is not in the navigation sequence', async () => {
+      const UNKNOWN_STEP = 'some-unlisted-step'
+      IMPORTANT_DATES_CONFIG[UNKNOWN_STEP] = {
+        backLinkOptions: {},
+        localKeyPrefix: 'projects.important_dates.start_outline_business_case',
+        fieldType: 'date',
+        monthField: PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH,
+        yearField: PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR,
+        schema: {}
+      }
+      getProjectStep.mockReturnValue(UNKNOWN_STEP)
+      getSessionData.mockReturnValue({ slug: 'TEST-001' })
+      navigateToProjectOverview.mockReturnValue('overview-redirect')
+
+      const result = await importantDatesController.postHandler(
+        mockRequest,
+        mockH
+      )
+
+      expect(navigateToProjectOverview).toHaveBeenCalledWith('TEST-001', mockH)
+      expect(result).toBe('overview-redirect')
+    })
   })
 
   describe('STR/STU simplified journey', () => {
@@ -659,6 +710,98 @@ describe('ImportantDatesController', () => {
           })
         )
       })
+
+      test.each(['STU', 'STR'])(
+        '%s START_BENEFITS passes useObcAsPreviousStage=true to view data',
+        async (projectType) => {
+          getProjectStep.mockReturnValue(PROJECT_STEPS.START_BENEFITS)
+          getSessionData.mockReturnValue({
+            slug: 'TEST-001',
+            projectType,
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+          })
+          IMPORTANT_DATES_CONFIG[PROJECT_STEPS.START_BENEFITS] = {
+            backLinkOptions: {},
+            localKeyPrefix:
+              'projects.important_dates.start_achieving_its_benefits',
+            fieldType: 'date',
+            monthField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+            yearField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR,
+            schema: {}
+          }
+
+          await importantDatesController.getHandler(mockRequest, mockH)
+
+          expect(buildViewData).toHaveBeenCalledWith(
+            mockRequest,
+            expect.objectContaining({
+              additionalData: expect.objectContaining({
+                useObcAsPreviousStage: true
+              })
+            })
+          )
+        }
+      )
+
+      test('full-journey project does not set useObcAsPreviousStage on START_BENEFITS', async () => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.START_BENEFITS)
+        getSessionData.mockReturnValue({
+          slug: 'TEST-001',
+          projectType: 'DEF',
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+        })
+        IMPORTANT_DATES_CONFIG[PROJECT_STEPS.START_BENEFITS] = {
+          backLinkOptions: {},
+          localKeyPrefix:
+            'projects.important_dates.start_achieving_its_benefits',
+          fieldType: 'date',
+          monthField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+          yearField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR,
+          schema: {}
+        }
+
+        await importantDatesController.getHandler(mockRequest, mockH)
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            additionalData: expect.objectContaining({
+              useObcAsPreviousStage: false
+            })
+          })
+        )
+      })
+
+      test.each(['STU', 'STR'])(
+        '%s START_BENEFITS: _getPreviousStageData uses OBC start fields',
+        async (projectType) => {
+          getProjectStep.mockReturnValue(PROJECT_STEPS.START_BENEFITS)
+          getSessionData.mockReturnValue({
+            slug: 'TEST-001',
+            projectType,
+            [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]: '5',
+            [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]: '2025',
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+          })
+          IMPORTANT_DATES_CONFIG[PROJECT_STEPS.START_BENEFITS] = {
+            backLinkOptions: {},
+            localKeyPrefix:
+              'projects.important_dates.start_achieving_its_benefits',
+            fieldType: 'date',
+            monthField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+            yearField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR,
+            schema: {}
+          }
+
+          await importantDatesController.getHandler(mockRequest, mockH)
+
+          // formatDate should be called with OBC start values (not startConstruction)
+          expect(formatDate).toHaveBeenCalledWith('5', '2025')
+        }
+      )
     })
   })
 })

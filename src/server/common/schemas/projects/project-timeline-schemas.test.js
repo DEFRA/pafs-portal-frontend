@@ -11,6 +11,7 @@ import {
   startConstructionYearSchema,
   readyForServiceMonthSchema,
   readyForServiceYearSchema,
+  readyForServiceSimplifiedMonthSchema,
   couldStartEarlySchema,
   earliestWithGiaMonthSchema,
   earliestWithGiaYearSchema
@@ -617,6 +618,76 @@ describe('project-timeline-schemas', () => {
         [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: 2027
       })
       expect(error).toBeUndefined()
+    })
+  })
+
+  describe('readyForServiceSimplifiedMonthSchema — validates against OBC start', () => {
+    const makeSchema = () =>
+      Joi.object({
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: Joi.number().optional(),
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: Joi.number().optional(),
+        [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]:
+          Joi.number().optional(),
+        [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]:
+          Joi.number().optional(),
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]:
+          readyForServiceSimplifiedMonthSchema,
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]:
+          readyForServiceYearSchema
+      }).options({ abortEarly: false })
+
+    it('passes when readyForService is after startOBC', () => {
+      const { error } = makeSchema().validate({
+        financialStartYear: 2025,
+        financialEndYear: 2030,
+        startOutlineBusinessCaseMonth: 5,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 9,
+        readyForServiceYear: 2025
+      })
+      expect(error).toBeUndefined()
+    })
+
+    it('fails with DATE_BEFORE_PREVIOUS_STAGE when readyForService is before startOBC', () => {
+      const { error } = makeSchema().validate({
+        financialStartYear: 2025,
+        financialEndYear: 2030,
+        startOutlineBusinessCaseMonth: 9,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 5,
+        readyForServiceYear: 2025
+      })
+      expect(error).toBeDefined()
+      const detail = error.details.find((d) =>
+        d.message.includes('DATE_BEFORE_PREVIOUS_STAGE')
+      )
+      expect(detail).toBeDefined()
+    })
+
+    it('skips sequential check when startOBC is absent (OBC not yet entered)', () => {
+      const { error } = makeSchema().validate({
+        financialStartYear: 2025,
+        financialEndYear: 2030,
+        readyForServiceMonth: 5,
+        readyForServiceYear: 2025
+      })
+      expect(error).toBeUndefined()
+    })
+
+    it('fails with DATE_OUTSIDE_FINANCIAL_RANGE when readyForService is outside FY', () => {
+      const { error } = makeSchema().validate({
+        financialStartYear: 2025,
+        financialEndYear: 2027,
+        startOutlineBusinessCaseMonth: 5,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 6,
+        readyForServiceYear: 2028
+      })
+      expect(error).toBeDefined()
+      const detail = error.details.find((d) =>
+        d.message.includes('DATE_OUTSIDE_FINANCIAL_RANGE')
+      )
+      expect(detail).toBeDefined()
     })
   })
 
