@@ -34,7 +34,6 @@ import {
 
 const AREA_LABEL = 'area.label'
 const VOLUME_LABEL = 'volume.label'
-const VOLUME_HINT = 'volume.hint'
 const LENGTH_LABEL = 'length.label'
 const WIDTH_LABEL = 'width.label'
 
@@ -78,7 +77,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME,
         labelKey: VOLUME_LABEL,
-        hintKey: VOLUME_HINT,
         suffix: 'm³'
       }
     ]
@@ -95,7 +93,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME,
         labelKey: VOLUME_LABEL,
-        hintKey: VOLUME_HINT,
         suffix: 'm³'
       },
       {
@@ -127,7 +124,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME,
         labelKey: VOLUME_LABEL,
-        hintKey: VOLUME_HINT,
         suffix: 'm³'
       }
     ]
@@ -181,7 +177,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME,
         labelKey: VOLUME_LABEL,
-        hintKey: VOLUME_HINT,
         suffix: 'm³'
       }
     ]
@@ -254,7 +249,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME,
         labelKey: VOLUME_LABEL,
-        hintKey: VOLUME_HINT,
         suffix: 'm³'
       }
     ]

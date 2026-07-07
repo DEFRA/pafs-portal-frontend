@@ -121,17 +121,17 @@ describe('NFM Controller', () => {
         const options = callArgs.additionalData.nfmMeasureOptions
 
         expect(options).toHaveLength(9)
-        expect(options[0].value).toBe(NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION)
+        expect(options[0].value).toBe(NFM_MEASURES.WOODLAND)
         expect(options[1].value).toBe(NFM_MEASURES.LEAKY_BARRIERS)
-        expect(options[2].value).toBe(NFM_MEASURES.OFFLINE_STORAGE)
-        expect(options[3].value).toBe(NFM_MEASURES.WOODLAND)
-        expect(options[4].value).toBe(NFM_MEASURES.HEADWATER_DRAINAGE)
-        expect(options[5].value).toBe(NFM_MEASURES.RUNOFF_MANAGEMENT)
-        expect(options[6].value).toBe(NFM_MEASURES.SALTMARSH_MANAGEMENT)
-        expect(options[7].value).toBe(NFM_MEASURES.SAND_DUNE_MANAGEMENT)
-        expect(options[8].value).toBe(
+        expect(options[2].value).toBe(NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION)
+        expect(options[3].value).toBe(
           NFM_MEASURES.FLOODPLAIN_WETLAND_RESTORATION
         )
+        expect(options[4].value).toBe(NFM_MEASURES.RUNOFF_MANAGEMENT)
+        expect(options[5].value).toBe(NFM_MEASURES.OFFLINE_STORAGE)
+        expect(options[6].value).toBe(NFM_MEASURES.HEADWATER_DRAINAGE)
+        expect(options[7].value).toBe(NFM_MEASURES.SALTMARSH_MANAGEMENT)
+        expect(options[8].value).toBe(NFM_MEASURES.SAND_DUNE_MANAGEMENT)
       })
 
       test('should translate measure option labels', async () => {

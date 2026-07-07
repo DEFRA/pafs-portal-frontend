@@ -116,11 +116,11 @@ export const nfmRiverRestorationSchema = Joi.object({
     .unsafe()
     .min(0)
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
-    .optional()
+    .required()
     .messages({
       'number.base': 'volume_invalid',
       'number.min': 'volume_invalid',
+      'any.required': 'volume_required',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     })
@@ -135,11 +135,11 @@ export const nfmLeakyBarriersSchema = Joi.object({
     .unsafe()
     .min(0)
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
-    .optional()
+    .required()
     .messages({
       'number.base': 'volume_invalid',
       'number.min': 'volume_invalid',
+      'any.required': 'volume_required',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     }),
@@ -193,10 +193,11 @@ export const nfmOfflineStorageSchema = Joi.object({
     .unsafe()
     .min(0)
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
+    .required()
     .messages({
       'number.base': 'volume_invalid',
       'number.min': 'volume_invalid',
+      'any.required': 'volume_required',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     })
@@ -264,10 +265,11 @@ export const nfmRunoffManagementSchema = Joi.object({
     .unsafe()
     .min(0)
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
+    .required()
     .messages({
       'number.base': 'volume_invalid',
       'number.min': 'volume_invalid',
+      'any.required': 'volume_required',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     })
@@ -296,10 +298,11 @@ export const nfmFloodplainWetlandRestorationSchema = Joi.object({
       .unsafe()
       .min(0)
       .custom(maxTwoDecimalPlaces)
-      .allow(null, '')
+      .required()
       .messages({
         'number.base': 'volume_invalid',
         'number.min': 'volume_invalid',
+        'any.required': 'volume_required',
         'number.precision': 'volume_precision',
         'number.integer.max': 'volume_whole_number_precision'
       })

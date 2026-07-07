@@ -48,30 +48,36 @@ class NfmController {
     const localKeyPrefix = 'projects.nfm.selected_measures'
     return [
       {
-        text: request.t(
-          `${localKeyPrefix}.options.river_floodplain_restoration`
-        ),
-        value: NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+        text: request.t(`${localKeyPrefix}.options.woodland`),
+        value: NFM_MEASURES.WOODLAND
       },
       {
         text: request.t(`${localKeyPrefix}.options.leaky_barriers`),
         value: NFM_MEASURES.LEAKY_BARRIERS
       },
       {
-        text: request.t(`${localKeyPrefix}.options.offline_storage`),
-        value: NFM_MEASURES.OFFLINE_STORAGE
+        text: request.t(
+          `${localKeyPrefix}.options.river_floodplain_restoration`
+        ),
+        value: NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
       },
       {
-        text: request.t(`${localKeyPrefix}.options.woodland`),
-        value: NFM_MEASURES.WOODLAND
-      },
-      {
-        text: request.t(`${localKeyPrefix}.options.headwater_drainage`),
-        value: NFM_MEASURES.HEADWATER_DRAINAGE
+        text: request.t(
+          `${localKeyPrefix}.options.floodplain_wetland_restoration`
+        ),
+        value: NFM_MEASURES.FLOODPLAIN_WETLAND_RESTORATION
       },
       {
         text: request.t(`${localKeyPrefix}.options.runoff_management`),
         value: NFM_MEASURES.RUNOFF_MANAGEMENT
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.offline_storage`),
+        value: NFM_MEASURES.OFFLINE_STORAGE
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.headwater_drainage`),
+        value: NFM_MEASURES.HEADWATER_DRAINAGE
       },
       {
         text: request.t(`${localKeyPrefix}.options.saltmarsh_management`),
@@ -80,12 +86,6 @@ class NfmController {
       {
         text: request.t(`${localKeyPrefix}.options.sand_dune_management`),
         value: NFM_MEASURES.SAND_DUNE_MANAGEMENT
-      },
-      {
-        text: request.t(
-          `${localKeyPrefix}.options.floodplain_wetland_restoration`
-        ),
-        value: NFM_MEASURES.FLOODPLAIN_WETLAND_RESTORATION
       }
     ]
   }
@@ -134,10 +134,8 @@ class NfmController {
         value: NFM_LAND_TYPES.PEATLAND_RESTORATION
       },
       {
-        text: request.t(
-          `${localKeyPrefix}.options.rivers_wetlands_and_freshwater_habitats`
-        ),
-        value: NFM_LAND_TYPES.RIVERS_WETLANDS_FRESHWATER_HABITATS
+        text: request.t(`${localKeyPrefix}.options.wetlands`),
+        value: NFM_LAND_TYPES.WETLANDS
       },
       {
         text: request.t(`${localKeyPrefix}.options.coastal_margins`),

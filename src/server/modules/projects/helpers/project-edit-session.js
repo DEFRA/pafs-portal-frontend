@@ -145,7 +145,7 @@ const NFM_LAND_USE_FIELD_MAPPINGS = [
     afterField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_AFTER
   },
   {
-    landUseType: 'rivers_wetlands_and_freshwater_habitats',
+    landUseType: 'wetlands',
     beforeField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
     afterField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER
   },

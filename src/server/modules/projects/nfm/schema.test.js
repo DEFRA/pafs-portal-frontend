@@ -113,13 +113,21 @@ describe('NFM Selected Measures Schema', () => {
 })
 
 describe('NFM Measure Schemas', () => {
-  test('validates river restoration with 2 decimal places and optional empty volume', () => {
+  test('validates river restoration with 2 decimal places and required volume', () => {
     const result = nfmRiverRestorationSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 45.67,
-      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: ''
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: 10.5
     })
 
     expect(result.error).toBeUndefined()
+  })
+
+  test('rejects river restoration when volume is missing', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 45.67
+    })
+
+    expect(result.error).toBeDefined()
   })
 
   test('rejects river restoration area with more than 2 decimal places', () => {
@@ -169,10 +177,10 @@ describe('NFM Measure Schemas', () => {
     expect(result.error.details[0].type).toBe('number.precision')
   })
 
-  test('validates offline storage with null optional volume', () => {
+  test('validates offline storage with required volume', () => {
     const result = nfmOfflineStorageSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: 8.25,
-      [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: null
+      [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: 50
     })
 
     expect(result.error).toBeUndefined()
@@ -226,25 +234,7 @@ describe('NFM Measure Schemas', () => {
     expect(result.error).toBeUndefined()
   })
 
-  test('allows explicitly undefined optional values', () => {
-    const result = nfmRunoffManagementSchema.validate({
-      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: 10.25,
-      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: undefined
-    })
-
-    expect(result.error).toBeUndefined()
-  })
-
-  test('allows empty string for optional volume fields', () => {
-    const result = nfmRunoffManagementSchema.validate({
-      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: 10.25,
-      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: ''
-    })
-
-    expect(result.error).toBeUndefined()
-  })
-
-  test('allows zero for river restoration optional volume (AC: 0 treated same as empty)', () => {
+  test('allows zero for river restoration volume', () => {
     const result = nfmRiverRestorationSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 45.67,
       [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: 0
@@ -253,7 +243,7 @@ describe('NFM Measure Schemas', () => {
     expect(result.error).toBeUndefined()
   })
 
-  test('allows zero for leaky barriers optional volume (AC: 0 treated same as empty)', () => {
+  test('allows zero for leaky barriers volume', () => {
     const result = nfmLeakyBarriersSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: 0,
       [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]: 1.5,
@@ -263,7 +253,7 @@ describe('NFM Measure Schemas', () => {
     expect(result.error).toBeUndefined()
   })
 
-  test('allows zero for offline storage optional volume (AC: 0 treated same as empty)', () => {
+  test('allows zero for offline storage volume', () => {
     const result = nfmOfflineStorageSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: 8.25,
       [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: 0
@@ -272,7 +262,7 @@ describe('NFM Measure Schemas', () => {
     expect(result.error).toBeUndefined()
   })
 
-  test('allows zero for runoff management optional volume (AC: 0 treated same as empty)', () => {
+  test('allows zero for runoff management volume', () => {
     const result = nfmRunoffManagementSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: 10.25,
       [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: 0
