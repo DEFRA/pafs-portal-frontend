@@ -9,7 +9,10 @@
   {% set wlbErrorMessages = {
     'WLB_FIELD_REQUIRED': t('projects.whole_life_benefits.errors.required'),
     'WLB_FIELD_INVALID': t('projects.whole_life_benefits.errors.invalid'),
-    'WLB_FIELD_OVER_MAX_DIGITS': t('projects.whole_life_benefits.errors.max_digits')
+    'WLB_FIELD_OVER_MAX_DIGITS': t('projects.whole_life_benefits.errors.max_digits'),
+    'WLB_ESTIMATE_REQUIRED': t('projects.whole_life_benefits.errors.required'),
+    'WLB_ESTIMATE_INVALID': t('projects.whole_life_benefits.errors.invalid'),
+    'WLB_ESTIMATE_MAX_DIGITS': t('projects.whole_life_benefits.errors.max_digits')
   } %}
   {# Build error list for summary — deduplicate so the same message only appears once #}
   {% set errorList = [] %}

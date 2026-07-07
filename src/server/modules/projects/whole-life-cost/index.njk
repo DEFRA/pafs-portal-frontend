@@ -7,11 +7,16 @@
 
 {% block body %}
 
+  {% set wlcErrorMessages = {
+    'WLC_COST_REQUIRED': t('projects.whole_life_cost.errors.required'),
+    'WLC_COST_INVALID': t('projects.whole_life_cost.errors.invalid'),
+    'WLC_COST_MAX_DIGITS': t('projects.whole_life_cost.errors.max_digits')
+  } %}
   {# Build error list for summary — deduplicate so the same message only appears once #}
   {% set errorList = [] %}
   {% for field in wlcFields %}
     {% if fieldErrors[field] %}
-      {% set msg = fieldErrors[field] %}
+      {% set msg = wlcErrorMessages[fieldErrors[field]] or fieldErrors[field] %}
       {% if errorList | selectattr('text', 'equalto', msg) | list | length == 0 %}
         {% set errorList = errorList.concat([
           {

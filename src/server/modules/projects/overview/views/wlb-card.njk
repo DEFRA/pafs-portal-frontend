@@ -1,4 +1,4 @@
-{% macro wlbSummaryCard(projectData, PROJECT_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) %}
+{% macro wlbSummaryCard(projectData, PROJECT_TYPES, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas, benefitCostRatio) %}
   {# STR and STU project types never show WLB section #}
   {% set projectType = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] %}
   {% set isHiddenType = projectType == PROJECT_TYPES.STR or projectType == PROJECT_TYPES.STU %}
@@ -66,6 +66,12 @@
                 {% if landValueUpliftBenefitsFormatted %}£{{ landValueUpliftBenefitsFormatted }}{% else %}{{ t('projects.overview.common.na') }}{% endif %}
               </dd>
             </div>
+            {% if benefitCostRatio is not none %}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.wlb_summary_card.benefit_cost_ratio') }}</dt>
+              <dd class="govuk-summary-list__value">{{ benefitCostRatio }}</dd>
+            </div>
+            {% endif %}
           </dl>
         {% else %}
           <p class="govuk-body">{{ t('projects.overview.wlb_summary_card.not_added') }}</p>
