@@ -427,9 +427,6 @@ function processFloodplainWetlandRestoration(payload) {
  */
 function processLandUseDetailData(payload, step) {
   const config = STEP_TO_LAND_TYPE_FIELD_CONFIG[step]
-  if (!config) {
-    return
-  }
   payload[config.beforeField] = keepAsDecimalString(payload[config.beforeField])
   payload[config.afterField] = keepAsDecimalString(payload[config.afterField])
 }
@@ -459,13 +456,15 @@ export function processPayload(step, payload, sessionData) {
       processLandUseChange(payload, sessionData)
   }
 
-  if (step in measureHandlers) {
+  if (Object.prototype.hasOwnProperty.call(measureHandlers, step)) {
     measureHandlers[step]()
     return
   }
 
   // All land-use detail steps use the generic handler
-  if (step in STEP_TO_LAND_TYPE_FIELD_CONFIG) {
+  if (
+    Object.prototype.hasOwnProperty.call(STEP_TO_LAND_TYPE_FIELD_CONFIG, step)
+  ) {
     processLandUseDetailData(payload, step)
   }
 }

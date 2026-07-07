@@ -3,7 +3,8 @@ import { processPayload } from './payload-helpers.js'
 import {
   PROJECT_STEPS,
   PROJECT_PAYLOAD_FIELDS,
-  NFM_LAND_TYPES
+  NFM_LAND_TYPES,
+  NFM_MEASURES
 } from '../../../../common/constants/projects.js'
 
 describe('NFM Payload Helpers', () => {
@@ -393,6 +394,32 @@ describe('NFM Payload Helpers', () => {
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(null)
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(null)
     })
+
+    test('should clear floodplain wetland restoration fields when deselected', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: [
+          NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+        ],
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]: 3,
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]: 30
+      }
+
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration,floodplain_wetland_restoration'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SELECTED_MEASURES, payload, sessionData)
+
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]
+      ).toBe(null)
+      expect(
+        payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
+        ]
+      ).toBe(null)
+    })
   })
 
   describe('processPayload - NFM_LAND_USE_CHANGE', () => {
@@ -689,6 +716,17 @@ describe('NFM Payload Helpers', () => {
       const originalPayload = { ...payload }
 
       processPayload('UNKNOWN_STEP', payload)
+
+      expect(payload).toEqual(originalPayload)
+    })
+
+    test('should ignore inherited object keys used as step names', () => {
+      const payload = {
+        someField: 'value'
+      }
+      const originalPayload = { ...payload }
+
+      processPayload('toString', payload)
 
       expect(payload).toEqual(originalPayload)
     })
