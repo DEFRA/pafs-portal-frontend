@@ -1388,5 +1388,41 @@ describe('OverviewController', () => {
       )
       expect(result).toBe('3.33')
     })
+
+    test('returns null when benefits field is empty string', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({ [field.ESTIMATED_WHOLE_LIFE_BENEFITS]: '' })
+        )
+      ).toBeNull()
+    })
+
+    test('returns null when a WLC field is empty string', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({
+            [field.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: ''
+          })
+        )
+      ).toBeNull()
+    })
+
+    test('returns null when benefits field is non-numeric', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({ [field.ESTIMATED_WHOLE_LIFE_BENEFITS]: 'abc' })
+        )
+      ).toBeNull()
+    })
+
+    test('returns null when a WLC field is non-numeric', () => {
+      expect(
+        computeBenefitCostRatio(
+          makeProjectData({
+            [field.WLC_ESTIMATED_DESIGN_CONSTRUCTION_COSTS]: 'abc'
+          })
+        )
+      ).toBeNull()
+    })
   })
 })

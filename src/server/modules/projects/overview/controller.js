@@ -51,6 +51,11 @@ import { submitProjectProposal } from '../../../common/services/project/project-
  * @param {Object} projectData - Flat project data from the session
  * @returns {string|null} Ratio to 2 dp (e.g. "1.50"), or null
  */
+// Accepts numeric strings ('0', '1000000'), plain numbers, and bigint strings.
+// Rejects null, undefined, empty string, and non-finite conversions (NaN, ±Infinity).
+const isValidNumeric = (value) =>
+  value != null && value !== '' && Number.isFinite(Number(value))
+
 export function computeBenefitCostRatio(projectData) {
   const benefits =
     projectData[PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]
@@ -63,14 +68,14 @@ export function computeBenefitCostRatio(projectData) {
   const futureCosts =
     projectData[PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS]
 
-  // Option A: all five inputs must be present for a sound calculation
+  // Option A: all five inputs must be valid numerics for a sound calculation
   const allCostFieldsPresent =
-    pvCosts != null &&
-    designCosts != null &&
-    riskCosts != null &&
-    futureCosts != null
+    isValidNumeric(pvCosts) &&
+    isValidNumeric(designCosts) &&
+    isValidNumeric(riskCosts) &&
+    isValidNumeric(futureCosts)
 
-  if (benefits == null || !allCostFieldsPresent) {
+  if (!isValidNumeric(benefits) || !allCostFieldsPresent) {
     return null
   }
 
