@@ -438,4 +438,227 @@ describe('ImportantDatesController', () => {
       )
     })
   })
+
+  describe('STR/STU simplified journey', () => {
+    const SIMPLIFIED_TYPES = ['STU', 'STR']
+
+    describe('getHandler — skips middle steps', () => {
+      test.each(SIMPLIFIED_TYPES)(
+        '%s: redirects COMPLETE_OUTLINE_BUSINESS_CASE to START_BENEFITS',
+        async (projectType) => {
+          getProjectStep.mockReturnValue(
+            PROJECT_STEPS.COMPLETE_OUTLINE_BUSINESS_CASE
+          )
+          getSessionData.mockReturnValue({
+            slug: 'TEST-001',
+            projectType
+          })
+
+          await importantDatesController.getHandler(mockRequest, mockH)
+
+          expect(mockH.redirect).toHaveBeenCalledWith(
+            ROUTES.PROJECT.EDIT.START_BENEFITS.replace(
+              '{referenceNumber}',
+              'TEST-001'
+            )
+          )
+        }
+      )
+
+      test.each(SIMPLIFIED_TYPES)(
+        '%s: redirects AWARD_MAIN_CONTRACT to START_BENEFITS',
+        async (projectType) => {
+          getProjectStep.mockReturnValue(PROJECT_STEPS.AWARD_MAIN_CONTRACT)
+          getSessionData.mockReturnValue({
+            slug: 'TEST-001',
+            projectType
+          })
+
+          await importantDatesController.getHandler(mockRequest, mockH)
+
+          expect(mockH.redirect).toHaveBeenCalledWith(
+            ROUTES.PROJECT.EDIT.START_BENEFITS.replace(
+              '{referenceNumber}',
+              'TEST-001'
+            )
+          )
+        }
+      )
+
+      test.each(SIMPLIFIED_TYPES)(
+        '%s: redirects START_WORK to START_BENEFITS',
+        async (projectType) => {
+          getProjectStep.mockReturnValue(PROJECT_STEPS.START_WORK)
+          getSessionData.mockReturnValue({
+            slug: 'TEST-001',
+            projectType
+          })
+
+          await importantDatesController.getHandler(mockRequest, mockH)
+
+          expect(mockH.redirect).toHaveBeenCalledWith(
+            ROUTES.PROJECT.EDIT.START_BENEFITS.replace(
+              '{referenceNumber}',
+              'TEST-001'
+            )
+          )
+        }
+      )
+
+      test.each(SIMPLIFIED_TYPES)(
+        '%s: renders view for START_OUTLINE_BUSINESS_CASE (not skipped)',
+        async (projectType) => {
+          getProjectStep.mockReturnValue(
+            PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE
+          )
+          getSessionData.mockReturnValue({
+            slug: 'TEST-001',
+            projectType,
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+          })
+
+          await importantDatesController.getHandler(mockRequest, mockH)
+
+          expect(mockH.view).toHaveBeenCalledWith(
+            PROJECT_VIEWS.IMPORTANT_DATES,
+            expect.any(Object)
+          )
+        }
+      )
+
+      test.each(SIMPLIFIED_TYPES)(
+        '%s: renders view for START_BENEFITS (not skipped)',
+        async (projectType) => {
+          getProjectStep.mockReturnValue(PROJECT_STEPS.START_BENEFITS)
+          IMPORTANT_DATES_CONFIG[PROJECT_STEPS.START_BENEFITS] = {
+            backLinkOptions: {},
+            localKeyPrefix:
+              'projects.important_dates.start_achieving_its_benefits',
+            fieldType: 'date',
+            monthField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+            yearField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR,
+            schema: {}
+          }
+          getSessionData.mockReturnValue({
+            slug: 'TEST-001',
+            projectType,
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+          })
+
+          await importantDatesController.getHandler(mockRequest, mockH)
+
+          expect(mockH.view).toHaveBeenCalledWith(
+            PROJECT_VIEWS.IMPORTANT_DATES,
+            expect.any(Object)
+          )
+        }
+      )
+    })
+
+    describe('postHandler — simplified step sequence', () => {
+      test.each(SIMPLIFIED_TYPES)(
+        '%s: after START_OUTLINE_BUSINESS_CASE goes to START_BENEFITS',
+        async (projectType) => {
+          getProjectStep.mockReturnValue(
+            PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE
+          )
+          getSessionData.mockReturnValue({
+            slug: 'TEST-001',
+            projectType,
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+          })
+          IMPORTANT_DATES_CONFIG[PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE] = {
+            backLinkOptions: {},
+            localKeyPrefix:
+              'projects.important_dates.start_outline_business_case',
+            fieldType: 'date',
+            monthField:
+              PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH,
+            yearField: PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR,
+            schema: {}
+          }
+          saveProjectWithErrorHandling.mockResolvedValue(null)
+
+          await importantDatesController.postHandler(mockRequest, mockH)
+
+          expect(mockH.redirect).toHaveBeenCalledWith(
+            ROUTES.PROJECT.EDIT.START_BENEFITS.replace(
+              '{referenceNumber}',
+              'TEST-001'
+            )
+          )
+        }
+      )
+    })
+
+    describe('_getConfig locale key override', () => {
+      test('STU START_OUTLINE uses study_start locale prefix', async () => {
+        getProjectStep.mockReturnValue(
+          PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE
+        )
+        getSessionData.mockReturnValue({
+          slug: 'TEST-001',
+          projectType: 'STU',
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+        })
+        IMPORTANT_DATES_CONFIG[PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE] = {
+          backLinkOptions: {},
+          localKeyPrefix:
+            'projects.important_dates.start_outline_business_case',
+          fieldType: 'date',
+          monthField: PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH,
+          yearField: PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR,
+          schema: {}
+        }
+
+        await importantDatesController.getHandler(mockRequest, mockH)
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            localKeyPrefix: 'projects.important_dates.study_start'
+          })
+        )
+      })
+
+      test('STR START_BENEFITS uses strategy_end locale prefix', async () => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.START_BENEFITS)
+        getSessionData.mockReturnValue({
+          slug: 'TEST-001',
+          projectType: 'STR',
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+        })
+        IMPORTANT_DATES_CONFIG[PROJECT_STEPS.START_BENEFITS] = {
+          backLinkOptions: {
+            targetURL: ROUTES.PROJECT.OVERVIEW,
+            targetEditURL: ROUTES.PROJECT.EDIT.START_WORK,
+            conditionalRedirect: false
+          },
+          localKeyPrefix:
+            'projects.important_dates.start_achieving_its_benefits',
+          fieldType: 'date',
+          monthField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+          yearField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR,
+          schema: {}
+        }
+
+        await importantDatesController.getHandler(mockRequest, mockH)
+
+        expect(buildViewData).toHaveBeenCalledWith(
+          mockRequest,
+          expect.objectContaining({
+            localKeyPrefix: 'projects.important_dates.strategy_end',
+            backLinkOptions: expect.objectContaining({
+              targetEditURL: ROUTES.PROJECT.EDIT.START_OUTLINE_BUSINESS_CASE
+            })
+          })
+        )
+      })
+    })
+  })
 })

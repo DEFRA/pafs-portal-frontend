@@ -60,7 +60,11 @@
       "start_construction_date": "Start construction",
       "ready_for_service_date": "Ready for service",
       "could_start_earlier": "Could start earlier with Grant in Aid",
-      "earliest_start_date": "Earliest start date with Grant in Aid"
+      "earliest_start_date": "Earliest start date with Grant in Aid",
+      "study_start_date": "Study start date",
+      "study_end_date": "Study completion date",
+      "strategy_start_date": "Strategy start date",
+      "strategy_end_date": "Strategy completion date"
     },
     "funding_summary_card": {
       "title": "Funding sources and spending",
@@ -419,6 +423,30 @@
       "heading": "When do you expect to start the project's outline business case?",
       "hint": "na",
       "placeholder": "to start the outline business case"
+    },
+    "study_start": {
+      "title": "What date do you expect to start your study?",
+      "heading": "What date do you expect to start your study?",
+      "hint": "na",
+      "placeholder": "to start your study"
+    },
+    "study_end": {
+      "title": "What date do you expect to complete your study?",
+      "heading": "What date do you expect to complete your study?",
+      "hint": "na",
+      "placeholder": "to complete your study"
+    },
+    "strategy_start": {
+      "title": "When do you expect to start the project's Strategic Appraisal Report?",
+      "heading": "When do you expect to start the project's Strategic Appraisal Report?",
+      "hint": "na",
+      "placeholder": "to start your strategy"
+    },
+    "strategy_end": {
+      "title": "When do you expect to complete the project's Strategic Appraisal Report?",
+      "heading": "When do you expect to complete the project's Strategic Appraisal Report?",
+      "hint": "na",
+      "placeholder": "to complete your strategy"
     },
     "complete_outline_business_case": {
       "title": "When do you expect to complete the project's outline business case?",

@@ -2,7 +2,9 @@ import { PROJECT_VIEWS } from '../../../common/constants/common.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_PAYLOAD_LEVELS,
-  PROJECT_STEPS
+  PROJECT_STEPS,
+  PROJECT_TYPES,
+  REFERENCE_NUMBER_PARAM
 } from '../../../common/constants/projects.js'
 import { ROUTES } from '../../../common/constants/routes.js'
 import { extractApiError } from '../../../common/helpers/error-renderer/index.js'
@@ -17,6 +19,47 @@ import {
   navigateToProjectOverview,
   formatDate
 } from '../helpers/project-utils.js'
+
+// Project types that use the simplified 2-date journey (start + end only).
+const STR_STU_SIMPLIFIED_TYPES = new Set([PROJECT_TYPES.STR, PROJECT_TYPES.STU])
+
+// Steps that are shown only in the full journey — STR/STU skip these and land on START_BENEFITS.
+const FULL_JOURNEY_ONLY_STEPS = new Set([
+  PROJECT_STEPS.COMPLETE_OUTLINE_BUSINESS_CASE,
+  PROJECT_STEPS.AWARD_MAIN_CONTRACT,
+  PROJECT_STEPS.START_WORK
+])
+
+// Config overrides for the two steps that differ in the simplified journey.
+// Each entry replaces only the keys that need to change; the rest come from IMPORTANT_DATES_CONFIG.
+const SIMPLIFIED_CONFIG_OVERRIDES = {
+  [PROJECT_TYPES.STU]: {
+    [PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE]: {
+      localKeyPrefix: 'projects.important_dates.study_start'
+    },
+    [PROJECT_STEPS.START_BENEFITS]: {
+      localKeyPrefix: 'projects.important_dates.study_end',
+      backLinkOptions: {
+        targetURL: ROUTES.PROJECT.OVERVIEW,
+        targetEditURL: ROUTES.PROJECT.EDIT.START_OUTLINE_BUSINESS_CASE,
+        conditionalRedirect: false
+      }
+    }
+  },
+  [PROJECT_TYPES.STR]: {
+    [PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE]: {
+      localKeyPrefix: 'projects.important_dates.strategy_start'
+    },
+    [PROJECT_STEPS.START_BENEFITS]: {
+      localKeyPrefix: 'projects.important_dates.strategy_end',
+      backLinkOptions: {
+        targetURL: ROUTES.PROJECT.OVERVIEW,
+        targetEditURL: ROUTES.PROJECT.EDIT.START_OUTLINE_BUSINESS_CASE,
+        conditionalRedirect: false
+      }
+    }
+  }
+}
 
 // Previous stage mappings for date validation
 const PREVIOUS_STAGE_MAP = {
@@ -53,7 +96,7 @@ const PAYLOAD_LEVEL_MAP = {
     PROJECT_PAYLOAD_LEVELS.EARLIEST_START_DATE
 }
 
-// Step sequence for navigation flow
+// Step sequence for the full journey (DEF / REF / REP / ELO / HCR)
 const STEP_SEQUENCE = {
   [PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE]:
     ROUTES.PROJECT.EDIT.COMPLETE_OUTLINE_BUSINESS_CASE,
@@ -66,14 +109,38 @@ const STEP_SEQUENCE = {
   [PROJECT_STEPS.EARLIEST_START_DATE]: ROUTES.PROJECT.OVERVIEW
 }
 
+// Step sequence for the simplified journey (STR / STU)
+const SIMPLIFIED_STEP_SEQUENCE = {
+  [PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE]:
+    ROUTES.PROJECT.EDIT.START_BENEFITS,
+  [PROJECT_STEPS.START_BENEFITS]: ROUTES.PROJECT.EDIT.COULD_START_EARLY,
+  [PROJECT_STEPS.COULD_START_EARLY]: ROUTES.PROJECT.EDIT.EARLIEST_START_DATE,
+  [PROJECT_STEPS.EARLIEST_START_DATE]: ROUTES.PROJECT.OVERVIEW
+}
+
 /**
  * Important Dates Controller
  * Handles all important dates fields (date fields and could start earlier radio)
  * Only update mode - always requires referenceNumber
  */
 class ImportantDatesController {
-  _getConfig(step) {
-    return IMPORTANT_DATES_CONFIG[step]
+  _isSimplifiedType(projectType) {
+    return STR_STU_SIMPLIFIED_TYPES.has(projectType)
+  }
+
+  _getEffectiveLocalKeyPrefix(step, projectType) {
+    return (
+      SIMPLIFIED_CONFIG_OVERRIDES[projectType]?.[step]?.localKeyPrefix ?? null
+    )
+  }
+
+  _getConfig(step, projectType) {
+    const base = IMPORTANT_DATES_CONFIG[step]
+    const overrides = SIMPLIFIED_CONFIG_OVERRIDES[projectType]?.[step]
+    if (!overrides) {
+      return base
+    }
+    return { ...base, ...overrides }
   }
 
   _getPreviousStageData(step, sessionData) {
@@ -132,8 +199,9 @@ class ImportantDatesController {
 
   _getViewData(request) {
     const step = getProjectStep(request)
-    const config = this._getConfig(step)
     const sessionData = getSessionData(request)
+    const projectType = sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]
+    const config = this._getConfig(step, projectType)
     const {
       backLinkOptions,
       localKeyPrefix,
@@ -180,37 +248,57 @@ class ImportantDatesController {
     const sessionData = getSessionData(request)
     const { slug: referenceNumber } = sessionData
     const step = getProjectStep(request)
+    const projectType = sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]
+    const isSimplified = this._isSimplifiedType(projectType)
 
-    // Handle COULD_START_EARLY step - conditional branching
+    // Handle COULD_START_EARLY step - conditional branching (same for all types)
     if (step === PROJECT_STEPS.COULD_START_EARLY) {
       const couldStartEarly = request.payload?.couldStartEarly
       if (couldStartEarly === 'true' || couldStartEarly === true) {
         return h
           .redirect(
             ROUTES.PROJECT.EDIT.EARLIEST_START_DATE.replace(
-              '{referenceNumber}',
+              REFERENCE_NUMBER_PARAM,
               referenceNumber
             )
           )
           .takeover()
       }
-      // If answer is no, return to overview
       return navigateToProjectOverview(referenceNumber, h)
     }
 
-    // For all other cases, move to the next step in sequence
-    const nextRoute = STEP_SEQUENCE[step]
+    const sequence = isSimplified ? SIMPLIFIED_STEP_SEQUENCE : STEP_SEQUENCE
+    const nextRoute = sequence[step]
     if (nextRoute) {
       return h
-        .redirect(nextRoute.replace('{referenceNumber}', referenceNumber))
+        .redirect(nextRoute.replace(REFERENCE_NUMBER_PARAM, referenceNumber))
         .takeover()
     }
 
-    // Fallback to overview
     return navigateToProjectOverview(referenceNumber, h)
   }
 
   async get(request, h) {
+    const sessionData = getSessionData(request)
+    const projectType = sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]
+    const step = getProjectStep(request)
+
+    // STR/STU skip the 3 middle steps — redirect to the end-date step
+    if (
+      this._isSimplifiedType(projectType) &&
+      FULL_JOURNEY_ONLY_STEPS.has(step)
+    ) {
+      const referenceNumber = sessionData.slug
+      return h
+        .redirect(
+          ROUTES.PROJECT.EDIT.START_BENEFITS.replace(
+            REFERENCE_NUMBER_PARAM,
+            referenceNumber
+          )
+        )
+        .takeover()
+    }
+
     return h.view(PROJECT_VIEWS.IMPORTANT_DATES, this._getViewData(request))
   }
 
@@ -231,9 +319,11 @@ class ImportantDatesController {
   async post(request, h) {
     // Save form data to session
     updateSessionData(request, request.payload)
-    const viewData = this._getViewData(request)
+    const sessionData = getSessionData(request)
+    const projectType = sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]
     const step = getProjectStep(request)
-    const config = this._getConfig(step)
+    const viewData = this._getViewData(request)
+    const config = this._getConfig(step, projectType)
     const { schema } = config
 
     try {
