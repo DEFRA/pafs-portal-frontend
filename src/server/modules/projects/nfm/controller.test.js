@@ -535,7 +535,7 @@ describe('NFM Controller', () => {
         await nfmController.postHandler(mockRequest, mockH)
 
         expect(mockH.redirect).toHaveBeenCalledWith(
-          '/project/TEST-001/nfm-river-restoration'
+          '/project/TEST-001/nfm-woodland'
         )
         expect(mockH.takeover).toHaveBeenCalled()
       })

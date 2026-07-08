@@ -673,8 +673,7 @@
         "label": "Area"
       },
       "volume": {
-        "label": "Design storage volume",
-        "hint": "If known"
+        "label": "Design storage volume"
       },
       "errors": {
         "area_required": "Enter the area in hectares",
@@ -691,8 +690,7 @@
     "leaky_barriers": {
       "title": "Details of Leaky barriers and in-channel storage",
       "volume": {
-        "label": "Design storage volume",
-        "hint": "If known"
+        "label": "Design storage volume"
       },
       "length": {
         "label": "Length"
@@ -722,8 +720,7 @@
         "label": "Area"
       },
       "volume": {
-        "label": "Design storage volume",
-        "hint": "If known"
+        "label": "Design storage volume"
       },
       "errors": {
         "area_required": "Enter the area in hectares",
@@ -771,8 +768,7 @@
         "label": "Area"
       },
       "volume": {
-        "label": "Design storage volume",
-        "hint": "If known"
+        "label": "Design storage volume"
       },
       "errors": {
         "area_required": "Enter the area in hectares",
@@ -832,8 +828,7 @@
         "label": "Area"
       },
       "volume": {
-        "label": "Design storage volume",
-        "hint": "If known"
+        "label": "Design storage volume"
       },
       "errors": {
         "area_required": "Enter the area in hectares",

@@ -28,7 +28,7 @@ describe('NFM Redirect Helpers', () => {
   })
 
   describe('handleConditionalRedirect - NFM_RIVER_RESTORATION', () => {
-    test('should redirect to leaky barriers when selected', async () => {
+    test('should skip previously ordered measures and redirect to land use change', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'river_floodplain_restoration,leaky_barriers'
@@ -44,8 +44,7 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toContain('leaky-barriers')
-      expect(result.path).toContain('TEST-001')
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
     })
 
     test('should redirect to land use change when leaky barriers not selected', async () => {
@@ -103,7 +102,7 @@ describe('NFM Redirect Helpers', () => {
   })
 
   describe('handleConditionalRedirect - NFM_LEAKY_BARRIERS', () => {
-    test('should redirect to land use change after leaky barriers when no further measures selected', async () => {
+    test('should redirect to river restoration after leaky barriers when selected', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'river_floodplain_restoration,leaky_barriers'
@@ -119,13 +118,13 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
+      expect(result.path).toBe('/project/TEST-001/nfm-river-restoration')
     })
 
     test('should redirect to sand dune when sand dune is selected after leaky barriers', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
-          'river_floodplain_restoration,leaky_barriers,sand_dune_management'
+          'leaky_barriers,sand_dune_management'
       }
 
       const result = await handleConditionalRedirect(
@@ -188,7 +187,7 @@ describe('NFM Redirect Helpers', () => {
     test('should redirect to sand dune when sand dune is selected after woodland', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
-          'river_floodplain_restoration,leaky_barriers,offline_storage,woodland,sand_dune_management'
+          'woodland,sand_dune_management'
       }
 
       const result = await handleConditionalRedirect(
@@ -207,8 +206,7 @@ describe('NFM Redirect Helpers', () => {
 
     test('should redirect to land use change when no further measures selected after woodland', async () => {
       const sessionData = {
-        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
-          'offline_storage,woodland'
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'woodland'
       }
 
       const result = await handleConditionalRedirect(
@@ -432,7 +430,7 @@ describe('NFM Redirect Helpers', () => {
   })
 
   describe('handleConditionalRedirect - NFM_SAND_DUNE', () => {
-    test('should redirect to floodplain wetland restoration when selected', async () => {
+    test('should redirect to land use change when floodplain is selected earlier in order', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'sand_dune_management,floodplain_wetland_restoration'
@@ -448,8 +446,7 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toContain('floodplain-wetland-restoration')
-      expect(result.path).toContain('TEST-001')
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
     })
 
     test('should redirect to land use change after sand dune', async () => {
@@ -489,7 +486,7 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
+      expect(result.path).toBe('/project/TEST-001/nfm-sand-dune')
     })
   })
 

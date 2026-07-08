@@ -114,6 +114,7 @@ export const nfmRiverRestorationSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: Joi.number()
     .unsafe()
+    .empty('')
     .min(0)
     .custom(maxTwoDecimalPlaces)
     .required()
@@ -133,6 +134,7 @@ export const nfmRiverRestorationSchema = Joi.object({
 export const nfmLeakyBarriersSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: Joi.number()
     .unsafe()
+    .empty('')
     .min(0)
     .custom(maxTwoDecimalPlaces)
     .required()
@@ -191,6 +193,7 @@ export const nfmOfflineStorageSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: Joi.number()
     .unsafe()
+    .empty('')
     .min(0)
     .custom(maxTwoDecimalPlaces)
     .required()
@@ -263,6 +266,7 @@ export const nfmRunoffManagementSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: Joi.number()
     .unsafe()
+    .empty('')
     .min(0)
     .custom(maxTwoDecimalPlaces)
     .required()
@@ -296,6 +300,7 @@ export const nfmFloodplainWetlandRestorationSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]:
     Joi.number()
       .unsafe()
+      .empty('')
       .min(0)
       .custom(maxTwoDecimalPlaces)
       .required()

@@ -9,6 +9,7 @@ import {
   nfmWoodlandSchema,
   nfmHeadwaterDrainageSchema,
   nfmRunoffManagementSchema,
+  nfmFloodplainWetlandRestorationSchema,
   nfmSaltmarshSchema,
   nfmSandDuneSchema,
   nfmLandUseChangeSchema,
@@ -130,6 +131,16 @@ describe('NFM Measure Schemas', () => {
     expect(result.error).toBeDefined()
   })
 
+  test('rejects river restoration when volume is blank', () => {
+    const result = nfmRiverRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 45.67,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: ''
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('any.required')
+  })
+
   test('rejects river restoration area with more than 2 decimal places', () => {
     const result = nfmRiverRestorationSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 45.678,
@@ -167,6 +178,17 @@ describe('NFM Measure Schemas', () => {
     expect(result.error).toBeUndefined()
   })
 
+  test('rejects leaky barriers when volume is blank', () => {
+    const result = nfmLeakyBarriersSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: '',
+      [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH]: 1.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH]: 3.5
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('any.required')
+  })
+
   test('rejects runoff management volume with more than 2 decimal places', () => {
     const result = nfmRunoffManagementSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: 20.5,
@@ -177,6 +199,16 @@ describe('NFM Measure Schemas', () => {
     expect(result.error.details[0].type).toBe('number.precision')
   })
 
+  test('rejects runoff management when volume is blank', () => {
+    const result = nfmRunoffManagementSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA]: 20.5,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: ''
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('any.required')
+  })
+
   test('validates offline storage with required volume', () => {
     const result = nfmOfflineStorageSchema.validate({
       [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: 8.25,
@@ -184,6 +216,16 @@ describe('NFM Measure Schemas', () => {
     })
 
     expect(result.error).toBeUndefined()
+  })
+
+  test('rejects offline storage when volume is blank', () => {
+    const result = nfmOfflineStorageSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA]: 8.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: ''
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('any.required')
   })
 
   test('rejects woodland area when negative', () => {
@@ -269,6 +311,73 @@ describe('NFM Measure Schemas', () => {
     })
 
     expect(result.error).toBeUndefined()
+  })
+
+  test('validates floodplain wetland restoration with area and volume', () => {
+    const result = nfmFloodplainWetlandRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]: 10.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]: 100.5
+    })
+
+    expect(result.error).toBeUndefined()
+  })
+
+  test('rejects floodplain wetland restoration when area is missing', () => {
+    const result = nfmFloodplainWetlandRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]: 100.5
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('any.required')
+  })
+
+  test('rejects floodplain wetland restoration when volume is missing', () => {
+    const result = nfmFloodplainWetlandRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]: 10.25
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('any.required')
+  })
+
+  test('rejects blank floodplain wetland restoration volume', () => {
+    const result = nfmFloodplainWetlandRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]: 10.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]: ''
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('any.required')
+  })
+
+  test('rejects floodplain wetland restoration area with more than 2 decimal places', () => {
+    const result = nfmFloodplainWetlandRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]: 10.257,
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]: 100.5
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
+  })
+
+  test('rejects floodplain wetland restoration volume with more than 2 decimal places', () => {
+    const result = nfmFloodplainWetlandRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]: 10.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]: 100.567
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.precision')
+  })
+
+  test('rejects negative floodplain wetland restoration volume', () => {
+    const result = nfmFloodplainWetlandRestorationSchema.validate({
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]: 10.25,
+      [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]: -1
+    })
+
+    expect(result.error).toBeDefined()
+    expect(result.error.details[0].type).toBe('number.min')
   })
 
   test('rejects negative value for river restoration volume', () => {
