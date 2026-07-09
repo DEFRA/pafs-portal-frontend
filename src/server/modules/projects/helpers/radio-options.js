@@ -45,7 +45,8 @@ export function buildRadioItems(
   currentValue,
   options = {}
 ) {
-  const { useHints = false, useBoldLabels = false } = options
+  const { useHints = false, useBoldLabels = false, excludeKeys = [] } = options
+  const excludeSet = new Set(excludeKeys)
   const items = []
 
   // Retrieve the full options object to detect divider keys
@@ -56,6 +57,10 @@ export function buildRadioItems(
       : []
 
   for (const key of translationKeys) {
+    if (excludeSet.has(key)) {
+      continue
+    }
+
     if (key === 'divider') {
       // Handle divider entries from the translation data
       items.push({ divider: t('common.or') })

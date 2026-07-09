@@ -23,6 +23,7 @@ import {
   formatFileSize,
   getProjectStateTag,
   isConfidenceRestrictedProjectType,
+  hasNonGiaContributions,
   buildProcessedFundingValues,
   computeFundingSourceTotals,
   buildIdToYearMap,
@@ -929,6 +930,155 @@ describe('project-utils', () => {
 
     test('should return false for unknown project type', () => {
       expect(isConfidenceRestrictedProjectType('UNKNOWN_TYPE')).toBe(false)
+    })
+  })
+
+  // ─── hasNonGiaContributions ────────────────────────────────────────────────
+
+  describe('hasNonGiaContributions', () => {
+    test('returns false when fundingValues is not an array', () => {
+      expect(hasNonGiaContributions(null)).toBe(false)
+      expect(hasNonGiaContributions(undefined)).toBe(false)
+      expect(hasNonGiaContributions({})).toBe(false)
+    })
+
+    test('returns false when fundingValues is an empty array', () => {
+      expect(hasNonGiaContributions([])).toBe(false)
+    })
+
+    test('returns false when all non-GIA fields are zero or empty', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          fcermGia: '50000',
+          localLevy: '0',
+          publicContributions: '',
+          privateContributions: null,
+          otherEaContributions: undefined,
+          notYetIdentified: '0'
+        }
+      ]
+      expect(hasNonGiaContributions(rows)).toBe(false)
+    })
+
+    test('returns true when localLevy > 0 in any row', () => {
+      const rows = [
+        { financialYear: 2025, fcermGia: '50000', localLevy: '10000' }
+      ]
+      expect(hasNonGiaContributions(rows)).toBe(true)
+    })
+
+    test('returns true when publicContributions > 0', () => {
+      const rows = [{ financialYear: 2025, publicContributions: '5000' }]
+      expect(hasNonGiaContributions(rows)).toBe(true)
+    })
+
+    test('returns true when privateContributions > 0', () => {
+      const rows = [{ financialYear: 2025, privateContributions: '1' }]
+      expect(hasNonGiaContributions(rows)).toBe(true)
+    })
+
+    test('returns true when otherEaContributions > 0', () => {
+      const rows = [{ financialYear: 2025, otherEaContributions: '200' }]
+      expect(hasNonGiaContributions(rows)).toBe(true)
+    })
+
+    test('returns true when notYetIdentified > 0', () => {
+      const rows = [{ financialYear: 2025, notYetIdentified: '99' }]
+      expect(hasNonGiaContributions(rows)).toBe(true)
+    })
+
+    test('returns true when public contributor amount > 0 even if summary field is empty', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          publicContributions: '',
+          publicContributors: [
+            {
+              name: 'Council A',
+              contributorType: 'public_contributions',
+              amount: '2500'
+            }
+          ]
+        }
+      ]
+      expect(hasNonGiaContributions(rows)).toBe(true)
+    })
+
+    test('returns true when private contributor amount > 0', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          privateContributions: '0',
+          privateContributors: [
+            {
+              name: 'Business A',
+              contributorType: 'private_contributions',
+              amount: '1'
+            }
+          ]
+        }
+      ]
+      expect(hasNonGiaContributions(rows)).toBe(true)
+    })
+
+    test('returns true when other EA contributor amount > 0', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          otherEaContributions: null,
+          otherEaContributors: [
+            {
+              name: 'EA Team',
+              contributorType: 'other_ea_contributions',
+              amount: '300'
+            }
+          ]
+        }
+      ]
+      expect(hasNonGiaContributions(rows)).toBe(true)
+    })
+
+    test('returns false when contributor arrays exist but all amounts are zero/empty', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          publicContributors: [{ name: 'Council A', amount: '0' }],
+          privateContributors: [{ name: 'Business A', amount: '' }],
+          otherEaContributors: [{ name: 'EA Team', amount: null }]
+        }
+      ]
+      expect(hasNonGiaContributions(rows)).toBe(false)
+    })
+
+    test('returns false when only GIA/Additional-GIA fields have values', () => {
+      const rows = [
+        {
+          financialYear: 2025,
+          fcermGia: '50000',
+          assetReplacementAllowance: '10000',
+          environmentStatutoryFunding: '5000',
+          frequentlyFloodedCommunities: '2000',
+          otherAdditionalGrantInAid: '3000',
+          otherGovernmentDepartment: '1500',
+          recovery: '500',
+          summerEconomicFund: '250'
+        }
+      ]
+      expect(hasNonGiaContributions(rows)).toBe(false)
+    })
+
+    test('returns true when non-GIA field > 0 in second row', () => {
+      const rows = [
+        { financialYear: 2025, fcermGia: '50000', localLevy: '0' },
+        { financialYear: 2026, fcermGia: '30000', localLevy: '1' }
+      ]
+      expect(hasNonGiaContributions(rows)).toBe(true)
+    })
+
+    test('handles numeric values (not just strings)', () => {
+      const rows = [{ financialYear: 2025, localLevy: 1000 }]
+      expect(hasNonGiaContributions(rows)).toBe(true)
     })
   })
 

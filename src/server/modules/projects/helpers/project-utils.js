@@ -40,6 +40,63 @@ export function isConfidenceRestrictedProjectType(projectType) {
   return restrictedTypes.includes(projectType)
 }
 
+/**
+ * Funding fields that are not Grant in Aid or Additional Grant in Aid.
+ * A project has non-GIA contributions when any of these fields has a value > 0
+ * in any financial year row, which affects the available options on Q3 of the
+ * confidence assessment (hiding the "N/A" option).
+ */
+const NON_GIA_FUNDING_FIELDS = [
+  'localLevy',
+  'publicContributions',
+  'privateContributions',
+  'otherEaContributions',
+  'notYetIdentified'
+]
+
+const NON_GIA_CONTRIBUTOR_ARRAY_FIELDS = [
+  'publicContributors',
+  'privateContributors',
+  'otherEaContributors'
+]
+
+function _isPositiveAmount(value) {
+  return (
+    value !== null && value !== undefined && value !== '' && Number(value) > 0
+  )
+}
+
+function _hasPositiveContributorAmount(contributors) {
+  if (!Array.isArray(contributors) || contributors.length === 0) {
+    return false
+  }
+  return contributors.some((contributor) =>
+    _isPositiveAmount(contributor?.amount)
+  )
+}
+
+/**
+ * Returns true if any funding value row contains a non-GIA / non-Additional-GIA
+ * funding source with a value greater than zero.
+ *
+ * Used to decide whether to hide the "N/A" option on Q3 of the confidence assessment.
+ *
+ * @param {Array} fundingValues - Array of funding value row objects from session data
+ * @returns {boolean}
+ */
+export function hasNonGiaContributions(fundingValues) {
+  if (!Array.isArray(fundingValues) || fundingValues.length === 0) {
+    return false
+  }
+  return fundingValues.some(
+    (row) =>
+      NON_GIA_FUNDING_FIELDS.some((field) => _isPositiveAmount(row[field])) ||
+      NON_GIA_CONTRIBUTOR_ARRAY_FIELDS.some((field) =>
+        _hasPositiveContributorAmount(row[field])
+      )
+  )
+}
+
 export function getBackLink(request, options = {}) {
   const { targetURL = '/', conditionalRedirect = false } = options
 
