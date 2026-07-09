@@ -312,18 +312,19 @@ class GoalsUrgencyConfidenceController {
     // For Q3, reject N/A when non-GIA contributions are present.
     if (step === PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING) {
       const fundingValues = this._getFundingValuesForQ3(request)
-      if (hasNonGiaContributions(fundingValues)) {
-        if (request.payload?.[fieldName] === 'not_applicable') {
-          return this._handleValidationError(h, viewData, {
-            fieldErrors: {
-              [fieldName]: 'CONFIDENCE_SECURED_PARTNERSHIP_FUNDING_INVALID'
-            },
-            fieldName,
-            fieldType,
-            request,
-            step
-          })
-        }
+      if (
+        hasNonGiaContributions(fundingValues) &&
+        request.payload?.[fieldName] === 'not_applicable'
+      ) {
+        return this._handleValidationError(h, viewData, {
+          fieldErrors: {
+            [fieldName]: 'CONFIDENCE_SECURED_PARTNERSHIP_FUNDING_INVALID'
+          },
+          fieldName,
+          fieldType,
+          request,
+          step
+        })
       }
     }
 
