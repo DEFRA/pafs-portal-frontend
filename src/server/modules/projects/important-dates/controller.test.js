@@ -127,8 +127,8 @@ describe('ImportantDatesController', () => {
     test('should include financial year dates', async () => {
       await importantDatesController.getHandler(mockRequest, mockH)
 
-      expect(formatDate).toHaveBeenCalledWith('4', '2025')
-      expect(formatDate).toHaveBeenCalledWith('3', 2027) // financialEndYear (2026) + 1
+      expect(formatDate).toHaveBeenCalledWith(4, '2025')
+      expect(formatDate).toHaveBeenCalledWith(3, 2027) // financialEndYear (2026) + 1
       expect(buildViewData).toHaveBeenCalledWith(
         mockRequest,
         expect.objectContaining({
@@ -156,6 +156,136 @@ describe('ImportantDatesController', () => {
           })
         })
       )
+    })
+
+    test('should build rangeHint from financial year start for START_OUTLINE_BUSINESS_CASE', async () => {
+      await importantDatesController.getHandler(mockRequest, mockH)
+
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        'projects.important_dates.start_outline_business_case.range_hint',
+        expect.objectContaining({
+          rangeStart: 'Month 4 2025',
+          rangeEnd: 'Month 3 2027'
+        })
+      )
+    })
+
+    test('should build rangeHint 1 month after previous stage for COMPLETE_OUTLINE_BUSINESS_CASE', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.COMPLETE_OUTLINE_BUSINESS_CASE
+      )
+      IMPORTANT_DATES_CONFIG[PROJECT_STEPS.COMPLETE_OUTLINE_BUSINESS_CASE] = {
+        backLinkOptions: { url: '/back' },
+        localKeyPrefix:
+          'projects.important_dates.complete_outline_business_case',
+        fieldType: 'date',
+        monthField: PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH,
+        yearField: PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR,
+        fieldName: 'completeOutlineBusinessCase',
+        schema: {}
+      }
+
+      await importantDatesController.getHandler(mockRequest, mockH)
+
+      // Previous stage (start OBC) is April 2025, so the range starts May 2025
+      expect(formatDate).toHaveBeenCalledWith(5, 2025)
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        'projects.important_dates.complete_outline_business_case.range_hint',
+        expect.objectContaining({
+          rangeStart: 'Month 5 2025',
+          rangeEnd: 'Month 3 2027'
+        })
+      )
+    })
+
+    test('should build rangeHint up to 1 month before OBC start for EARLIEST_START_DATE', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.EARLIEST_START_DATE)
+      IMPORTANT_DATES_CONFIG[PROJECT_STEPS.EARLIEST_START_DATE] = {
+        backLinkOptions: { url: '/back' },
+        localKeyPrefix: 'projects.important_dates.earliest_date',
+        fieldType: 'date',
+        monthField: PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH,
+        yearField: PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_YEAR,
+        fieldName: 'earliestWithGia',
+        schema: {}
+      }
+
+      await importantDatesController.getHandler(mockRequest, mockH)
+
+      // OBC start is April 2025, so the upper bound is March 2025
+      expect(formatDate).toHaveBeenCalledWith(3, 2025)
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        'projects.important_dates.earliest_date.range_hint',
+        expect.objectContaining({
+          rangeEnd: 'Month 3 2025'
+        })
+      )
+    })
+
+    test('should not build a rangeHint for radio field COULD_START_EARLY', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.COULD_START_EARLY)
+      IMPORTANT_DATES_CONFIG[PROJECT_STEPS.COULD_START_EARLY] = {
+        backLinkOptions: { url: '/back' },
+        localKeyPrefix: 'projects.important_dates.could_start_earlier',
+        fieldType: 'radio',
+        fieldName: 'couldStartEarly',
+        schema: {}
+      }
+
+      await importantDatesController.getHandler(mockRequest, mockH)
+
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            rangeHint: ''
+          })
+        })
+      )
+    })
+
+    test('should build a dynamic dateHint from the range start for START_OUTLINE_BUSINESS_CASE', async () => {
+      await importantDatesController.getHandler(mockRequest, mockH)
+
+      // Minimum accepted input is the financial year start (April 2025)
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        'projects.important_dates.date_hint',
+        { month: 4, year: 2025 }
+      )
+    })
+
+    test('should build a dynamic dateHint 1 month after the previous stage for COMPLETE_OUTLINE_BUSINESS_CASE', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.COMPLETE_OUTLINE_BUSINESS_CASE
+      )
+      IMPORTANT_DATES_CONFIG[PROJECT_STEPS.COMPLETE_OUTLINE_BUSINESS_CASE] = {
+        backLinkOptions: { url: '/back' },
+        localKeyPrefix:
+          'projects.important_dates.complete_outline_business_case',
+        fieldType: 'date',
+        monthField: PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH,
+        yearField: PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR,
+        fieldName: 'completeOutlineBusinessCase',
+        schema: {}
+      }
+
+      await importantDatesController.getHandler(mockRequest, mockH)
+
+      // Previous stage (start OBC) is April 2025, so the minimum is May 2025
+      expect(mockRequest.t).toHaveBeenCalledWith(
+        'projects.important_dates.date_hint',
+        { month: 5, year: 2025 }
+      )
+    })
+
+    test('should fall back to the generic date hint when there is no resolvable range start', async () => {
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001'
+      })
+
+      await importantDatesController.getHandler(mockRequest, mockH)
+
+      expect(mockRequest.t).toHaveBeenCalledWith('projects.common.date_hint')
     })
 
     test('should render view for COULD_START_EARLY step', async () => {
@@ -200,7 +330,7 @@ describe('ImportantDatesController', () => {
       await importantDatesController.getHandler(mockRequest, mockH)
 
       // March 2025 → FY 2024 starts in April 2024
-      expect(formatDate).toHaveBeenCalledWith('4', 2024)
+      expect(formatDate).toHaveBeenCalledWith(4, 2024)
 
       vi.useRealTimers()
     })
@@ -802,6 +932,135 @@ describe('ImportantDatesController', () => {
           expect(formatDate).toHaveBeenCalledWith('5', '2025')
         }
       )
+    })
+
+    describe('range and date hints', () => {
+      // [projectType, startDateLocalePrefix, endDateLocalePrefix]
+      const HINT_PREFIXES = [
+        ['STU', 'study_start', 'study_end'],
+        ['STR', 'strategy_start', 'strategy_end']
+      ]
+
+      test.each(HINT_PREFIXES)(
+        '%s START_OUTLINE_BUSINESS_CASE: range hint spans the financial year and date hint uses the FY start',
+        async (projectType, startPrefix) => {
+          getProjectStep.mockReturnValue(
+            PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE
+          )
+          getSessionData.mockReturnValue({
+            slug: 'TEST-001',
+            projectType,
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+          })
+          IMPORTANT_DATES_CONFIG[PROJECT_STEPS.START_OUTLINE_BUSINESS_CASE] = {
+            backLinkOptions: {},
+            localKeyPrefix:
+              'projects.important_dates.start_outline_business_case',
+            fieldType: 'date',
+            monthField:
+              PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH,
+            yearField: PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR,
+            schema: {}
+          }
+
+          await importantDatesController.getHandler(mockRequest, mockH)
+
+          // Lower bound is the financial year start (April 2025); upper bound
+          // is the financial year end (March 2027 for FY end year 2026).
+          expect(mockRequest.t).toHaveBeenCalledWith(
+            `projects.important_dates.${startPrefix}.range_hint`,
+            expect.objectContaining({
+              rangeStart: 'Month 4 2025',
+              rangeEnd: 'Month 3 2027'
+            })
+          )
+          expect(mockRequest.t).toHaveBeenCalledWith(
+            'projects.important_dates.date_hint',
+            { month: 4, year: 2025 }
+          )
+        }
+      )
+
+      test.each(HINT_PREFIXES)(
+        '%s START_BENEFITS: range hint starts 1 month after the start date and date hint matches',
+        async (projectType, _startPrefix, endPrefix) => {
+          getProjectStep.mockReturnValue(PROJECT_STEPS.START_BENEFITS)
+          getSessionData.mockReturnValue({
+            slug: 'TEST-001',
+            projectType,
+            [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]: '5',
+            [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]: '2025',
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+            [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+          })
+          IMPORTANT_DATES_CONFIG[PROJECT_STEPS.START_BENEFITS] = {
+            backLinkOptions: {},
+            localKeyPrefix:
+              'projects.important_dates.start_achieving_its_benefits',
+            fieldType: 'date',
+            monthField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+            yearField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR,
+            schema: {}
+          }
+
+          await importantDatesController.getHandler(mockRequest, mockH)
+
+          // Previous stage (study/strategy start) is May 2025, so the range
+          // starts June 2025 and the date hint reflects the same minimum.
+          expect(formatDate).toHaveBeenCalledWith(6, 2025)
+          expect(mockRequest.t).toHaveBeenCalledWith(
+            `projects.important_dates.${endPrefix}.range_hint`,
+            expect.objectContaining({
+              rangeStart: 'Month 6 2025',
+              rangeEnd: 'Month 3 2027'
+            })
+          )
+          expect(mockRequest.t).toHaveBeenCalledWith(
+            'projects.important_dates.date_hint',
+            { month: 6, year: 2025 }
+          )
+        }
+      )
+
+      test('full-journey START_BENEFITS still derives its range from start construction, not the OBC start', async () => {
+        getProjectStep.mockReturnValue(PROJECT_STEPS.START_BENEFITS)
+        getSessionData.mockReturnValue({
+          slug: 'TEST-001',
+          projectType: 'DEF',
+          [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]: '5',
+          [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]: '2025',
+          [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]: '9',
+          [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]: '2025',
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+          [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+        })
+        IMPORTANT_DATES_CONFIG[PROJECT_STEPS.START_BENEFITS] = {
+          backLinkOptions: {},
+          localKeyPrefix:
+            'projects.important_dates.start_achieving_its_benefits',
+          fieldType: 'date',
+          monthField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+          yearField: PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR,
+          schema: {}
+        }
+
+        await importantDatesController.getHandler(mockRequest, mockH)
+
+        // Previous stage (start construction) is Sep 2025, so the range starts
+        // Oct 2025 — proving the simplified fix does not affect the full journey.
+        expect(mockRequest.t).toHaveBeenCalledWith(
+          'projects.important_dates.start_achieving_its_benefits.range_hint',
+          expect.objectContaining({
+            rangeStart: 'Month 10 2025',
+            rangeEnd: 'Month 3 2027'
+          })
+        )
+        expect(mockRequest.t).toHaveBeenCalledWith(
+          'projects.important_dates.date_hint',
+          { month: 10, year: 2025 }
+        )
+      })
     })
   })
 })

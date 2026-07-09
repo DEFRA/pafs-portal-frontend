@@ -74,6 +74,13 @@ const SIMPLIFIED_PREVIOUS_STAGE_MAP = {
     yearField: PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR
   }
 }
+// Financial-year boundary months, named so the month numbers used throughout
+// this controller are self-documenting rather than unexplained "magic" values.
+const FINANCIAL_YEAR_START_MONTH = 4 // April
+const FINANCIAL_YEAR_END_MONTH = 3 // March
+
+// Number of months in a year, used for month arithmetic (calendar constant).
+const MONTHS_IN_YEAR = 12
 
 // Previous stage mappings for date validation
 const PREVIOUS_STAGE_MAP = {
@@ -167,6 +174,33 @@ class ImportantDatesController {
     return formatDate(month, year)
   }
 
+  /**
+   * Get the previous stage's month/year as numbers (or null when not set).
+   * Used to compute the "1 month after the previous stage" range start.
+   * Project-type aware: STR/STU use the simplified previous-stage map so the
+   * end date's lower bound is 1 month after the study/strategy start date
+   * (rather than the full-journey start-construction date, which they skip).
+   */
+  _getPreviousStageRaw(step, sessionData) {
+    const projectType = sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]
+    const stageMap = this._isSimplifiedType(projectType)
+      ? SIMPLIFIED_PREVIOUS_STAGE_MAP
+      : PREVIOUS_STAGE_MAP
+    const previousStage = stageMap[step]
+    if (!previousStage) {
+      return null
+    }
+
+    const month = sessionData[previousStage.monthField]
+    const year = sessionData[previousStage.yearField]
+
+    if (!month || !year) {
+      return null
+    }
+
+    return { month: Number(month), year: Number(year) }
+  }
+
   _getFinancialYearDates(sessionData) {
     const financialStartYear =
       sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]
@@ -177,10 +211,10 @@ class ImportantDatesController {
     // e.g., FY 2030 runs from April 2030 to March 2031
     return {
       financialYearStart: financialStartYear
-        ? formatDate('4', financialStartYear)
+        ? formatDate(FINANCIAL_YEAR_START_MONTH, financialStartYear)
         : '',
       financialYearEnd: financialEndYear
-        ? formatDate('3', Number(financialEndYear) + 1)
+        ? formatDate(FINANCIAL_YEAR_END_MONTH, Number(financialEndYear) + 1)
         : ''
     }
   }
@@ -196,17 +230,160 @@ class ImportantDatesController {
     return formatDate(month, year)
   }
 
-  _getCurrentFinancialYearStart() {
+  /**
+   * Get the outline business case start month/year as numbers (or null).
+   * Used to compute the upper bound of the earliest start date range.
+   */
+  _getObcStartRaw(sessionData) {
+    const month =
+      sessionData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]
+    const year =
+      sessionData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]
+
+    if (!month || !year) {
+      return null
+    }
+
+    return { month: Number(month), year: Number(year) }
+  }
+
+  /**
+   * Add (or subtract, with a negative delta) whole months to a month/year
+   * pair, handling year rollover in both directions.
+   * @param {number|string} month - Month (1-12)
+   * @param {number|string} year - Year
+   * @param {number} delta - Number of months to add (may be negative)
+   * @returns {{month: number, year: number}}
+   */
+  _addMonths(month, year, delta) {
+    const zeroBasedTotal = Number(month) - 1 + delta
+    const yearOffset = Math.floor(zeroBasedTotal / MONTHS_IN_YEAR)
+    const normalisedMonth =
+      ((zeroBasedTotal % MONTHS_IN_YEAR) + MONTHS_IN_YEAR) % MONTHS_IN_YEAR
+    return { month: normalisedMonth + 1, year: Number(year) + yearOffset }
+  }
+
+  /**
+   * Compute the raw minimum accepted month/year (the lower bound of the
+   * acceptable range) for the current date question.
+   * - Earliest start date: current financial year start (April of the
+   *   current financial year).
+   * - Timeline dates: 1 month after the previous stage when it exists,
+   *   otherwise the financial year start (April of financialStartYear).
+   * Returns null for non-date questions or when the bound can't be resolved.
+   */
+  _getRangeStartRaw(step, config, sessionData) {
+    const { fieldType, monthField } = config
+
+    if (fieldType !== 'date') {
+      return null
+    }
+
+    // Earliest start date: lower bound is the current financial year start
+    if (monthField === PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH) {
+      return {
+        month: FINANCIAL_YEAR_START_MONTH,
+        year: this._getCurrentFinancialStartYear()
+      }
+    }
+
+    // Timeline dates: 1 month after the previous stage when available
+    const previousStageRaw = this._getPreviousStageRaw(step, sessionData)
+    if (previousStageRaw) {
+      return this._addMonths(previousStageRaw.month, previousStageRaw.year, 1)
+    }
+
+    // Otherwise the financial year start (April of financialStartYear)
+    const financialStartYear =
+      sessionData[PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]
+    if (!financialStartYear) {
+      return null
+    }
+    return {
+      month: FINANCIAL_YEAR_START_MONTH,
+      year: Number(financialStartYear)
+    }
+  }
+
+  /**
+   * Build the dynamic "acceptable range" hint for a date question.
+   * - Timeline dates: (financial year start OR 1 month after the previous
+   *   stage) to the financial year end (March of financialEndYear + 1).
+   * - Earliest start date: current financial year start to 1 month before the
+   *   outline business case start date.
+   * - Radio questions have no date range, so an empty string is returned.
+   */
+  _getRangeHint(request, context) {
+    const { config, sessionData, rangeStartRaw, financialYearEnd } = context
+    const { fieldType, monthField, localKeyPrefix } = config
+
+    // Only date questions with a resolvable lower bound get a range hint
+    if (fieldType !== 'date' || !rangeStartRaw) {
+      return ''
+    }
+
+    const rangeStart = formatDate(rangeStartRaw.month, rangeStartRaw.year)
+
+    // Earliest start date: upper bound is 1 month before OBC start
+    if (monthField === PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH) {
+      const obcStartRaw = this._getObcStartRaw(sessionData)
+      if (!obcStartRaw) {
+        return ''
+      }
+      const upperBound = this._addMonths(
+        obcStartRaw.month,
+        obcStartRaw.year,
+        -1
+      )
+      return request.t(`${localKeyPrefix}.range_hint`, {
+        rangeStart,
+        rangeEnd: formatDate(upperBound.month, upperBound.year)
+      })
+    }
+
+    // Standard timeline dates always end at the financial year end
+    if (!financialYearEnd) {
+      return ''
+    }
+
+    return request.t(`${localKeyPrefix}.range_hint`, {
+      rangeStart,
+      rangeEnd: financialYearEnd
+    })
+  }
+
+  /**
+   * Build the dynamic "For example, M YYYY" hint from the minimum accepted
+   * input (the lower bound of the acceptable range). Falls back to the
+   * generic example when the lower bound can't be resolved.
+   */
+  _getDateHint(request, rangeStartRaw) {
+    if (!rangeStartRaw) {
+      return request.t('projects.common.date_hint')
+    }
+    return request.t('projects.important_dates.date_hint', {
+      month: rangeStartRaw.month,
+      year: rangeStartRaw.year
+    })
+  }
+
+  _getCurrentFinancialStartYear() {
     const now = new Date()
     const currentMonth = now.getMonth() + 1
     const currentYear = now.getFullYear()
 
     // If we're before April (months 1-3), we're in the previous financial year
-    const currentFinancialYear =
-      currentMonth < 4 ? currentYear - 1 : currentYear
+    return currentMonth < FINANCIAL_YEAR_START_MONTH
+      ? currentYear - 1
+      : currentYear
+  }
 
+  _getCurrentFinancialYearStart() {
     // Financial year starts in April
-    return formatDate('4', currentFinancialYear)
+    return formatDate(
+      FINANCIAL_YEAR_START_MONTH,
+      this._getCurrentFinancialStartYear()
+    )
   }
 
   _getViewData(request) {
@@ -230,6 +407,15 @@ class ImportantDatesController {
     const obcStartDate = this._getObcStartDate(sessionData)
     const currentFinancialYearStart = this._getCurrentFinancialYearStart()
 
+    const rangeStartRaw = this._getRangeStartRaw(step, config, sessionData)
+    const rangeHint = this._getRangeHint(request, {
+      config,
+      sessionData,
+      rangeStartRaw,
+      financialYearEnd
+    })
+    const dateHint = this._getDateHint(request, rangeStartRaw)
+
     const additionalData = {
       step,
       projectSteps: PROJECT_STEPS,
@@ -239,7 +425,8 @@ class ImportantDatesController {
       fieldName,
       useObcAsPreviousStage,
       sectionHint: request.t(localKeyPrefix + '.hint'),
-      dateHint: request.t('projects.common.date_hint'),
+      dateHint,
+      rangeHint: rangeHint || '',
       previousStageDate: previousStageDate || '',
       financialYearStart: financialYearStart || '',
       financialYearEnd: financialYearEnd || '',

@@ -22,7 +22,8 @@ import { detectChanges } from './project-edit-session.js'
 import {
   PROJECT_ERROR_CODES,
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_PAYLOAD_LEVELS
+  PROJECT_PAYLOAD_LEVELS,
+  PROJECT_TYPES
 } from '../../../common/constants/projects.js'
 
 // Mock dependencies
@@ -162,6 +163,142 @@ describe('project-submission helpers', () => {
       expect(payload).toEqual({
         projectType: 'DEF'
       })
+    })
+
+    test('should backfill startConstruction fields from start-outline date for STR/STU START_BENEFITS payload', () => {
+      requiredInterventionTypesForProjectType.mockReturnValue(true)
+      PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR,
+        PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR,
+        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
+        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
+        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
+      ]
+
+      const sessionData = {
+        projectType: PROJECT_TYPES.STU,
+        referenceNumber: 'TEST-001',
+        financialStartYear: '2025',
+        financialEndYear: '2026',
+        startOutlineBusinessCaseMonth: '5',
+        startOutlineBusinessCaseYear: '2025',
+        readyForServiceMonth: '6',
+        readyForServiceYear: '2025'
+      }
+
+      const payload = buildProjectPayload(
+        sessionData,
+        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
+      )
+
+      expect(payload).toEqual({
+        referenceNumber: 'TEST-001',
+        financialStartYear: '2025',
+        financialEndYear: '2026',
+        startConstructionMonth: '5',
+        startConstructionYear: '2025',
+        readyForServiceMonth: '6',
+        readyForServiceYear: '2025'
+      })
+    })
+
+    test('should not override existing startConstruction fields for STR/STU START_BENEFITS payload', () => {
+      // Even when startConstruction values exist in the session (e.g. a legacy
+      // project that was migrated with those fields set), the simplified journey
+      // always uses the OBC start date as the previous stage, so overwrite.
+      requiredInterventionTypesForProjectType.mockReturnValue(true)
+      PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
+        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
+        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
+        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
+      ]
+
+      const sessionData = {
+        projectType: PROJECT_TYPES.STR,
+        startOutlineBusinessCaseMonth: '5',
+        startOutlineBusinessCaseYear: '2025',
+        startConstructionMonth: '9',
+        startConstructionYear: '2025',
+        readyForServiceMonth: '10',
+        readyForServiceYear: '2025'
+      }
+
+      const payload = buildProjectPayload(
+        sessionData,
+        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
+      )
+
+      // OBC start always wins for simplified types
+      expect(payload.startConstructionMonth).toBe('5')
+      expect(payload.startConstructionYear).toBe('2025')
+    })
+
+    test('should backfill null startConstruction fields from OBC start for STR/STU in edit mode', () => {
+      // In edit mode the database returns startConstructionMonth: null for STR/STU.
+      // The payload builder includes null (null !== undefined), so the previous
+      // === undefined check was insufficient. The unconditional overwrite fixes this.
+      requiredInterventionTypesForProjectType.mockReturnValue(true)
+      PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
+        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+        PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR,
+        PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR,
+        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
+        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
+        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
+      ]
+
+      const sessionData = {
+        projectType: PROJECT_TYPES.STU,
+        referenceNumber: 'TEST-001',
+        financialStartYear: '2025',
+        financialEndYear: '2026',
+        startOutlineBusinessCaseMonth: '5',
+        startOutlineBusinessCaseYear: '2025',
+        startConstructionMonth: null, // null from DB in edit mode
+        startConstructionYear: null,
+        readyForServiceMonth: '6',
+        readyForServiceYear: '2025'
+      }
+
+      const payload = buildProjectPayload(
+        sessionData,
+        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
+      )
+
+      // null is overwritten with the OBC start date
+      expect(payload.startConstructionMonth).toBe('5')
+      expect(payload.startConstructionYear).toBe('2025')
+      expect(payload.readyForServiceMonth).toBe('6')
+    })
+
+    test('should not backfill startConstruction fields for non-simplified START_BENEFITS payload', () => {
+      requiredInterventionTypesForProjectType.mockReturnValue(true)
+      PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
+        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
+        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
+        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
+      ]
+
+      const sessionData = {
+        projectType: PROJECT_TYPES.DEF,
+        startOutlineBusinessCaseMonth: '5',
+        startOutlineBusinessCaseYear: '2025',
+        readyForServiceMonth: '6',
+        readyForServiceYear: '2025'
+      }
+
+      const payload = buildProjectPayload(
+        sessionData,
+        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
+      )
+
+      expect(payload.startConstructionMonth).toBeUndefined()
+      expect(payload.startConstructionYear).toBeUndefined()
     })
   })
 
