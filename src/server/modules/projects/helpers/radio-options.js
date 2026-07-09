@@ -81,7 +81,8 @@ export function buildRadioItems(
   options = {}
 ) {
   const { useHints = false, useBoldLabels = false, excludeKeys = [] } = options
-  const excludeSet = new Set(excludeKeys)
+  const normalizedExcludeKeys = Array.isArray(excludeKeys) ? excludeKeys : []
+  const excludeSet = new Set(normalizedExcludeKeys)
   const items = []
 
   // Retrieve the full options object to detect divider keys
@@ -92,22 +93,26 @@ export function buildRadioItems(
       : []
 
   for (const key of translationKeys) {
-    if (excludeSet.has(key)) {
-      continue
+    if (!excludeSet.has(key)) {
+      if (key === 'divider') {
+        // Handle divider entries from the translation data
+        items.push({ divider: t('common.or') })
+      } else {
+        items.push(
+          buildRadioItemForKey(
+            t,
+            optionsKeyPrefix,
+            itemsMap,
+            currentValue,
+            key,
+            {
+              useHints,
+              useBoldLabels
+            }
+          )
+        )
+      }
     }
-
-    if (key === 'divider') {
-      // Handle divider entries from the translation data
-      items.push({ divider: t('common.or') })
-      continue
-    }
-
-    items.push(
-      buildRadioItemForKey(t, optionsKeyPrefix, itemsMap, currentValue, key, {
-        useHints,
-        useBoldLabels
-      })
-    )
   }
 
   return items

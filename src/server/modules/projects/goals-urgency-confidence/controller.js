@@ -154,7 +154,7 @@ class GoalsUrgencyConfidenceController {
     )
   }
 
-  _getViewData(request, formData = null) {
+  _getViewData(request, formData = {}) {
     const step = getProjectStep(request)
     const config = this._getConfig(step)
     const sessionData = getSessionData(request)

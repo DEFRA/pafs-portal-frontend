@@ -416,6 +416,26 @@ describe('radio-options', () => {
 
       expect(result).toHaveLength(4)
     })
+
+    test('should not throw when excludeKeys is null', () => {
+      const call = () =>
+        buildRadioItems(mockT, 'projects.confidence.options', null, null, {
+          excludeKeys: null
+        })
+
+      expect(call).not.toThrow()
+      expect(call()).toHaveLength(4)
+    })
+
+    test('should not throw when excludeKeys is a non-array value', () => {
+      const call = () =>
+        buildRadioItems(mockT, 'projects.confidence.options', null, null, {
+          excludeKeys: 'medium'
+        })
+
+      expect(call).not.toThrow()
+      expect(call()).toHaveLength(4)
+    })
   })
 
   describe('getLabelForValue', () => {
