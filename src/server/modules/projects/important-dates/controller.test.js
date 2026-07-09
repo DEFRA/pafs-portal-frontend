@@ -222,6 +222,35 @@ describe('ImportantDatesController', () => {
       )
     })
 
+    test('should return empty rangeHint for EARLIEST_START_DATE when OBC start is missing', async () => {
+      getProjectStep.mockReturnValue(PROJECT_STEPS.EARLIEST_START_DATE)
+      IMPORTANT_DATES_CONFIG[PROJECT_STEPS.EARLIEST_START_DATE] = {
+        backLinkOptions: { url: '/back' },
+        localKeyPrefix: 'projects.important_dates.earliest_date',
+        fieldType: 'date',
+        monthField: PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH,
+        yearField: PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_YEAR,
+        fieldName: 'earliestWithGia',
+        schema: {}
+      }
+      getSessionData.mockReturnValue({
+        slug: 'TEST-001',
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: '2025',
+        [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: '2026'
+      })
+
+      await importantDatesController.getHandler(mockRequest, mockH)
+
+      expect(buildViewData).toHaveBeenCalledWith(
+        mockRequest,
+        expect.objectContaining({
+          additionalData: expect.objectContaining({
+            rangeHint: ''
+          })
+        })
+      )
+    })
+
     test('should not build a rangeHint for radio field COULD_START_EARLY', async () => {
       getProjectStep.mockReturnValue(PROJECT_STEPS.COULD_START_EARLY)
       IMPORTANT_DATES_CONFIG[PROJECT_STEPS.COULD_START_EARLY] = {
