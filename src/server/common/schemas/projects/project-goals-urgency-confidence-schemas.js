@@ -6,6 +6,10 @@ import {
 } from '../../constants/projects.js'
 import { SIZE } from '../../constants/common.js'
 
+const CONFIDENCE_LEVELS_WITHOUT_NA = Object.values(CONFIDENCE_LEVELS).filter(
+  (v) => v !== CONFIDENCE_LEVELS.NOT_APPLICABLE
+)
+
 /**
  * Approach / Project Goals schema
  * Character count field, max 700 characters
@@ -64,15 +68,31 @@ function confidenceSchema(requiredMessage, invalidMessage) {
     })
 }
 
-export const confidenceHomesBetterProtectedSchema = confidenceSchema(
-  PROJECT_VALIDATION_MESSAGES.CONFIDENCE_HOMES_BETTER_PROTECTED_REQUIRED,
-  PROJECT_VALIDATION_MESSAGES.CONFIDENCE_HOMES_BETTER_PROTECTED_INVALID
-)
+export const confidenceHomesBetterProtectedSchema = Joi.string()
+  .trim()
+  .required()
+  .valid(...CONFIDENCE_LEVELS_WITHOUT_NA)
+  .messages({
+    'string.empty':
+      PROJECT_VALIDATION_MESSAGES.CONFIDENCE_HOMES_BETTER_PROTECTED_REQUIRED,
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.CONFIDENCE_HOMES_BETTER_PROTECTED_REQUIRED,
+    'any.only':
+      PROJECT_VALIDATION_MESSAGES.CONFIDENCE_HOMES_BETTER_PROTECTED_INVALID
+  })
 
-export const confidenceHomesByGatewayFourSchema = confidenceSchema(
-  PROJECT_VALIDATION_MESSAGES.CONFIDENCE_HOMES_BY_GATEWAY_FOUR_REQUIRED,
-  PROJECT_VALIDATION_MESSAGES.CONFIDENCE_HOMES_BY_GATEWAY_FOUR_INVALID
-)
+export const confidenceHomesByGatewayFourSchema = Joi.string()
+  .trim()
+  .required()
+  .valid(...CONFIDENCE_LEVELS_WITHOUT_NA)
+  .messages({
+    'string.empty':
+      PROJECT_VALIDATION_MESSAGES.CONFIDENCE_HOMES_BY_GATEWAY_FOUR_REQUIRED,
+    'any.required':
+      PROJECT_VALIDATION_MESSAGES.CONFIDENCE_HOMES_BY_GATEWAY_FOUR_REQUIRED,
+    'any.only':
+      PROJECT_VALIDATION_MESSAGES.CONFIDENCE_HOMES_BY_GATEWAY_FOUR_INVALID
+  })
 
 export const confidenceSecuredPartnershipFundingSchema = confidenceSchema(
   PROJECT_VALIDATION_MESSAGES.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING_REQUIRED,
