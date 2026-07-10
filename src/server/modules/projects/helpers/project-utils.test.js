@@ -838,6 +838,12 @@ describe('project-utils', () => {
       expect(formatNumberWithCommas('-£1234567')).toBe('-1,234,567')
       expect(formatNumberWithCommas('-1,234,567')).toBe('-1,234,567')
     })
+
+    test('should preserve decimal portions when formatting', () => {
+      expect(formatNumberWithCommas('1234.56')).toBe('1,234.56')
+      expect(formatNumberWithCommas('-1234.56')).toBe('-1,234.56')
+      expect(formatNumberWithCommas('.75')).toBe('0.75')
+    })
   })
 
   describe('getProjectStateTag', () => {

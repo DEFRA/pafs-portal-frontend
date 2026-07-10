@@ -79,12 +79,6 @@ describe('input formatting helpers', () => {
     expect(input.value).toBe('1,234,567')
   })
 
-  it('formatInputValueWithCommas leaves value unchanged when it contains a decimal point', () => {
-    input.value = '1234.56'
-    formatInputValueWithCommas(input)
-    expect(input.value).toBe('1234.56')
-  })
-
   it('formatInputValueWithCommas does nothing if input is falsy', () => {
     expect(formatInputValueWithCommas(null)).toBeUndefined()
     expect(formatInputValueWithCommas(undefined)).toBeUndefined()

@@ -91,7 +91,59 @@ function keepAsDecimalString(value) {
   if (value === null || value === undefined || value === '') {
     return null
   }
-  return String(value)
+  return String(value).replaceAll(',', '').trim()
+}
+
+function sanitizeNumericField(payload, field) {
+  if (typeof payload[field] === 'string') {
+    payload[field] = payload[field].replaceAll(',', '').trim()
+  }
+}
+
+export function sanitizeNumericPayload(step, payload) {
+  const stepToFields = {
+    [PROJECT_STEPS.NFM_RIVER_RESTORATION]: [
+      PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA,
+      PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME
+    ],
+    [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: [
+      PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME,
+      PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_LENGTH,
+      PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_WIDTH
+    ],
+    [PROJECT_STEPS.NFM_OFFLINE_STORAGE]: [
+      PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_AREA,
+      PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME
+    ],
+    [PROJECT_STEPS.NFM_WOODLAND]: [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA],
+    [PROJECT_STEPS.NFM_HEADWATER_DRAINAGE]: [
+      PROJECT_PAYLOAD_FIELDS.NFM_HEADWATER_DRAINAGE_AREA
+    ],
+    [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]: [
+      PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_AREA,
+      PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME
+    ],
+    [PROJECT_STEPS.NFM_SALTMARSH]: [
+      PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_AREA,
+      PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH
+    ],
+    [PROJECT_STEPS.NFM_SAND_DUNE]: [
+      PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA,
+      PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH
+    ]
+  }
+
+  const directFields = stepToFields[step]
+  if (directFields) {
+    directFields.forEach((field) => sanitizeNumericField(payload, field))
+    return
+  }
+
+  const landUseConfig = STEP_TO_LAND_TYPE_FIELD_CONFIG[step]
+  if (landUseConfig) {
+    sanitizeNumericField(payload, landUseConfig.beforeField)
+    sanitizeNumericField(payload, landUseConfig.afterField)
+  }
 }
 
 /**

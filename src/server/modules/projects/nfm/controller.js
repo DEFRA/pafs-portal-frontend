@@ -27,7 +27,10 @@ import {
   getDynamicBackLink,
   NFM_STEP_SEQUENCE
 } from './helpers/navigation-helpers.js'
-import { processPayload } from './helpers/payload-helpers.js'
+import {
+  processPayload,
+  sanitizeNumericPayload
+} from './helpers/payload-helpers.js'
 import { handleConditionalRedirect } from './helpers/redirect-helpers.js'
 import {
   PAYLOAD_LEVEL_MAP,
@@ -422,6 +425,8 @@ class NfmController {
       ) {
         request.payload.nfmLandUseChange = [request.payload.nfmLandUseChange]
       }
+
+      sanitizeNumericPayload(step, request.payload)
 
       // Validate payload BEFORE processing (validate array format)
       const validationError = validatePayload(request, h, {

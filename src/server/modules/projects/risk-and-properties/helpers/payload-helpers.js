@@ -169,6 +169,18 @@ export function processPayload(step, payload, sessionData) {
       PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION
     ])
   }
+
+  if (step === PROJECT_STEPS.TWENTY_PERCENT_DEPRIVED) {
+    normalizeNumericFields(payload, [
+      PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED
+    ])
+  }
+
+  if (step === PROJECT_STEPS.FORTY_PERCENT_DEPRIVED) {
+    normalizeNumericFields(payload, [
+      PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED
+    ])
+  }
 }
 
 /**
@@ -192,6 +204,9 @@ export function processPayload(step, payload, sessionData) {
  */
 export function normalizeNumericFields(payload, fields) {
   fields.forEach((field) => {
+    if (typeof payload[field] === 'string') {
+      payload[field] = payload[field].replaceAll(',', '').trim()
+    }
     if (payload[field] === '') {
       payload[field] = null
     }

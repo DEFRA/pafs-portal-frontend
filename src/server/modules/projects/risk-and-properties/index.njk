@@ -122,8 +122,9 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS }}"
-                  type="number"
+                  type="text"
                   inputmode="numeric"
+                  data-number-format="comma"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] or '' }}"
                 >
               </td>
@@ -132,8 +133,9 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS }}"
-                  type="number"
+                  type="text"
                   inputmode="numeric"
+                  data-number-format="comma"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] or '' }}"
                 >
               </td>
@@ -142,8 +144,9 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50 }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50 }}"
-                  type="number"
+                  type="text"
                   inputmode="numeric"
+                  data-number-format="comma"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] or '' }}"
                 >
               </td>
@@ -152,8 +155,9 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE }}"
-                  type="number"
+                  type="text"
                   inputmode="numeric"
+                  data-number-format="comma"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] or '' }}"
                 >
               </td>
@@ -209,8 +213,9 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL }}"
-                  type="number"
+                  type="text"
                   inputmode="numeric"
+                  data-number-format="comma"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] or '' }}"
                 >
               </td>
@@ -219,8 +224,9 @@
                   class="govuk-input govuk-input--width-10 {% if fieldErrors and fieldErrors[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] %}govuk-input--error{% endif %}"
                   id="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION }}"
                   name="{{ PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION }}"
-                  type="number"
+                  type="text"
                   inputmode="numeric"
+                  data-number-format="comma"
                   value="{{ formData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] or '' }}"
                 >
               </td>
@@ -256,8 +262,11 @@
         classes: "govuk-input--width-5",
         value: formData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] if formData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] != null else '',
         errorMessage: percentError20,
-        type: "number",
-        inputmode: "numeric"
+        type: "text",
+        inputmode: "numeric",
+        attributes: {
+          "data-number-format": "comma"
+        }
       }) }}
 
       {# FORTY PERCENT DEPRIVED PAGE #}
@@ -287,8 +296,11 @@
         classes: "govuk-input--width-5",
         value: formData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] if formData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] != null else '',
         errorMessage: percentError40,
-        type: "number",
-        inputmode: "numeric"
+        type: "text",
+        inputmode: "numeric",
+        attributes: {
+          "data-number-format": "comma"
+        }
       }) }}
 
       {# CURRENT FLOOD RISK PAGE (for fluvial, tidal, sea) #}

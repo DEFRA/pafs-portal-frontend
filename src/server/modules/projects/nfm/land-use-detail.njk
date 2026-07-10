@@ -51,6 +51,9 @@
           text: "hectares"
         },
         classes: "govuk-input--width-10",
+        attributes: {
+          "data-number-format": "comma"
+        },
         errorMessage: {
           text: beforeErrorText
         } if beforeError else undefined
@@ -69,6 +72,9 @@
           text: "hectares"
         },
         classes: "govuk-input--width-10",
+        attributes: {
+          "data-number-format": "comma"
+        },
         errorMessage: {
           text: afterErrorText
         } if afterError else undefined
