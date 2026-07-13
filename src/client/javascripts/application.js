@@ -76,6 +76,11 @@ const extractNumericParts = (value, allowNegative = false) => {
   }
 }
 
+const signPrefix = (isNegative) => (isNegative ? '-' : '')
+
+const hasNoNumericDigits = ({ integerPart, decimalPart }) =>
+  !integerPart && !decimalPart
+
 export const withCommas = (digits) => {
   if (!digits) {
     return ''
@@ -108,19 +113,21 @@ export const withCommas = (digits) => {
 export const formatNumberWithCommas = (value, allowNegative = false) => {
   const { isNegative, integerPart, decimalPart, hasDecimalPoint } =
     extractNumericParts(value, allowNegative)
+  const sign = signPrefix(isNegative)
+  const hasNoDigits = hasNoNumericDigits({ integerPart, decimalPart })
 
-  if (hasDecimalPoint && !integerPart && !decimalPart) {
-    return `${isNegative ? '-' : ''}0.`
+  if (hasDecimalPoint && hasNoDigits) {
+    return `${sign}0.`
   }
 
-  if (!integerPart && !decimalPart) {
-    return isNegative ? '-' : ''
+  if (hasNoDigits) {
+    return sign
   }
 
   const formattedInteger = integerPart ? withCommas(integerPart) : '0'
   const formattedDecimal = hasDecimalPoint ? `.${decimalPart}` : ''
 
-  return `${isNegative ? '-' : ''}${formattedInteger}${formattedDecimal}`
+  return `${sign}${formattedInteger}${formattedDecimal}`
 }
 
 export const formatInputValueWithCommas = (inputEl) => {
