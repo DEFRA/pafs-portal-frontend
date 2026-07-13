@@ -1,4 +1,6 @@
-{% macro importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate, isReadOnly) %}
+{% macro importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate, isReadOnly, PROJECT_TYPES) %}
+  {% set projectType = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE] %}
+  {% set isSimplifiedType = projectType == PROJECT_TYPES.STU or projectType == PROJECT_TYPES.STR %}
   {% set hasImportantDates = projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR] %}
   <div class="govuk-summary-card">
     <div class="govuk-summary-card__title-wrapper">
@@ -20,56 +22,83 @@
     <div class="govuk-summary-card__content">
       {% if hasImportantDates %}
         <dl class="govuk-summary-list">
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.outline_business_case_start') }}</dt>
-            <dd class="govuk-summary-list__value">
-              {%if projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR] %}
-                {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]) }}
-              {% else %}
-                {{ t('projects.overview.common.na') }}
-              {% endif %}
-            </dd>
-          </div>
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.outline_business_case_complete') }}</dt>
-            <dd class="govuk-summary-list__value">
-              {%if projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR] %}
-                {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR]) }}
-              {% else %}
-                {{ t('projects.overview.common.na') }}
-              {% endif %}
-            </dd>
-          </div>
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.contract_award_date') }}</dt>
-            <dd class="govuk-summary-list__value">
-              {%if projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_YEAR] %}
-                {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_YEAR]) }}
-              {% else %}
-                {{ t('projects.overview.common.na') }}
-              {% endif %}
-            </dd>
-          </div>
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.start_construction_date') }}</dt>
-            <dd class="govuk-summary-list__value">
-              {%if projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR] %}
-                {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]) }}
-              {% else %}
-                {{ t('projects.overview.common.na') }}
-              {% endif %}
-            </dd>
-          </div>
-          <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.ready_for_service_date') }}</dt>
-            <dd class="govuk-summary-list__value">
-              {%if projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR] %}
-                {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]) }}
-              {% else %}
-                {{ t('projects.overview.common.na') }}
-              {% endif %}
-            </dd>
-          </div>
+          {% if isSimplifiedType %}
+            {# Simplified 2-date view for STU (Study) and STR (Strategy) #}
+            {% set startLabel = t('projects.overview.important_dates_summary_card.' + (projectType == PROJECT_TYPES.STU and 'study_start_date' or 'strategy_start_date')) %}
+            {% set endLabel   = t('projects.overview.important_dates_summary_card.' + (projectType == PROJECT_TYPES.STU and 'study_end_date'   or 'strategy_end_date')) %}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ startLabel }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR] %}
+                  {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]) }}
+                {% else %}
+                  {{ t('projects.overview.common.na') }}
+                {% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ endLabel }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR] %}
+                  {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]) }}
+                {% else %}
+                  {{ t('projects.overview.common.na') }}
+                {% endif %}
+              </dd>
+            </div>
+          {% else %}
+            {# Full 5-date view for all other project types #}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.outline_business_case_start') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR] %}
+                  {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]) }}
+                {% else %}
+                  {{ t('projects.overview.common.na') }}
+                {% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.outline_business_case_complete') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR] %}
+                  {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.COMPLETE_OUTLINE_BUSINESS_CASE_YEAR]) }}
+                {% else %}
+                  {{ t('projects.overview.common.na') }}
+                {% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.contract_award_date') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_YEAR] %}
+                  {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.AWARD_CONTRACT_YEAR]) }}
+                {% else %}
+                  {{ t('projects.overview.common.na') }}
+                {% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.start_construction_date') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR] %}
+                  {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]) }}
+                {% else %}
+                  {{ t('projects.overview.common.na') }}
+                {% endif %}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.ready_for_service_date') }}</dt>
+              <dd class="govuk-summary-list__value">
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR] %}
+                  {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]) }}
+                {% else %}
+                  {{ t('projects.overview.common.na') }}
+                {% endif %}
+              </dd>
+            </div>
+          {% endif %}
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.could_start_earlier') }}</dt>
             <dd class="govuk-summary-list__value">
@@ -86,7 +115,7 @@
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key">{{ t('projects.overview.important_dates_summary_card.earliest_start_date') }}</dt>
               <dd class="govuk-summary-list__value">
-                {%if projectData[PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_YEAR] %}
+                {% if projectData[PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH] and projectData[PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_YEAR] %}
                   {{ formatDate(projectData[PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_MONTH], projectData[PROJECT_PAYLOAD_FIELDS.EARLIEST_WITH_GIA_YEAR]) }}
                 {% else %}
                   {{ t('projects.overview.common.na') }}

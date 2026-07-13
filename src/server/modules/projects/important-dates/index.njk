@@ -17,7 +17,8 @@
       {% endif %}
 
       {# For earliest date, include OBC start date context #}
-      {% if monthField == 'earliestWithGiaMonth' %}
+      {# For simplified end-date (STU/STR), include OBC start date as previous-stage context #}
+      {% if monthField == 'earliestWithGiaMonth' or useObcAsPreviousStage %}
         <input type="hidden" name="startOutlineBusinessCaseMonth" value="{{ formData.startOutlineBusinessCaseMonth }}"/>
         <input type="hidden" name="startOutlineBusinessCaseYear" value="{{ formData.startOutlineBusinessCaseYear }}"/>
       {% endif %}
@@ -74,10 +75,17 @@
         {% set yearClasses = yearClasses + " govuk-input--error" %}
       {% endif %}
 
-      {# Build hint HTML - combine section hint and date hint #}
+      {# Build hint HTML - combine section hint, acceptable date range and date hint #}
       {% set hintHtml = '' %}
       {% if sectionHint and sectionHint != 'na' %}
         {% set hintHtml = sectionHint %}
+      {% endif %}
+      {% if rangeHint %}
+        {% if hintHtml %}
+          {% set hintHtml = hintHtml + '<br><br>' + rangeHint %}
+        {% else %}
+          {% set hintHtml = rangeHint %}
+        {% endif %}
       {% endif %}
       {% if dateHint %}
         {% if hintHtml %}

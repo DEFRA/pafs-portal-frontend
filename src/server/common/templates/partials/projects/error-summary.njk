@@ -174,14 +174,14 @@
 {% if fieldErrors.startOutlineBusinessCaseMonth and(fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.MONTH_REQUIRED or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.YEAR_REQUIRED) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.required', {placeholder: t('projects.important_dates.start_outline_business_case.placeholder')}),
+      text: t('projects.important_dates.validation.required', {placeholder: t(localKeyPrefix + '.placeholder')}),
       href: "#startOutlineBusinessCaseMonth"
     }
   ]) %}
 {% elif fieldErrors.startOutlineBusinessCaseMonth and(fieldErrors.startOutlineBusinessCaseMonth == ERROR_CODES.MONTH_INVALID or fieldErrors.startOutlineBusinessCaseYear == ERROR_CODES.YEAR_INVALID) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.invalid', {placeholder: t('projects.important_dates.start_outline_business_case.placeholder')}),
+      text: t('projects.important_dates.validation.invalid', {placeholder: t(localKeyPrefix + '.placeholder')}),
       href: "#startOutlineBusinessCaseMonth"
     }
   ]) %}
@@ -189,7 +189,7 @@
   {% set errorList = errorList.concat([
     {
       text: t('projects.important_dates.validation.outside_financial_range', {
-        placeholder: t('projects.important_dates.start_outline_business_case.placeholder'),
+        placeholder: t(localKeyPrefix + '.placeholder'),
         financialYearStart: financialYearStart or '',
         financialYearEnd: financialYearEnd or ''
       }),
@@ -319,14 +319,14 @@
 {% if fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.MONTH_REQUIRED or fieldErrors.readyForServiceYear == ERROR_CODES.YEAR_REQUIRED) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.required', {placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder')}),
+      text: t('projects.important_dates.validation.required', {placeholder: t(localKeyPrefix + '.placeholder')}),
       href: "#readyForServiceMonth"
     }
   ]) %}
 {% elif fieldErrors.readyForServiceMonth and(fieldErrors.readyForServiceMonth == ERROR_CODES.MONTH_INVALID or fieldErrors.readyForServiceYear == ERROR_CODES.YEAR_INVALID) %}
   {% set errorList = errorList.concat([
     {
-      text: t('projects.important_dates.validation.invalid', {placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder')}),
+      text: t('projects.important_dates.validation.invalid', {placeholder: t(localKeyPrefix + '.placeholder')}),
       href: "#readyForServiceMonth"
     }
   ]) %}
@@ -334,8 +334,8 @@
   {% set errorList = errorList.concat([
     {
       text: t('projects.important_dates.validation.before_previous_stage', {
-        placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder'),
-        previousStagePlaceholder: t('projects.important_dates.start_achieving_its_benefits.previousStagePlaceholder'),
+        placeholder: t(localKeyPrefix + '.placeholder'),
+        previousStagePlaceholder: t(localKeyPrefix + '.previousStagePlaceholder', ''),
         previousStageDate: previousStageDate or ''
       }),
       href: "#readyForServiceMonth"
@@ -345,7 +345,7 @@
   {% set errorList = errorList.concat([
     {
       text: t('projects.important_dates.validation.outside_financial_range', {
-        placeholder: t('projects.important_dates.start_achieving_its_benefits.placeholder'),
+        placeholder: t(localKeyPrefix + '.placeholder'),
         financialYearStart: financialYearStart or '',
         financialYearEnd: financialYearEnd or ''
       }),

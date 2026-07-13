@@ -2,6 +2,7 @@ import Joi from 'joi'
 import { SIZE } from '../../constants/common.js'
 import {
   PROJECT_PAYLOAD_FIELDS,
+  PROJECT_TYPES,
   PROJECT_VALIDATION_MESSAGES
 } from '../../constants/projects.js'
 
@@ -12,6 +13,8 @@ const FINANCIAL_YEAR = {
   MIN_YEAR: SIZE.LENGTH_2000,
   MAX_YEAR: SIZE.LENGTH_2100
 }
+
+// Project types that use a condensed timeline (Start OBC → RFS only)
 
 /**
  * Helper: Get current financial month and year
@@ -131,7 +134,16 @@ const yearSchema = Joi.number()
   })
 
 /**
- * Validate standard timeline dates (within financial year range and sequential)
+ * Resolve a prev-field argument that may be a static string or a dynamic
+ * function (data) => string resolved at validation time.
+ */
+const resolvePrevField = (fieldOrFn, data) =>
+  typeof fieldOrFn === 'function' ? fieldOrFn(data) : fieldOrFn
+
+/**
+ * Validate standard timeline dates (within financial year range and sequential).
+ * prevMonthField / prevYearField may be a plain field-name string or a function
+ * (data) => string that resolves the field name at validation time.
  */
 const validateStandardTimelineDate = (
   monthField,
@@ -168,21 +180,21 @@ const validateStandardTimelineDate = (
       })
     }
 
-    // Check sequential ordering if previous stage exists
-    if (prevMonthField && prevYearField) {
-      const prevMonth = Number(data[prevMonthField])
-      const prevYear = Number(data[prevYearField])
-      const prevDataExists = !Number.isNaN(prevMonth) && !Number.isNaN(prevYear)
+    // Resolve prev field names — support both static strings and dynamic functions
+    const resolvedPrevMonth = resolvePrevField(prevMonthField, data)
+    const resolvedPrevYear = resolvePrevField(prevYearField, data)
 
-      if (prevDataExists) {
-        const comparison = compareMonthYear(month, year, prevMonth, prevYear)
-        // Require strictly greater than previous stage (not equal)
-        // To allow equal dates, change <= to < below
-        if (comparison <= 0) {
-          return helpers.error('custom.date_not_after_previous_stage', {
-            stageName
-          })
-        }
+    if (resolvedPrevMonth && resolvedPrevYear) {
+      const prevMonth = Number(data[resolvedPrevMonth])
+      const prevYear = Number(data[resolvedPrevYear])
+      if (
+        !Number.isNaN(prevMonth) &&
+        !Number.isNaN(prevYear) &&
+        compareMonthYear(month, year, prevMonth, prevYear) <= 0
+      ) {
+        return helpers.error('custom.date_not_after_previous_stage', {
+          stageName
+        })
       }
     }
 
@@ -338,6 +350,22 @@ export const startConstructionYearSchema = yearSchema.label(
   PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR
 )
 
+// Dynamic prev-field resolvers for Ready for Service.
+// STR/STU use a condensed timeline (Start OBC → RFS only), so RFS is
+// validated against startOutlineBusinessCase instead of startConstruction.
+const isStrStuType = (projectType) =>
+  projectType === PROJECT_TYPES.STR || projectType === PROJECT_TYPES.STU
+
+const resolveRfsPrevMonthField = (data) =>
+  isStrStuType(data[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE])
+    ? PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH
+    : PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH
+
+const resolveRfsPrevYearField = (data) =>
+  isStrStuType(data[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE])
+    ? PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR
+    : PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR
+
 /**
  * Ready for Service schemas
  */
@@ -346,8 +374,8 @@ export const readyForServiceMonthSchema = monthSchema
     validateStandardTimelineDate(
       PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
       PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR,
-      PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
-      PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
+      resolveRfsPrevMonthField,
+      resolveRfsPrevYearField,
       'Ready for Service'
     )
   )
@@ -362,6 +390,29 @@ export const readyForServiceMonthSchema = monthSchema
 export const readyForServiceYearSchema = yearSchema.label(
   PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
 )
+
+/**
+ * Ready for Service schema for simplified journey (STU / STR).
+ * Validates readyForService against startOutlineBusinessCase (not startConstruction),
+ * because the simplified journey only collects start + end dates.
+ */
+export const readyForServiceSimplifiedMonthSchema = monthSchema
+  .custom(
+    validateStandardTimelineDate(
+      PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+      PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR,
+      PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH,
+      PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR,
+      'Study/Strategy End Date'
+    )
+  )
+  .messages({
+    'custom.date_outside_financial_range':
+      PROJECT_VALIDATION_MESSAGES.DATE_OUTSIDE_FINANCIAL_RANGE,
+    'custom.date_not_after_previous_stage':
+      PROJECT_VALIDATION_MESSAGES.DATE_BEFORE_PREVIOUS_STAGE
+  })
+  .label(PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH)
 
 /**
  * Could Start Early schema - boolean field

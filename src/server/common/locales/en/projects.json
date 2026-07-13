@@ -60,7 +60,11 @@
       "start_construction_date": "Start construction",
       "ready_for_service_date": "Ready for service",
       "could_start_earlier": "Could start earlier with Grant in Aid",
-      "earliest_start_date": "Earliest start date with Grant in Aid"
+      "earliest_start_date": "Earliest start date with Grant in Aid",
+      "study_start_date": "Study start date",
+      "study_end_date": "Study completion date",
+      "strategy_start_date": "Strategy start date",
+      "strategy_end_date": "Strategy completion date"
     },
     "funding_summary_card": {
       "title": "Funding sources and spending",
@@ -414,39 +418,75 @@
     }
   },
   "important_dates": {
+    "date_hint": "For example, {{month}} {{year}}",
     "start_outline_business_case": {
       "title": "When do you expect to start the project's outline business case?",
       "heading": "When do you expect to start the project's outline business case?",
       "hint": "na",
-      "placeholder": "to start the outline business case"
+      "placeholder": "to start the outline business case",
+      "range_hint": "The date you expect to start the project's outline business case must be within {{rangeStart}} and {{rangeEnd}}"
+    },
+    "study_start": {
+      "title": "What date do you expect to start your study?",
+      "heading": "What date do you expect to start your study?",
+      "hint": "na",
+      "placeholder": "to start your study",
+      "range_hint": "The date you expect to start your study must be within {{rangeStart}} and {{rangeEnd}}"
+    },
+    "study_end": {
+      "title": "What date do you expect to complete your study?",
+      "heading": "What date do you expect to complete your study?",
+      "hint": "na",
+      "placeholder": "to complete your study",
+      "previousStagePlaceholder": "to start your study",
+      "range_hint": "The date you expect to complete your study must be within {{rangeStart}} and {{rangeEnd}}"
+    },
+    "strategy_start": {
+      "title": "When do you expect to start the project's Strategic Appraisal Report?",
+      "heading": "When do you expect to start the project's Strategic Appraisal Report?",
+      "hint": "na",
+      "placeholder": "to start your strategy",
+      "range_hint": "The date you expect to start the project's Strategic Appraisal Report must be within {{rangeStart}} and {{rangeEnd}}"
+    },
+    "strategy_end": {
+      "title": "When do you expect to complete the project's Strategic Appraisal Report?",
+      "heading": "When do you expect to complete the project's Strategic Appraisal Report?",
+      "hint": "na",
+      "placeholder": "to complete your strategy",
+      "previousStagePlaceholder": "to start your strategy",
+      "range_hint": "The date you expect to complete the project's Strategic Appraisal Report must be within {{rangeStart}} and {{rangeEnd}}"
     },
     "complete_outline_business_case": {
       "title": "When do you expect to complete the project's outline business case?",
       "heading": "When do you expect to complete the project's outline business case?",
       "hint": "na",
       "placeholder": "to complete the outline business case",
-      "previousStagePlaceholder": "to start the outline business case"
+      "previousStagePlaceholder": "to start the outline business case",
+      "range_hint": "The date you expect to complete the project's outline business case must be within {{rangeStart}} and {{rangeEnd}}"
     },
     "award_main_contract": {
       "title": "When do you expect to award the project's main contract?",
       "heading": "When do you expect to award the project's main contract?",
       "hint": "na",
       "placeholder": "to award the main contract",
-      "previousStagePlaceholder": "to complete the outline business case"
+      "previousStagePlaceholder": "to complete the outline business case",
+      "range_hint": "The date you expect to award the project's main contract must be within {{rangeStart}} and {{rangeEnd}}"
     },
     "expect_to_start_the_work": {
       "title": "When do you expect to start the work?",
       "heading": "When do you expect to start the work?",
       "hint": "This could be construction or creating a strategy.",
       "placeholder": "to start the work",
-      "previousStagePlaceholder": "to award the main contract"
+      "previousStagePlaceholder": "to award the main contract",
+      "range_hint": "The date you expect to start the work must be within {{rangeStart}} and {{rangeEnd}}"
     },
     "start_achieving_its_benefits": {
       "title": "When do you expect the project to start achieving its benefits?",
       "heading": "When do you expect the project to start achieving its benefits?",
       "hint": "This may occur when properties begin to benefit or when new habitats are created.",
       "placeholder": "the project to start achieving its benefits",
-      "previousStagePlaceholder": "to start the work"
+      "previousStagePlaceholder": "to start the work",
+      "range_hint": "The date you expect the project to start achieving its benefits must be within {{rangeStart}} and {{rangeEnd}}"
     },
     "could_start_earlier": {
       "title": "Could the project start sooner if funding was made available earlier?",
@@ -456,7 +496,8 @@
     "earliest_date": {
       "title": "What is the earliest date the project could start if funding was made available earlier?",
       "heading": "What is the earliest date the project could start if funding was made available earlier?",
-      "hint": "Spend includes any funding source (e.g. local levy, contributions and GiA)."
+      "hint": "Spend includes any funding source (e.g. local levy, contributions and GiA).",
+      "range_hint": "The earliest date the project could start must be within {{rangeStart}} and {{rangeEnd}}"
     },
     "validation": {
       "required": "Enter the date you expect {{placeholder}}",
@@ -1541,7 +1582,7 @@
       }
     },
     "footer": {
-      "html_text": "Find out more about <a class=\"govuk-link\" target=\"_blank\" href=\"https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1026844/Partnership_funding_supporting_guidance_for_OM4.pdf\">partnership funding eligibility for environmental benefits (opens in new window or tab)</a>."
+      "html_text": "Find out more about <a class=\"govuk-link\" target=\"_blank\" href=\"https://www.gov.uk/government/publications/fcerm-project-metrics-and-benefit-areas/understanding-environmental-improvements-metrics\">understanding environmental improvements metrics (opens in new window or tab)</a>."
     }
   },
   "failed_submissions": {

@@ -53,6 +53,7 @@ export {
   startConstructionYearSchema,
   readyForServiceMonthSchema,
   readyForServiceYearSchema,
+  readyForServiceSimplifiedMonthSchema,
   couldStartEarlySchema,
   earliestWithGiaMonthSchema,
   earliestWithGiaYearSchema

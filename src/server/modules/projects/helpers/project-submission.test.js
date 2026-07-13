@@ -63,6 +63,19 @@ describe('project-submission helpers', () => {
         PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR,
         PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR
       ]
+
+    PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
+      PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+      PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR,
+      PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR,
+      PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE,
+      PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
+      PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
+      PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH,
+      PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR,
+      PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+      PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
+    ]
   })
 
   describe('_cleanProjectTypeSpecificData', () => {
@@ -162,6 +175,95 @@ describe('project-submission helpers', () => {
       expect(payload).toEqual({
         projectType: 'DEF'
       })
+    })
+
+    test('START_BENEFITS STR: sends projectType and OBC fields, omits startConstruction', () => {
+      requiredInterventionTypesForProjectType.mockReturnValue(false)
+      const sessionData = {
+        referenceNumber: 'SWC/001/001',
+        financialStartYear: 2025,
+        financialEndYear: 2030,
+        projectType: 'STR',
+        // STR/STU never complete startConstruction — fields absent (undefined)
+        startConstructionMonth: undefined,
+        startConstructionYear: undefined,
+        // OBC fields are set in the first step for all types
+        startOutlineBusinessCaseMonth: 4,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 8,
+        readyForServiceYear: 2025
+      }
+
+      const payload = buildProjectPayload(
+        sessionData,
+        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
+      )
+
+      // projectType MUST be present — the backend validator needs it
+      expect(payload.projectType).toBe('STR')
+      // OBC fields MUST be present — used as prev-stage for STR/STU
+      expect(payload.startOutlineBusinessCaseMonth).toBe(4)
+      expect(payload.startOutlineBusinessCaseYear).toBe(2025)
+      // startConstruction MUST be absent — undefined is excluded by buildProjectPayload
+      expect(payload.startConstructionMonth).toBeUndefined()
+      expect(payload.startConstructionYear).toBeUndefined()
+      // Core date fields present
+      expect(payload.readyForServiceMonth).toBe(8)
+      expect(payload.readyForServiceYear).toBe(2025)
+    })
+
+    test('START_BENEFITS STU: sends projectType and OBC fields, omits startConstruction', () => {
+      requiredInterventionTypesForProjectType.mockReturnValue(false)
+      const sessionData = {
+        referenceNumber: 'SWC/001/002',
+        financialStartYear: 2025,
+        financialEndYear: 2030,
+        projectType: 'STU',
+        startOutlineBusinessCaseMonth: 5,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 10,
+        readyForServiceYear: 2025
+      }
+
+      const payload = buildProjectPayload(
+        sessionData,
+        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
+      )
+
+      expect(payload.projectType).toBe('STU')
+      expect(payload.startOutlineBusinessCaseMonth).toBe(5)
+      expect(payload.startOutlineBusinessCaseYear).toBe(2025)
+      expect(payload.startConstructionMonth).toBeUndefined()
+      expect(payload.startConstructionYear).toBeUndefined()
+      expect(payload.readyForServiceMonth).toBe(10)
+    })
+
+    test('START_BENEFITS DEF: sends projectType and startConstruction, OBC fields included if in session', () => {
+      requiredInterventionTypesForProjectType.mockReturnValue(true)
+      const sessionData = {
+        referenceNumber: 'SWC/001/003',
+        financialStartYear: 2025,
+        financialEndYear: 2030,
+        projectType: 'DEF',
+        startConstructionMonth: 10,
+        startConstructionYear: 2025,
+        startOutlineBusinessCaseMonth: 4,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 12,
+        readyForServiceYear: 2025
+      }
+
+      const payload = buildProjectPayload(
+        sessionData,
+        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
+      )
+
+      expect(payload.projectType).toBe('DEF')
+      expect(payload.startConstructionMonth).toBe(10)
+      expect(payload.startConstructionYear).toBe(2025)
+      // OBC fields also included (sent as context; validator uses startConstruction for DEF)
+      expect(payload.startOutlineBusinessCaseMonth).toBe(4)
+      expect(payload.readyForServiceMonth).toBe(12)
     })
   })
 

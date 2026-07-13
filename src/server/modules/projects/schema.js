@@ -24,6 +24,7 @@ export {
   validateAwardMainContract,
   validateStartWork,
   validateStartBenefits,
+  validateStartBenefitsSimplified,
   validateCouldStartEarlier,
   validateEarliestStartDate
 } from './schemas/important-dates-schemas.js'

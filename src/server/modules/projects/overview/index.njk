@@ -145,7 +145,7 @@
     {% if submissionErrors['section-important-dates'] %}
       <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-important-dates'] }}</p>
     {% endif %}
-    {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate, isReadOnly) }}
+    {{ importantDatesSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, formatDate, isReadOnly, PROJECT_TYPES) }}
   </div>
 
   <div id="section-funding-sources"{% if submissionErrors['section-funding-sources'] %} class="govuk-form-group--error"{% endif %}>
