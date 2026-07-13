@@ -74,10 +74,17 @@ export const validateStartWork = Joi.object({
   .label('Start Work')
 
 export const validateStartBenefits = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: Joi.string().optional(),
   [PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR]: Joi.number().optional(),
   [PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR]: Joi.number().optional(),
+  // Context for non-STR/STU: sequential check against startConstruction
   [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]: Joi.number().optional(),
   [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]: Joi.number().optional(),
+  // Context for STR/STU: sequential check against startOutlineBusinessCase
+  [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]:
+    Joi.number().optional(),
+  [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]:
+    Joi.number().optional(),
   [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]: readyForServiceMonthSchema,
   [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: readyForServiceYearSchema
 })

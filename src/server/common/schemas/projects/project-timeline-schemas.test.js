@@ -621,6 +621,116 @@ describe('project-timeline-schemas', () => {
     })
   })
 
+  describe('readyForServiceMonthSchema — STR/STU dynamic projectType behaviour', () => {
+    const makeSchema = (fields = {}) =>
+      Joi.object({
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: Joi.string().optional(),
+        [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]:
+          Joi.number().optional(),
+        [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]:
+          Joi.number().optional(),
+        [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]:
+          Joi.number().optional(),
+        [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]:
+          Joi.number().optional(),
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]:
+          readyForServiceMonthSchema,
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]:
+          readyForServiceYearSchema,
+        ...fields
+      }).options({ abortEarly: false })
+
+    it('passes for STR when RFS is after startOBC', () => {
+      const { error } = makeSchema().validate({
+        projectType: 'STR',
+        startOutlineBusinessCaseMonth: 4,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 8,
+        readyForServiceYear: 2025
+      })
+      expect(error).toBeUndefined()
+    })
+
+    it('passes for STU when RFS is after startOBC', () => {
+      const { error } = makeSchema().validate({
+        projectType: 'STU',
+        startOutlineBusinessCaseMonth: 4,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 8,
+        readyForServiceYear: 2025
+      })
+      expect(error).toBeUndefined()
+    })
+
+    it('fails with DATE_BEFORE_PREVIOUS_STAGE for STR when RFS is before startOBC', () => {
+      const { error } = makeSchema().validate({
+        projectType: 'STR',
+        startOutlineBusinessCaseMonth: 8,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 5,
+        readyForServiceYear: 2025
+      })
+      expect(error).toBeDefined()
+      expect(
+        error.details.some((d) =>
+          d.message.includes('DATE_BEFORE_PREVIOUS_STAGE')
+        )
+      ).toBe(true)
+    })
+
+    it('fails with DATE_BEFORE_PREVIOUS_STAGE for STU when RFS equals startOBC', () => {
+      const { error } = makeSchema().validate({
+        projectType: 'STU',
+        startOutlineBusinessCaseMonth: 6,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 6,
+        readyForServiceYear: 2025
+      })
+      expect(error).toBeDefined()
+      expect(
+        error.details.some((d) =>
+          d.message.includes('DATE_BEFORE_PREVIOUS_STAGE')
+        )
+      ).toBe(true)
+    })
+
+    it('skips sequential check for STR when startOBC is absent', () => {
+      const { error } = makeSchema().validate({
+        projectType: 'STR',
+        readyForServiceMonth: 6,
+        readyForServiceYear: 2025
+      })
+      expect(error).toBeUndefined()
+    })
+
+    it('uses startConstruction as previous stage for non-STR/STU types', () => {
+      const { error } = makeSchema().validate({
+        projectType: 'DEF',
+        startConstructionMonth: 10,
+        startConstructionYear: 2025,
+        readyForServiceMonth: 12,
+        readyForServiceYear: 2025
+      })
+      expect(error).toBeUndefined()
+    })
+
+    it('fails with DATE_BEFORE_PREVIOUS_STAGE for DEF when RFS is before startConstruction', () => {
+      const { error } = makeSchema().validate({
+        projectType: 'DEF',
+        startConstructionMonth: 10,
+        startConstructionYear: 2025,
+        readyForServiceMonth: 8,
+        readyForServiceYear: 2025
+      })
+      expect(error).toBeDefined()
+      expect(
+        error.details.some((d) =>
+          d.message.includes('DATE_BEFORE_PREVIOUS_STAGE')
+        )
+      ).toBe(true)
+    })
+  })
+
   describe('readyForServiceSimplifiedMonthSchema — validates against OBC start', () => {
     const makeSchema = () =>
       Joi.object({

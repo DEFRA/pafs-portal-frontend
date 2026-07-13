@@ -17,13 +17,8 @@
       {% endif %}
 
       {# For earliest date, include OBC start date context #}
-      {% if monthField == 'earliestWithGiaMonth' %}
-        <input type="hidden" name="startOutlineBusinessCaseMonth" value="{{ formData.startOutlineBusinessCaseMonth }}"/>
-        <input type="hidden" name="startOutlineBusinessCaseYear" value="{{ formData.startOutlineBusinessCaseYear }}"/>
-      {% endif %}
-
       {# For simplified end-date (STU/STR), include OBC start date as previous-stage context #}
-      {% if useObcAsPreviousStage %}
+      {% if monthField == 'earliestWithGiaMonth' or useObcAsPreviousStage %}
         <input type="hidden" name="startOutlineBusinessCaseMonth" value="{{ formData.startOutlineBusinessCaseMonth }}"/>
         <input type="hidden" name="startOutlineBusinessCaseYear" value="{{ formData.startOutlineBusinessCaseYear }}"/>
       {% endif %}

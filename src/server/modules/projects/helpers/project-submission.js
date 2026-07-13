@@ -13,44 +13,8 @@ import { detectChanges } from './project-edit-session.js'
 import { PROJECT_PAYLOAD_LEVEL_FIELDS } from './project-config.js'
 import {
   PROJECT_ERROR_CODES,
-  PROJECT_PAYLOAD_LEVELS,
-  PROJECT_PAYLOAD_FIELDS,
-  PROJECT_TYPES
+  PROJECT_PAYLOAD_FIELDS
 } from '../../../common/constants/projects.js'
-
-const SIMPLIFIED_TIMELINE_TYPES = new Set([
-  PROJECT_TYPES.STU,
-  PROJECT_TYPES.STR
-])
-
-const _applySimplifiedStartBenefitsFallback = (sessionData, level, payload) => {
-  const projectType = sessionData[PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]
-  const isSimplifiedType = SIMPLIFIED_TIMELINE_TYPES.has(projectType)
-
-  if (!isSimplifiedType || level !== PROJECT_PAYLOAD_LEVELS.START_BENEFITS) {
-    return
-  }
-
-  // Backend READY_FOR_SERVICE level validates readyForService against
-  // startConstruction fields. In the STR/STU simplified journey those fields
-  // are never collected (they're null in the database for these project types)
-  // so we always substitute the start-outline date instead.
-  // We use an unconditional overwrite because in edit mode the database returns
-  // startConstructionMonth: null, which the payload-builder includes as null
-  // (null !== undefined), causing MONTH_INVALID on the backend.
-  const obcMonth =
-    sessionData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]
-  const obcYear =
-    sessionData[PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]
-
-  if (obcMonth != null) {
-    payload[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH] = obcMonth
-  }
-
-  if (obcYear != null) {
-    payload[PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR] = obcYear
-  }
-}
 
 export function _cleanProjectTypeSpecificData(sessionData) {
   const { projectType } = sessionData
@@ -86,8 +50,6 @@ export function buildProjectPayload(sessionData, level) {
       payload[field] = sessionData[field]
     }
   })
-
-  _applySimplifiedStartBenefitsFallback(sessionData, level, payload)
 
   return payload
 }

@@ -235,6 +235,39 @@ describe('Project Schemas', () => {
       const result = validateStartBenefits.validate({})
       expect(result.error).toBeDefined()
     })
+
+    test('STR: passes when RFS is after startOBC', () => {
+      const result = validateStartBenefits.validate({
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'STR',
+        [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]: 4,
+        [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]: 2026,
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]: 8,
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: 2026
+      })
+      expect(result.error).toBeUndefined()
+    })
+
+    test('STR: fails when RFS is before startOBC', () => {
+      const result = validateStartBenefits.validate({
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'STR',
+        [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH]: 8,
+        [PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR]: 2026,
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]: 4,
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: 2026
+      })
+      expect(result.error).toBeDefined()
+    })
+
+    test('non-STR/STU: passes when RFS is after startConstruction', () => {
+      const result = validateStartBenefits.validate({
+        [PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE]: 'DEF',
+        [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH]: 6,
+        [PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR]: 2026,
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH]: 10,
+        [PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR]: 2026
+      })
+      expect(result.error).toBeUndefined()
+    })
   })
 
   describe('validateCouldStartEarlier', () => {

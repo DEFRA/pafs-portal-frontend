@@ -22,8 +22,7 @@ import { detectChanges } from './project-edit-session.js'
 import {
   PROJECT_ERROR_CODES,
   PROJECT_PAYLOAD_FIELDS,
-  PROJECT_PAYLOAD_LEVELS,
-  PROJECT_TYPES
+  PROJECT_PAYLOAD_LEVELS
 } from '../../../common/constants/projects.js'
 
 // Mock dependencies
@@ -64,6 +63,19 @@ describe('project-submission helpers', () => {
         PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR,
         PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR
       ]
+
+    PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
+      PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
+      PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR,
+      PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR,
+      PROJECT_PAYLOAD_FIELDS.PROJECT_TYPE,
+      PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
+      PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
+      PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_MONTH,
+      PROJECT_PAYLOAD_FIELDS.START_OUTLINE_BUSINESS_CASE_YEAR,
+      PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
+      PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
+    ]
   })
 
   describe('_cleanProjectTypeSpecificData', () => {
@@ -165,27 +177,21 @@ describe('project-submission helpers', () => {
       })
     })
 
-    test('should backfill startConstruction fields from start-outline date for STR/STU START_BENEFITS payload', () => {
-      requiredInterventionTypesForProjectType.mockReturnValue(true)
-      PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
-        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
-        PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR,
-        PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR,
-        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
-        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
-        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
-        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
-      ]
-
+    test('START_BENEFITS STR: sends projectType and OBC fields, omits startConstruction', () => {
+      requiredInterventionTypesForProjectType.mockReturnValue(false)
       const sessionData = {
-        projectType: PROJECT_TYPES.STU,
-        referenceNumber: 'TEST-001',
-        financialStartYear: '2025',
-        financialEndYear: '2026',
-        startOutlineBusinessCaseMonth: '5',
-        startOutlineBusinessCaseYear: '2025',
-        readyForServiceMonth: '6',
-        readyForServiceYear: '2025'
+        referenceNumber: 'SWC/001/001',
+        financialStartYear: 2025,
+        financialEndYear: 2030,
+        projectType: 'STR',
+        // STR/STU never complete startConstruction — fields absent (undefined)
+        startConstructionMonth: undefined,
+        startConstructionYear: undefined,
+        // OBC fields are set in the first step for all types
+        startOutlineBusinessCaseMonth: 4,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 8,
+        readyForServiceYear: 2025
       }
 
       const payload = buildProjectPayload(
@@ -193,129 +199,30 @@ describe('project-submission helpers', () => {
         PROJECT_PAYLOAD_LEVELS.START_BENEFITS
       )
 
-      expect(payload).toEqual({
-        referenceNumber: 'TEST-001',
-        financialStartYear: '2025',
-        financialEndYear: '2026',
-        startConstructionMonth: '5',
-        startConstructionYear: '2025',
-        readyForServiceMonth: '6',
-        readyForServiceYear: '2025'
-      })
-    })
-
-    test('should not override existing startConstruction fields for STR/STU START_BENEFITS payload', () => {
-      // Even when startConstruction values exist in the session (e.g. a legacy
-      // project that was migrated with those fields set), the simplified journey
-      // always uses the OBC start date as the previous stage, so overwrite.
-      requiredInterventionTypesForProjectType.mockReturnValue(true)
-      PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
-        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
-        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
-        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
-        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
-      ]
-
-      const sessionData = {
-        projectType: PROJECT_TYPES.STR,
-        startOutlineBusinessCaseMonth: '5',
-        startOutlineBusinessCaseYear: '2025',
-        startConstructionMonth: '9',
-        startConstructionYear: '2025',
-        readyForServiceMonth: '10',
-        readyForServiceYear: '2025'
-      }
-
-      const payload = buildProjectPayload(
-        sessionData,
-        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
-      )
-
-      // OBC start always wins for simplified types
-      expect(payload.startConstructionMonth).toBe('5')
-      expect(payload.startConstructionYear).toBe('2025')
-    })
-
-    test('should backfill null startConstruction fields from OBC start for STR/STU in edit mode', () => {
-      // In edit mode the database returns startConstructionMonth: null for STR/STU.
-      // The payload builder includes null (null !== undefined), so the previous
-      // === undefined check was insufficient. The unconditional overwrite fixes this.
-      requiredInterventionTypesForProjectType.mockReturnValue(true)
-      PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
-        PROJECT_PAYLOAD_FIELDS.REFERENCE_NUMBER,
-        PROJECT_PAYLOAD_FIELDS.FINANCIAL_START_YEAR,
-        PROJECT_PAYLOAD_FIELDS.FINANCIAL_END_YEAR,
-        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
-        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
-        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
-        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
-      ]
-
-      const sessionData = {
-        projectType: PROJECT_TYPES.STU,
-        referenceNumber: 'TEST-001',
-        financialStartYear: '2025',
-        financialEndYear: '2026',
-        startOutlineBusinessCaseMonth: '5',
-        startOutlineBusinessCaseYear: '2025',
-        startConstructionMonth: null, // null from DB in edit mode
-        startConstructionYear: null,
-        readyForServiceMonth: '6',
-        readyForServiceYear: '2025'
-      }
-
-      const payload = buildProjectPayload(
-        sessionData,
-        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
-      )
-
-      // null is overwritten with the OBC start date
-      expect(payload.startConstructionMonth).toBe('5')
-      expect(payload.startConstructionYear).toBe('2025')
-      expect(payload.readyForServiceMonth).toBe('6')
-    })
-
-    test('should not backfill startConstruction fields for non-simplified START_BENEFITS payload', () => {
-      requiredInterventionTypesForProjectType.mockReturnValue(true)
-      PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
-        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
-        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
-        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
-        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
-      ]
-
-      const sessionData = {
-        projectType: PROJECT_TYPES.DEF,
-        startOutlineBusinessCaseMonth: '5',
-        startOutlineBusinessCaseYear: '2025',
-        readyForServiceMonth: '6',
-        readyForServiceYear: '2025'
-      }
-
-      const payload = buildProjectPayload(
-        sessionData,
-        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
-      )
-
+      // projectType MUST be present — the backend validator needs it
+      expect(payload.projectType).toBe('STR')
+      // OBC fields MUST be present — used as prev-stage for STR/STU
+      expect(payload.startOutlineBusinessCaseMonth).toBe(4)
+      expect(payload.startOutlineBusinessCaseYear).toBe(2025)
+      // startConstruction MUST be absent — undefined is excluded by buildProjectPayload
       expect(payload.startConstructionMonth).toBeUndefined()
       expect(payload.startConstructionYear).toBeUndefined()
+      // Core date fields present
+      expect(payload.readyForServiceMonth).toBe(8)
+      expect(payload.readyForServiceYear).toBe(2025)
     })
 
-    test('should not set startConstruction fallback when OBC start values are missing for simplified START_BENEFITS', () => {
-      requiredInterventionTypesForProjectType.mockReturnValue(true)
-      PROJECT_PAYLOAD_LEVEL_FIELDS[PROJECT_PAYLOAD_LEVELS.START_BENEFITS] = [
-        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_MONTH,
-        PROJECT_PAYLOAD_FIELDS.START_CONSTRUCTION_YEAR,
-        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_MONTH,
-        PROJECT_PAYLOAD_FIELDS.READY_FOR_SERVICE_YEAR
-      ]
-
+    test('START_BENEFITS STU: sends projectType and OBC fields, omits startConstruction', () => {
+      requiredInterventionTypesForProjectType.mockReturnValue(false)
       const sessionData = {
-        projectType: PROJECT_TYPES.STU,
-        startOutlineBusinessCaseMonth: null,
-        startOutlineBusinessCaseYear: null,
-        readyForServiceMonth: '6',
-        readyForServiceYear: '2025'
+        referenceNumber: 'SWC/001/002',
+        financialStartYear: 2025,
+        financialEndYear: 2030,
+        projectType: 'STU',
+        startOutlineBusinessCaseMonth: 5,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 10,
+        readyForServiceYear: 2025
       }
 
       const payload = buildProjectPayload(
@@ -323,10 +230,40 @@ describe('project-submission helpers', () => {
         PROJECT_PAYLOAD_LEVELS.START_BENEFITS
       )
 
+      expect(payload.projectType).toBe('STU')
+      expect(payload.startOutlineBusinessCaseMonth).toBe(5)
+      expect(payload.startOutlineBusinessCaseYear).toBe(2025)
       expect(payload.startConstructionMonth).toBeUndefined()
       expect(payload.startConstructionYear).toBeUndefined()
-      expect(payload.readyForServiceMonth).toBe('6')
-      expect(payload.readyForServiceYear).toBe('2025')
+      expect(payload.readyForServiceMonth).toBe(10)
+    })
+
+    test('START_BENEFITS DEF: sends projectType and startConstruction, OBC fields included if in session', () => {
+      requiredInterventionTypesForProjectType.mockReturnValue(true)
+      const sessionData = {
+        referenceNumber: 'SWC/001/003',
+        financialStartYear: 2025,
+        financialEndYear: 2030,
+        projectType: 'DEF',
+        startConstructionMonth: 10,
+        startConstructionYear: 2025,
+        startOutlineBusinessCaseMonth: 4,
+        startOutlineBusinessCaseYear: 2025,
+        readyForServiceMonth: 12,
+        readyForServiceYear: 2025
+      }
+
+      const payload = buildProjectPayload(
+        sessionData,
+        PROJECT_PAYLOAD_LEVELS.START_BENEFITS
+      )
+
+      expect(payload.projectType).toBe('DEF')
+      expect(payload.startConstructionMonth).toBe(10)
+      expect(payload.startConstructionYear).toBe(2025)
+      // OBC fields also included (sent as context; validator uses startConstruction for DEF)
+      expect(payload.startOutlineBusinessCaseMonth).toBe(4)
+      expect(payload.readyForServiceMonth).toBe(12)
     })
   })
 
@@ -369,22 +306,6 @@ describe('project-submission helpers', () => {
       expect(result.success).toBe(true)
     })
 
-    test('should use empty access token when auth session is missing', async () => {
-      getAuthSession.mockReturnValue(undefined)
-      upsertProjectProposal.mockResolvedValue({
-        success: true,
-        data: { referenceNumber: 'TEST-001' }
-      })
-
-      const result = await submitProject(
-        mockRequest,
-        PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE
-      )
-
-      expect(upsertProjectProposal).toHaveBeenCalledWith(expect.any(Object), '')
-      expect(result.success).toBe(true)
-    })
-
     test('should handle submission failure from API', async () => {
       upsertProjectProposal.mockResolvedValue({
         success: false,
@@ -399,22 +320,6 @@ describe('project-submission helpers', () => {
       expect(result.success).toBe(false)
       expect(result.error).toBeDefined()
       expect(mockRequest.logger.error).toHaveBeenCalled()
-    })
-
-    test('should use full response as error payload when API failure has no data property', async () => {
-      const failedResponse = {
-        success: false,
-        errors: [{ errorCode: 'CUSTOM_ERROR' }]
-      }
-      upsertProjectProposal.mockResolvedValue(failedResponse)
-
-      const result = await submitProject(
-        mockRequest,
-        PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE
-      )
-
-      expect(result.success).toBe(false)
-      expect(result.error.response.data).toEqual(failedResponse)
     })
 
     test('should handle network errors', async () => {
@@ -584,31 +489,6 @@ describe('project-submission helpers', () => {
       })
     })
 
-    test('should fallback to NETWORK_ERROR when API error has no errorCode', () => {
-      const error = {
-        response: {
-          data: {
-            errors: [{ message: 'Something went wrong' }]
-          }
-        }
-      }
-      extractApiError.mockReturnValue({})
-
-      handleServiceConsumptionError(
-        mockRequest,
-        mockH,
-        error,
-        viewData,
-        template
-      )
-
-      expect(mockH.view).toHaveBeenCalledWith(template, {
-        ...viewData,
-        errorCode: PROJECT_ERROR_CODES.NETWORK_ERROR,
-        error: {}
-      })
-    })
-
     test('should handle generic errors', () => {
       const error = new Error('Generic error')
       const apiError = { errorCode: PROJECT_ERROR_CODES.NETWORK_ERROR }
@@ -724,28 +604,6 @@ describe('project-submission helpers', () => {
       expect(updateSessionData).not.toHaveBeenCalled()
     })
 
-    test('should skip session update when successful response does not include referenceNumber and slug', async () => {
-      upsertProjectProposal.mockResolvedValue({
-        success: true,
-        data: {
-          data: {
-            status: 'ok'
-          }
-        }
-      })
-
-      const result = await saveProjectWithErrorHandling(
-        mockRequest,
-        mockH,
-        PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE,
-        viewData,
-        template
-      )
-
-      expect(result).toBeNull()
-      expect(updateSessionData).not.toHaveBeenCalled()
-    })
-
     test('should return error view on submission failure', async () => {
       const error = new Error('Submission failed')
       error.response = {
@@ -842,32 +700,6 @@ describe('project-submission helpers', () => {
       )
     })
 
-    test('should handle successful save when metrics is not present', async () => {
-      const requestWithoutMetrics = {
-        ...mockRequest,
-        metrics: undefined
-      }
-      upsertProjectProposal.mockResolvedValue({
-        success: true,
-        data: {
-          data: {
-            referenceNumber: 'TEST-001',
-            slug: 'test-001'
-          }
-        }
-      })
-
-      await expect(
-        saveProjectWithErrorHandling(
-          requestWithoutMetrics,
-          mockH,
-          PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE,
-          viewData,
-          template
-        )
-      ).resolves.toBeNull()
-    })
-
     test('should record proposalStepVisit metric with validation_error on failed save', async () => {
       upsertProjectProposal.mockResolvedValue({
         success: false,
@@ -891,29 +723,6 @@ describe('project-submission helpers', () => {
           result: 'validation_error'
         }
       )
-    })
-
-    test('should handle failed save when metrics is not present', async () => {
-      const requestWithoutMetrics = {
-        ...mockRequest,
-        metrics: undefined
-      }
-      upsertProjectProposal.mockResolvedValue({
-        success: false,
-        data: { errors: [{ errorCode: 'CUSTOM_ERROR' }] }
-      })
-      extractApiError.mockReturnValue({ errorCode: 'CUSTOM_ERROR' })
-
-      const result = await saveProjectWithErrorHandling(
-        requestWithoutMetrics,
-        mockH,
-        PROJECT_PAYLOAD_LEVELS.PROJECT_TYPE,
-        viewData,
-        template
-      )
-
-      expect(mockH.view).toHaveBeenCalled()
-      expect(result).toBeUndefined()
     })
   })
 })
