@@ -18,7 +18,9 @@ import {
   getProjectStep,
   getSessionData,
   updateSessionData,
-  isConfidenceRestrictedProjectType
+  isConfidenceRestrictedProjectType,
+  hasNonGiaContributions,
+  buildProcessedFundingValues
 } from '../helpers/project-utils.js'
 import { buildRadioItems } from '../helpers/radio-options.js'
 
@@ -106,6 +108,19 @@ class GoalsUrgencyConfidenceController {
     return GOALS_URGENCY_CONFIDENCE_CONFIG[step]
   }
 
+  _getFundingValuesForQ3(request) {
+    const sessionData = getSessionData(request)
+    const sessionFundingValues =
+      sessionData[PROJECT_PAYLOAD_FIELDS.FUNDING_VALUES]
+    if (
+      Array.isArray(sessionFundingValues) &&
+      sessionFundingValues.length > 0
+    ) {
+      return sessionFundingValues
+    }
+    return buildProcessedFundingValues(sessionData)
+  }
+
   _buildRadioItemsForStep(request, step, currentValue) {
     const radioConfig = RADIO_CONFIG[step]
     if (!radioConfig) {
@@ -113,24 +128,39 @@ class GoalsUrgencyConfidenceController {
     }
 
     const config = this._getConfig(step)
+    const extraOptions = {}
+    let selectedValue = currentValue
+
+    if (step === PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING) {
+      const fundingValues = this._getFundingValuesForQ3(request)
+      if (hasNonGiaContributions(fundingValues)) {
+        extraOptions.excludeKeys = ['not_applicable']
+        if (selectedValue === 'not_applicable') {
+          selectedValue = null
+        }
+      }
+    }
+
     return buildRadioItems(
       request.t,
       config.localKeyPrefix + '.options',
       null,
-      currentValue,
+      selectedValue,
       {
         useHints: radioConfig.useHints,
-        useBoldLabels: radioConfig.useBoldLabels
+        useBoldLabels: radioConfig.useBoldLabels,
+        ...extraOptions
       }
     )
   }
 
-  _getViewData(request) {
+  _getViewData(request, formData = {}) {
     const step = getProjectStep(request)
     const config = this._getConfig(step)
     const sessionData = getSessionData(request)
     const { backLinkOptions, localKeyPrefix, fieldType, fieldName, maxLength } =
       config
+    const effectiveValue = formData?.[fieldName] ?? sessionData[fieldName]
 
     const additionalData = {
       step,
@@ -146,7 +176,7 @@ class GoalsUrgencyConfidenceController {
       additionalData.radioItems = this._buildRadioItemsForStep(
         request,
         step,
-        sessionData[fieldName]
+        effectiveValue
       )
     }
 
@@ -161,7 +191,8 @@ class GoalsUrgencyConfidenceController {
     return buildViewData(request, {
       localKeyPrefix,
       backLinkOptions,
-      additionalData
+      additionalData,
+      formData
     })
   }
 
@@ -274,10 +305,28 @@ class GoalsUrgencyConfidenceController {
       return accessCheck
     }
 
-    updateSessionData(request, request.payload)
-    const viewData = this._getViewData(request)
+    const viewData = this._getViewData(request, request.payload)
     const config = this._getConfig(step)
     const { schema, fieldName, fieldType } = config
+
+    // For Q3, reject N/A when non-GIA contributions are present.
+    if (step === PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING) {
+      const fundingValues = this._getFundingValuesForQ3(request)
+      if (
+        hasNonGiaContributions(fundingValues) &&
+        request.payload?.[fieldName] === 'not_applicable'
+      ) {
+        return this._handleValidationError(h, viewData, {
+          fieldErrors: {
+            [fieldName]: 'CONFIDENCE_SECURED_PARTNERSHIP_FUNDING_INVALID'
+          },
+          fieldName,
+          fieldType,
+          request,
+          step
+        })
+      }
+    }
 
     try {
       // Validate payload if schema exists
@@ -296,6 +345,8 @@ class GoalsUrgencyConfidenceController {
           })
         }
       }
+
+      updateSessionData(request, request.payload)
 
       // Save project data
       const level = this._getPayloadLevel(step)

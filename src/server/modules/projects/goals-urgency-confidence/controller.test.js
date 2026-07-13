@@ -18,7 +18,9 @@ import {
   getProjectStep,
   getSessionData,
   updateSessionData,
-  isConfidenceRestrictedProjectType
+  isConfidenceRestrictedProjectType,
+  hasNonGiaContributions,
+  buildProcessedFundingValues
 } from '../helpers/project-utils.js'
 import { buildRadioItems } from '../helpers/radio-options.js'
 
@@ -151,6 +153,9 @@ describe('GoalsUrgencyConfidenceController', () => {
       return ['ELO', 'HCR', 'STR', 'STU'].includes(projectType)
     })
 
+    hasNonGiaContributions.mockReturnValue(false)
+    buildProcessedFundingValues.mockReturnValue([])
+
     saveProjectWithErrorHandling.mockResolvedValue(null)
   })
 
@@ -228,6 +233,80 @@ describe('GoalsUrgencyConfidenceController', () => {
         null,
         'medium',
         { useHints: true, useBoldLabels: true }
+      )
+    })
+
+    test('should exclude not_applicable from Q3 radio items when non-GIA contributions > 0', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+      )
+      hasNonGiaContributions.mockReturnValue(true)
+
+      await goalsUrgencyConfidenceController.getHandler(mockRequest, mockH)
+
+      expect(buildRadioItems).toHaveBeenCalledWith(
+        mockRequest.t,
+        'projects.confidence_assessment.funding_confidence.options',
+        null,
+        'medium',
+        { useHints: true, useBoldLabels: true, excludeKeys: ['not_applicable'] }
+      )
+    })
+
+    test('should include not_applicable in Q3 radio items when no non-GIA contributions', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+      )
+      hasNonGiaContributions.mockReturnValue(false)
+
+      await goalsUrgencyConfidenceController.getHandler(mockRequest, mockH)
+
+      expect(buildRadioItems).toHaveBeenCalledWith(
+        mockRequest.t,
+        'projects.confidence_assessment.funding_confidence.options',
+        null,
+        'medium',
+        { useHints: true, useBoldLabels: true }
+      )
+    })
+
+    test('should evaluate Q3 non-GIA rules from processed DB funding rows when fundingValues is missing', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+      )
+      const sessionDataWithoutFundingValues = {
+        slug: 'TEST-001',
+        pafs_core_funding_values: [{ id: 1, financialYear: 2025 }],
+        pafs_core_funding_contributors: [
+          {
+            fundingValueId: 1,
+            name: 'Council A',
+            contributorType: 'public_contributions',
+            amount: '2500'
+          }
+        ],
+        [PROJECT_PAYLOAD_FIELDS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING]:
+          'medium'
+      }
+      const processedRows = [
+        { financialYear: 2025, publicContributions: '2500' }
+      ]
+      getSessionData.mockReturnValue(sessionDataWithoutFundingValues)
+      buildProcessedFundingValues.mockReturnValue(processedRows)
+      hasNonGiaContributions.mockReturnValue(true)
+
+      await goalsUrgencyConfidenceController.getHandler(mockRequest, mockH)
+
+      expect(buildProcessedFundingValues).toHaveBeenCalledWith(
+        sessionDataWithoutFundingValues
+      )
+      expect(hasNonGiaContributions).toHaveBeenCalledWith(processedRows)
+      expect(buildRadioItems).toHaveBeenCalledWith(
+        mockRequest.t,
+        'projects.confidence_assessment.funding_confidence.options',
+        null,
+        'medium',
+        { useHints: true, useBoldLabels: true, excludeKeys: ['not_applicable'] }
       )
     })
 
@@ -689,7 +768,7 @@ describe('GoalsUrgencyConfidenceController', () => {
       )
     })
 
-    test('should render view with fieldErrors when validation fails for radio', async () => {
+    test('should render view with fieldErrors when validation fails for radio (post block)', async () => {
       getProjectStep.mockReturnValue(PROJECT_STEPS.URGENCY_REASON)
       const joiError = {
         details: [
@@ -720,7 +799,7 @@ describe('GoalsUrgencyConfidenceController', () => {
       expect(viewData.validationMessageKey).toBeUndefined()
     })
 
-    test('should handle catch block and render view with API error', async () => {
+    test('should handle catch block and render view with API error (post block)', async () => {
       const error = new Error('Network error')
       saveProjectWithErrorHandling.mockRejectedValue(error)
       extractApiError.mockReturnValue({ message: 'API error' })
@@ -740,7 +819,7 @@ describe('GoalsUrgencyConfidenceController', () => {
       )
     })
 
-    test('should fallback to overview when step has no next route in sequence', async () => {
+    test('should fallback to overview when step has no next route in sequence (post block)', async () => {
       // Use a step that is not in STEP_SEQUENCE by manipulating getProjectStep
       // to return a step after clearing its sequence entry
       // The fallback is tested by CONFIDENCE_SECURED_PARTNERSHIP_FUNDING -> OVERVIEW
@@ -755,7 +834,7 @@ describe('GoalsUrgencyConfidenceController', () => {
       )
     })
 
-    test('should handle missing referenceNumber gracefully', async () => {
+    test('should handle missing referenceNumber gracefully (post block)', async () => {
       getSessionData.mockReturnValue({})
 
       await goalsUrgencyConfidenceController.postHandler(mockRequest, mockH)
@@ -765,7 +844,7 @@ describe('GoalsUrgencyConfidenceController', () => {
       )
     })
 
-    test('should fallback to overview when step is not in STEP_SEQUENCE', async () => {
+    test('should fallback to overview when step is not in STEP_SEQUENCE (post block)', async () => {
       // Use a step key that exists in config but not in STEP_SEQUENCE
       const fakeStep = 'unknown-step'
       getProjectStep.mockReturnValue(fakeStep)
@@ -790,7 +869,7 @@ describe('GoalsUrgencyConfidenceController', () => {
       delete GOALS_URGENCY_CONFIDENCE_CONFIG[fakeStep]
     })
 
-    test('should return null radioItems for steps without radio config', async () => {
+    test('should return null radioItems for steps without radio config (post block)', async () => {
       // PROJECT_GOALS is character-count, so _buildRadioItemsForStep returns null
       // But fieldType is not 'radio', so _buildRadioItemsForStep is not called
       // To test the null return, we need a radio step with no RADIO_CONFIG entry
@@ -819,7 +898,7 @@ describe('GoalsUrgencyConfidenceController', () => {
       delete GOALS_URGENCY_CONFIDENCE_CONFIG[fakeRadioStep]
     })
 
-    test('should skip validation and proceed when schema is undefined', async () => {
+    test('should skip validation and proceed when schema is undefined (post block)', async () => {
       const noSchemaStep = 'no-schema-step'
       getProjectStep.mockReturnValue(noSchemaStep)
       GOALS_URGENCY_CONFIDENCE_CONFIG[noSchemaStep] = {
@@ -840,7 +919,7 @@ describe('GoalsUrgencyConfidenceController', () => {
       delete GOALS_URGENCY_CONFIDENCE_CONFIG[noSchemaStep]
     })
 
-    test('should handle urgency details MAX_LENGTH validation', async () => {
+    test('should handle urgency details MAX_LENGTH validation (post block)', async () => {
       getProjectStep.mockReturnValue(PROJECT_STEPS.URGENCY_DETAILS)
       const joiError = {
         details: [
@@ -1092,6 +1171,82 @@ describe('GoalsUrgencyConfidenceController', () => {
           }
         })
       )
+    })
+
+    test('should reject not_applicable on Q3 POST when non-GIA contributions > 0', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+      )
+      hasNonGiaContributions.mockReturnValue(true)
+      mockRequest.payload = {
+        confidenceSecuredPartnershipFunding: 'not_applicable'
+      }
+
+      await goalsUrgencyConfidenceController.postHandler(mockRequest, mockH)
+
+      expect(mockH.view).toHaveBeenCalledWith(
+        PROJECT_VIEWS.GOALS_URGENCY_CONFIDENCE,
+        expect.objectContaining({
+          fieldErrors: {
+            confidenceSecuredPartnershipFunding:
+              'CONFIDENCE_SECURED_PARTNERSHIP_FUNDING_INVALID'
+          }
+        })
+      )
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
+    })
+
+    test('should use standard schema for Q3 POST when no non-GIA contributions', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+      )
+      hasNonGiaContributions.mockReturnValue(false)
+      mockRequest.payload = {
+        confidenceSecuredPartnershipFunding: 'not_applicable'
+      }
+
+      await goalsUrgencyConfidenceController.postHandler(mockRequest, mockH)
+
+      expect(
+        GOALS_URGENCY_CONFIDENCE_CONFIG[
+          PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+        ].schema.validate
+      ).toHaveBeenCalled()
+    })
+
+    test('should use processed DB funding rows for Q3 POST non-GIA validation when fundingValues is missing', async () => {
+      getProjectStep.mockReturnValue(
+        PROJECT_STEPS.CONFIDENCE_SECURED_PARTNERSHIP_FUNDING
+      )
+      const sessionDataWithoutFundingValues = {
+        slug: 'TEST-001',
+        pafs_core_funding_values: [{ id: 1, financialYear: 2025 }],
+        pafs_core_funding_contributors: [
+          {
+            fundingValueId: 1,
+            name: 'Council A',
+            contributorType: 'public_contributions',
+            amount: '2500'
+          }
+        ]
+      }
+      const processedRows = [
+        { financialYear: 2025, publicContributions: '2500' }
+      ]
+      getSessionData.mockReturnValue(sessionDataWithoutFundingValues)
+      buildProcessedFundingValues.mockReturnValue(processedRows)
+      hasNonGiaContributions.mockReturnValue(true)
+      mockRequest.payload = {
+        confidenceSecuredPartnershipFunding: 'not_applicable'
+      }
+
+      await goalsUrgencyConfidenceController.postHandler(mockRequest, mockH)
+
+      expect(buildProcessedFundingValues).toHaveBeenCalledWith(
+        sessionDataWithoutFundingValues
+      )
+      expect(hasNonGiaContributions).toHaveBeenCalledWith(processedRows)
+      expect(saveProjectWithErrorHandling).not.toHaveBeenCalled()
     })
   })
 })

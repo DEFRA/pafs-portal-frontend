@@ -1151,10 +1151,6 @@
         "low": {
           "label": "Low",
           "hint": "Based on shapefile or estimate."
-        },
-        "not_applicable": {
-          "label": "N/A",
-          "hint": "No properties benefitting from this project."
         }
       },
       "validation": {
@@ -1180,10 +1176,6 @@
         "low": {
           "label": "Low",
           "hint": "Significant concerns in completing by specified Gateway 4 date or profile of properties benefitting."
-        },
-        "not_applicable": {
-          "label": "N/A",
-          "hint": "No property benefits being provided by the project."
         }
       },
       "validation": {

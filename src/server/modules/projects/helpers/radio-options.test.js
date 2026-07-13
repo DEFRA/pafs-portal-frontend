@@ -388,6 +388,54 @@ describe('radio-options', () => {
       expect(result[0].text).toBe('High')
       expect(result[0].html).toBeUndefined()
     })
+
+    test('should exclude keys listed in excludeKeys option', () => {
+      const result = buildRadioItems(
+        mockT,
+        'projects.confidence.options',
+        null,
+        null,
+        { excludeKeys: ['medium', 'low'] }
+      )
+
+      const values = result.map((item) => item.value)
+      expect(values).not.toContain('medium')
+      expect(values).not.toContain('low')
+      expect(values).toContain('high')
+      expect(values).toContain('medium_high')
+    })
+
+    test('should not exclude any keys when excludeKeys is empty array', () => {
+      const result = buildRadioItems(
+        mockT,
+        'projects.confidence.options',
+        null,
+        null,
+        { excludeKeys: [] }
+      )
+
+      expect(result).toHaveLength(4)
+    })
+
+    test('should not throw when excludeKeys is null', () => {
+      const call = () =>
+        buildRadioItems(mockT, 'projects.confidence.options', null, null, {
+          excludeKeys: null
+        })
+
+      expect(call).not.toThrow()
+      expect(call()).toHaveLength(4)
+    })
+
+    test('should not throw when excludeKeys is a non-array value', () => {
+      const call = () =>
+        buildRadioItems(mockT, 'projects.confidence.options', null, null, {
+          excludeKeys: 'medium'
+        })
+
+      expect(call).not.toThrow()
+      expect(call()).toHaveLength(4)
+    })
   })
 
   describe('getLabelForValue', () => {

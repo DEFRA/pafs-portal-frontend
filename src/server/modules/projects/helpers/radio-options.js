@@ -20,6 +20,41 @@ function addHintIfAvailable(item, t, optionsKeyPrefix, key) {
   }
 }
 
+function getOptionLabelText(t, optionsKeyPrefix, key) {
+  const labelKey = `${optionsKeyPrefix}.${key}.label`
+  const labelText = t(labelKey)
+  return labelText === labelKey ? t(`${optionsKeyPrefix}.${key}`) : labelText
+}
+
+function buildRadioItemForKey(
+  t,
+  optionsKeyPrefix,
+  itemsMap,
+  currentValue,
+  key,
+  options
+) {
+  const { useHints, useBoldLabels } = options
+  const value = itemsMap?.[key] ?? key
+  const text = getOptionLabelText(t, optionsKeyPrefix, key)
+  const item = {
+    value,
+    checked: currentValue === value
+  }
+
+  if (useBoldLabels) {
+    item.html = `<strong>${text}</strong>`
+  } else {
+    item.text = text
+  }
+
+  if (useHints) {
+    addHintIfAvailable(item, t, optionsKeyPrefix, key)
+  }
+
+  return item
+}
+
 /**
  * Build an array of GOV.UK radio items from translation keys.
  *
@@ -45,7 +80,9 @@ export function buildRadioItems(
   currentValue,
   options = {}
 ) {
-  const { useHints = false, useBoldLabels = false } = options
+  const { useHints = false, useBoldLabels = false, excludeKeys = [] } = options
+  const normalizedExcludeKeys = Array.isArray(excludeKeys) ? excludeKeys : []
+  const excludeSet = new Set(normalizedExcludeKeys)
   const items = []
 
   // Retrieve the full options object to detect divider keys
@@ -56,36 +93,25 @@ export function buildRadioItems(
       : []
 
   for (const key of translationKeys) {
-    if (key === 'divider') {
-      // Handle divider entries from the translation data
-      items.push({ divider: t('common.or') })
-    } else {
-      // Use itemsMap value if provided, otherwise use the key itself
-      const value = itemsMap?.[key] ?? key
-      const labelKey = `${optionsKeyPrefix}.${key}.label`
-      const labelText = t(labelKey)
-
-      // If the label key returns itself, try without .label suffix (flat structure)
-      const text =
-        labelText === labelKey ? t(`${optionsKeyPrefix}.${key}`) : labelText
-
-      const item = {
-        value,
-        checked: currentValue === value
-      }
-
-      // Use html property for bold labels, otherwise use text property
-      if (useBoldLabels) {
-        item.html = `<strong>${text}</strong>`
+    if (!excludeSet.has(key)) {
+      if (key === 'divider') {
+        // Handle divider entries from the translation data
+        items.push({ divider: t('common.or') })
       } else {
-        item.text = text
+        items.push(
+          buildRadioItemForKey(
+            t,
+            optionsKeyPrefix,
+            itemsMap,
+            currentValue,
+            key,
+            {
+              useHints,
+              useBoldLabels
+            }
+          )
+        )
       }
-
-      if (useHints) {
-        addHintIfAvailable(item, t, optionsKeyPrefix, key)
-      }
-
-      items.push(item)
     }
   }
 
