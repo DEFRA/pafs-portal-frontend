@@ -14,7 +14,9 @@ describe('application decimal comma formatting', () => {
   it('formats decimal values with thousand separators', () => {
     expect(formatNumberWithCommas('1234.56')).toBe('1,234.56')
     expect(formatNumberWithCommas('.75')).toBe('0.75')
+    expect(formatNumberWithCommas('.')).toBe('0.')
     expect(formatNumberWithCommas('-1234.56', true)).toBe('-1,234.56')
+    expect(formatNumberWithCommas('-.', true)).toBe('-0.')
   })
 
   it('formats decimal input values while preserving the decimal portion', () => {

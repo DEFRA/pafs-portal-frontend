@@ -52,7 +52,7 @@ export const digitsOnly = (value, allowNegative = false) => {
 }
 
 const extractNumericParts = (value, allowNegative = false) => {
-  const str = String(value || '').trim()
+  const str = String(value ?? '').trim()
   const isNegative = allowNegative && str.startsWith('-')
   const unsigned = isNegative ? str.slice(1) : str
   const cleaned = unsigned.replaceAll(',', '').replaceAll(/[^\d.]/g, '')
@@ -108,6 +108,10 @@ export const withCommas = (digits) => {
 export const formatNumberWithCommas = (value, allowNegative = false) => {
   const { isNegative, integerPart, decimalPart, hasDecimalPoint } =
     extractNumericParts(value, allowNegative)
+
+  if (hasDecimalPoint && !integerPart && !decimalPart) {
+    return `${isNegative ? '-' : ''}0.`
+  }
 
   if (!integerPart && !decimalPart) {
     return isNegative ? '-' : ''

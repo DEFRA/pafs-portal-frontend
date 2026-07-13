@@ -368,7 +368,8 @@ function extractNumberParts(value) {
 }
 
 /**
- * Format an integer-like value with comma separators.
+ * Format a numeric-like value with comma separators for the integer part.
+ * Preserves any decimal portion.
  * Returns null when value is empty/invalid.
  * @param {string|number|bigint|null|undefined} value
  * @returns {string|null}
@@ -386,7 +387,7 @@ export function formatNumberWithCommas(value) {
   const formattedInteger = parts.integerPart
     ? insertCommas(parts.integerPart)
     : '0'
-  const formattedDecimal = parts.hasDecimalPoint ? `.${parts.decimalPart}` : ''
+  const formattedDecimal = parts.decimalPart ? `.${parts.decimalPart}` : ''
 
   return `${parts.isNegative ? '-' : ''}${formattedInteger}${formattedDecimal}`
 }

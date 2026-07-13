@@ -55,6 +55,7 @@ describe('number formatting helpers', () => {
   it('formatNumberWithCommas combines digitsOnly and withCommas', () => {
     expect(formatNumberWithCommas('12a34b567')).toBe('1,234,567')
     expect(formatNumberWithCommas('1000')).toBe('1,000')
+    expect(formatNumberWithCommas(0)).toBe('0')
     expect(formatNumberWithCommas('')).toBe('')
     expect(formatNumberWithCommas(null)).toBe('')
   })
