@@ -25,7 +25,7 @@ export const ALL_CARBON_FIELDS = [
 
 const MAX_EMISSION_DIGITS = 16
 const MAX_WHOLE_NUMBER_DIGITS = 18
-const MAX_COST_DIGITS = 18
+const MAX_INTEGER_VALUE = 100_000_000_000
 const DECIMAL_REGEX = /^\d+(\.\d{1,2})?$/
 const INTEGER_REGEX = /^\d+$/
 const SIGNED_INTEGER_REGEX = /^-?\d+$/
@@ -42,7 +42,7 @@ const CARBON_EMISSION_INVALID_ERROR =
 const CARBON_EMISSION_WHOLE_NUMBER_ERROR =
   'For non decimal values, Please enter a whole number up to 18 digits.'
 const CARBON_COST_INVALID_ERROR =
-  'Please enter a whole number with no more than 18 digits.'
+  'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
 const CARBON_OPERATIONAL_COST_FORECAST_REQUIRED_ERROR =
   'You must enter a value. If there is no operation or maintenance element enter 0. Otherwise enter an estimate above 0.'
 
@@ -69,7 +69,7 @@ const validateCarbonInteger = (value, helpers) => {
   if (!INTEGER_REGEX.test(value)) {
     return helpers.error(ERROR_STRING_PATTERN_BASE)
   }
-  if (value.length > MAX_COST_DIGITS) {
+  if (Number(value) > MAX_INTEGER_VALUE) {
     return helpers.error(ERROR_STRING_MAX)
   }
   return value
@@ -79,9 +79,9 @@ const validateCarbonSignedInteger = (value, helpers) => {
   if (!SIGNED_INTEGER_REGEX.test(value)) {
     return helpers.error(ERROR_STRING_PATTERN_BASE)
   }
-  // Check length excluding minus sign
+  // Check magnitude excluding minus sign
   const absValue = value.startsWith('-') ? value.slice(1) : value
-  if (absValue.length > MAX_COST_DIGITS) {
+  if (Number(absValue) > MAX_INTEGER_VALUE) {
     return helpers.error(ERROR_STRING_MAX)
   }
   return value

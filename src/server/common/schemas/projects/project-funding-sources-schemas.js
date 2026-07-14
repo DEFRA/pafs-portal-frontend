@@ -4,7 +4,7 @@ import {
   PROJECT_VALIDATION_MESSAGES
 } from '../../constants/projects.js'
 
-const MAX_DIGITS = 18
+const MAX_VALUE = 100_000_000_000
 const MAX_CONTRIBUTOR_NAME_LENGTH = 200
 const DIGITS_ONLY_REGEX = /^\d+$/
 
@@ -47,7 +47,7 @@ const validateSpendString = (value, helpers) => {
   if (!DIGITS_ONLY_REGEX.test(value)) {
     return helpers.error('string.pattern.base')
   }
-  if (value.length > MAX_DIGITS) {
+  if (Number(value) > MAX_VALUE) {
     return helpers.error('string.max')
   }
   return value

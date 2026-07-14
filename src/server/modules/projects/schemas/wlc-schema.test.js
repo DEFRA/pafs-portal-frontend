@@ -40,11 +40,10 @@ describe('wlc-schema', () => {
     expect(getWlcSchemaForProjectType(PROJECT_TYPES.STU)).toBeNull()
   })
 
-  test('required schema accepts valid 18-digit values', () => {
+  test('required schema accepts values up to and including 100 billion', () => {
     const payload = {
       ...validPayload,
-      [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]:
-        '123456789012345678'
+      [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: '100000000000'
     }
 
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
@@ -60,21 +59,20 @@ describe('wlc-schema', () => {
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number up to 18 digits (0 allowed)'
+      'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
     )
   })
 
-  test('required schema rejects values longer than 18 digits', () => {
+  test('required schema rejects values greater than 100 billion', () => {
     const payload = {
       ...validPayload,
-      [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]:
-        '1234567890123456789'
+      [PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_WHOLE_LIFE_PV_COSTS]: '100000000001'
     }
 
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number up to 18 digits (0 allowed)'
+      'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
     )
   })
 
@@ -87,7 +85,7 @@ describe('wlc-schema', () => {
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number up to 18 digits (0 allowed)'
+      'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
     )
   })
 
@@ -112,7 +110,7 @@ describe('wlc-schema', () => {
     const { error } = wlcOptionalSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number up to 18 digits (0 allowed)'
+      'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
     )
   })
 

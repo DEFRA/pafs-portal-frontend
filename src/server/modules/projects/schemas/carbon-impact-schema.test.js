@@ -191,15 +191,15 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a whole number with no more than 18 digits.'
+        'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
       )
     })
 
-    test('rejects integer values exceeding 18 digits', () => {
+    test('rejects integer values exceeding 100 billion', () => {
       const payload = {
         ...validPayload,
         [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]:
-          '1234567890123456789'
+          '100000000001'
       }
 
       const { error } = carbonImpactSchema.validate(payload, {
@@ -207,7 +207,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a whole number with no more than 18 digits.'
+        'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
       )
     })
 
@@ -277,7 +277,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a whole number with no more than 18 digits.'
+        'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
       )
     })
   })
@@ -440,7 +440,7 @@ describe('carbon-impact-schema', () => {
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Please enter a whole number with no more than 18 digits.'
+          'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
         )
       })
 
@@ -463,16 +463,16 @@ describe('carbon-impact-schema', () => {
         expect(error).toBeUndefined()
       })
 
-      test('rejects values exceeding 18 digits (excluding minus sign)', () => {
+      test('rejects values exceeding 100 billion (excluding minus sign)', () => {
         const { error } = CARBON_STEP_SCHEMAS[
           PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT
         ].validate({
           [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]:
-            '-1234567890123456789'
+            '-100000000001'
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Please enter a whole number with no more than 18 digits.'
+          'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
         )
       })
     })
@@ -507,7 +507,7 @@ describe('carbon-impact-schema', () => {
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Please enter a whole number with no more than 18 digits.'
+          'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
         )
       })
 
