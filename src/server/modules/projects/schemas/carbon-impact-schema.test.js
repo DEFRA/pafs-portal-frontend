@@ -150,6 +150,21 @@ describe('carbon-impact-schema', () => {
       )
     })
 
+    test('rejects non-string values in decimal fields', () => {
+      const payload = {
+        ...validPayload,
+        [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: 123
+      }
+
+      const { error } = carbonImpactSchema.validate(payload, {
+        abortEarly: false
+      })
+      expect(error).toBeDefined()
+      expect(error.details[0].message).toBe(
+        'Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal.'
+      )
+    })
+
     test('rejects decimal values exceeding 16 integer digits', () => {
       const payload = {
         ...validPayload,
@@ -191,7 +206,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+        'Please enter a whole number less than or equal to 100 billion (0 allowed)'
       )
     })
 
@@ -207,7 +222,23 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+        'Please enter a whole number less than or equal to 100 billion (0 allowed)'
+      )
+    })
+
+    test('rejects operational cost forecast values exceeding 100 billion', () => {
+      const payload = {
+        ...validPayload,
+        [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]:
+          '100000000001'
+      }
+
+      const { error } = carbonImpactSchema.validate(payload, {
+        abortEarly: false
+      })
+      expect(error).toBeDefined()
+      expect(error.details[0].message).toBe(
+        'Please enter a whole number less than or equal to 100 billion (0 allowed)'
       )
     })
 
@@ -234,6 +265,30 @@ describe('carbon-impact-schema', () => {
         [PROJECT_PAYLOAD_FIELDS.CARBON_COST_AVOIDED]: null,
         [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: '',
         [PROJECT_PAYLOAD_FIELDS.CARBON_OPERATIONAL_COST_FORECAST]: '100'
+      }
+
+      const { error } = carbonImpactSchema.validate(payload, {
+        abortEarly: false
+      })
+      expect(error).toBeUndefined()
+    })
+
+    test('allows explicitly undefined optional decimal field values', () => {
+      const payload = {
+        ...validPayload,
+        [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: undefined
+      }
+
+      const { error } = carbonImpactSchema.validate(payload, {
+        abortEarly: false
+      })
+      expect(error).toBeUndefined()
+    })
+
+    test('allows explicitly undefined optional signed integer field values', () => {
+      const payload = {
+        ...validPayload,
+        [PROJECT_PAYLOAD_FIELDS.CARBON_SAVINGS_NET_ECONOMIC_BENEFIT]: undefined
       }
 
       const { error } = carbonImpactSchema.validate(payload, {
@@ -277,7 +332,7 @@ describe('carbon-impact-schema', () => {
       })
       expect(error).toBeDefined()
       expect(error.details[0].message).toBe(
-        'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+        'Please enter a whole number less than or equal to 100 billion (0 allowed)'
       )
     })
   })
@@ -302,6 +357,13 @@ describe('carbon-impact-schema', () => {
         const { error } = CARBON_STEP_SCHEMAS[
           PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD
         ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: null })
+        expect(error).toBeUndefined()
+      })
+
+      test('accepts undefined (optional field)', () => {
+        const { error } = CARBON_STEP_SCHEMAS[
+          PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD
+        ].validate({ [PROJECT_PAYLOAD_FIELDS.CARBON_COST_BUILD]: undefined })
         expect(error).toBeUndefined()
       })
 
@@ -440,7 +502,7 @@ describe('carbon-impact-schema', () => {
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+          'Please enter a whole number less than or equal to 100 billion (0 allowed)'
         )
       })
 
@@ -472,7 +534,7 @@ describe('carbon-impact-schema', () => {
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+          'Please enter a whole number less than or equal to 100 billion (0 allowed)'
         )
       })
     })
@@ -507,7 +569,7 @@ describe('carbon-impact-schema', () => {
         })
         expect(error).toBeDefined()
         expect(error.details[0].message).toBe(
-          'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+          'Please enter a whole number less than or equal to 100 billion (0 allowed)'
         )
       })
 

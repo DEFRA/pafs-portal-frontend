@@ -59,7 +59,7 @@ describe('wlc-schema', () => {
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+      'Please enter a whole number less than or equal to 100 billion (0 allowed)'
     )
   })
 
@@ -72,7 +72,7 @@ describe('wlc-schema', () => {
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+      'Please enter a whole number less than or equal to 100 billion (0 allowed)'
     )
   })
 
@@ -85,7 +85,7 @@ describe('wlc-schema', () => {
     const { error } = wlcRequiredSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+      'Please enter a whole number less than or equal to 100 billion (0 allowed)'
     )
   })
 
@@ -110,7 +110,7 @@ describe('wlc-schema', () => {
     const { error } = wlcOptionalSchema.validate(payload, { abortEarly: false })
     expect(error).toBeDefined()
     expect(error.details[0].message).toBe(
-      'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+      'Please enter a whole number less than or equal to 100 billion (0 allowed)'
     )
   })
 

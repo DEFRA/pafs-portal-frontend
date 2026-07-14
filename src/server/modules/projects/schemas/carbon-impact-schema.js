@@ -42,7 +42,7 @@ const CARBON_EMISSION_INVALID_ERROR =
 const CARBON_EMISSION_WHOLE_NUMBER_ERROR =
   'For non decimal values, Please enter a whole number up to 18 digits.'
 const CARBON_COST_INVALID_ERROR =
-  'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+  'Please enter a whole number less than or equal to 100 billion (0 allowed)'
 const CARBON_OPERATIONAL_COST_FORECAST_REQUIRED_ERROR =
   'You must enter a value. If there is no operation or maintenance element enter 0. Otherwise enter an estimate above 0.'
 
@@ -91,12 +91,7 @@ const optionalDecimalField = Joi.string()
   .trim()
   .allow(null, '')
   .optional()
-  .custom((value, helpers) => {
-    if (value === null || value === undefined || value === '') {
-      return value
-    }
-    return validateCarbonDecimal(value, helpers)
-  })
+  .custom((value, helpers) => validateCarbonDecimal(value, helpers))
   .messages({
     [ERROR_STRING_BASE]: CARBON_EMISSION_INVALID_ERROR,
     [ERROR_STRING_PATTERN_BASE]: CARBON_EMISSION_INVALID_ERROR,
@@ -108,12 +103,7 @@ const optionalSignedIntegerField = Joi.string()
   .trim()
   .allow(null, '')
   .optional()
-  .custom((value, helpers) => {
-    if (value === null || value === undefined || value === '') {
-      return value
-    }
-    return validateCarbonSignedInteger(value, helpers)
-  })
+  .custom((value, helpers) => validateCarbonSignedInteger(value, helpers))
   .messages({
     [ERROR_STRING_BASE]: CARBON_COST_INVALID_ERROR,
     [ERROR_STRING_PATTERN_BASE]: CARBON_COST_INVALID_ERROR,
@@ -144,9 +134,6 @@ const optionalDecimalFieldNegativeCheck = Joi.string()
   .allow(null, '')
   .optional()
   .custom((value, helpers) => {
-    if (value === null || value === undefined || value === '') {
-      return value
-    }
     if (value.startsWith('-')) {
       return helpers.error(ERROR_STRING_NEGATIVE)
     }

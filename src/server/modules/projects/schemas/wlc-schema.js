@@ -29,7 +29,7 @@ const validateWlcCostString = (value, helpers) => {
 }
 
 const WLC_MESSAGE =
-  'Please enter a whole number less than or equal to 100 billion, (0 allowed)'
+  'Please enter a whole number less than or equal to 100 billion (0 allowed)'
 
 /**
  * A single WLC cost field schema (required variant).
