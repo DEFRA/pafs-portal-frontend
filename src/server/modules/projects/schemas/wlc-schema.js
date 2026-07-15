@@ -11,7 +11,8 @@ const WLC_FIELDS = [
   PROJECT_PAYLOAD_FIELDS.WLC_ESTIMATED_FUTURE_COSTS
 ]
 
-const MAX_DIGITS = 18
+// Maximum accepted value: 100 billion (inclusive).
+const MAX_VALUE = 100_000_000_000
 
 const DIGITS_ONLY_REGEX = /^\d+$/
 
@@ -20,18 +21,19 @@ const validateWlcCostString = (value, helpers) => {
     return helpers.error('string.pattern.base')
   }
 
-  if (value.length > MAX_DIGITS) {
+  if (Number(value) > MAX_VALUE) {
     return helpers.error('string.max')
   }
 
   return value
 }
 
-const WLC_MESSAGE = 'Please enter a whole number up to 18 digits (0 allowed)'
+const WLC_MESSAGE =
+  'Please enter a whole number less than or equal to 100 billion (0 allowed)'
 
 /**
  * A single WLC cost field schema (required variant).
- * Accepts an integer >= 0 with at most 18 digits.
+ * Accepts an integer >= 0 up to and including 100 billion.
  */
 const requiredCostField = Joi.string()
   .trim()
@@ -47,7 +49,7 @@ const requiredCostField = Joi.string()
 
 /**
  * A single WLC cost field schema (optional variant for ELO/HCR).
- * Accepts an integer >= 0 with at most 18 digits, or blank/null.
+ * Accepts an integer >= 0 up to and including 100 billion, or blank/null.
  */
 const optionalCostField = Joi.string()
   .trim()

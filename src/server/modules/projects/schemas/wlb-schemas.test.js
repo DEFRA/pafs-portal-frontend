@@ -92,10 +92,9 @@ describe('wlb-schemas', () => {
       )
     })
 
-    it('should fail when first field exceeds 18 digits', () => {
+    it('should fail when first field is greater than 100 billion', () => {
       const payload = {
-        [PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]:
-          '1234567890123456789'
+        [PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]: '100000000001'
       }
 
       const { error } = wlbRequiredSchema.validate(payload)
@@ -106,10 +105,9 @@ describe('wlb-schemas', () => {
       )
     })
 
-    it('should accept exactly 18 digits', () => {
+    it('should accept exactly 100 billion', () => {
       const payload = {
-        [PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]:
-          '123456789012345678'
+        [PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]: '100000000000'
       }
 
       const { error } = wlbRequiredSchema.validate(payload)
@@ -209,10 +207,9 @@ describe('wlb-schemas', () => {
       )
     })
 
-    it('should fail when value exceeds 18 digits', () => {
+    it('should fail when value is greater than 100 billion', () => {
       const payload = {
-        [PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]:
-          '1234567890123456789'
+        [PROJECT_PAYLOAD_FIELDS.ESTIMATED_WHOLE_LIFE_BENEFITS]: '100000000001'
       }
 
       const { error } = wlbOptionalSchema.validate(payload)

@@ -14,7 +14,8 @@ const WLB_FIELDS = [
   PROJECT_PAYLOAD_FIELDS.ESTIMATED_LAND_VALUE_UPLIFT_BENEFITS
 ]
 
-const MAX_DIGITS = 18
+// Maximum accepted value: 100 billion (inclusive).
+const MAX_VALUE = 100_000_000_000
 
 const DIGITS_ONLY_REGEX = /^\d+$/
 
@@ -23,7 +24,7 @@ const validateWlbEstimateString = (value, helpers) => {
     return helpers.error('string.pattern.base')
   }
 
-  if (value.length > MAX_DIGITS) {
+  if (Number(value) > MAX_VALUE) {
     return helpers.error('string.max')
   }
 
@@ -32,7 +33,7 @@ const validateWlbEstimateString = (value, helpers) => {
 
 /**
  * A single WLB estimate field schema (required variant).
- * Accepts an integer >= 0 with at most 18 digits.
+ * Accepts an integer >= 0 up to and including 100 billion.
  */
 const requiredEstimateField = Joi.string()
   .trim()
@@ -48,7 +49,7 @@ const requiredEstimateField = Joi.string()
 
 /**
  * A single WLB estimate field schema (optional variant for ELO/HCR).
- * Accepts an integer >= 0 with at most 18 digits, or blank/null.
+ * Accepts an integer >= 0 up to and including 100 billion, or blank/null.
  */
 const optionalEstimateField = Joi.string()
   .trim()
