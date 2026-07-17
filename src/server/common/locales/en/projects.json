@@ -658,8 +658,8 @@
         "leaky_barriers_in_channel_storage": "Leaky barriers and in-channel storage",
         "offline_storage": "Offline storage areas",
         "woodland": "Woodland",
-        "headwater_drainage": "Peatland restoration (headwater drainage management)",
-        "headwater_drainage_management": "Peatland restoration (headwater drainage management)",
+        "headwater_drainage": "Restored peatland (headwater drainage management)",
+        "headwater_drainage_management": "Restored peatland (headwater drainage management)",
         "runoff_management": "Runoff pathway management",
         "runoff_attenuation_management": "Runoff pathway management",
         "saltmarsh_management": "Saltmarsh or mudflat management",
@@ -749,7 +749,7 @@
       }
     },
     "headwater_drainage": {
-      "title": "Details of new peatland restoration (headwater drainage management)",
+      "title": "Details of new restored peatland (headwater drainage management)",
       "area": {
         "label": "Area",
         "hint": "Enter the area in hectares",
@@ -852,7 +852,7 @@
         "enclosed_dairying_farmland": "Enclosed dairying farmland",
         "semi_natural_grassland": "Semi-natural grassland",
         "woodland": "Woodland",
-        "woodland_for_timber_harvesting": "Woodland for timber harvesting",
+        "woodland_for_timber_harvesting": "Woodland - timber harvesting",
         "mountain_moors_and_heath": "Mountain moors and heath",
         "peatland_degraded": "Peatland degraded",
         "peatland_restoration": "Peatland restoration",
@@ -942,7 +942,7 @@
         }
       },
       "woodland_for_timber_harvesting": {
-        "title": "What is the area of woodland for timber harvesting?",
+        "title": "What is the area of woodland - timber harvesting?",
         "before": {
           "label": "Before natural flood measures"
         },
