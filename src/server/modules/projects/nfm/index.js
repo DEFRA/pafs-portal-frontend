@@ -42,121 +42,51 @@ const createMeasureEditPreHandlers = () => [
   { method: requireSelectedMeasure }
 ]
 
+const getRoutesForPaths = (paths, preHandlers) =>
+  paths.flatMap((path) => createRoutePair(path, preHandlers, nfmController))
+
+const NFM_MEASURE_PATHS = [
+  ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+  ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
+  ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
+  ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
+  ROUTES.PROJECT.EDIT.NFM.WOODLAND,
+  ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE,
+  ROUTES.PROJECT.EDIT.NFM.RUNOFF_MANAGEMENT,
+  ROUTES.PROJECT.EDIT.NFM.SALTMARSH,
+  ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
+  ROUTES.PROJECT.EDIT.NFM.FLOODPLAIN_WETLAND_RESTORATION
+]
+
+const NFM_LAND_USE_PATHS = [
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_ENCLOSED_ARABLE_FARMLAND,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_ENCLOSED_DAIRYING_FARMLAND,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_SEMI_NATURAL_GRASSLAND,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_MOUNTAIN_MOORS_AND_HEATH,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_PEATLAND_DEGRADED,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_PEATLAND_RESTORATION,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_RIVERS_WETLANDS_FRESHWATER,
+  ROUTES.PROJECT.EDIT.NFM.LAND_USE_COASTAL_MARGINS,
+  ROUTES.PROJECT.EDIT.NFM.LANDOWNER_CONSENT,
+  ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
+  ROUTES.PROJECT.EDIT.NFM.PROJECT_READINESS
+]
+
 const getNfmMeasureRoutes = (editPreHandlers, measureEditPreHandlers) => [
   ...createRoutePair(
     ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
     editPreHandlers,
     nfmController
   ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
-    measureEditPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LEAKY_BARRIERS,
-    measureEditPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
-    measureEditPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.WOODLAND,
-    measureEditPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE,
-    measureEditPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.RUNOFF_MANAGEMENT,
-    measureEditPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.SALTMARSH,
-    measureEditPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
-    measureEditPreHandlers,
-    nfmController
-  )
+  ...getRoutesForPaths(NFM_MEASURE_PATHS.slice(1), measureEditPreHandlers)
 ]
 
-const getNfmLandUseRoutes = (editPreHandlers) => [
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LAND_USE_ENCLOSED_ARABLE_FARMLAND,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LAND_USE_ENCLOSED_DAIRYING_FARMLAND,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LAND_USE_SEMI_NATURAL_GRASSLAND,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LAND_USE_MOUNTAIN_MOORS_AND_HEATH,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LAND_USE_PEATLAND_RESTORATION,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LAND_USE_RIVERS_WETLANDS_FRESHWATER,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LAND_USE_COASTAL_MARGINS,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.LANDOWNER_CONSENT,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
-    editPreHandlers,
-    nfmController
-  ),
-  ...createRoutePair(
-    ROUTES.PROJECT.EDIT.NFM.PROJECT_READINESS,
-    editPreHandlers,
-    nfmController
-  )
-]
+const getNfmLandUseRoutes = (editPreHandlers) =>
+  getRoutesForPaths(NFM_LAND_USE_PATHS, editPreHandlers)
 
 export const projectNfm = {
   plugin: {

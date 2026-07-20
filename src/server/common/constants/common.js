@@ -60,6 +60,7 @@ export const PROJECT_VIEWS = {
   NFM_RUNOFF_MANAGEMENT: 'modules/projects/nfm/input-generic',
   NFM_SALTMARSH: 'modules/projects/nfm/input-generic',
   NFM_SAND_DUNE: 'modules/projects/nfm/input-generic',
+  NFM_FLOODPLAIN_WETLAND_RESTORATION: 'modules/projects/nfm/input-generic',
   NFM_LAND_USE_CHANGE: 'modules/projects/nfm/land-use-change',
   NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND:
     'modules/projects/nfm/land-use-enclosed-arable-farmland',

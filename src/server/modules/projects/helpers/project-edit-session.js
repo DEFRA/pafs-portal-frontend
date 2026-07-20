@@ -43,6 +43,12 @@ const NFM_MEASURE_FIELD_MAPPINGS = {
   sand_dune_management: {
     areaHectares: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA,
     lengthKm: PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH
+  },
+  floodplain_wetland_restoration: {
+    areaHectares:
+      PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA,
+    storageVolumeM3:
+      PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
   }
 }
 
@@ -118,9 +124,20 @@ const NFM_LAND_USE_FIELD_MAPPINGS = [
     afterField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
   },
   {
+    landUseType: 'woodland_for_timber_harvesting',
+    beforeField:
+      PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER
+  },
+  {
     landUseType: 'mountain_moors_and_heath',
     beforeField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
     afterField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
+  },
+  {
+    landUseType: 'peatland_degraded',
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER
   },
   {
     landUseType: 'peatland_restoration',
@@ -128,7 +145,7 @@ const NFM_LAND_USE_FIELD_MAPPINGS = [
     afterField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_RESTORATION_AFTER
   },
   {
-    landUseType: 'rivers_wetlands_and_freshwater_habitats',
+    landUseType: 'wetlands',
     beforeField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
     afterField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER
   },

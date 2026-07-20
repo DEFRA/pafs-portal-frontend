@@ -2,7 +2,9 @@ import { describe, test, expect } from 'vitest'
 import { processPayload } from './payload-helpers.js'
 import {
   PROJECT_STEPS,
-  PROJECT_PAYLOAD_FIELDS
+  PROJECT_PAYLOAD_FIELDS,
+  NFM_LAND_TYPES,
+  NFM_MEASURES
 } from '../../../../common/constants/projects.js'
 
 describe('NFM Payload Helpers', () => {
@@ -392,6 +394,32 @@ describe('NFM Payload Helpers', () => {
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(null)
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(null)
     })
+
+    test('should clear floodplain wetland restoration fields when deselected', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: [
+          NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+        ],
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]: 3,
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]: 30
+      }
+
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'river_floodplain_restoration,floodplain_wetland_restoration'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_SELECTED_MEASURES, payload, sessionData)
+
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]
+      ).toBe(null)
+      expect(
+        payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
+        ]
+      ).toBe(null)
+    })
   })
 
   describe('processPayload - NFM_LAND_USE_CHANGE', () => {
@@ -434,6 +462,40 @@ describe('NFM Payload Helpers', () => {
 
       expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]).toBe('')
     })
+
+    test('should clear deselected new land-use detail fields', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [
+          NFM_LAND_TYPES.ENCLOSED_ARABLE_FARMLAND
+        ],
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE]: 12,
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]: 8,
+        [PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE]: 4,
+        [PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER]: 5
+      }
+
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+          'enclosed_arable_farmland,woodland_for_timber_harvesting,peatland_degraded'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_LAND_USE_CHANGE, payload, sessionData)
+
+      expect(
+        payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE
+        ]
+      ).toBe(null)
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]
+      ).toBe(null)
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE]).toBe(
+        null
+      )
+      expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER]).toBe(
+        null
+      )
+    })
   })
 
   describe('processPayload - NFM land-use detail steps', () => {
@@ -454,6 +516,28 @@ describe('NFM Payload Helpers', () => {
       expect(
         payload[PROJECT_PAYLOAD_FIELDS.NFM_ENCLOSED_ARABLE_FARMLAND_AFTER]
       ).toBe('9.4')
+    })
+
+    test('should preserve string precision for woodland for timber harvesting values', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE]:
+          '11.25',
+        [PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]: '7.5'
+      }
+
+      processPayload(
+        PROJECT_STEPS.NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING,
+        payload
+      )
+
+      expect(
+        payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE
+        ]
+      ).toBe('11.25')
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]
+      ).toBe('7.5')
     })
   })
 
@@ -583,6 +667,47 @@ describe('NFM Payload Helpers', () => {
     })
   })
 
+  describe('processPayload - NFM_FLOODPLAIN_WETLAND_RESTORATION', () => {
+    test('should keep string values for decimal precision', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]:
+          '11.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]:
+          '99.25'
+      }
+
+      processPayload(PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION, payload)
+
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]
+      ).toBe('11.5')
+      expect(
+        payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
+        ]
+      ).toBe('99.25')
+    })
+
+    test('should convert empty string to null for optional volume', () => {
+      const payload = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]:
+          '11.5',
+        [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]: ''
+      }
+
+      processPayload(PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION, payload)
+
+      expect(
+        payload[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]
+      ).toBe('11.5')
+      expect(
+        payload[
+          PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME
+        ]
+      ).toBe(null)
+    })
+  })
+
   describe('processPayload - Unknown step', () => {
     test('should not modify payload for unknown step', () => {
       const payload = {
@@ -591,6 +716,17 @@ describe('NFM Payload Helpers', () => {
       const originalPayload = { ...payload }
 
       processPayload('UNKNOWN_STEP', payload)
+
+      expect(payload).toEqual(originalPayload)
+    })
+
+    test('should ignore inherited object keys used as step names', () => {
+      const payload = {
+        someField: 'value'
+      }
+      const originalPayload = { ...payload }
+
+      processPayload('toString', payload)
 
       expect(payload).toEqual(originalPayload)
     })

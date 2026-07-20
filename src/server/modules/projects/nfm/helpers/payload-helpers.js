@@ -41,10 +41,23 @@ const LAND_TYPE_FIELD_CONFIG = [
     step: PROJECT_STEPS.NFM_LAND_USE_WOODLAND
   },
   {
+    landType: NFM_LAND_TYPES.WOODLAND_FOR_TIMBER_HARVESTING,
+    beforeField:
+      PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING
+  },
+  {
     landType: NFM_LAND_TYPES.MOUNTAIN_MOORS_AND_HEATH,
     beforeField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
     afterField: PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER,
     step: PROJECT_STEPS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH
+  },
+  {
+    landType: NFM_LAND_TYPES.PEATLAND_DEGRADED,
+    beforeField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE,
+    afterField: PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER,
+    step: PROJECT_STEPS.NFM_LAND_USE_PEATLAND_DEGRADED
   },
   {
     landType: NFM_LAND_TYPES.PEATLAND_RESTORATION,
@@ -53,7 +66,7 @@ const LAND_TYPE_FIELD_CONFIG = [
     step: PROJECT_STEPS.NFM_LAND_USE_PEATLAND_RESTORATION
   },
   {
-    landType: NFM_LAND_TYPES.RIVERS_WETLANDS_FRESHWATER_HABITATS,
+    landType: NFM_LAND_TYPES.WETLANDS,
     beforeField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE,
     afterField: PROJECT_PAYLOAD_FIELDS.NFM_RIVERS_WETLANDS_FRESHWATER_AFTER,
     step: PROJECT_STEPS.NFM_LAND_USE_RIVERS_WETLANDS_FRESHWATER
@@ -166,6 +179,16 @@ function clearSandDuneData(payload) {
 }
 
 /**
+ * Clear floodplain wetland restoration data from payload
+ * @param {Object} payload - Request payload
+ */
+function clearFloodplainWetlandRestorationData(payload) {
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA] = null
+  payload[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME] =
+    null
+}
+
+/**
  * Clear land-use detail data for a given land type from payload
  * @param {Object} payload - Request payload
  * @param {string} landType - NFM_LAND_TYPES value
@@ -235,6 +258,9 @@ function processNfmMeasureChanges(previousMeasures, newMeasures, payload) {
         break
       case NFM_MEASURES.SAND_DUNE_MANAGEMENT:
         clearSandDuneData(payload)
+        break
+      case NFM_MEASURES.FLOODPLAIN_WETLAND_RESTORATION:
+        clearFloodplainWetlandRestorationData(payload)
         break
       default:
         break
@@ -378,6 +404,22 @@ function processSandDune(payload) {
 }
 
 /**
+ * Process floodplain wetland restoration payload
+ * @param {Object} payload - Request payload
+ */
+function processFloodplainWetlandRestoration(payload) {
+  payload.nfmFloodplainWetlandRestorationVolume = convertEmptyToNull(
+    payload.nfmFloodplainWetlandRestorationVolume
+  )
+  payload.nfmFloodplainWetlandRestorationArea = keepAsDecimalString(
+    payload.nfmFloodplainWetlandRestorationArea
+  )
+  payload.nfmFloodplainWetlandRestorationVolume = keepAsDecimalString(
+    payload.nfmFloodplainWetlandRestorationVolume
+  )
+}
+
+/**
  * Process land-use detail payload for any land type step.
  * Converts before/after string values to floats.
  * @param {Object} payload - Request payload
@@ -385,9 +427,6 @@ function processSandDune(payload) {
  */
 function processLandUseDetailData(payload, step) {
   const config = STEP_TO_LAND_TYPE_FIELD_CONFIG[step]
-  if (!config) {
-    return
-  }
   payload[config.beforeField] = keepAsDecimalString(payload[config.beforeField])
   payload[config.afterField] = keepAsDecimalString(payload[config.afterField])
 }
@@ -411,17 +450,21 @@ export function processPayload(step, payload, sessionData) {
       processRunoffManagement(payload),
     [PROJECT_STEPS.NFM_SALTMARSH]: () => processSaltmarsh(payload),
     [PROJECT_STEPS.NFM_SAND_DUNE]: () => processSandDune(payload),
+    [PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION]: () =>
+      processFloodplainWetlandRestoration(payload),
     [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: () =>
       processLandUseChange(payload, sessionData)
   }
 
-  if (step in measureHandlers) {
+  if (Object.prototype.hasOwnProperty.call(measureHandlers, step)) {
     measureHandlers[step]()
     return
   }
 
   // All land-use detail steps use the generic handler
-  if (step in STEP_TO_LAND_TYPE_FIELD_CONFIG) {
+  if (
+    Object.prototype.hasOwnProperty.call(STEP_TO_LAND_TYPE_FIELD_CONFIG, step)
+  ) {
     processLandUseDetailData(payload, step)
   }
 }
