@@ -241,7 +241,7 @@ describe('project-funding-sources-schemas', () => {
     test('rejects non-digit characters in aggregated public contributions', () => {
       const { error } = fundingValueRowSchema.validate(
         validRow({
-          publicContributions: '200,000'
+          publicContributions: '200abc'
         })
       )
 

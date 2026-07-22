@@ -75,10 +75,9 @@ const createOptionalSpendSchema = (label) =>
         PROJECT_VALIDATION_MESSAGES.FUNDING_SOURCES_ESTIMATED_SPEND_MAX_DIGITS
     })
 
-// Contributor-backed source totals (public/private/other EA contributions) are
-// aggregated sums of individual named contributors. Each individual contributor
-// amount is already capped at MAX_VALUE, but the rolled-up total is allowed to
-// exceed it (e.g. two contributors of 100 billion each in the same year).
+// Some spend fields are aggregated sums (e.g. contributor-backed totals and the
+// overall financial-year total). Individual contributor amounts are capped at
+// MAX_VALUE, but these rolled-up totals may exceed it.
 const createOptionalSumSpendSchema = (label) =>
   Joi.string()
     .trim()
