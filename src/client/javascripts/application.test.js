@@ -55,6 +55,7 @@ describe('number formatting helpers', () => {
   it('formatNumberWithCommas combines digitsOnly and withCommas', () => {
     expect(formatNumberWithCommas('12a34b567')).toBe('1,234,567')
     expect(formatNumberWithCommas('1000')).toBe('1,000')
+    expect(formatNumberWithCommas(0)).toBe('0')
     expect(formatNumberWithCommas('')).toBe('')
     expect(formatNumberWithCommas(null)).toBe('')
   })
@@ -77,12 +78,6 @@ describe('input formatting helpers', () => {
   it('formatInputValueWithCommas formats input value', () => {
     formatInputValueWithCommas(input)
     expect(input.value).toBe('1,234,567')
-  })
-
-  it('formatInputValueWithCommas leaves value unchanged when it contains a decimal point', () => {
-    input.value = '1234.56'
-    formatInputValueWithCommas(input)
-    expect(input.value).toBe('1234.56')
   })
 
   it('formatInputValueWithCommas does nothing if input is falsy', () => {

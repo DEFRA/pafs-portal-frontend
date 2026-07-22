@@ -45,6 +45,9 @@
             text: field.suffix
           },
           classes: "govuk-input--width-10",
+          attributes: {
+            "data-number-format": "comma"
+          },
           errorMessage: fieldErrors[field.name] and {
             text: t(localKeyPrefix + '.errors.' + fieldErrors[field.name])
           }

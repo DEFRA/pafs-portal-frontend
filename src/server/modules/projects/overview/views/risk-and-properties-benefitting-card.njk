@@ -1,4 +1,4 @@
-{% macro riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t, isReadOnly) %}
+{% macro riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) %}
   {% set hasRisks = projectData[PROJECT_PAYLOAD_FIELDS.RISKS] and projectData[PROJECT_PAYLOAD_FIELDS.RISKS].length > 0 %}
   <div class="govuk-summary-card">
     <div class="govuk-summary-card__title-wrapper">
@@ -57,16 +57,16 @@
                 {% else %}
                   <ul class="govuk-list">
                     {% if projectData[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] %}
-                      <li>{{ t('projects.overview.risk_and_properties_summary_card.maintaining_protection') }}: {{ projectData[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] }}</li>
+                      <li>{{ t('projects.overview.risk_and_properties_summary_card.maintaining_protection') }}: {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS]) }}</li>
                     {% endif %}
                     {% if projectData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] %}
-                      <li>{{ t('projects.overview.risk_and_properties_summary_card.reducing_50_plus') }}: {{ projectData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] }}</li>
+                      <li>{{ t('projects.overview.risk_and_properties_summary_card.reducing_50_plus') }}: {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS]) }}</li>
                     {% endif %}
                     {% if projectData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] %}
-                      <li>{{ t('projects.overview.risk_and_properties_summary_card.reducing_less_50') }}: {{ projectData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] }}</li>
+                      <li>{{ t('projects.overview.risk_and_properties_summary_card.reducing_less_50') }}: {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50]) }}</li>
                     {% endif %}
                     {% if projectData[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] %}
-                      <li>{{ t('projects.overview.risk_and_properties_summary_card.increasing_resilience') }}: {{ projectData[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] }}</li>
+                      <li>{{ t('projects.overview.risk_and_properties_summary_card.increasing_resilience') }}: {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE]) }}</li>
                     {% endif %}
                     {% if not projectData[PROJECT_PAYLOAD_FIELDS.MAINTAINING_EXISTING_ASSETS] and not projectData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_50_PLUS] and not projectData[PROJECT_PAYLOAD_FIELDS.REDUCING_FLOOD_RISK_LESS_50] and not projectData[PROJECT_PAYLOAD_FIELDS.INCREASING_FLOOD_RESILIENCE] %}
                       {{ t('projects.overview.common.na') }}
@@ -89,10 +89,10 @@
                 {% else %}
                   <ul class="govuk-list">
                     {% if projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] %}
-                      <li>{{ t('projects.overview.risk_and_properties_summary_card.maintaining_assets_coastal') }}: {{ projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] }}</li>
+                      <li>{{ t('projects.overview.risk_and_properties_summary_card.maintaining_assets_coastal') }}: {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL]) }}</li>
                     {% endif %}
                     {% if projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] %}
-                      <li>{{ t('projects.overview.risk_and_properties_summary_card.reducing_coastal_erosion') }}: {{ projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] }}</li>
+                      <li>{{ t('projects.overview.risk_and_properties_summary_card.reducing_coastal_erosion') }}: {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION]) }}</li>
                     {% endif %}
                     {% if not projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_MAINTAINING_ASSETS_COASTAL] and not projectData[PROJECT_PAYLOAD_FIELDS.PROPERTIES_BENEFIT_INVESTMENT_COASTAL_EROSION] %}
                       {{ t('projects.overview.common.na') }}
@@ -109,7 +109,7 @@
             </dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] != null %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED] }}%
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_20_PERCENT_DEPRIVED]) }}%
             {% else %}
                 {{ t('projects.overview.common.na') }}
               {% endif %}
@@ -122,7 +122,7 @@
             </dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] != null %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED] }}%
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.PERCENT_PROPERTIES_40_PERCENT_DEPRIVED]) }}%
             {% else %}
                 {{ t('projects.overview.common.na') }}
               {% endif %}

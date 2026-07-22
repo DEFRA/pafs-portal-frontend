@@ -247,15 +247,15 @@ class EnvironmentalBenefitsController {
     // For input fields, keep as string - Joi schema handles conversion internally
     // Return undefined for empty/missing values so Joi's required() fires instead of string.base
     if (fieldType === 'input') {
-      if (
-        fieldValue === '' ||
-        fieldValue === null ||
-        fieldValue === undefined
-      ) {
+      if (fieldValue === null || fieldValue === undefined) {
+        return undefined
+      }
+      const sanitizedValue = String(fieldValue).replaceAll(',', '').trim()
+      if (sanitizedValue === '') {
         return undefined
       }
       // Keep as string - our Joi schema does string validation and internal conversion
-      return String(fieldValue)
+      return sanitizedValue
     }
 
     return fieldValue

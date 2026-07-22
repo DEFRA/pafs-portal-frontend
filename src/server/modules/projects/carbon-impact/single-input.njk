@@ -75,6 +75,7 @@
         inputmode: "decimal",
         classes: "govuk-input--width-20",
         suffix: { text: t(localKeyPrefix + '.suffix') },
+        attributes: { "data-number-format": "comma" },
         errorMessage: { text: fieldErrors[fieldName] } if fieldErrors and fieldErrors[fieldName] else undefined
       }) }}
     {% endif %}
