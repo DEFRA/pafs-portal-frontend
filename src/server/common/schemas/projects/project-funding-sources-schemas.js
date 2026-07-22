@@ -43,11 +43,11 @@ export const SPENDING_FUNDING_SOURCE_FIELDS = [
   ...ADDITIONAL_GIA_FUNDING_SOURCE_FIELDS
 ]
 
-const validateSpendString = (value, helpers) => {
+const validateSpendString = (value, helpers, { enforceMax = true } = {}) => {
   if (!DIGITS_ONLY_REGEX.test(value)) {
     return helpers.error('string.pattern.base')
   }
-  if (Number(value) > MAX_VALUE) {
+  if (enforceMax && Number(value) > MAX_VALUE) {
     return helpers.error('string.max')
   }
   return value
@@ -73,6 +73,26 @@ const createOptionalSpendSchema = (label) =>
         PROJECT_VALIDATION_MESSAGES.FUNDING_SOURCES_ESTIMATED_SPEND_INVALID,
       'string.max':
         PROJECT_VALIDATION_MESSAGES.FUNDING_SOURCES_ESTIMATED_SPEND_MAX_DIGITS
+    })
+
+// Contributor-backed source totals (public/private/other EA contributions) are
+// aggregated sums of individual named contributors. Each individual contributor
+// amount is already capped at MAX_VALUE, but the rolled-up total is allowed to
+// exceed it (e.g. two contributors of 100 billion each in the same year).
+const createOptionalSumSpendSchema = (label) =>
+  Joi.string()
+    .trim()
+    .allow(null, '')
+    .optional()
+    .custom((value, helpers) =>
+      validateSpendString(value, helpers, { enforceMax: false })
+    )
+    .label(label)
+    .messages({
+      'string.base':
+        PROJECT_VALIDATION_MESSAGES.FUNDING_SOURCES_ESTIMATED_SPEND_INVALID,
+      'string.pattern.base':
+        PROJECT_VALIDATION_MESSAGES.FUNDING_SOURCES_ESTIMATED_SPEND_INVALID
     })
 
 const CONTRIBUTOR_TYPE_VALUES = [
@@ -248,13 +268,13 @@ export const fundingValueRowSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY]: createOptionalSpendSchema(
     PROJECT_PAYLOAD_FIELDS.LOCAL_LEVY
   ),
-  [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: createOptionalSpendSchema(
+  [PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS]: createOptionalSumSpendSchema(
     PROJECT_PAYLOAD_FIELDS.PUBLIC_CONTRIBUTIONS
   ),
-  [PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]: createOptionalSpendSchema(
+  [PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS]: createOptionalSumSpendSchema(
     PROJECT_PAYLOAD_FIELDS.PRIVATE_CONTRIBUTIONS
   ),
-  [PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS]: createOptionalSpendSchema(
+  [PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS]: createOptionalSumSpendSchema(
     PROJECT_PAYLOAD_FIELDS.OTHER_EA_CONTRIBUTIONS
   ),
   [PROJECT_PAYLOAD_FIELDS.NOT_YET_IDENTIFIED]: createOptionalSpendSchema(
@@ -295,7 +315,7 @@ export const fundingValueRowSchema = Joi.object({
   [OTHER_EA_CONTRIBUTORS_FIELD]: createContributorsArraySchema(
     'other_ea_contributions'
   ),
-  [PROJECT_PAYLOAD_FIELDS.TOTAL]: createOptionalSpendSchema(
+  [PROJECT_PAYLOAD_FIELDS.TOTAL]: createOptionalSumSpendSchema(
     PROJECT_PAYLOAD_FIELDS.TOTAL
   )
 }).options({ allowUnknown: true })
