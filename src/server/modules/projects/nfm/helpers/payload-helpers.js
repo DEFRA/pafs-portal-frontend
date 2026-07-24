@@ -508,15 +508,13 @@ export function processPayload(step, payload, sessionData) {
       processLandUseChange(payload, sessionData)
   }
 
-  if (Object.prototype.hasOwnProperty.call(measureHandlers, step)) {
+  if (Object.hasOwn(measureHandlers, step)) {
     measureHandlers[step]()
     return
   }
 
   // All land-use detail steps use the generic handler
-  if (
-    Object.prototype.hasOwnProperty.call(STEP_TO_LAND_TYPE_FIELD_CONFIG, step)
-  ) {
+  if (Object.hasOwn(STEP_TO_LAND_TYPE_FIELD_CONFIG, step)) {
     processLandUseDetailData(payload, step)
   }
 }

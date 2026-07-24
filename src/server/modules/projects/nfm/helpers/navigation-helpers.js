@@ -31,7 +31,7 @@ function getPreviousMeasuresForStep(step) {
     return []
   }
 
-  return [...NFM_MEASURE_ORDER.slice(0, currentIndex)].reverse()
+  return NFM_MEASURE_ORDER.slice(0, currentIndex).reverse()
 }
 
 function selectedMeasuresBackLink() {
