@@ -78,6 +78,7 @@ export async function refreshAuthSession(request) {
     const now = Date.now()
     request.yar.set('auth', {
       ...session,
+      ...(result.data.user && { user: result.data.user }),
       accessToken: result.data.accessToken,
       refreshToken: result.data.refreshToken,
       expiresAt: now + parseExpiry(result.data.expiresIn),

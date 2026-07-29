@@ -154,6 +154,74 @@ describe('Session Manager', () => {
       expect(mockRequest.yar.set).toHaveBeenCalled()
     })
 
+    test('updates session user when refresh response includes updated user data', async () => {
+      const oldUser = { id: 1, isRma: false, areas: [] }
+      const updatedUser = {
+        id: 1,
+        email: 'user@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        admin: false,
+        isRma: true,
+        isPso: false,
+        isEa: false,
+        areas: [{ areaId: 5, primary: true, name: 'Test RMA', areaType: 'RMA' }]
+      }
+      const session = {
+        user: oldUser,
+        accessToken: 'old-token',
+        refreshToken: 'refresh123',
+        expiresAt: Date.now() + 60000,
+        lastActivity: Date.now()
+      }
+
+      mockRequest.yar.get.mockReturnValue(session)
+      refreshToken.mockResolvedValue({
+        success: true,
+        data: {
+          user: updatedUser,
+          accessToken: 'new-token',
+          refreshToken: 'new-refresh',
+          expiresIn: '15m'
+        }
+      })
+
+      await refreshAuthSession(mockRequest)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'auth',
+        expect.objectContaining({ user: updatedUser })
+      )
+    })
+
+    test('preserves existing session user when refresh response omits user', async () => {
+      const existingUser = { id: 1, isRma: true, areas: [{ areaId: 5 }] }
+      const session = {
+        user: existingUser,
+        accessToken: 'old-token',
+        refreshToken: 'refresh123',
+        expiresAt: Date.now() + 60000,
+        lastActivity: Date.now()
+      }
+
+      mockRequest.yar.get.mockReturnValue(session)
+      refreshToken.mockResolvedValue({
+        success: true,
+        data: {
+          accessToken: 'new-token',
+          refreshToken: 'new-refresh',
+          expiresIn: '15m'
+        }
+      })
+
+      await refreshAuthSession(mockRequest)
+
+      expect(mockRequest.yar.set).toHaveBeenCalledWith(
+        'auth',
+        expect.objectContaining({ user: existingUser })
+      )
+    })
+
     test('handles concurrent session error', async () => {
       const session = {
         refreshToken: 'refresh123',
