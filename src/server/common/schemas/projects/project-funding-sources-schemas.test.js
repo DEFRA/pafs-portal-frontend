@@ -185,6 +185,70 @@ describe('project-funding-sources-schemas', () => {
       expect(error).toBeUndefined()
     })
 
+    test('accepts aggregated public contributions above 100 billion', () => {
+      const { error } = fundingValueRowSchema.validate(
+        validRow({
+          publicContributions: '200000000000'
+        })
+      )
+
+      expect(error).toBeUndefined()
+    })
+
+    test('accepts financial year total above 100 billion', () => {
+      const { error } = fundingValueRowSchema.validate(
+        validRow({
+          total: '500000000000'
+        })
+      )
+
+      expect(error).toBeUndefined()
+    })
+
+    test('accepts contributor amount of exactly 100 billion', () => {
+      const { error } = fundingValueRowSchema.validate(
+        validRow({
+          publicContributors: [
+            {
+              name: 'Local Authority A',
+              contributorType: 'public_contributions',
+              amount: '100000000000'
+            }
+          ]
+        })
+      )
+
+      expect(error).toBeUndefined()
+    })
+
+    test('rejects contributor amount exceeding 100 billion', () => {
+      const { error } = fundingValueRowSchema.validate(
+        validRow({
+          publicContributors: [
+            {
+              name: 'Local Authority A',
+              contributorType: 'public_contributions',
+              amount: '100000000001'
+            }
+          ]
+        })
+      )
+
+      expect(error).toBeDefined()
+      expect(error.details[0].type).toBe('string.max')
+    })
+
+    test('rejects non-digit characters in aggregated public contributions', () => {
+      const { error } = fundingValueRowSchema.validate(
+        validRow({
+          publicContributions: '200abc'
+        })
+      )
+
+      expect(error).toBeDefined()
+      expect(error.details[0].type).toBe('string.pattern.base')
+    })
+
     test('rejects mismatched contributor type inside contributor array', () => {
       const { error } = fundingValueRowSchema.validate(
         validRow({
@@ -240,6 +304,148 @@ describe('project-funding-sources-schemas', () => {
         validRow({ financialYear: 2025, fcermGia: '0' }),
         validRow({ financialYear: 2026, fcermGia: '1' })
       ])
+
+      expect(error).toBeUndefined()
+    })
+
+    test('accepts single contributor with exactly 100 billion in validated funding values array', () => {
+      const schema = createFundingValuesSchema(['publicContributions'])
+      const { error } = schema.validate([
+        validRow({
+          financialYear: 2025,
+          publicContributors: [
+            {
+              name: 'Local Authority A',
+              contributorType: 'public_contributions',
+              amount: '100000000000'
+            }
+          ],
+          publicContributions: '100000000000' // This is set by setSourceTotalsFromContributorArrays
+        })
+      ])
+
+      expect(error).toBeUndefined()
+    })
+
+    test('accepts multiple contributors whose amounts sum to exactly 100 billion', () => {
+      const schema = createFundingValuesSchema(['publicContributions'])
+      const { error } = schema.validate([
+        validRow({
+          financialYear: 2025,
+          publicContributors: [
+            {
+              name: 'Local Authority A',
+              contributorType: 'public_contributions',
+              amount: '50000000000'
+            },
+            {
+              name: 'Local Authority B',
+              contributorType: 'public_contributions',
+              amount: '50000000000'
+            }
+          ],
+          publicContributions: '100000000000'
+        })
+      ])
+
+      expect(error).toBeUndefined()
+    })
+
+    test('accepts when contributor totals sum to more than 100 billion', () => {
+      const schema = createFundingValuesSchema(['publicContributions'])
+      const { error } = schema.validate([
+        validRow({
+          financialYear: 2025,
+          publicContributors: [
+            {
+              name: 'Local Authority A',
+              contributorType: 'public_contributions',
+              amount: '100000000000'
+            },
+            {
+              name: 'Local Authority B',
+              contributorType: 'public_contributions',
+              amount: '100000000000'
+            }
+          ],
+          publicContributions: '200000000000'
+        })
+      ])
+
+      expect(error).toBeUndefined()
+    })
+
+    test('accepts multiple contributors that sum to exactly 100 billion in same year', () => {
+      const { error } = fundingValueRowSchema.validate(
+        validRow({
+          financialYear: 2027,
+          publicContributors: [
+            {
+              name: 'Contributor 1',
+              contributorType: 'public_contributions',
+              amount: '50000000000'
+            },
+            {
+              name: 'Contributor 2',
+              contributorType: 'public_contributions',
+              amount: '50000000000'
+            }
+          ]
+        })
+      )
+
+      expect(error).toBeUndefined()
+    })
+
+    test('accepts multiple contributors that sum to more than 100 billion in same year', () => {
+      const { error } = fundingValueRowSchema.validate(
+        validRow({
+          financialYear: 2027,
+          publicContributors: [
+            {
+              name: 'Contributor 1',
+              contributorType: 'public_contributions',
+              amount: '100000000000'
+            },
+            {
+              name: 'Contributor 2',
+              contributorType: 'public_contributions',
+              amount: '100000000000'
+            }
+          ]
+        })
+      )
+
+      expect(error).toBeUndefined()
+    })
+
+    test('accepts different contributor groups independently hitting their limits', () => {
+      const { error } = fundingValueRowSchema.validate(
+        validRow({
+          financialYear: 2027,
+          publicContributors: [
+            {
+              name: 'Public Org',
+              contributorType: 'public_contributions',
+              amount: '100000000000'
+            }
+          ],
+          privateContributors: [
+            {
+              name: 'Private Corp',
+              contributorType: 'private_contributions',
+              amount: '100000000000'
+            }
+          ],
+          otherEaContributors: [
+            {
+              name: 'EA Branch',
+              contributorType: 'other_ea_contributions',
+              amount: '100000000000'
+            }
+          ]
+        })
+      )
 
       expect(error).toBeUndefined()
     })
