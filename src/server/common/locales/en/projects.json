@@ -702,8 +702,8 @@
         "woodland": "Woodland",
         "headwater_drainage": "Restored peatland (headwater drainage management)",
         "headwater_drainage_management": "Restored peatland (headwater drainage management)",
-        "runoff_management": "Runoff pathway management",
-        "runoff_attenuation_management": "Runoff pathway management",
+        "runoff_management": "Run-off pathway management",
+        "runoff_attenuation_management": "Run-off pathway management",
         "saltmarsh_management": "Saltmarsh or mudflat management",
         "sand_dune_management": "Sand dune management",
         "floodplain_wetland_restoration": "Floodplain and floodplain wetland restoration"
@@ -730,7 +730,7 @@
       }
     },
     "leaky_barriers": {
-      "title": "Details of Leaky barriers and in-channel storage",
+      "title": "Details of leaky barriers and in-channel storage",
       "volume": {
         "label": "Design storage volume"
       },
@@ -805,7 +805,7 @@
       }
     },
     "runoff_management": {
-      "title": "Details of new runoff pathway management",
+      "title": "Details of new run-off pathway management",
       "area": {
         "label": "Area"
       },
@@ -825,7 +825,7 @@
       }
     },
     "saltmarsh": {
-      "title": "Details of new Saltmarsh or mudflat management",
+      "title": "Details of new saltmarsh or mudflat management",
       "area": {
         "label": "Area"
       },
@@ -845,7 +845,7 @@
       }
     },
     "sand_dune": {
-      "title": "Details of new Sand dune management",
+      "title": "Details of new sand dune management",
       "area": {
         "label": "Area"
       },
@@ -968,7 +968,7 @@
         }
       },
       "woodland": {
-        "title": "What is the area of woodland?",
+        "title": "What is the area of Woodland?",
         "before": {
           "label": "Before natural flood measures"
         },
@@ -984,7 +984,7 @@
         }
       },
       "woodland_for_timber_harvesting": {
-        "title": "What is the area of woodland - timber harvesting?",
+        "title": "What is the area of Woodland - timber harvesting?",
         "before": {
           "label": "Before natural flood measures"
         },
@@ -1016,7 +1016,7 @@
         }
       },
       "peatland_degraded": {
-        "title": "What is the area of peatland degraded?",
+        "title": "What is the area of Peatland degraded?",
         "before": {
           "label": "Before natural flood measures"
         },
@@ -1032,7 +1032,7 @@
         }
       },
       "peatland_restoration": {
-        "title": "What is the area of peatland restoration?",
+        "title": "What is the area of Peatland restoration?",
         "before": {
           "label": "Before natural flood measures"
         },
