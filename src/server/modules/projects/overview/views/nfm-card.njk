@@ -1,4 +1,4 @@
-{% macro nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t, isReadOnly) %}
+{% macro nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t, isReadOnly, formatNumberWithCommas) %}
   {% set hasNfmData = projectData[PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES] %}
   {% set hasNfmOrSudIntervention = projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] and(PROJECT_INTERVENTION_TYPES.NFM in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES] or PROJECT_INTERVENTION_TYPES.SUDS in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]) %}
   {% set hasSudsOnly = hasNfmOrSudIntervention and not (PROJECT_INTERVENTION_TYPES.NFM in projectData[PROJECT_PAYLOAD_FIELDS.PROJECT_INTERVENTION_TYPES]) %}
@@ -56,24 +56,39 @@
                     </tr>
                   </thead>
                   <tbody class="govuk-table__body">
-                    {% for measure in projectData.pafs_core_nfm_measures %}
-                      <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header">
-                          {{ t('projects.nfm.selected_measures.options.' + measure.measureType) }}
-                        </th>
-                        <td class="govuk-table__cell">
-                          {% if measure.areaHectares %}{{ measure.areaHectares }} ha{% else %}-{% endif %}
-                        </td>
-                        <td class="govuk-table__cell">
-                          {% if measure.storageVolumeM3 %}{{ measure.storageVolumeM3 }} m³{% else %}-{% endif %}
-                        </td>
-                        <td class="govuk-table__cell">
-                          {% if measure.lengthKm %}{{ measure.lengthKm }} km{% else %}-{% endif %}
-                        </td>
-                        <td class="govuk-table__cell">
-                          {% if measure.widthM %}{{ measure.widthM }} m{% else %}-{% endif %}
-                        </td>
-                      </tr>
+                    {% set measureDisplayOrder = [
+                      NFM_MEASURES.WOODLAND,
+                      'leaky_barriers_in_channel_storage',
+                      NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION,
+                      NFM_MEASURES.FLOODPLAIN_WETLAND_RESTORATION,
+                      'runoff_attenuation_management',
+                      NFM_MEASURES.OFFLINE_STORAGE,
+                      'headwater_drainage_management',
+                      NFM_MEASURES.SALTMARSH_MANAGEMENT,
+                      NFM_MEASURES.SAND_DUNE_MANAGEMENT
+                    ] %}
+                    {% for measureType in measureDisplayOrder %}
+                      {% for measure in projectData.pafs_core_nfm_measures %}
+                        {% if measure.measureType == measureType %}
+                          <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">
+                              {{ t('projects.nfm.selected_measures.options.' + measure.measureType) }}
+                            </th>
+                            <td class="govuk-table__cell">
+                              {% if measure.areaHectares %}{{ formatNumberWithCommas(measure.areaHectares) }} ha{% else %}-{% endif %}
+                            </td>
+                            <td class="govuk-table__cell">
+                              {% if measure.storageVolumeM3 %}{{ formatNumberWithCommas(measure.storageVolumeM3) }} m³{% else %}-{% endif %}
+                            </td>
+                            <td class="govuk-table__cell">
+                              {% if measure.lengthKm %}{{ formatNumberWithCommas(measure.lengthKm) }} km{% else %}-{% endif %}
+                            </td>
+                            <td class="govuk-table__cell">
+                              {% if measure.widthM %}{{ formatNumberWithCommas(measure.widthM) }} m{% else %}-{% endif %}
+                            </td>
+                          </tr>
+                        {% endif %}
+                      {% endfor %}
                     {% endfor %}
                   </tbody>
                 </table>
@@ -105,10 +120,10 @@
                           {{ t('projects.nfm.land_use_change.options.' + landUse.landUseType) }}
                         </th>
                         <td class="govuk-table__cell">
-                          {% if landUse.areaBeforeHectares %}{{ landUse.areaBeforeHectares }} ha{% else %}-{% endif %}
+                          {% if landUse.areaBeforeHectares %}{{ formatNumberWithCommas(landUse.areaBeforeHectares) }} ha{% else %}-{% endif %}
                         </td>
                         <td class="govuk-table__cell">
-                          {% if landUse.areaAfterHectares %}{{ landUse.areaAfterHectares }} ha{% else %}-{% endif %}
+                          {% if landUse.areaAfterHectares %}{{ formatNumberWithCommas(landUse.areaAfterHectares) }} ha{% else %}-{% endif %}
                         </td>
                       </tr>
                     {% endfor %}

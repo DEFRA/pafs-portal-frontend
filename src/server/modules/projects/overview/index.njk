@@ -159,14 +159,14 @@
     {% if submissionErrors['section-risk-properties'] %}
       <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-risk-properties'] }}</p>
     {% endif %}
-    {{ riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t, isReadOnly) }}
+    {{ riskAndPropertiesBenefittingSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_RISK_TYPES, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) }}
   </div>
 
   <div id="section-environmental-benefits"{% if submissionErrors['section-environmental-benefits'] %} class="govuk-form-group--error"{% endif %}>
     {% if submissionErrors['section-environmental-benefits'] %}
       <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-environmental-benefits'] }}</p>
     {% endif %}
-    {{ environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) }}
+    {{ environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) }}
   </div>
 
   <div id="section-goals"{% if submissionErrors['section-goals'] %} class="govuk-form-group--error"{% endif %}>
@@ -194,7 +194,7 @@
     {% if submissionErrors['section-nfm'] %}
       <p class="govuk-error-message"><span class="govuk-visually-hidden">{{ t('common.error_prefix') }}</span>{{ submissionErrors['section-nfm'] }}</p>
     {% endif %}
-    {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t, isReadOnly) }}
+    {{ nfmSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, PROJECT_INTERVENTION_TYPES, NFM_MEASURES, NFM_LANDOWNER_CONSENT_OPTIONS, NFM_EXPERIENCE_LEVEL_OPTIONS, t, isReadOnly, formatNumberWithCommas) }}
   </div>
 
   <div id="section-wlc"{% if submissionErrors['section-wlc'] %} class="govuk-form-group--error"{% endif %}>

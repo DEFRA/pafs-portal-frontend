@@ -51,6 +51,36 @@ export const digitsOnly = (value, allowNegative = false) => {
   return str.replaceAll(/\D/g, '')
 }
 
+const extractNumericParts = (value, allowNegative = false) => {
+  const str = String(value ?? '').trim()
+  const isNegative = allowNegative && str.startsWith('-')
+  const unsigned = isNegative ? str.slice(1) : str
+  const cleaned = unsigned.replaceAll(',', '').replaceAll(/[^\d.]/g, '')
+
+  if (!cleaned) {
+    return {
+      isNegative,
+      integerPart: '',
+      decimalPart: '',
+      hasDecimalPoint: false
+    }
+  }
+
+  const [integerPart = '', ...decimalParts] = cleaned.split('.')
+
+  return {
+    isNegative,
+    integerPart,
+    decimalPart: decimalParts.join(''),
+    hasDecimalPoint: cleaned.includes('.')
+  }
+}
+
+const signPrefix = (isNegative) => (isNegative ? '-' : '')
+
+const hasNoNumericDigits = ({ integerPart, decimalPart }) =>
+  !integerPart && !decimalPart
+
 export const withCommas = (digits) => {
   if (!digits) {
     return ''
@@ -81,20 +111,27 @@ export const withCommas = (digits) => {
 }
 
 export const formatNumberWithCommas = (value, allowNegative = false) => {
-  const digits = digitsOnly(value, allowNegative)
-  if (allowNegative && digits.startsWith('-')) {
-    // Format negative numbers: extract sign, format digits, prepend sign
-    const absoluteDigits = digits.slice(1)
-    return absoluteDigits ? '-' + withCommas(absoluteDigits) : '-'
+  const { isNegative, integerPart, decimalPart, hasDecimalPoint } =
+    extractNumericParts(value, allowNegative)
+  const sign = signPrefix(isNegative)
+  const hasNoDigits = hasNoNumericDigits({ integerPart, decimalPart })
+
+  if (hasDecimalPoint && hasNoDigits) {
+    return `${sign}0.`
   }
-  return withCommas(digits)
+
+  if (hasNoDigits) {
+    return sign
+  }
+
+  const formattedInteger = integerPart ? withCommas(integerPart) : '0'
+  const formattedDecimal = hasDecimalPoint ? `.${decimalPart}` : ''
+
+  return `${sign}${formattedInteger}${formattedDecimal}`
 }
 
 export const formatInputValueWithCommas = (inputEl) => {
   if (typeof document === 'undefined' || !inputEl) {
-    return
-  }
-  if (inputEl.value.includes('.')) {
     return
   }
   const allowNegative = 'allowNegative' in inputEl.dataset

@@ -404,8 +404,29 @@ function insertCommas(digits) {
   return out
 }
 
+function extractNumberParts(value) {
+  const str = String(value).trim()
+  const isNegative = str.startsWith('-')
+  const unsigned = isNegative ? str.slice(1) : str
+  const cleaned = unsigned.replaceAll(',', '').replaceAll(/[^\d.]/g, '')
+
+  if (!cleaned) {
+    return null
+  }
+
+  const [integerPart = '', ...decimalParts] = cleaned.split('.')
+
+  return {
+    isNegative,
+    integerPart,
+    decimalPart: decimalParts.join(''),
+    hasDecimalPoint: cleaned.includes('.')
+  }
+}
+
 /**
- * Format an integer-like value with comma separators.
+ * Format a numeric-like value with comma separators for the integer part.
+ * Preserves any decimal portion.
  * Returns null when value is empty/invalid.
  * @param {string|number|bigint|null|undefined} value
  * @returns {string|null}
@@ -415,16 +436,17 @@ export function formatNumberWithCommas(value) {
     return null
   }
 
-  const str = String(value)
-  const isNegative = str.startsWith('-')
-  const digits = str.replaceAll(/\D/g, '')
-
-  if (!digits) {
+  const parts = extractNumberParts(value)
+  if (!parts || (!parts.integerPart && !parts.decimalPart)) {
     return null
   }
 
-  const formatted = insertCommas(digits)
-  return isNegative ? '-' + formatted : formatted
+  const formattedInteger = parts.integerPart
+    ? insertCommas(parts.integerPart)
+    : '0'
+  const formattedDecimal = parts.decimalPart ? `.${parts.decimalPart}` : ''
+
+  return `${parts.isNegative ? '-' : ''}${formattedInteger}${formattedDecimal}`
 }
 
 /**

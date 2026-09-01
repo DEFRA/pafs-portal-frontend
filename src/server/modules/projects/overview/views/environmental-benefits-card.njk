@@ -1,4 +1,4 @@
-{% macro environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly) %}
+{% macro environmentalBenefitsSummaryCard(projectData, PROJECT_PAYLOAD_FIELDS, PROJECT_STEPS, t, isReadOnly, formatNumberWithCommas) %}
   {% set hasEnvironmentalBenefits = projectData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENTAL_BENEFITS] %}
   {% set environmentalBenefitsVisited = projectData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENTAL_BENEFITS] !== null and projectData[PROJECT_PAYLOAD_FIELDS.ENVIRONMENTAL_BENEFITS] !== undefined %}
   <div class="govuk-summary-card">
@@ -25,7 +25,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.intertidal_habitat') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_INTERTIDAL_HABITAT_CREATED_OR_ENHANCED]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}
@@ -36,7 +36,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.woodland') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WOODLAND_HABITAT_CREATED_OR_ENHANCED]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}
@@ -47,7 +47,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.wet_woodland') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WET_WOODLAND_HABITAT_CREATED_OR_ENHANCED] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WET_WOODLAND_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WET_WOODLAND_HABITAT_CREATED_OR_ENHANCED]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}
@@ -58,7 +58,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.wetland_or_wet_grassland') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WETLAND_OR_WET_GRASSLAND_CREATED_OR_ENHANCED] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WETLAND_OR_WET_GRASSLAND_CREATED_OR_ENHANCED] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_WETLAND_OR_WET_GRASSLAND_CREATED_OR_ENHANCED]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}
@@ -69,7 +69,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.grassland') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_GRASSLAND_HABITAT_CREATED_OR_ENHANCED] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_GRASSLAND_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_GRASSLAND_HABITAT_CREATED_OR_ENHANCED]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}
@@ -80,7 +80,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.heathland') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_HEATHLAND_CREATED_OR_ENHANCED] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_HEATHLAND_CREATED_OR_ENHANCED] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_HEATHLAND_CREATED_OR_ENHANCED]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}
@@ -91,7 +91,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.ponds_lakes') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_POND_OR_LAKE_HABITAT_CREATED_OR_ENHANCED] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_POND_OR_LAKE_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_POND_OR_LAKE_HABITAT_CREATED_OR_ENHANCED]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}
@@ -102,7 +102,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.arable_land') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_ARABLE_LAND_LAKE_HABITAT_CREATED_OR_ENHANCED] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_ARABLE_LAND_LAKE_HABITAT_CREATED_OR_ENHANCED] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.HECTARES_OF_ARABLE_LAND_LAKE_HABITAT_CREATED_OR_ENHANCED]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.hectares') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}
@@ -113,7 +113,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.comprehensive_restoration') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_COMPREHENSIVE] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_COMPREHENSIVE] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_COMPREHENSIVE]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.kilometres') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}
@@ -124,7 +124,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.partial_restoration') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_PARTIAL] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_PARTIAL] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_PARTIAL]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.kilometres') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}
@@ -135,7 +135,7 @@
             <dt class="govuk-summary-list__key">{{ t('projects.overview.environmental_benefits_summary_card.create_habitat_watercourse') }}</dt>
             <dd class="govuk-summary-list__value">
               {% if projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_SINGLE] %}
-                {{ projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_SINGLE] }}
+                {{ formatNumberWithCommas(projectData[PROJECT_PAYLOAD_FIELDS.KILOMETRES_OF_WATERCOURSE_ENHANCED_OR_CREATED_SINGLE]) }}
                 {{ t('projects.overview.environmental_benefits_summary_card.kilometres') }}
               {% else %}
                 {{ t('projects.overview.common.na') }}

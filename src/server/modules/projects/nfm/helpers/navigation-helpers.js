@@ -1,6 +1,5 @@
 import {
   PROJECT_STEPS,
-  NFM_MEASURES,
   PROJECT_PAYLOAD_FIELDS,
   PROJECT_INTERVENTION_TYPES
 } from '../../../../common/constants/projects.js'
@@ -8,6 +7,8 @@ import { ROUTES } from '../../../../common/constants/routes.js'
 import {
   LAND_TYPE_ROUTE_MAP,
   MEASURE_TO_ROUTE,
+  NFM_MEASURE_ORDER,
+  STEP_TO_MEASURE,
   STEP_TO_LAND_TYPE,
   LAND_USE_DETAIL_STEPS,
   getSelectedLandTypes,
@@ -15,60 +16,19 @@ import {
   NFM_LAND_TYPE_ORDER
 } from './shared-navigation-helpers.js'
 
-const STEP_PREVIOUS_MEASURES = {
-  [PROJECT_STEPS.NFM_RIVER_RESTORATION]: [],
-  [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: [
-    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-  ],
-  [PROJECT_STEPS.NFM_OFFLINE_STORAGE]: [
-    NFM_MEASURES.LEAKY_BARRIERS,
-    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-  ],
-  [PROJECT_STEPS.NFM_WOODLAND]: [
-    NFM_MEASURES.OFFLINE_STORAGE,
-    NFM_MEASURES.LEAKY_BARRIERS,
-    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-  ],
-  [PROJECT_STEPS.NFM_HEADWATER_DRAINAGE]: [
-    NFM_MEASURES.WOODLAND,
-    NFM_MEASURES.OFFLINE_STORAGE,
-    NFM_MEASURES.LEAKY_BARRIERS,
-    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-  ],
-  [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]: [
-    NFM_MEASURES.HEADWATER_DRAINAGE,
-    NFM_MEASURES.WOODLAND,
-    NFM_MEASURES.OFFLINE_STORAGE,
-    NFM_MEASURES.LEAKY_BARRIERS,
-    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-  ],
-  [PROJECT_STEPS.NFM_SALTMARSH]: [
-    NFM_MEASURES.RUNOFF_MANAGEMENT,
-    NFM_MEASURES.HEADWATER_DRAINAGE,
-    NFM_MEASURES.WOODLAND,
-    NFM_MEASURES.OFFLINE_STORAGE,
-    NFM_MEASURES.LEAKY_BARRIERS,
-    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-  ],
-  [PROJECT_STEPS.NFM_SAND_DUNE]: [
-    NFM_MEASURES.SALTMARSH_MANAGEMENT,
-    NFM_MEASURES.RUNOFF_MANAGEMENT,
-    NFM_MEASURES.HEADWATER_DRAINAGE,
-    NFM_MEASURES.WOODLAND,
-    NFM_MEASURES.OFFLINE_STORAGE,
-    NFM_MEASURES.LEAKY_BARRIERS,
-    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-  ],
-  [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: [
-    NFM_MEASURES.SAND_DUNE_MANAGEMENT,
-    NFM_MEASURES.SALTMARSH_MANAGEMENT,
-    NFM_MEASURES.RUNOFF_MANAGEMENT,
-    NFM_MEASURES.HEADWATER_DRAINAGE,
-    NFM_MEASURES.WOODLAND,
-    NFM_MEASURES.OFFLINE_STORAGE,
-    NFM_MEASURES.LEAKY_BARRIERS,
-    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
-  ]
+function getPreviousMeasuresForStep(step) {
+  if (step === PROJECT_STEPS.NFM_LAND_USE_CHANGE) {
+    return [...NFM_MEASURE_ORDER].reverse()
+  }
+
+  // Callers only reach here for steps present in STEP_TO_MEASURE, and every
+  // mapped measure is guaranteed to exist in NFM_MEASURE_ORDER.
+  const currentIndex = NFM_MEASURE_ORDER.indexOf(STEP_TO_MEASURE[step])
+  if (currentIndex <= 0) {
+    return []
+  }
+
+  return NFM_MEASURE_ORDER.slice(0, currentIndex).reverse()
 }
 
 function selectedMeasuresBackLink() {
@@ -146,8 +106,7 @@ function getLandownerConsentBackLink(sessionData) {
  * Use null for steps that require conditional navigation (handled by redirect-helpers)
  */
 export const NFM_STEP_SEQUENCE = {
-  [PROJECT_STEPS.NFM_SELECTED_MEASURES]:
-    ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION, // Default next route (conditional redirect takes priority)
+  [PROJECT_STEPS.NFM_SELECTED_MEASURES]: ROUTES.PROJECT.EDIT.NFM.WOODLAND, // Default next route (conditional redirect takes priority)
   [PROJECT_STEPS.NFM_RIVER_RESTORATION]: null, // Conditional - next measure or overview
   [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: null, // Conditional - next measure or overview
   [PROJECT_STEPS.NFM_OFFLINE_STORAGE]: null, // Conditional - next measure or overview
@@ -156,6 +115,7 @@ export const NFM_STEP_SEQUENCE = {
   [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]: null, // Conditional - next measure or overview
   [PROJECT_STEPS.NFM_SALTMARSH]: null, // Conditional - next measure or overview
   [PROJECT_STEPS.NFM_SAND_DUNE]: null, // Conditional - go to land-use-change
+  [PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION]: null, // Conditional - go to land-use-change
   [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: null,
   [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND]: null,
   [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_LIVESTOCK_FARMLAND]: null,
@@ -233,9 +193,12 @@ export function getDynamicBackLink(step, sessionData) {
     return STATIC_BACK_LINKS[step]
   }
 
-  if (!(step in STEP_PREVIOUS_MEASURES)) {
+  if (
+    !(step in STEP_TO_MEASURE) &&
+    step !== PROJECT_STEPS.NFM_LAND_USE_CHANGE
+  ) {
     return null
   }
 
-  return getMeasureBackLink(sessionData, STEP_PREVIOUS_MEASURES[step])
+  return getMeasureBackLink(sessionData, getPreviousMeasuresForStep(step))
 }

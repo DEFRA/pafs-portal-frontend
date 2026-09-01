@@ -695,33 +695,34 @@
       "hint": "Select all that apply",
       "error": "Select at least one natural flood management measure",
       "options": {
-        "river_floodplain_restoration": "River and floodplain restoration",
+        "river_floodplain_restoration": "River restoration",
         "leaky_barriers": "Leaky barriers and in-channel storage",
         "leaky_barriers_in_channel_storage": "Leaky barriers and in-channel storage",
         "offline_storage": "Offline storage areas",
         "woodland": "Woodland",
-        "headwater_drainage": "Headwater drainage management",
-        "headwater_drainage_management": "Headwater drainage management",
-        "runoff_management": "Runoff attenuation or management",
-        "runoff_attenuation_management": "Runoff attenuation or management",
+        "headwater_drainage": "Restored peatland (headwater drainage management)",
+        "headwater_drainage_management": "Restored peatland (headwater drainage management)",
+        "runoff_management": "Run-off pathway management",
+        "runoff_attenuation_management": "Run-off pathway management",
         "saltmarsh_management": "Saltmarsh or mudflat management",
-        "sand_dune_management": "Sand dune management"
+        "sand_dune_management": "Sand dune management",
+        "floodplain_wetland_restoration": "Floodplain and floodplain wetland restoration"
       }
     },
     "river_restoration": {
-      "title": "Details of new river and floodplain restoration",
+      "title": "Details of new river restoration",
       "area": {
         "label": "Area"
       },
       "volume": {
-        "label": "Design storage volume",
-        "hint": "If known"
+        "label": "Design storage volume"
       },
       "errors": {
         "area_required": "Enter the area in hectares",
         "area_invalid": "Area must be a number greater than 0",
         "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_required": "Enter the design storage volume in m3",
         "volume_invalid": "Volume must be a number 0 or greater",
         "NFM_MEASURE_VOLUME_INVALID": "Volume must be a number 0 or greater",
         "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
@@ -729,10 +730,9 @@
       }
     },
     "leaky_barriers": {
-      "title": "Details of Leaky barriers and in-channel storage",
+      "title": "Details of leaky barriers and in-channel storage",
       "volume": {
-        "label": "Design storage volume",
-        "hint": "If known"
+        "label": "Design storage volume"
       },
       "length": {
         "label": "Length"
@@ -743,6 +743,7 @@
       "errors": {
         "volume_invalid": "Volume must be a number 0 or greater",
         "NFM_MEASURE_VOLUME_INVALID": "Volume must be a number 0 or greater",
+        "volume_required": "Enter the design storage volume in m3",
         "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
         "length_required": "Enter the length in km",
@@ -761,14 +762,14 @@
         "label": "Area"
       },
       "volume": {
-        "label": "Design storage volume",
-        "hint": "If known"
+        "label": "Design storage volume"
       },
       "errors": {
         "area_required": "Enter the area in hectares",
         "area_invalid": "Area must be a number greater than 0",
         "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_required": "Enter the design storage volume in m3",
         "volume_invalid": "Volume must be a number 0 or greater",
         "NFM_MEASURE_VOLUME_INVALID": "Volume must be a number 0 or greater",
         "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
@@ -790,7 +791,7 @@
       }
     },
     "headwater_drainage": {
-      "title": "Details of new headwater drainage management",
+      "title": "Details of new restored peatland (headwater drainage management)",
       "area": {
         "label": "Area",
         "hint": "Enter the area in hectares",
@@ -804,19 +805,19 @@
       }
     },
     "runoff_management": {
-      "title": "Details of new runoff attenuation or management",
+      "title": "Details of new run-off pathway management",
       "area": {
         "label": "Area"
       },
       "volume": {
-        "label": "Design storage volume",
-        "hint": "If known"
+        "label": "Design storage volume"
       },
       "errors": {
         "area_required": "Enter the area in hectares",
         "area_invalid": "Area must be a number greater than 0",
         "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
         "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_required": "Enter the design storage volume in m3",
         "volume_invalid": "Volume must be a number 0 or greater",
         "NFM_MEASURE_VOLUME_INVALID": "Volume must be a number 0 or greater",
         "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
@@ -824,7 +825,7 @@
       }
     },
     "saltmarsh": {
-      "title": "Details of new Saltmarsh or mudflat management",
+      "title": "Details of new saltmarsh or mudflat management",
       "area": {
         "label": "Area"
       },
@@ -844,7 +845,7 @@
       }
     },
     "sand_dune": {
-      "title": "Details of new Sand dune management",
+      "title": "Details of new sand dune management",
       "area": {
         "label": "Area"
       },
@@ -863,8 +864,28 @@
         "length_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
       }
     },
+    "floodplain_wetland_restoration": {
+      "title": "Details of new floodplain and floodplain wetland restoration",
+      "area": {
+        "label": "Area"
+      },
+      "volume": {
+        "label": "Design storage volume"
+      },
+      "errors": {
+        "area_required": "Enter the area in hectares",
+        "area_invalid": "Area must be a number greater than 0",
+        "area_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "area_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits.",
+        "volume_required": "Enter the design storage volume in m3",
+        "volume_invalid": "Volume must be a number 0 or greater",
+        "NFM_MEASURE_VOLUME_INVALID": "Volume must be a number 0 or greater",
+        "volume_precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+        "volume_whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
+      }
+    },
     "land_use_change": {
-      "title": "Tell us which land uses are within your project area. Include existing land uses and new land uses",
+      "title": "Tell us what the land use in your project area will be before and after your natural flood measures project",
       "hint": "Select all that apply",
       "error": "Select at least one land type",
       "options": {
@@ -873,9 +894,11 @@
         "enclosed_dairying_farmland": "Enclosed dairying farmland",
         "semi_natural_grassland": "Semi-natural grassland",
         "woodland": "Woodland",
+        "woodland_for_timber_harvesting": "Woodland - timber harvesting",
         "mountain_moors_and_heath": "Mountain moors and heath",
+        "peatland_degraded": "Peatland degraded",
         "peatland_restoration": "Peatland restoration",
-        "rivers_wetlands_and_freshwater_habitats": "Rivers, wetlands, and freshwater habitats",
+        "wetlands": "Wetlands",
         "coastal_margins": "Coastal margins"
       }
     },
@@ -960,8 +983,40 @@
           "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
         }
       },
+      "woodland_for_timber_harvesting": {
+        "title": "What is the area of Woodland - timber harvesting?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
+        }
+      },
       "mountain_moors_and_heath": {
         "title": "What is the area of Mountain moors and heath?",
+        "before": {
+          "label": "Before natural flood measures"
+        },
+        "after": {
+          "label": "After natural flood measures"
+        },
+        "validation": {
+          "required_before": "Enter the area before natural flood measures",
+          "required_after": "Enter the area after natural flood measures",
+          "invalid": "Area must be a number greater than or equal to 0",
+          "precision": "Please enter a number with up to 16 digits before the decimal and no more than 2 digits after the decimal. (0 allowed)",
+          "whole_number_precision": "For non decimal values, Please enter a whole number up to 18 digits."
+        }
+      },
+      "peatland_degraded": {
+        "title": "What is the area of Peatland degraded?",
         "before": {
           "label": "Before natural flood measures"
         },
@@ -993,7 +1048,7 @@
         }
       },
       "rivers_wetlands_freshwater_habitats": {
-        "title": "What is the area of Rivers, wetlands, and freshwater habitats?",
+        "title": "What is the area of Wetlands?",
         "before": {
           "label": "Before natural flood measures"
         },

@@ -112,6 +112,10 @@ export const PROJECT_PAYLOAD_FIELDS = {
   NFM_SALTMARSH_LENGTH: 'nfmSaltmarshLength',
   NFM_SAND_DUNE_AREA: 'nfmSandDuneArea',
   NFM_SAND_DUNE_LENGTH: 'nfmSandDuneLength',
+  NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA:
+    'nfmFloodplainWetlandRestorationArea',
+  NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME:
+    'nfmFloodplainWetlandRestorationVolume',
   NFM_LAND_USE_CHANGE: 'nfmLandUseChange',
   NFM_ENCLOSED_ARABLE_FARMLAND_BEFORE: 'nfmEnclosedArableFarmlandBefore',
   NFM_ENCLOSED_ARABLE_FARMLAND_AFTER: 'nfmEnclosedArableFarmlandAfter',
@@ -123,8 +127,14 @@ export const PROJECT_PAYLOAD_FIELDS = {
   NFM_SEMI_NATURAL_GRASSLAND_AFTER: 'nfmSemiNaturalGrasslandAfter',
   NFM_WOODLAND_LAND_USE_BEFORE: 'nfmWoodlandLandUseBefore',
   NFM_WOODLAND_LAND_USE_AFTER: 'nfmWoodlandLandUseAfter',
+  NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE:
+    'nfmWoodlandForTimberHarvestingBefore',
+  NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER:
+    'nfmWoodlandForTimberHarvestingAfter',
   NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE: 'nfmMountainMoorsAndHeathBefore',
   NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER: 'nfmMountainMoorsAndHeathAfter',
+  NFM_PEATLAND_DEGRADED_BEFORE: 'nfmPeatlandDegradedBefore',
+  NFM_PEATLAND_DEGRADED_AFTER: 'nfmPeatlandDegradedAfter',
   NFM_PEATLAND_RESTORATION_BEFORE: 'nfmPeatlandRestorationBefore',
   NFM_PEATLAND_RESTORATION_AFTER: 'nfmPeatlandRestorationAfter',
   NFM_RIVERS_WETLANDS_FRESHWATER_BEFORE: 'nfmRiversWetlandsFreshwaterBefore',

@@ -6,11 +6,15 @@ import {
   NFM_LAND_TYPES
 } from '../../../../common/constants/projects.js'
 import { getDynamicBackLink, NFM_STEP_SEQUENCE } from './navigation-helpers.js'
+import {
+  getSelectedMeasures,
+  isMeasureSelected
+} from './shared-navigation-helpers.js'
 
 describe('nfm navigation helpers', () => {
   test('NFM_STEP_SEQUENCE exposes expected defaults', () => {
     expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_SELECTED_MEASURES]).toBe(
-      ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION
+      ROUTES.PROJECT.EDIT.NFM.WOODLAND
     )
     expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_RIVER_RESTORATION]).toBeNull()
     expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_LEAKY_BARRIERS]).toBeNull()
@@ -25,6 +29,9 @@ describe('nfm navigation helpers', () => {
   test('NFM_STEP_SEQUENCE includes saltmarsh and sand dune as conditional (null) steps', () => {
     expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_SALTMARSH]).toBeNull()
     expect(NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_SAND_DUNE]).toBeNull()
+    expect(
+      NFM_STEP_SEQUENCE[PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION]
+    ).toBeNull()
   })
 
   test('returns null for selected measures step when not SUDS-only', () => {
@@ -68,14 +75,13 @@ describe('nfm navigation helpers', () => {
     })
   })
 
-  test('leaky barriers goes back to river restoration when selected', () => {
+  test('leaky barriers goes back to woodland when selected', () => {
     const result = getDynamicBackLink(PROJECT_STEPS.NFM_LEAKY_BARRIERS, {
-      [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
-        'river_floodplain_restoration,leaky_barriers'
+      [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'woodland,leaky_barriers'
     })
 
     expect(result).toEqual({
-      targetEditURL: ROUTES.PROJECT.EDIT.NFM.RIVER_RESTORATION,
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.WOODLAND,
       conditionalRedirect: false
     })
   })
@@ -94,7 +100,7 @@ describe('nfm navigation helpers', () => {
   test('offline storage prefers leaky barriers as back link', () => {
     const result = getDynamicBackLink(PROJECT_STEPS.NFM_OFFLINE_STORAGE, {
       [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
-        'river_floodplain_restoration,leaky_barriers,offline_storage'
+        'leaky_barriers,offline_storage'
     })
 
     expect(result).toEqual({
@@ -103,14 +109,14 @@ describe('nfm navigation helpers', () => {
     })
   })
 
-  test('woodland prefers offline storage as back link', () => {
+  test('woodland falls back to selected measures when first in order', () => {
     const result = getDynamicBackLink(PROJECT_STEPS.NFM_WOODLAND, {
       [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
         'leaky_barriers,offline_storage,woodland'
     })
 
     expect(result).toEqual({
-      targetEditURL: ROUTES.PROJECT.EDIT.NFM.OFFLINE_STORAGE,
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
       conditionalRedirect: false
     })
   })
@@ -138,14 +144,14 @@ describe('nfm navigation helpers', () => {
     })
   })
 
-  test('runoff management prefers headwater drainage as back link', () => {
+  test('runoff management prefers floodplain wetland restoration as back link', () => {
     const result = getDynamicBackLink(PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT, {
       [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
-        'headwater_drainage,runoff_management'
+        'floodplain_wetland_restoration,runoff_management'
     })
 
     expect(result).toEqual({
-      targetEditURL: ROUTES.PROJECT.EDIT.NFM.HEADWATER_DRAINAGE,
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.FLOODPLAIN_WETLAND_RESTORATION,
       conditionalRedirect: false
     })
   })
@@ -207,6 +213,33 @@ describe('nfm navigation helpers', () => {
     })
   })
 
+  test('floodplain wetland restoration falls back to selected measures when earlier measures are not selected', () => {
+    const result = getDynamicBackLink(
+      PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION,
+      {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'sand_dune_management,floodplain_wetland_restoration'
+      }
+    )
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SELECTED_MEASURES,
+      conditionalRedirect: false
+    })
+  })
+
+  test('land use change prefers sand dune as back link when both are selected', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_LAND_USE_CHANGE, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+        'sand_dune_management,floodplain_wetland_restoration'
+    })
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
+      conditionalRedirect: false
+    })
+  })
+
   test('handles null session data for measure steps', () => {
     const result = getDynamicBackLink(PROJECT_STEPS.NFM_WOODLAND, null)
 
@@ -254,6 +287,22 @@ describe('nfm navigation helpers', () => {
     })
   })
 
+  test('new land-use detail goes back to previous selected land type', () => {
+    const result = getDynamicBackLink(
+      PROJECT_STEPS.NFM_LAND_USE_PEATLAND_DEGRADED,
+      {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+          'woodland_for_timber_harvesting,peatland_degraded'
+      }
+    )
+
+    expect(result).toEqual({
+      targetEditURL:
+        ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING,
+      conditionalRedirect: false
+    })
+  })
+
   test('landowner consent goes back to last selected land-use detail', () => {
     const result = getDynamicBackLink(PROJECT_STEPS.NFM_LANDOWNER_CONSENT, {
       [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
@@ -262,6 +311,19 @@ describe('nfm navigation helpers', () => {
 
     expect(result).toEqual({
       targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_COASTAL_MARGINS,
+      conditionalRedirect: false
+    })
+  })
+
+  test('landowner consent uses woodland for timber harvesting when it is the only selected new land type', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_LANDOWNER_CONSENT, {
+      [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+        'woodland_for_timber_harvesting'
+    })
+
+    expect(result).toEqual({
+      targetEditURL:
+        ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING,
       conditionalRedirect: false
     })
   })
@@ -293,5 +355,35 @@ describe('nfm navigation helpers', () => {
       targetEditURL: ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
       conditionalRedirect: false
     })
+  })
+
+  test('land use detail step falls back to land-use-change when session data is missing', () => {
+    const result = getDynamicBackLink(
+      PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND,
+      null
+    )
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    })
+  })
+
+  test('landowner consent falls back to land-use-change when session data is missing', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_LANDOWNER_CONSENT, null)
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    })
+  })
+
+  test('getSelectedMeasures returns an empty array when session data is missing', () => {
+    expect(getSelectedMeasures(null)).toEqual([])
+    expect(getSelectedMeasures(undefined)).toEqual([])
+  })
+
+  test('isMeasureSelected returns false when session data is missing', () => {
+    expect(isMeasureSelected(null, 'woodland')).toBe(false)
   })
 })

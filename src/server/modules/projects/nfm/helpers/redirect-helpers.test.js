@@ -28,7 +28,7 @@ describe('NFM Redirect Helpers', () => {
   })
 
   describe('handleConditionalRedirect - NFM_RIVER_RESTORATION', () => {
-    test('should redirect to leaky barriers when selected', async () => {
+    test('should skip previously ordered measures and redirect to land use change', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'river_floodplain_restoration,leaky_barriers'
@@ -44,8 +44,7 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toContain('leaky-barriers')
-      expect(result.path).toContain('TEST-001')
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
     })
 
     test('should redirect to land use change when leaky barriers not selected', async () => {
@@ -103,7 +102,7 @@ describe('NFM Redirect Helpers', () => {
   })
 
   describe('handleConditionalRedirect - NFM_LEAKY_BARRIERS', () => {
-    test('should redirect to land use change after leaky barriers when no further measures selected', async () => {
+    test('should redirect to river restoration after leaky barriers when selected', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
           'river_floodplain_restoration,leaky_barriers'
@@ -119,13 +118,13 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
-      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
+      expect(result.path).toBe('/project/TEST-001/nfm-river-restoration')
     })
 
     test('should redirect to sand dune when sand dune is selected after leaky barriers', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
-          'river_floodplain_restoration,leaky_barriers,sand_dune_management'
+          'leaky_barriers,sand_dune_management'
       }
 
       const result = await handleConditionalRedirect(
@@ -188,7 +187,7 @@ describe('NFM Redirect Helpers', () => {
     test('should redirect to sand dune when sand dune is selected after woodland', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
-          'river_floodplain_restoration,leaky_barriers,offline_storage,woodland,sand_dune_management'
+          'woodland,sand_dune_management'
       }
 
       const result = await handleConditionalRedirect(
@@ -207,8 +206,7 @@ describe('NFM Redirect Helpers', () => {
 
     test('should redirect to land use change when no further measures selected after woodland', async () => {
       const sessionData = {
-        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
-          'offline_storage,woodland'
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]: 'woodland'
       }
 
       const result = await handleConditionalRedirect(
@@ -432,6 +430,25 @@ describe('NFM Redirect Helpers', () => {
   })
 
   describe('handleConditionalRedirect - NFM_SAND_DUNE', () => {
+    test('should redirect to land use change when floodplain is selected earlier in order', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'sand_dune_management,floodplain_wetland_restoration'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_SAND_DUNE,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
+    })
+
     test('should redirect to land use change after sand dune', async () => {
       const sessionData = {
         [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
@@ -449,6 +466,27 @@ describe('NFM Redirect Helpers', () => {
       expect(result).toBeDefined()
       expect(result.redirected).toBe(true)
       expect(result.path).toBe('/project/TEST-001/nfm-land-use-change')
+    })
+  })
+
+  describe('handleConditionalRedirect - NFM_FLOODPLAIN_WETLAND_RESTORATION', () => {
+    test('should redirect to land use change after floodplain wetland restoration', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_SELECTED_MEASURES]:
+          'sand_dune_management,floodplain_wetland_restoration'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result).toBeDefined()
+      expect(result.redirected).toBe(true)
+      expect(result.path).toBe('/project/TEST-001/nfm-sand-dune')
     })
   })
 
@@ -585,6 +623,52 @@ describe('NFM Redirect Helpers', () => {
 
       expect(result.path).toBe(
         ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND.replace(
+          '{referenceNumber}',
+          'TEST-001'
+        )
+      )
+    })
+
+    test('should redirect from new land-use detail step to the next selected new land type', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]: [
+          NFM_LAND_TYPES.WOODLAND_FOR_TIMBER_HARVESTING,
+          NFM_LAND_TYPES.PEATLAND_DEGRADED
+        ]
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result.path).toBe(
+        ROUTES.PROJECT.EDIT.NFM.LAND_USE_PEATLAND_DEGRADED.replace(
+          '{referenceNumber}',
+          'TEST-001'
+        )
+      )
+    })
+
+    test('should redirect to woodland for timber harvesting from land-use-change when it is the first selected land type', async () => {
+      const sessionData = {
+        [PROJECT_PAYLOAD_FIELDS.NFM_LAND_USE_CHANGE]:
+          'woodland_for_timber_harvesting,coastal_margins'
+      }
+
+      const result = await handleConditionalRedirect(
+        PROJECT_STEPS.NFM_LAND_USE_CHANGE,
+        mockRequest,
+        mockH,
+        sessionData,
+        'TEST-001'
+      )
+
+      expect(result.path).toBe(
+        ROUTES.PROJECT.EDIT.NFM.LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING.replace(
           '{referenceNumber}',
           'TEST-001'
         )

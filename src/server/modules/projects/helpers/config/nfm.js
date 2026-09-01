@@ -5,6 +5,7 @@ import {
 } from '../../../../common/constants/projects.js'
 import {
   nfmHeadwaterDrainageSchema,
+  nfmFloodplainWetlandRestorationSchema,
   nfmInclusionSchema,
   nfmLeakyBarriersSchema,
   nfmOfflineStorageSchema,
@@ -16,7 +17,9 @@ import {
   nfmLandUseEnclosedDairyingFarmlandSchema,
   nfmLandUseSemiNaturalGrasslandSchema,
   nfmLandUseWoodlandSchema,
+  nfmLandUseWoodlandForTimberHarvestingSchema,
   nfmLandUseMountainMoorsAndHeathSchema,
+  nfmLandUsePeatlandDegradedSchema,
   nfmLandUsePeatlandRestorationSchema,
   nfmLandUseRiversWetlandsFreshwaterSchema,
   nfmLandUseCoastalMarginsSchema,
@@ -31,7 +34,6 @@ import {
 
 const AREA_LABEL = 'area.label'
 const VOLUME_LABEL = 'volume.label'
-const VOLUME_HINT = 'volume.hint'
 const LENGTH_LABEL = 'length.label'
 const WIDTH_LABEL = 'width.label'
 
@@ -75,7 +77,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME,
         labelKey: VOLUME_LABEL,
-        hintKey: VOLUME_HINT,
         suffix: 'm³'
       }
     ]
@@ -92,7 +93,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME,
         labelKey: VOLUME_LABEL,
-        hintKey: VOLUME_HINT,
         suffix: 'm³'
       },
       {
@@ -124,7 +124,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME,
         labelKey: VOLUME_LABEL,
-        hintKey: VOLUME_HINT,
         suffix: 'm³'
       }
     ]
@@ -178,7 +177,6 @@ export const NFM_CONFIG = {
       {
         name: PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME,
         labelKey: VOLUME_LABEL,
-        hintKey: VOLUME_HINT,
         suffix: 'm³'
       }
     ]
@@ -228,11 +226,32 @@ export const NFM_CONFIG = {
   [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: {
     localKeyPrefix: 'projects.nfm.land_use_change',
     backLinkOptions: {
-      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.FLOODPLAIN_WETLAND_RESTORATION,
       conditionalRedirect: false
     },
     schema: nfmLandUseChangeSchema,
     fieldType: 'checkbox'
+  },
+  [PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION]: {
+    localKeyPrefix: 'projects.nfm.floodplain_wetland_restoration',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.SAND_DUNE,
+      conditionalRedirect: false
+    },
+    schema: nfmFloodplainWetlandRestorationSchema,
+    fieldType: 'input',
+    inputFields: [
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA,
+        labelKey: AREA_LABEL,
+        suffix: 'hectares'
+      },
+      {
+        name: PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME,
+        labelKey: VOLUME_LABEL,
+        suffix: 'm³'
+      }
+    ]
   },
   [PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND]: {
     localKeyPrefix: 'projects.nfm.land_use.enclosed_arable_farmland',
@@ -279,6 +298,15 @@ export const NFM_CONFIG = {
     schema: nfmLandUseWoodlandSchema,
     fieldType: 'input'
   },
+  [PROJECT_STEPS.NFM_LAND_USE_WOODLAND_FOR_TIMBER_HARVESTING]: {
+    localKeyPrefix: 'projects.nfm.land_use.woodland_for_timber_harvesting',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUseWoodlandForTimberHarvestingSchema,
+    fieldType: 'input'
+  },
   [PROJECT_STEPS.NFM_LAND_USE_MOUNTAIN_MOORS_AND_HEATH]: {
     localKeyPrefix: 'projects.nfm.land_use.mountain_moors_and_heath',
     backLinkOptions: {
@@ -286,6 +314,15 @@ export const NFM_CONFIG = {
       conditionalRedirect: false
     },
     schema: nfmLandUseMountainMoorsAndHeathSchema,
+    fieldType: 'input'
+  },
+  [PROJECT_STEPS.NFM_LAND_USE_PEATLAND_DEGRADED]: {
+    localKeyPrefix: 'projects.nfm.land_use.peatland_degraded',
+    backLinkOptions: {
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    },
+    schema: nfmLandUsePeatlandDegradedSchema,
     fieldType: 'input'
   },
   [PROJECT_STEPS.NFM_LAND_USE_PEATLAND_RESTORATION]: {

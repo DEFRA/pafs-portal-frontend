@@ -27,7 +27,10 @@ import {
   getDynamicBackLink,
   NFM_STEP_SEQUENCE
 } from './helpers/navigation-helpers.js'
-import { processPayload } from './helpers/payload-helpers.js'
+import {
+  processPayload,
+  sanitizeNumericPayload
+} from './helpers/payload-helpers.js'
 import { handleConditionalRedirect } from './helpers/redirect-helpers.js'
 import {
   PAYLOAD_LEVEL_MAP,
@@ -48,30 +51,36 @@ class NfmController {
     const localKeyPrefix = 'projects.nfm.selected_measures'
     return [
       {
-        text: request.t(
-          `${localKeyPrefix}.options.river_floodplain_restoration`
-        ),
-        value: NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
+        text: request.t(`${localKeyPrefix}.options.woodland`),
+        value: NFM_MEASURES.WOODLAND
       },
       {
         text: request.t(`${localKeyPrefix}.options.leaky_barriers`),
         value: NFM_MEASURES.LEAKY_BARRIERS
       },
       {
-        text: request.t(`${localKeyPrefix}.options.offline_storage`),
-        value: NFM_MEASURES.OFFLINE_STORAGE
+        text: request.t(
+          `${localKeyPrefix}.options.river_floodplain_restoration`
+        ),
+        value: NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION
       },
       {
-        text: request.t(`${localKeyPrefix}.options.woodland`),
-        value: NFM_MEASURES.WOODLAND
-      },
-      {
-        text: request.t(`${localKeyPrefix}.options.headwater_drainage`),
-        value: NFM_MEASURES.HEADWATER_DRAINAGE
+        text: request.t(
+          `${localKeyPrefix}.options.floodplain_wetland_restoration`
+        ),
+        value: NFM_MEASURES.FLOODPLAIN_WETLAND_RESTORATION
       },
       {
         text: request.t(`${localKeyPrefix}.options.runoff_management`),
         value: NFM_MEASURES.RUNOFF_MANAGEMENT
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.offline_storage`),
+        value: NFM_MEASURES.OFFLINE_STORAGE
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.headwater_drainage`),
+        value: NFM_MEASURES.HEADWATER_DRAINAGE
       },
       {
         text: request.t(`${localKeyPrefix}.options.saltmarsh_management`),
@@ -110,18 +119,26 @@ class NfmController {
         value: NFM_LAND_TYPES.WOODLAND
       },
       {
+        text: request.t(
+          `${localKeyPrefix}.options.woodland_for_timber_harvesting`
+        ),
+        value: NFM_LAND_TYPES.WOODLAND_FOR_TIMBER_HARVESTING
+      },
+      {
         text: request.t(`${localKeyPrefix}.options.mountain_moors_and_heath`),
         value: NFM_LAND_TYPES.MOUNTAIN_MOORS_AND_HEATH
+      },
+      {
+        text: request.t(`${localKeyPrefix}.options.peatland_degraded`),
+        value: NFM_LAND_TYPES.PEATLAND_DEGRADED
       },
       {
         text: request.t(`${localKeyPrefix}.options.peatland_restoration`),
         value: NFM_LAND_TYPES.PEATLAND_RESTORATION
       },
       {
-        text: request.t(
-          `${localKeyPrefix}.options.rivers_wetlands_and_freshwater_habitats`
-        ),
-        value: NFM_LAND_TYPES.RIVERS_WETLANDS_FRESHWATER_HABITATS
+        text: request.t(`${localKeyPrefix}.options.wetlands`),
+        value: NFM_LAND_TYPES.WETLANDS
       },
       {
         text: request.t(`${localKeyPrefix}.options.coastal_margins`),
@@ -371,6 +388,8 @@ class NfmController {
         PROJECT_VIEWS.NFM_RUNOFF_MANAGEMENT,
       [PROJECT_STEPS.NFM_SALTMARSH]: PROJECT_VIEWS.NFM_SALTMARSH,
       [PROJECT_STEPS.NFM_SAND_DUNE]: PROJECT_VIEWS.NFM_SAND_DUNE,
+      [PROJECT_STEPS.NFM_FLOODPLAIN_WETLAND_RESTORATION]:
+        PROJECT_VIEWS.NFM_FLOODPLAIN_WETLAND_RESTORATION,
       [PROJECT_STEPS.NFM_LAND_USE_CHANGE]: PROJECT_VIEWS.NFM_LAND_USE_CHANGE,
       [PROJECT_STEPS.NFM_LANDOWNER_CONSENT]:
         PROJECT_VIEWS.NFM_LANDOWNER_CONSENT,
@@ -422,6 +441,8 @@ class NfmController {
       ) {
         request.payload.nfmLandUseChange = [request.payload.nfmLandUseChange]
       }
+
+      sanitizeNumericPayload(step, request.payload)
 
       // Validate payload BEFORE processing (validate array format)
       const validationError = validatePayload(request, h, {

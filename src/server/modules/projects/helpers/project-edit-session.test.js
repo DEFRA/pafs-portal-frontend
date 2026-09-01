@@ -347,7 +347,7 @@ describe('project-edit-session', () => {
       ).toBeUndefined()
     })
 
-    test('should map remaining NFM measure types (runoff, saltmarsh, sand dune)', () => {
+    test('should map remaining NFM measure types (runoff, saltmarsh, sand dune, floodplain wetland restoration)', () => {
       const projectData = {
         referenceNumber: 'REF123',
         pafs_core_nfm_measures: [
@@ -365,6 +365,11 @@ describe('project-edit-session', () => {
             measureType: 'sand_dune_management',
             areaHectares: 4.25,
             lengthKm: 0.75
+          },
+          {
+            measureType: 'floodplain_wetland_restoration',
+            areaHectares: 2.2,
+            storageVolumeM3: 45.5
           }
         ]
       }
@@ -379,6 +384,12 @@ describe('project-edit-session', () => {
       expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SALTMARSH_LENGTH]).toBe(1.2)
       expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_AREA]).toBe(4.25)
       expect(result[PROJECT_PAYLOAD_FIELDS.NFM_SAND_DUNE_LENGTH]).toBe(0.75)
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]
+      ).toBe(2.2)
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]
+      ).toBe(45.5)
     })
 
     test('should map NFM land-use changes into before and after fields', () => {
@@ -394,6 +405,16 @@ describe('project-edit-session', () => {
             landUseType: 'woodland',
             areaBeforeHectares: 8,
             areaAfterHectares: 12
+          },
+          {
+            landUseType: 'woodland_for_timber_harvesting',
+            areaBeforeHectares: 6,
+            areaAfterHectares: 9
+          },
+          {
+            landUseType: 'peatland_degraded',
+            areaBeforeHectares: 3.5,
+            areaAfterHectares: 2
           },
           {
             landUseType: 'coastal_margins',
@@ -417,6 +438,16 @@ describe('project-edit-session', () => {
       expect(result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER]).toBe(
         12
       )
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE]
+      ).toBe(6)
+      expect(
+        result[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER]
+      ).toBe(9)
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE]).toBe(
+        3.5
+      )
+      expect(result[PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER]).toBe(2)
       expect(result[PROJECT_PAYLOAD_FIELDS.NFM_COASTAL_MARGINS_BEFORE]).toBe(
         undefined
       )

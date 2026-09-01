@@ -1,12 +1,11 @@
-import {
-  PROJECT_STEPS,
-  NFM_MEASURES
-} from '../../../../common/constants/projects.js'
+import { PROJECT_STEPS } from '../../../../common/constants/projects.js'
 import { ROUTES } from '../../../../common/constants/routes.js'
 import { navigateToProjectOverview } from '../../helpers/project-utils.js'
 import {
   LAND_TYPE_ROUTE_MAP,
   MEASURE_TO_ROUTE,
+  NFM_MEASURE_ORDER,
+  STEP_TO_MEASURE,
   STEP_TO_LAND_TYPE,
   LAND_USE_DETAIL_STEPS,
   getSelectedLandTypes,
@@ -16,58 +15,16 @@ import {
 
 const REFERENCE_NUMBER_PLACEHOLDER = '{referenceNumber}'
 
-const STEP_NEXT_MEASURES = {
-  [PROJECT_STEPS.NFM_SELECTED_MEASURES]: [
-    NFM_MEASURES.RIVER_FLOODPLAIN_RESTORATION,
-    NFM_MEASURES.LEAKY_BARRIERS,
-    NFM_MEASURES.OFFLINE_STORAGE,
-    NFM_MEASURES.WOODLAND,
-    NFM_MEASURES.HEADWATER_DRAINAGE,
-    NFM_MEASURES.RUNOFF_MANAGEMENT,
-    NFM_MEASURES.SALTMARSH_MANAGEMENT,
-    NFM_MEASURES.SAND_DUNE_MANAGEMENT
-  ],
-  [PROJECT_STEPS.NFM_RIVER_RESTORATION]: [
-    NFM_MEASURES.LEAKY_BARRIERS,
-    NFM_MEASURES.OFFLINE_STORAGE,
-    NFM_MEASURES.WOODLAND,
-    NFM_MEASURES.HEADWATER_DRAINAGE,
-    NFM_MEASURES.RUNOFF_MANAGEMENT,
-    NFM_MEASURES.SALTMARSH_MANAGEMENT,
-    NFM_MEASURES.SAND_DUNE_MANAGEMENT
-  ],
-  [PROJECT_STEPS.NFM_LEAKY_BARRIERS]: [
-    NFM_MEASURES.OFFLINE_STORAGE,
-    NFM_MEASURES.WOODLAND,
-    NFM_MEASURES.HEADWATER_DRAINAGE,
-    NFM_MEASURES.RUNOFF_MANAGEMENT,
-    NFM_MEASURES.SALTMARSH_MANAGEMENT,
-    NFM_MEASURES.SAND_DUNE_MANAGEMENT
-  ],
-  [PROJECT_STEPS.NFM_OFFLINE_STORAGE]: [
-    NFM_MEASURES.WOODLAND,
-    NFM_MEASURES.HEADWATER_DRAINAGE,
-    NFM_MEASURES.RUNOFF_MANAGEMENT,
-    NFM_MEASURES.SALTMARSH_MANAGEMENT,
-    NFM_MEASURES.SAND_DUNE_MANAGEMENT
-  ],
-  [PROJECT_STEPS.NFM_WOODLAND]: [
-    NFM_MEASURES.HEADWATER_DRAINAGE,
-    NFM_MEASURES.RUNOFF_MANAGEMENT,
-    NFM_MEASURES.SALTMARSH_MANAGEMENT,
-    NFM_MEASURES.SAND_DUNE_MANAGEMENT
-  ],
-  [PROJECT_STEPS.NFM_HEADWATER_DRAINAGE]: [
-    NFM_MEASURES.RUNOFF_MANAGEMENT,
-    NFM_MEASURES.SALTMARSH_MANAGEMENT,
-    NFM_MEASURES.SAND_DUNE_MANAGEMENT
-  ],
-  [PROJECT_STEPS.NFM_RUNOFF_MANAGEMENT]: [
-    NFM_MEASURES.SALTMARSH_MANAGEMENT,
-    NFM_MEASURES.SAND_DUNE_MANAGEMENT
-  ],
-  [PROJECT_STEPS.NFM_SALTMARSH]: [NFM_MEASURES.SAND_DUNE_MANAGEMENT],
-  [PROJECT_STEPS.NFM_SAND_DUNE]: []
+function getNextMeasuresForStep(step) {
+  if (step === PROJECT_STEPS.NFM_SELECTED_MEASURES) {
+    return NFM_MEASURE_ORDER
+  }
+
+  // Callers only reach here for steps present in STEP_TO_MEASURE, and every
+  // mapped measure is guaranteed to exist in NFM_MEASURE_ORDER.
+  const currentIndex = NFM_MEASURE_ORDER.indexOf(STEP_TO_MEASURE[step])
+
+  return NFM_MEASURE_ORDER.slice(currentIndex + 1)
 }
 
 function redirectToMeasure(h, referenceNumber, measure) {
@@ -106,8 +63,8 @@ export async function handleConditionalRedirect(
   referenceNumber
 ) {
   // Handle NFM measure steps (standard measure navigation)
-  if (step in STEP_NEXT_MEASURES) {
-    const nextMeasures = STEP_NEXT_MEASURES[step]
+  if (step === PROJECT_STEPS.NFM_SELECTED_MEASURES || step in STEP_TO_MEASURE) {
+    const nextMeasures = getNextMeasuresForStep(step)
     for (const measure of nextMeasures) {
       if (isMeasureSelected(sessionData, measure)) {
         return redirectToMeasure(h, referenceNumber, measure)

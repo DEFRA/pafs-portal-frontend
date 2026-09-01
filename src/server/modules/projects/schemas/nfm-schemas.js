@@ -114,13 +114,14 @@ export const nfmRiverRestorationSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: Joi.number()
     .unsafe()
+    .empty('')
     .min(0)
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
-    .optional()
+    .required()
     .messages({
       'number.base': 'volume_invalid',
       'number.min': 'volume_invalid',
+      'any.required': 'volume_required',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     })
@@ -133,13 +134,14 @@ export const nfmRiverRestorationSchema = Joi.object({
 export const nfmLeakyBarriersSchema = Joi.object({
   [PROJECT_PAYLOAD_FIELDS.NFM_LEAKY_BARRIERS_VOLUME]: Joi.number()
     .unsafe()
+    .empty('')
     .min(0)
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
-    .optional()
+    .required()
     .messages({
       'number.base': 'volume_invalid',
       'number.min': 'volume_invalid',
+      'any.required': 'volume_required',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     }),
@@ -191,12 +193,14 @@ export const nfmOfflineStorageSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_OFFLINE_STORAGE_VOLUME]: Joi.number()
     .unsafe()
+    .empty('')
     .min(0)
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
+    .required()
     .messages({
       'number.base': 'volume_invalid',
       'number.min': 'volume_invalid',
+      'any.required': 'volume_required',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     })
@@ -262,15 +266,51 @@ export const nfmRunoffManagementSchema = Joi.object({
     }),
   [PROJECT_PAYLOAD_FIELDS.NFM_RUNOFF_MANAGEMENT_VOLUME]: Joi.number()
     .unsafe()
+    .empty('')
     .min(0)
     .custom(maxTwoDecimalPlaces)
-    .allow(null, '')
+    .required()
     .messages({
       'number.base': 'volume_invalid',
       'number.min': 'volume_invalid',
+      'any.required': 'volume_required',
       'number.precision': 'volume_precision',
       'number.integer.max': 'volume_whole_number_precision'
     })
+}).unknown(true)
+
+/**
+ * NFM Floodplain Wetland Restoration Schema
+ * Validates area (hectares) and volume (m³)
+ */
+export const nfmFloodplainWetlandRestorationSchema = Joi.object({
+  [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_AREA]: Joi.number()
+    .unsafe()
+    .empty('')
+    .positive()
+    .custom(maxTwoDecimalPlaces)
+    .required()
+    .messages({
+      'number.base': 'area_invalid',
+      'number.positive': 'area_invalid',
+      'number.precision': 'area_precision',
+      'number.integer.max': 'area_whole_number_precision',
+      'any.required': 'area_required'
+    }),
+  [PROJECT_PAYLOAD_FIELDS.NFM_FLOODPLAIN_WETLAND_RESTORATION_VOLUME]:
+    Joi.number()
+      .unsafe()
+      .empty('')
+      .min(0)
+      .custom(maxTwoDecimalPlaces)
+      .required()
+      .messages({
+        'number.base': 'volume_invalid',
+        'number.min': 'volume_invalid',
+        'any.required': 'volume_required',
+        'number.precision': 'volume_precision',
+        'number.integer.max': 'volume_whole_number_precision'
+      })
 }).unknown(true)
 
 /**
@@ -417,9 +457,20 @@ export const nfmLandUseWoodlandSchema = createLandUseDetailSchema(
   PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_LAND_USE_AFTER
 )
 
+export const nfmLandUseWoodlandForTimberHarvestingSchema =
+  createLandUseDetailSchema(
+    PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_BEFORE,
+    PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_FOR_TIMBER_HARVESTING_AFTER
+  )
+
 export const nfmLandUseMountainMoorsAndHeathSchema = createLandUseDetailSchema(
   PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_BEFORE,
   PROJECT_PAYLOAD_FIELDS.NFM_MOUNTAIN_MOORS_AND_HEATH_AFTER
+)
+
+export const nfmLandUsePeatlandDegradedSchema = createLandUseDetailSchema(
+  PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_BEFORE,
+  PROJECT_PAYLOAD_FIELDS.NFM_PEATLAND_DEGRADED_AFTER
 )
 
 export const nfmLandUsePeatlandRestorationSchema = createLandUseDetailSchema(
