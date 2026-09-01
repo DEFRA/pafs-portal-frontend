@@ -20,15 +20,9 @@ function getNextMeasuresForStep(step) {
     return NFM_MEASURE_ORDER
   }
 
-  const currentMeasure = STEP_TO_MEASURE[step]
-  if (!currentMeasure) {
-    return []
-  }
-
-  const currentIndex = NFM_MEASURE_ORDER.indexOf(currentMeasure)
-  if (currentIndex === -1) {
-    return []
-  }
+  // Callers only reach here for steps present in STEP_TO_MEASURE, and every
+  // mapped measure is guaranteed to exist in NFM_MEASURE_ORDER.
+  const currentIndex = NFM_MEASURE_ORDER.indexOf(STEP_TO_MEASURE[step])
 
   return NFM_MEASURE_ORDER.slice(currentIndex + 1)
 }

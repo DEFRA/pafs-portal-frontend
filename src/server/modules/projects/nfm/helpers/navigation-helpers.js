@@ -21,12 +21,9 @@ function getPreviousMeasuresForStep(step) {
     return [...NFM_MEASURE_ORDER].reverse()
   }
 
-  const currentMeasure = STEP_TO_MEASURE[step]
-  if (!currentMeasure) {
-    return []
-  }
-
-  const currentIndex = NFM_MEASURE_ORDER.indexOf(currentMeasure)
+  // Callers only reach here for steps present in STEP_TO_MEASURE, and every
+  // mapped measure is guaranteed to exist in NFM_MEASURE_ORDER.
+  const currentIndex = NFM_MEASURE_ORDER.indexOf(STEP_TO_MEASURE[step])
   if (currentIndex <= 0) {
     return []
   }

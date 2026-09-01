@@ -50,4 +50,32 @@ describe('NFM payload helper formatting', () => {
 
     expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_WOODLAND_AREA]).toBe('1234.25')
   })
+
+  test('sanitizeNumericPayload leaves non-string values untouched', () => {
+    const payload = {
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: 1234.5,
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]: null
+    }
+
+    sanitizeNumericPayload(PROJECT_STEPS.NFM_RIVER_RESTORATION, payload)
+
+    expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]).toBe(
+      1234.5
+    )
+    expect(
+      payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_VOLUME]
+    ).toBeNull()
+  })
+
+  test('sanitizeNumericPayload leaves payload unchanged for an unrelated step', () => {
+    const payload = {
+      [PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]: '1,234.5'
+    }
+
+    sanitizeNumericPayload(PROJECT_STEPS.NFM_LANDOWNER_CONSENT, payload)
+
+    expect(payload[PROJECT_PAYLOAD_FIELDS.NFM_RIVER_RESTORATION_AREA]).toBe(
+      '1,234.5'
+    )
+  })
 })

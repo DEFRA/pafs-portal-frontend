@@ -6,6 +6,10 @@ import {
   NFM_LAND_TYPES
 } from '../../../../common/constants/projects.js'
 import { getDynamicBackLink, NFM_STEP_SEQUENCE } from './navigation-helpers.js'
+import {
+  getSelectedMeasures,
+  isMeasureSelected
+} from './shared-navigation-helpers.js'
 
 describe('nfm navigation helpers', () => {
   test('NFM_STEP_SEQUENCE exposes expected defaults', () => {
@@ -351,5 +355,35 @@ describe('nfm navigation helpers', () => {
       targetEditURL: ROUTES.PROJECT.EDIT.NFM.EXPERIENCE,
       conditionalRedirect: false
     })
+  })
+
+  test('land use detail step falls back to land-use-change when session data is missing', () => {
+    const result = getDynamicBackLink(
+      PROJECT_STEPS.NFM_LAND_USE_ENCLOSED_ARABLE_FARMLAND,
+      null
+    )
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    })
+  })
+
+  test('landowner consent falls back to land-use-change when session data is missing', () => {
+    const result = getDynamicBackLink(PROJECT_STEPS.NFM_LANDOWNER_CONSENT, null)
+
+    expect(result).toEqual({
+      targetEditURL: ROUTES.PROJECT.EDIT.NFM.LAND_USE_CHANGE,
+      conditionalRedirect: false
+    })
+  })
+
+  test('getSelectedMeasures returns an empty array when session data is missing', () => {
+    expect(getSelectedMeasures(null)).toEqual([])
+    expect(getSelectedMeasures(undefined)).toEqual([])
+  })
+
+  test('isMeasureSelected returns false when session data is missing', () => {
+    expect(isMeasureSelected(null, 'woodland')).toBe(false)
   })
 })
