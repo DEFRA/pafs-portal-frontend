@@ -1,7 +1,7 @@
 # PAFS Portal Frontend
 
 [![License](https://img.shields.io/badge/license-OGL--UK--3.0-blue.svg)](http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3)
-[![Node.js](https://img.shields.io/badge/node-22-brightgreen.svg)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/node-24-brightgreen.svg)](https://nodejs.org/)
 [![Hapi.js](https://img.shields.io/badge/hapi.js-21-blue.svg)](https://hapi.dev/)
 [![GOV.UK Frontend](https://img.shields.io/badge/GOV.UK-6.x-green.svg)](https://frontend.design-system.service.gov.uk/)
 [![CDP](https://img.shields.io/badge/CDP-Platform-green.svg)](https://github.com/DEFRA/cdp-documentation)
@@ -17,7 +17,7 @@ Frontend web application for the Project Application and Funding Service (PAFS) 
 
 **Tech Stack:**
 
-- Node.js 22 + Hapi.js 21
+- Node.js 24 + Hapi.js 21
 - GOV.UK Frontend 6.x + Nunjucks
 - Redis sessions (production) / Memory (development)
 - Webpack 5 + Vitest
@@ -45,7 +45,7 @@ Frontend web application for the Project Application and Funding Service (PAFS) 
 
 ## Requirements
 
-**Node.js:** >= 22  
+**Node.js:** >= 24 (the repository uses 24.22.1)
 **npm:** >= 11  
 **Redis:** >= 7 (production only, optional for development)
 
@@ -53,8 +53,8 @@ Frontend web application for the Project Application and Funding Service (PAFS) 
 
 ```bash
 # Using nvm (recommended)
-nvm install 22
-nvm use 22
+nvm install 24.22.1
+nvm use 24.22.1
 
 # Or download from nodejs.org
 ```
